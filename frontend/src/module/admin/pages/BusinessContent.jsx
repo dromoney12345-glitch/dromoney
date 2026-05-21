@@ -531,12 +531,14 @@ const BusinessContent = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-rose-500 uppercase tracking-widest ml-1">Support Video</label>
-                                    <label className="flex items-center justify-center h-16 gap-2 bg-rose-50 text-rose-600 rounded-xl font-black text-[9px] uppercase cursor-pointer hover:bg-rose-100 transition-all border border-rose-100 border-dashed">
-                                        {isUploading && uploadType === 'video' ? <Loader2 size={12} className="animate-spin" /> : <Video size={14} />} 
-                                        {formData.videoUrl ? 'VIDEO READY' : 'UPLOAD VIDEO'}
-                                        <input type="file" className="hidden" accept="video/*" onChange={(e) => handleFileUpload(e, 'video')} />
-                                    </label>
+                                    <label className="text-[10px] font-black text-rose-500 uppercase tracking-widest ml-1">Support Video (YouTube URL)</label>
+                                    <input
+                                        type="url"
+                                        value={formData.videoUrl}
+                                        onChange={(e) => setFormData({...formData, videoUrl: e.target.value})}
+                                        placeholder="https://www.youtube.com/watch?v=..."
+                                        className="w-full bg-rose-50/30 border border-rose-100 rounded-xl px-4 py-3 text-sm font-bold outline-none text-rose-600 placeholder:text-rose-300 focus:ring-2 focus:ring-rose-500/20"
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Heading</label>
