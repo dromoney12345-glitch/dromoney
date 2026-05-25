@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; // test sync
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Layout & Pages
