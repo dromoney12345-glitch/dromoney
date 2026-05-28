@@ -131,11 +131,7 @@ const BusinessIdeas = () => {
 
     // --- SCREEN -1: INTRO (Premium Rocket Welcome) ---
     const IntroScreen = () => (
-<<<<<<< HEAD
         <div className="h-[calc(100vh-122px)] flex flex-col bg-[#F8FAFF] overflow-hidden select-none">
-=======
-        <div className="h-[calc(100vh-144px)] flex flex-col bg-[#F8FAFF] overflow-hidden">
->>>>>>> db0518783a89a6e8a3f7ba649a896b9ed4cebed6
             <style>
                 {`
                 @keyframes boost {
@@ -156,27 +152,15 @@ const BusinessIdeas = () => {
                 `}
             </style>
 
-<<<<<<< HEAD
             {/* Sticky Header Row */}
             <div className="bg-white/80 backdrop-blur-md px-6 py-3 flex items-center justify-between border-b border-slate-100/50 shrink-0">
                 <button onClick={() => navigate(-1)} className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 active:scale-90 transition-all border border-slate-100">
-=======
-            {/* Header Row */}
-            <div className="bg-white/80 backdrop-blur-md px-6 py-3 flex items-center border-b border-slate-100/50 shrink-0">
-                <button onClick={() => navigate('/user/home')} className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 active:scale-90 transition-all border border-slate-100">
->>>>>>> db0518783a89a6e8a3f7ba649a896b9ed4cebed6
                     <ChevronLeft size={22} />
                 </button>
             </div>
 
-<<<<<<< HEAD
             <div className="flex-1 flex flex-col items-center justify-between p-5 overflow-hidden">
                 <div className="w-full max-w-[320px] bg-gradient-to-br from-[#5D38F0] to-[#8643FF] rounded-[2rem] p-6 text-white shadow-xl relative overflow-hidden flex-1 flex flex-col items-center justify-center min-h-0 mb-5">
-=======
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col items-center justify-center p-5 min-h-0">
-                <div className="w-full max-w-[340px] bg-gradient-to-br from-[#5D38F0] to-[#8643FF] rounded-[2.5rem] p-6 text-white shadow-xl relative overflow-hidden mb-6 flex flex-col items-center justify-center flex-1 max-h-[360px]">
->>>>>>> db0518783a89a6e8a3f7ba649a896b9ed4cebed6
                     {/* Decorative Elements */}
                     <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 blur-2xl" />
                     <div className="absolute bottom-0 left-0 w-24 h-24 bg-indigo-400/20 rounded-full -ml-12 -mb-12 blur-2xl" />
@@ -192,11 +176,7 @@ const BusinessIdeas = () => {
                         </p>
                     </div>
 
-<<<<<<< HEAD
                     <div className="my-4 relative z-10 shrink-0">
-=======
-                    <div className="my-6 relative z-10 flex items-center justify-center flex-1 min-h-0">
->>>>>>> db0518783a89a6e8a3f7ba649a896b9ed4cebed6
                         <div className="absolute inset-0 bg-white/10 blur-[40px] rounded-full scale-125 animate-pulse" />
                         <div className="animate-boost relative">
                             <div className="absolute -bottom-6 -right-6 z-0 flex gap-1">
@@ -207,29 +187,17 @@ const BusinessIdeas = () => {
                         </div>
                     </div>
 
-<<<<<<< HEAD
                     <div className="text-center space-y-1.5 relative z-10">
                         <div className="bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-xl inline-block">
                             <p className="text-[11px] font-black text-[#00FF94] leading-tight uppercase tracking-wider">बहुत कम इन्वेस्टमेंट से</p>
                         </div>
                         <p className="text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mt-1">Start Your Own Brand Today</p>
-=======
-                    <div className="text-center space-y-1 relative z-10">
-                        <div className="bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-xl">
-                            <p className="text-[11px] font-black text-[#00FF94] leading-tight uppercase tracking-wider">बहुत कम इन्वेस्टमेंट से</p>
-                        </div>
-                        <p className="text-[8px] font-bold text-white/60 uppercase tracking-[0.2em] mt-1">Start Your Own Brand Today</p>
->>>>>>> db0518783a89a6e8a3f7ba649a896b9ed4cebed6
                     </div>
                 </div>
 
                 <button 
                     onClick={() => navigate('/user/business-ideas/all')}
-<<<<<<< HEAD
                     className="w-full max-w-[320px] bg-[#5D38F0] hover:bg-[#4C2CD9] text-white font-black text-[14px] py-4 rounded-[2rem] shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 transition-all active:scale-95 uppercase tracking-widest border-b-4 border-indigo-800 shrink-0"
-=======
-                    className="w-full max-w-[340px] bg-[#5D38F0] hover:bg-[#4C2CD9] text-white font-black text-[14px] py-4 rounded-[2rem] shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 transition-all active:scale-95 uppercase tracking-widest border-b-4 border-indigo-800 shrink-0"
->>>>>>> db0518783a89a6e8a3f7ba649a896b9ed4cebed6
                 >
                     LET'S START <ArrowRight size={18} />
                 </button>
