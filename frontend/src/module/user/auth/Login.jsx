@@ -25,6 +25,13 @@ const Login = () => {
         }
     }, [isAuthenticated, contextLoading, navigate]);
 
+    useEffect(() => {
+        if (resendCooldown > 0) {
+            const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [resendCooldown]);
+
     // While auth state is being determined, show nothing (prevents login flash)
     if (isAuthenticated || contextLoading) {
         return (
@@ -33,13 +40,6 @@ const Login = () => {
             </div>
         );
     }
-
-    useEffect(() => {
-        if (resendCooldown > 0) {
-            const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [resendCooldown]);
 
     const handleSendOtp = async (e) => {
         e.preventDefault();
