@@ -1,5 +1,5 @@
 import React from 'react'; // test sync
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 // Layout & Pages
 import UserLayout from './module/user/UserLayout';
@@ -106,7 +106,25 @@ const ProtectedAdminRoute = ({ children }) => {
 const RootRedirect = () => {
   const { isAuthenticated, loading } = useUser();
   if (loading) return null; // wait silently
-  return <Navigate to={isAuthenticated ? '/user/home' : '/user/auth/login'} replace />;
+  
+  const lastRoute = sessionStorage.getItem('dromoney_last_route');
+  if (isAuthenticated) {
+    if (lastRoute && lastRoute !== '/') {
+      return <Navigate to={lastRoute} replace />;
+    }
+    return <Navigate to='/user/home' replace />;
+  }
+  return <Navigate to='/user/auth/login' replace />;
+};
+
+const RouteTracker = () => {
+  const location = useLocation();
+  React.useEffect(() => {
+    if (location.pathname !== '/' && location.pathname !== '/user/auth/login') {
+      sessionStorage.setItem('dromoney_last_route', location.pathname + location.search);
+    }
+  }, [location]);
+  return null;
 };
 
 function App() {
@@ -119,7 +137,8 @@ function App() {
           <SplashScreen onComplete={() => setShowSplash(false)} />
         ) : (
           <Router>
-          <Routes>
+            <RouteTracker />
+            <Routes>
             {/* Redirecting root to login or home based on auth */}
             <Route path="/" element={<RootRedirect />} />
 
