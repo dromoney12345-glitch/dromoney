@@ -192,11 +192,6 @@ const AdminLayout = () => {
                             >
                                 <item.icon className={`w-5 h-5 shrink-0 ${sidebarOpen ? 'mr-1' : ''}`} />
                                 {sidebarOpen && <span className="text-[12px] font-medium tracking-tight whitespace-nowrap uppercase">{item.label}</span>}
-                                {sidebarOpen && (
-                                    <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6" /></svg>
-                                    </div>
-                                )}
                             </NavLink>
                         ))}
                     </nav>
