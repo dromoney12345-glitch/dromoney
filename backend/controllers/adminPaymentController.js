@@ -64,6 +64,17 @@ exports.updatePaymentStatus = async (req, res) => {
                     user.boosterExpiry = expiryDate;
                     await user.save();
 
+                    // Create standard Transaction for user history
+                    const Transaction = require('../models/Transaction');
+                    await Transaction.create({
+                        user: user._id,
+                        type: 'debit',
+                        currency: 'INR',
+                        amount: payment.amount,
+                        source: payment.plan || (isSupport ? 'Support Booster' : 'Task Booster'),
+                        status: 'Success'
+                    });
+
                     try {
                         const { sendNotificationToUser } = require('./fcmController');
                         const boosterName = isSupport ? 'Support Booster' : 'Task Booster';
@@ -76,9 +87,43 @@ exports.updatePaymentStatus = async (req, res) => {
                         console.error('Push notification failed for booster activation:', pushErr.message);
                     }
                 } else {
+                    // Handle other payment types
+                    if (payment.paymentType === 'BUSINESS_IDEA_UNLOCK' && payment.businessIdea) {
+                        if (!user.unlockedIdeas.includes(payment.businessIdea)) {
+                            user.unlockedIdeas.push(payment.businessIdea);
+                        }
+                    } else if (payment.paymentType === 'BUSINESS_HUB_PLAN') {
+                        const daysToAdd = payment.durationInDays || 30;
+                        let currentExpiry = user.supportExpiry && new Date(user.supportExpiry) > new Date() 
+                            ? new Date(user.supportExpiry) 
+                            : new Date();
+                        currentExpiry.setDate(currentExpiry.getDate() + daysToAdd);
+                        user.supportExpiry = currentExpiry;
+                        user.activeBusinessPlan = payment.plan || 'Premium Plan';
+                        user.businessPlanStatus = 'active';
+                    } else if (payment.paymentType === 'SUPPORT_CHAT_RENEWAL') {
+                        const daysToAdd = payment.durationInDays || 90;
+                        let currentExpiry = user.supportExpiry && new Date(user.supportExpiry) > new Date() 
+                            ? new Date(user.supportExpiry) 
+                            : new Date();
+                        currentExpiry.setDate(currentExpiry.getDate() + daysToAdd);
+                        user.supportExpiry = currentExpiry;
+                    }
+
                     // Default: Platform unlock
                     user.isPaid = true;
                     await user.save();
+
+                    // Create standard Transaction for user history
+                    const Transaction = require('../models/Transaction');
+                    await Transaction.create({
+                        user: user._id,
+                        type: 'debit',
+                        currency: 'INR',
+                        amount: payment.amount,
+                        source: payment.plan || 'Platform Unlock',
+                        status: 'Success'
+                    });
 
                     // Send Push Notification to the unlocked user
                     try {

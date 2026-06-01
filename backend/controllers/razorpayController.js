@@ -166,6 +166,17 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
                 user.unlockedIdeas.push(payment.businessIdea);
                 await user.save();
             }
+
+            // Create standard Transaction for user history
+            const Transaction = require('../models/Transaction');
+            await Transaction.create({
+                user: user._id,
+                type: 'debit',
+                currency: 'INR',
+                amount: payment.amount,
+                source: payment.plan || 'Business Idea Unlock',
+                status: 'Success'
+            });
         } else if (payment.paymentType === 'SUPPORT_BOOSTER' || payment.paymentType === 'TASK_BOOSTER') {
             console.log(`[PAYMENT] Activating Booster ${payment.paymentType} for user ${user._id}`);
             
@@ -185,6 +196,17 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
             user.boosterExpiry = expiryDate;
             
             await user.save();
+
+            // Create standard Transaction for user history
+            const Transaction = require('../models/Transaction');
+            await Transaction.create({
+                user: user._id,
+                type: 'debit',
+                currency: 'INR',
+                amount: payment.amount,
+                source: payment.plan || (payment.paymentType === 'SUPPORT_BOOSTER' ? 'Support Booster' : 'Task Booster'),
+                status: 'Success'
+            });
         } else {
             console.log(`[PAYMENT] Unlocking Platform for user ${user._id}`);
             
@@ -266,6 +288,17 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
             }
             
             await user.save();
+
+            // Create standard Transaction for user history
+            const Transaction = require('../models/Transaction');
+            await Transaction.create({
+                user: user._id,
+                type: 'debit',
+                currency: 'INR',
+                amount: payment.amount,
+                source: payment.plan || 'Platform Unlock',
+                status: 'Success'
+            });
         }
 
         // Send Push Notifications to User based on purchase type

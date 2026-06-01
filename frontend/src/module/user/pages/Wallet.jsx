@@ -241,7 +241,7 @@ const Wallet = () => {
     const filteredTransactions = activeTab === 'cash' 
         ? (wallet.transactions || []).filter(tx => {
             if (filter === 'Earning') return tx.type === 'credit';
-            if (filter === 'Payout') return tx.type === 'withdrawal';
+            if (filter === 'Payout') return tx.type === 'withdrawal' || tx.type === 'debit';
             return true;
         })
         : (coins.history || []).filter(tx => {
