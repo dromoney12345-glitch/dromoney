@@ -618,13 +618,6 @@ const Home = () => {
                                 </div>
                             </div>
 
-                            <div className="flex gap-4">
-                                {[FacebookIcon, InstagramIcon, XIcon].map((Icon, i) => (
-                                    <div key={i} className="text-slate-400 hover:text-emerald-400 transition-all cursor-pointer active:scale-90">
-                                        <Icon />
-                                    </div>
-                                ))}
-                            </div>
                         </div>
 
                         <p className="text-[12px] font-medium text-slate-400 leading-relaxed max-w-[320px] not-italic font-sans">
