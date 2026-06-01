@@ -3,6 +3,108 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Info, HelpCircle, Sparkles, Headset, Building2, CheckCircle2 } from 'lucide-react';
 import api from '../../shared/services/api';
 
+const LOCAL_FALLBACKS = {
+    'privacy': {
+        title: 'Privacy Policy (गोपनीयता नीति)',
+        subtitle: 'Your Data Privacy & Security',
+        sections: [
+            {
+                title: 'A. डेटा जो हम इकट्ठा करते हैं (Data We Collect)',
+                text: '• व्यक्तिगत जानकारी: आपका नाम, फोन नंबर, और ईमेल एड्रेस।\n• KYC डेटा: आधार कार्ड/पैन कार्ड की जानकारी (केवल आपकी पहचान सत्यापित करने और धोखाधड़ी रोकने के लिए)।\n• बैंक विवरण: विड्रॉल भेजने के लिए आपके द्वारा दी गई बैंक जानकारी।\n• डिवाइस जानकारी: आपका IP एड्रेस और डिवाइस ID (ताकि एक फोन में एक ही अकाउंट चले)।'
+            },
+            {
+                title: 'B. डेटा का उपयोग (How We Use Data)',
+                text: '• आपके वॉलेट में पैसे भेजने और केवाईसी (KYC) वेरिफिकेशन के लिए।\n• विज्ञापनों और टास्क की सत्यता की जांच करने के लिए।\n• ऐप की सुरक्षा बढ़ाने और स्पैम रोकने के लिए।'
+            },
+            {
+                title: 'C. डेटा सुरक्षा (Data Security)',
+                text: 'हम आपका डेटा किसी भी तीसरी पार्टी को नहीं बेचते हैं। आपका डेटा हमारे सुरक्षित सर्वर पर एन्क्रिप्टेड (Encrypted) रूप में रहता है।'
+            },
+            {
+                title: 'D. थर्ड पार्टी सर्विसेज (Third-Party Services)',
+                text: 'हम भुगतान के लिए Razorpay और विज्ञापनों के लिए AdMob/Google Ads का उपयोग करते हैं। वे अपनी पॉलिसी के अनुसार आपका डेटा प्रोसेस कर सकते हैं।'
+            }
+        ]
+    },
+    'terms': {
+        title: 'Terms & Conditions',
+        subtitle: 'Usage Guidelines & Agreement',
+        sections: [
+            { title: '1. Account Creation', text: 'Users must provide accurate, complete information during registration. Multiple accounts per device are strictly prohibited to prevent fraud.' },
+            { title: '2. Eligibility', text: 'The platform is for individuals looking to earn through verified task models and affiliate partnerships. Automated bot activity is strictly banned.' },
+            { title: '3. Financial Payouts', text: 'Earnings are generated based on verified task completion and referral guidelines. The platform reserves the right to review conversions.' }
+        ]
+    },
+    'guidelines': {
+        title: 'Community Guidelines',
+        subtitle: 'Community & Ethical Standards',
+        sections: [
+            { title: 'Ethical Earning', text: 'Always follow task instructions precisely to ensure coin credit. Fair play is required for all active users.' },
+            { title: 'Respect & Safety', text: 'Maintain professional, respectful conduct in all platform community interactions and helpdesk inquiries.' }
+        ]
+    },
+    'refund-policy': {
+        title: 'Refund & Cancellation Policy (रिफंड और रद्दीकरण नीति)',
+        subtitle: 'Rules regarding digital content, technical issues, bans, and user errors.',
+        sections: [
+            {
+                title: '1. डिजिटल कंटेंट (Digital Content)',
+                text: 'हमारे प्लेटफॉर्म पर ₹499 का कोर्स और ₹49/₹11 के बूस्टर "Digital Goods" की श्रेणी में आते हैं। एक बार पेमेंट सफल होने और कंटेंट का एक्सेस (Access) मिलने के बाद, कोई भी रिफंड प्रदान नहीं किया जाएगा।\n\nOnce the course or booster is activated, no refund will be issued.'
+            },
+            {
+                title: '2. तकनीकी खराबी (Technical Issues)',
+                text: 'यदि आपके बैंक से पैसे कट गए हैं लेकिन ऐप में कोर्स या बूस्टर एक्टिवेट नहीं हुआ है, तो कृपया 24-48 घंटे प्रतीक्षा करें। यदि फिर भी समस्या हल नहीं होती, तो आप हमारे सपोर्ट सेक्शन में ट्रांजैक्शन आईडी (Transaction ID) भेज सकते हैं। जांच के बाद यदि पेमेंट हमें प्राप्त हुआ है, तो सर्विस एक्टिवेट कर दी जाएगी, लेकिन पैसा वापस नहीं होगा।\n\nIn case of payment failure contact support. No cash refund, only service activation.'
+            },
+            {
+                title: '3. अकाउंट बैन (Account Ban)',
+                text: 'यदि कोई यूजर धोखाधड़ी, फेक रेफरल, या नियमों का उल्लंघन करते हुए पाया जाता है और उसका अकाउंट बैन किया जाता है, तो उस स्थिति में उसकी बची हुई कोई भी राशि या सब्सक्रिप्शन फीस रिफंड नहीं की जाएगी।\n\nNo refunds for banned accounts due to violation of community guidelines.'
+            },
+            {
+                title: '4. यूजर की गलती (User Error)',
+                text: 'गलती से खरीदे गए बूस्टर या कोर्स के लिए कंपनी जिम्मेदार नहीं होगी और न ही इसके लिए कोई रिफंड दिया जाएगा।\n\nNo refunds for accidental purchases.'
+            }
+        ]
+    },
+    'how-it-works': {
+        title: 'How It Works',
+        subtitle: 'Master the Dromoney Platform',
+        sections: [
+            { title: '1. Register & Verify', text: 'Create your account and complete a simple KYC to unlock all earning features safely. Your identity is verified through Aadhaar/PAN to ensure platform security.' },
+            { title: '2. Explore Opportunities', text: 'Browse through affiliate projects, daily tasks, and exclusive business ideas tailored for you. Choose from multiple income streams.' },
+            { title: '3. Start Earning', text: 'Complete tasks or refer partners to accumulate coins and real cash in your dashboard. Track your progress in real-time.' },
+            { title: '4. Instant Payouts', text: 'Withdraw your earnings directly to your bank account with our secure payment gateway. Get paid with 100% transparency.' }
+        ]
+    },
+    'benefits': {
+        title: 'User Benefits',
+        subtitle: 'Why choose Dromoney?',
+        sections: [
+            { title: 'Financial Freedom', text: 'Access multiple income streams that you can manage from anywhere in the world. Earn at your own pace without any fixed targets.' },
+            { title: 'Skill Development', text: 'Learn marketing and business strategies through our verified project frameworks. Get certified.' },
+            { title: 'Safe & Secure', text: 'Your data and earnings are protected by industry-leading security protocols. We use encryption.' },
+            { title: 'Community Support', text: 'Join thousands of earners and get 24/7 assistance from our expert team.' }
+        ]
+    },
+    'support': {
+        title: 'Support Center',
+        subtitle: 'We are here to help you 24/7',
+        sections: [
+            { title: 'Direct Assistance', text: 'Chat with our support executives for any technical or payment related queries.' },
+            { title: 'Knowledge Base', text: 'Read our guides and FAQs to solve common issues instantly without waiting.' },
+            { title: 'Email Support', text: 'For complex issues, reach us at support@dromoney.com for detailed resolutions.' }
+        ]
+    },
+    'about': {
+        title: 'About Dromoney',
+        subtitle: 'Empowering Digital Earners',
+        sections: [
+            { title: 'Our Mission', text: 'To provide a transparent and efficient platform where everyone can monetize their digital presence. We believe in fair compensation and equal opportunities.' },
+            { title: 'The Platform', text: 'Dromoney is India\'s fastest growing affiliate and task-based earning ecosystem. We connect brands with genuine users.' },
+            { title: 'Transparency', text: 'We believe in fairness. Every payout and task is tracked with 100% precision. Our verified system ensures security.' }
+        ]
+    }
+};
+
 const InfoPage = () => {
     const { type } = useParams();
     const navigate = useNavigate();
@@ -19,12 +121,10 @@ const InfoPage = () => {
                 console.log("API Response for", dbKey, ":", res); // Debug log
                 
                 if (res.success && res.data && res.data.data) {
-                    // res.data is the content document
-                    // res.data.data contains { title, subtitle, sections }
                     const d = res.data.data;
                     console.log("Extracted data:", d); // Debug log
                     
-                    if (d && d.sections && Array.isArray(d.sections)) {
+                    if (d && d.sections && Array.isArray(d.sections) && d.sections.length > 0) {
                         setPageData({
                             title: d.title,
                             subtitle: d.subtitle,
@@ -34,20 +134,29 @@ const InfoPage = () => {
                     }
                 }
                 
-                // If we reach here, data is not in expected format
-                console.log("Data not in expected format for", type);
+                // Fall back if data format from DB is generic or pending setup
+                if (LOCAL_FALLBACKS[type]) {
+                    setPageData(LOCAL_FALLBACKS[type]);
+                    return;
+                }
+                
                 throw new Error("Data not in expected format");
                 
             } catch (err) {
                 console.error("Error fetching page data:", err);
-                setPageData({
-                    title: 'ERROR',
-                    subtitle: 'Failed to load content from database',
-                    sections: [{ 
-                        title: 'Connection Problem', 
-                        text: 'Unable to fetch data from server. Please check your internet connection and try again.' 
-                    }]
-                });
+                // Try fallback first before showing error
+                if (LOCAL_FALLBACKS[type]) {
+                    setPageData(LOCAL_FALLBACKS[type]);
+                } else {
+                    setPageData({
+                        title: 'ERROR',
+                        subtitle: 'Failed to load content from database',
+                        sections: [{ 
+                            title: 'Connection Problem', 
+                            text: 'Unable to fetch data from server. Please check your internet connection and try again.' 
+                        }]
+                    });
+                }
             } finally {
                 setLoading(false);
             }
