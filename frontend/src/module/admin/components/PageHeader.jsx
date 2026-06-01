@@ -10,7 +10,7 @@ const PageHeader = ({ title, subtitle, action }) => (
         {action && (
             <button
                 onClick={action.onClick}
-                className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-medium text-[12px] uppercase tracking-widest px-5 py-2.5 rounded-xl shadow-lg shadow-sky-100 transition-all active:scale-95"
+                className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-medium text-[12px] uppercase tracking-normal px-5 py-2.5 rounded-xl shadow-lg shadow-sky-100 transition-all active:scale-95"
             >
                 {action.icon && <action.icon size={16} />}
                 {action.label}

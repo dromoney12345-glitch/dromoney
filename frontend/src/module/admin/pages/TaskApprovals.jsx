@@ -106,11 +106,11 @@ const TaskApprovals = () => {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-slate-50 bg-slate-50/50">
-                                <th className="text-left px-6 py-5 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">User / Task</th>
-                                <th className="text-left px-6 py-5 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">Reward</th>
-                                <th className="text-left px-6 py-5 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">Date</th>
-                                <th className="text-left px-6 py-5 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">Status</th>
-                                <th className="text-center px-6 py-5 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">Actions</th>
+                                <th className="text-left px-4 py-3 text-[10px] font-medium text-slate-400 uppercase tracking-normal">User / Task</th>
+                                <th className="text-left px-4 py-3 text-[10px] font-medium text-slate-400 uppercase tracking-normal">Reward</th>
+                                <th className="text-left px-4 py-3 text-[10px] font-medium text-slate-400 uppercase tracking-normal">Date</th>
+                                <th className="text-left px-4 py-3 text-[10px] font-medium text-slate-400 uppercase tracking-normal">Status</th>
+                                <th className="text-center px-4 py-3 text-[10px] font-medium text-slate-400 uppercase tracking-normal">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -157,7 +157,7 @@ const TaskApprovals = () => {
                                     <td colSpan="5" className="py-24 text-center">
                                         <div className="flex flex-col items-center gap-3 grayscale opacity-30">
                                             <Clock size={48} className="text-slate-300" />
-                                            <p className="text-[11px] font-medium uppercase tracking-widest text-slate-500">No submissions found</p>
+                                            <p className="text-[11px] font-medium uppercase tracking-normal text-slate-500">No submissions found</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -171,12 +171,12 @@ const TaskApprovals = () => {
             {isModalOpen && selectedSubmission && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-[#0F172A]/80 backdrop-blur-sm"></div>
-                    <div className="relative bg-white w-full max-w-[440px] rounded-[40px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
+                    <div className="relative bg-white w-full max-w-[440px] rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
                         <div className="bg-[#0F172A] p-7 text-white relative">
                             <div className="flex justify-between items-start">
                                 <div>
                                     <h3 className="text-xl font-medium tracking-tight mb-1">Proof Review</h3>
-                                    <p className="text-[10px] text-sky-400 font-medium uppercase tracking-[0.2em]">{selectedSubmission.task?.title}</p>
+                                    <p className="text-[10px] text-sky-400 font-medium uppercase tracking-normal">{selectedSubmission.task?.title}</p>
                                 </div>
                                 <button onClick={() => setIsModalOpen(false)} className="w-9 h-9 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center transition-colors text-white/40 hover:text-white">
                                     <XCircle size={22} />
@@ -187,19 +187,19 @@ const TaskApprovals = () => {
                         <div className="p-8 space-y-7">
                             <div className="flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-100">
                                 <div>
-                                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-0.5">Submitted By</p>
+                                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-0.5">Submitted By</p>
                                     <p className="text-[13px] font-medium text-slate-800">{selectedSubmission.user?.name}</p>
                                     <p className="text-[11px] font-bold text-slate-500">{selectedSubmission.user?.phone}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-0.5">Reward</p>
+                                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-0.5">Reward</p>
                                     <p className="text-[15px] font-medium text-amber-600">{selectedSubmission.coinsReward} Coins</p>
                                 </div>
                             </div>
 
                             <div className="space-y-3">
-                                <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest px-1">Proof Image</p>
-                                <div className="aspect-[4/3] bg-slate-50 rounded-[32px] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
+                                <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal px-1">Proof Image</p>
+                                <div className="aspect-[4/3] bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
                                     <img 
                                         src={selectedSubmission.proofImage} 
                                         alt="Proof" 
@@ -216,13 +216,13 @@ const TaskApprovals = () => {
                                 <div className="flex gap-4">
                                     <button
                                         onClick={() => handleAction(selectedSubmission._id, 'reject')}
-                                        className="flex-1 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-4.5 rounded-[20px] font-medium text-[11px] uppercase tracking-widest transition-all active:scale-95 border border-rose-100"
+                                        className="flex-1 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-4.5 rounded-[20px] font-medium text-[11px] uppercase tracking-normal transition-all active:scale-95 border border-rose-100"
                                     >
                                         Reject
                                     </button>
                                     <button
                                         onClick={() => handleAction(selectedSubmission._id, 'approve')}
-                                        className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-4.5 rounded-[20px] font-medium text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-sky-200"
+                                        className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-4.5 rounded-[20px] font-medium text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-xl shadow-sky-200"
                                     >
                                         Approve
                                     </button>
@@ -231,11 +231,11 @@ const TaskApprovals = () => {
                                 <div className={`p-5 rounded-[24px] text-center border-2 ${selectedSubmission.status === 'Approved' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
                                     <div className="flex items-center justify-center gap-2 mb-1">
                                         {selectedSubmission.status === 'Approved' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-                                        <p className="text-[10px] font-medium uppercase tracking-[0.2em]">Record Processed</p>
+                                        <p className="text-[10px] font-medium uppercase tracking-normal">Record Processed</p>
                                     </div>
                                     <p className="text-[12px] font-bold">This submission was <span className="underline decoration-2 underline-offset-4 uppercase">{selectedSubmission.status}</span></p>
                                     {selectedSubmission.rejectionReason && (
-                                        <p className="text-[10px] mt-2 font-bold opacity-70 italic">Reason: {selectedSubmission.rejectionReason}</p>
+                                        <p className="text-[10px] mt-2 font-bold opacity-70">Reason: {selectedSubmission.rejectionReason}</p>
                                     )}
                                 </div>
                             )}

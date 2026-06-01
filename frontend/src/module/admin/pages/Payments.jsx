@@ -151,13 +151,13 @@ const Payments = () => {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-slate-50 bg-slate-50/50">
-                                <th className="text-left px-5 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em] font-['Poppins']">Transaction ID</th>
-                                <th className="text-left px-5 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em] font-['Poppins']">User Profile</th>
-                                <th className="text-left px-5 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em] font-['Poppins']">Amount</th>
-                                <th className="text-left px-5 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em] font-['Poppins']">Method</th>
-                                <th className="text-left px-5 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em] font-['Poppins']">UTR Number</th>
-                                <th className="text-left px-5 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em] font-['Poppins']">Status</th>
-                                <th className="text-center px-5 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em] font-['Poppins']">Actions</th>
+                                <th className="text-left px-5 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Transaction ID</th>
+                                <th className="text-left px-5 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">User Profile</th>
+                                <th className="text-left px-5 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Amount</th>
+                                <th className="text-left px-5 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Method</th>
+                                <th className="text-left px-5 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">UTR Number</th>
+                                <th className="text-left px-5 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Status</th>
+                                <th className="text-center px-5 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -196,7 +196,7 @@ const Payments = () => {
                                     <td colSpan="7" className="py-24 text-center">
                                         <div className="flex flex-col items-center gap-3 grayscale opacity-30">
                                             <CreditCard size={48} className="text-slate-300" />
-                                            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-500 font-['Poppins']">No payment records found</p>
+                                            <p className="text-[11px] font-semibold uppercase tracking-normal text-slate-500 font-['Poppins']">No payment records found</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -207,7 +207,7 @@ const Payments = () => {
 
                 {/* Pagination Footer */}
                 <div className="px-5 py-4 bg-slate-50/50 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="text-[10px] font-medium text-slate-400 uppercase tracking-widest order-2 sm:order-1 outline-none font-['Poppins']">
+                    <div className="text-[10px] font-medium text-slate-400 uppercase tracking-normal order-2 sm:order-1 outline-none font-['Poppins']">
                         Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filtered.length)} of {filtered.length} entries
                     </div>
                     <div className="flex items-center gap-2 order-1 sm:order-2">
@@ -244,10 +244,10 @@ const Payments = () => {
             {isModalOpen && selectedPayment && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-[#0F172A]/80 backdrop-blur-sm"></div>
-                    <div className="relative bg-white w-full max-w-[420px] rounded-[40px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
+                    <div className="relative bg-white w-full max-w-[420px] rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
                         <div className="bg-[#0F172A] p-7 text-white relative">
                             <h3 className="text-xl font-semibold tracking-tight mb-1 font-['Poppins']">Payment Verification</h3>
-                            <p className="text-[10px] text-sky-400 font-medium uppercase tracking-[0.2em] font-['Poppins']">TXN ID: #{selectedPayment.id}</p>
+                            <p className="text-[10px] text-sky-400 font-medium uppercase tracking-normal font-['Poppins']">TXN ID: #{selectedPayment.id}</p>
                             <button onClick={() => setIsModalOpen(false)} className="absolute top-7 right-7 w-9 h-9 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center transition-colors text-white/40 hover:text-white">
                                 <XClose size={22} />
                             </button>
@@ -267,18 +267,18 @@ const Payments = () => {
                                 </div>
                                 <div className="text-right">
                                     <p className="text-xl font-semibold text-slate-900 leading-none font-['Poppins']">{selectedPayment.amount}</p>
-                                    <p className="text-[9px] text-emerald-500 font-medium uppercase mt-1 tracking-widest font-['Poppins']">Entry Fee</p>
+                                    <p className="text-[9px] text-emerald-500 font-medium uppercase mt-1 tracking-normal font-['Poppins']">Entry Fee</p>
                                 </div>
                             </div>
 
                             {/* UTR & ScreenShot Mockup */}
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between px-1">
-                                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest font-['Poppins']">UTR Number</p>
-                                    <p className="text-[13px] font-semibold text-slate-800 tracking-wider font-mono font-['Poppins']">{selectedPayment.utr}</p>
+                                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal font-['Poppins']">UTR Number</p>
+                                    <p className="text-[13px] font-semibold text-slate-800 tracking-tight font-mono font-['Poppins']">{selectedPayment.utr}</p>
                                 </div>
 
-                                <div className="aspect-[1.5/1] bg-slate-50 rounded-[32px] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
+                                <div className="aspect-[1.5/1] bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
                                     <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-4 backdrop-blur-[2px]">
                                         <button className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><Download size={20} /></button>
                                         <button className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><ExternalLink size={20} /></button>
@@ -301,20 +301,20 @@ const Payments = () => {
                                 <div className="flex gap-4 pt-2">
                                     <button
                                         onClick={() => handleStatusUpdate(selectedPayment.id, 'Failed')}
-                                        className="flex-1 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-4.5 rounded-[20px] font-semibold text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-rose-100/50 font-['Poppins']"
+                                        className="flex-1 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-4.5 rounded-[20px] font-semibold text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-lg shadow-rose-100/50 font-['Poppins']"
                                     >
                                         Decline
                                     </button>
                                     <button
                                         onClick={() => handleStatusUpdate(selectedPayment.id, 'Success')}
-                                        className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-4.5 rounded-[20px] font-semibold text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-sky-200 font-['Poppins']"
+                                        className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-4.5 rounded-[20px] font-semibold text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-xl shadow-sky-200 font-['Poppins']"
                                     >
                                         Verify & Activate
                                     </button>
                                 </div>
                             ) : (
                                 <div className={`p-5 rounded-[24px] text-center border-2 font-['Poppins'] ${selectedPayment.status === 'Success' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
-                                    <p className="text-[10px] font-medium uppercase tracking-[0.2em] mb-1">Audit Record</p>
+                                    <p className="text-[10px] font-medium uppercase tracking-normal mb-1">Audit Record</p>
                                     <p className="text-[12px] font-medium tracking-tight">Status: <span className="underline decoration-2 underline-offset-4">{selectedPayment.status}</span></p>
                                 </div>
                             )}

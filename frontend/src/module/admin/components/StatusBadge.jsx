@@ -13,7 +13,7 @@ const StatusBadge = ({ status }) => {
     };
     const cls = styles[status?.toLowerCase()] || 'bg-slate-100 text-slate-500';
     return (
-        <span className={`text-[9px] font-medium uppercase tracking-widest px-2.5 py-1 rounded-lg ${cls}`}>
+        <span className={`text-[9px] font-medium uppercase tracking-normal px-2.5 py-1 rounded-lg ${cls}`}>
             {status}
         </span>
     );

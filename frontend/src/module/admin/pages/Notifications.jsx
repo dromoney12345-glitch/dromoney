@@ -113,19 +113,19 @@ const Notifications = () => {
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {/* Compose */}
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                    <h2 className="text-sm font-medium text-slate-800 uppercase tracking-widest mb-5 flex items-center gap-2">
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+                    <h2 className="text-sm font-medium text-slate-800 uppercase tracking-normal mb-5 flex items-center gap-2">
                         <Bell size={16} className="text-sky-500" /> Compose Message
                     </h2>
                     <div className="space-y-4">
                         <div>
-                            <label className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">Title</label>
+                            <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal">Title</label>
                             <input type="text" value={title} onChange={e => setTitle(e.target.value)}
                                 placeholder="e.g. Special Weekend Offer!"
                                 className="mt-2 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[14px] font-bold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all" />
                         </div>
                         <div>
-                            <label className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">Message</label>
+                            <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal">Message</label>
                             <textarea value={message} onChange={e => setMessage(e.target.value)}
                                 placeholder="Write your broadcast message here..."
                                 rows={4}
@@ -138,7 +138,7 @@ const Notifications = () => {
                         <button 
                             disabled={loading}
                             onClick={handleSend}
-                            className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-medium text-[12px] uppercase tracking-widest transition-all active:scale-95 shadow-md ${sent ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-slate-900 hover:bg-black text-white shadow-sky-100'}`}>
+                            className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-medium text-[12px] uppercase tracking-normal transition-all active:scale-95 shadow-md ${sent ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-slate-900 hover:bg-black text-white shadow-sky-100'}`}>
                             {loading ? <Loader2 size={15} className="animate-spin" /> : sent ? '✓ Sent Successfully!' : <><Send size={15} /> Send Broadcast</>}
                         </button>
                     </div>
@@ -147,7 +147,7 @@ const Notifications = () => {
                 {/* History */}
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
                     <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/20">
-                        <h2 className="text-sm font-medium text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                        <h2 className="text-sm font-medium text-slate-800 uppercase tracking-normal flex items-center gap-2">
                             <HistoryIcon size={16} className="text-slate-400" /> Broadcast History
                         </h2>
                         {history.length > 0 && (
@@ -193,7 +193,7 @@ const Notifications = () => {
                                 <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-slate-100">
                                     <Bell size={28} className="text-slate-200" />
                                 </div>
-                                <p className="text-sm font-medium text-slate-300 uppercase tracking-widest leading-none">No Broadcast History</p>
+                                <p className="text-sm font-medium text-slate-300 uppercase tracking-normal leading-none">No Broadcast History</p>
                             </div>
                         )}
                     </div>

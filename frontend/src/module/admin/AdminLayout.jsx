@@ -135,7 +135,7 @@ const AdminLayout = () => {
             <div className={`fixed inset-0 z-[100] transition-all duration-500 ${isNotifOpen ? 'visible' : 'invisible'}`}>
                 <div onClick={() => setIsNotifOpen(false)} className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-500 ${isNotifOpen ? 'opacity-100' : 'opacity-0'}`}></div>
                 <div className={`absolute top-0 right-0 h-full w-full max-w-[380px] bg-white shadow-2xl transition-transform duration-500 ease-out flex flex-col ${isNotifOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                    <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
+                    <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-sky-100">
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
@@ -147,7 +147,7 @@ const AdminLayout = () => {
                         </button>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
                         {notifications.length > 0 ? notifications.map((notif) => (
                             <div key={notif.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-xl hover:shadow-slate-100/40 transition-all cursor-pointer group">
                                 <div className="flex justify-between items-start mb-2">
@@ -158,7 +158,7 @@ const AdminLayout = () => {
                             </div>
                         )) : (
                             <div className="text-center py-20">
-                                <p className="text-[11px] font-medium text-slate-300 uppercase tracking-widest">No recent activity</p>
+                                <p className="text-[11px] font-medium text-slate-300 uppercase tracking-normal">No recent activity</p>
                             </div>
                         )}
                     </div>
@@ -177,7 +177,7 @@ const AdminLayout = () => {
                     {sidebarOpen && (
                         <div className="text-center">
                             <h1 className="text-sm font-medium text-white leading-none tracking-wide mb-0.5 uppercase">Dromoney</h1>
-                            <p className="text-[8px] font-medium text-amber-500 uppercase tracking-[0.2em] leading-none">Admin Control</p>
+                            <p className="text-[8px] font-medium text-amber-500 uppercase tracking-normal leading-none">Admin Control</p>
                         </div>
                     )}
                 </div>
@@ -213,7 +213,7 @@ const AdminLayout = () => {
 
             {/* ── Main Area ── */}
             <div className="flex-1 flex flex-col overflow-hidden">
-                <header className="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between shrink-0 shadow-sm relative z-20">
+                <header className="bg-white border-b border-slate-100 px-4 py-4 flex items-center justify-between shrink-0 shadow-sm relative z-20">
                     <button onClick={() => setSidebarOpen(!sidebarOpen)} className="w-9 h-9 bg-slate-50 hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 border border-slate-100 transition-colors">
                         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" /></svg>
                     </button>

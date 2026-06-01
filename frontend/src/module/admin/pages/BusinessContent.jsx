@@ -273,18 +273,18 @@ const BusinessContent = () => {
             <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-2xl font-medium text-slate-900 tracking-tight">Business Hub Manager</h1>
-                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1">Manage Strategies & Plan Control</p>
+                    <p className="text-sm font-bold text-slate-400 uppercase tracking-normal mt-1">Manage Strategies & Plan Control</p>
                 </div>
                 <div className="flex gap-3">
                     <button 
                         onClick={() => setShowSettingsModal(true)}
-                        className="bg-white text-slate-600 border border-slate-200 px-6 py-3 rounded-2xl font-medium text-sm flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
+                        className="bg-white text-slate-600 border border-slate-200 px-4 py-3 rounded-2xl font-medium text-sm flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
                     >
                         <Layout size={20} /> PLAN SETTINGS
                     </button>
                     <button 
                         onClick={() => { resetForm(); setShowModal(true); }}
-                        className="bg-[#5D38F0] text-white px-6 py-3 rounded-2xl font-medium text-sm flex items-center gap-2 shadow-lg shadow-indigo-100 hover:bg-[#4C2CD9] transition-all active:scale-95"
+                        className="bg-[#5D38F0] text-white px-4 py-3 rounded-2xl font-medium text-sm flex items-center gap-2 shadow-lg shadow-indigo-100 hover:bg-[#4C2CD9] transition-all active:scale-95"
                     >
                         <Plus size={20} /> CREATE NEW CARD
                     </button>
@@ -295,11 +295,11 @@ const BusinessContent = () => {
                 {loading ? (
                     <div className="col-span-full flex flex-col items-center justify-center py-20 gap-4">
                         <Loader2 size={40} className="text-[#5D38F0] animate-spin" />
-                        <p className="font-medium text-slate-400 uppercase tracking-widest text-xs">Loading Hub Cards...</p>
+                        <p className="font-medium text-slate-400 uppercase tracking-normal text-xs">Loading Hub Cards...</p>
                     </div>
                 ) : (
                     ideas.map((idea) => (
-                        <div key={idea._id} className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-100 group hover:shadow-xl transition-all">
+                        <div key={idea._id} className="bg-white rounded-[2.5rem] p-4 shadow-sm border border-slate-100 group hover:shadow-xl transition-all">
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shrink-0">
                                     {idea.bannerImage ? <img src={idea.bannerImage} className="w-full h-full object-cover" alt="" /> : <ImageIcon className="text-slate-200" />}
@@ -317,8 +317,8 @@ const BusinessContent = () => {
                             <p className="text-xs font-bold text-slate-400 line-clamp-2 leading-relaxed mb-6">{idea.desc}</p>
                             
                             <div className="flex items-center gap-2 pt-4 border-t border-slate-50">
-                                <button onClick={() => openEdit(idea)} className="flex-1 bg-slate-50 text-slate-600 py-3 rounded-xl font-medium text-[10px] uppercase tracking-widest hover:bg-indigo-50 transition-all flex items-center justify-center gap-2"><Edit2 size={14} /> EDIT</button>
-                                <button onClick={() => openEcoEditor(idea)} className="flex-1 bg-amber-50 text-amber-600 py-3 rounded-xl font-medium text-[10px] uppercase tracking-widest hover:bg-amber-100 transition-all flex items-center justify-center gap-2"><Layout size={14} /> ECOSYSTEM</button>
+                                <button onClick={() => openEdit(idea)} className="flex-1 bg-slate-50 text-slate-600 py-3 rounded-xl font-medium text-[10px] uppercase tracking-normal hover:bg-indigo-50 transition-all flex items-center justify-center gap-2"><Edit2 size={14} /> EDIT</button>
+                                <button onClick={() => openEcoEditor(idea)} className="flex-1 bg-amber-50 text-amber-600 py-3 rounded-xl font-medium text-[10px] uppercase tracking-normal hover:bg-amber-100 transition-all flex items-center justify-center gap-2"><Layout size={14} /> ECOSYSTEM</button>
                                 <button onClick={() => handleDelete(idea._id)} className="w-12 h-12 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center hover:bg-rose-100 transition-all"><Trash2 size={18} /></button>
                             </div>
                         </div>
@@ -333,7 +333,7 @@ const BusinessContent = () => {
                         <div className="px-8 pt-8 pb-4 flex items-center justify-between border-b border-slate-50">
                             <div>
                                 <h2 className="text-xl font-medium text-slate-900 uppercase tracking-tight">Ecosystem Content</h2>
-                                <p className="text-[10px] font-bold text-amber-500 uppercase tracking-widest mt-0.5">{ecoData.ideaTitle}</p>
+                                <p className="text-[10px] font-bold text-amber-500 uppercase tracking-normal mt-0.5">{ecoData.ideaTitle}</p>
                             </div>
                             <button onClick={() => setShowEcoModal(false)} className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400"><X size={20} /></button>
                         </div>
@@ -367,7 +367,7 @@ const BusinessContent = () => {
                                     />
                                 </div>
                             ))}
-                            <button onClick={handleSaveEco} disabled={submitting} className="w-full bg-slate-900 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-[0.2em] shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
+                            <button onClick={handleSaveEco} disabled={submitting} className="w-full bg-slate-900 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
                                 {submitting ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />} SAVE ECOSYSTEM CONTENT
                             </button>
                         </div>
@@ -380,9 +380,9 @@ const BusinessContent = () => {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
                     <div className="bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in duration-200 flex h-[85vh]">
                         {/* Sidebar: Plan List */}
-                        <div className="w-64 bg-slate-50 border-r border-slate-100 p-6 flex flex-col gap-4 overflow-y-auto">
+                        <div className="w-64 bg-slate-50 border-r border-slate-100 p-4 flex flex-col gap-4 overflow-y-auto">
                             <div className="mb-2">
-                                <h3 className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Available Plans</h3>
+                                <h3 className="text-[10px] font-medium text-slate-400 uppercase tracking-normal">Available Plans</h3>
                             </div>
                             {settingsData.businessPlans.map((plan, idx) => (
                                 <button 
@@ -410,13 +410,13 @@ const BusinessContent = () => {
                             <div className="px-8 pt-8 pb-4 flex items-center justify-between border-b border-slate-50 shrink-0">
                                 <div>
                                     <h2 className="text-xl font-medium text-slate-900 uppercase tracking-tight">Customize Membership</h2>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Edit title, price & duration</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-normal mt-0.5">Edit title, price & duration</p>
                                 </div>
                                 <button onClick={() => setShowSettingsModal(false)} className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400"><X size={20} /></button>
                             </div>
 
                             {settingsData.businessPlans.length > 0 ? (
-                                <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+                                <div className="flex-1 overflow-y-auto p-5 space-y-8 custom-scrollbar">
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-medium text-slate-400 uppercase ml-1">Plan Title</label>
@@ -427,7 +427,7 @@ const BusinessContent = () => {
                                             <input type="number" value={settingsData.businessPlans[activePlanIdx].price} onChange={(e) => updatePlanField(activePlanIdx, 'price', e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-bold outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all" />
                                         </div>
                                         <div className="space-y-1">
-                                            <label className="text-[9px] font-medium text-indigo-500 uppercase ml-1 italic">Plan Duration</label>
+                                            <label className="text-[9px] font-medium text-indigo-500 uppercase ml-1">Plan Duration</label>
                                             <input type="text" value={settingsData.businessPlans[activePlanIdx].duration} onChange={(e) => updatePlanField(activePlanIdx, 'duration', e.target.value)} placeholder="e.g. / Yearly" className="w-full bg-indigo-50/30 border border-indigo-100 rounded-xl px-4 py-3 text-xs font-bold outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all text-indigo-600" />
                                         </div>
                                         <div className="space-y-1">
@@ -442,7 +442,7 @@ const BusinessContent = () => {
 
                                     <div className="space-y-4">
                                         <div className="flex items-center justify-between border-b border-slate-50 pb-2">
-                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Benefit Cards</label>
+                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal">Benefit Cards</label>
                                             <button onClick={() => addBenefit(activePlanIdx)} className="text-indigo-600 font-medium text-[10px] uppercase flex items-center gap-1 hover:bg-indigo-50 px-3 py-1.5 rounded-lg transition-all"><PlusCircle size={14} /> Add Benefit</button>
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -488,8 +488,8 @@ const BusinessContent = () => {
                                         </div>
                                     </div>
                                     <div className="pt-4 flex justify-between gap-4">
-                                        <button onClick={() => removePlan(activePlanIdx)} className="bg-rose-50 text-rose-500 px-6 py-4 rounded-2xl font-medium text-[10px] uppercase tracking-widest hover:bg-rose-100 transition-all flex items-center gap-2"><Trash2 size={16} /> DELETE PLAN</button>
-                                        <button onClick={handleSaveSettings} disabled={submitting} className="flex-1 bg-slate-900 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-[0.2em] shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
+                                        <button onClick={() => removePlan(activePlanIdx)} className="bg-rose-50 text-rose-500 px-4 py-4 rounded-2xl font-medium text-[10px] uppercase tracking-normal hover:bg-rose-100 transition-all flex items-center gap-2"><Trash2 size={16} /> DELETE PLAN</button>
+                                        <button onClick={handleSaveSettings} disabled={submitting} className="flex-1 bg-slate-900 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
                                             {submitting ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />} SAVE ALL CHANGES
                                         </button>
                                     </div>
@@ -497,7 +497,7 @@ const BusinessContent = () => {
                             ) : (
                                 <div className="flex-1 flex flex-col items-center justify-center gap-4 text-slate-400">
                                     <Layout size={40} className="opacity-20" />
-                                    <p className="font-medium text-xs uppercase tracking-widest">No plans created yet</p>
+                                    <p className="font-medium text-xs uppercase tracking-normal">No plans created yet</p>
                                     <button onClick={addNewPlan} className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-medium text-[10px] uppercase">Create Your First Plan</button>
                                 </div>
                             )}
@@ -512,14 +512,14 @@ const BusinessContent = () => {
                         <div className="px-8 pt-8 pb-4 flex items-center justify-between border-b border-slate-50">
                             <div>
                                 <h2 className="text-xl font-medium text-slate-900 uppercase tracking-tight">{editingId ? 'Update Strategy' : 'Create Strategy'}</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Configure card & support video</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-normal mt-0.5">Configure card & support video</p>
                             </div>
                             <button onClick={() => setShowModal(false)} className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400"><X size={20} /></button>
                         </div>
                         <form onSubmit={handleSaveIdea} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Card Banner</label>
+                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Card Banner</label>
                                     <div className="flex gap-4">
                                         <div className="w-16 h-16 bg-slate-50 border rounded-xl flex items-center justify-center overflow-hidden shrink-0">
                                             {formData.bannerImage ? <img src={formData.bannerImage} className="w-full h-full object-cover" /> : <ImageIcon className="text-slate-200" />}
@@ -531,7 +531,7 @@ const BusinessContent = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-medium text-rose-500 uppercase tracking-widest ml-1">Support Video (YouTube URL)</label>
+                                    <label className="text-[10px] font-medium text-rose-500 uppercase tracking-normal ml-1">Support Video (YouTube URL)</label>
                                     <input
                                         type="url"
                                         value={formData.videoUrl}
@@ -541,27 +541,27 @@ const BusinessContent = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Heading</label>
+                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Heading</label>
                                     <input type="text" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold outline-none" required />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Monthly Profit</label>
+                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Monthly Profit</label>
                                     <input type="text" value={formData.potentialEarnings} onChange={(e) => setFormData({...formData, potentialEarnings: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold outline-none" required />
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
-                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Description</label>
+                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Description</label>
                                     <textarea value={formData.desc} onChange={(e) => setFormData({...formData, desc: e.target.value})} rows="2" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold outline-none resize-none" required />
                                 </div>
                                 <div className="md:col-span-2 space-y-3">
-                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Select Badges</label>
+                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Select Badges</label>
                                     <div className="flex flex-wrap gap-2">
                                         {['Trending', 'High Profit', 'New', 'Hot Deal', 'Low Budget'].map((badge) => (
-                                            <button key={badge} type="button" onClick={() => toggleBadge(badge)} className={`px-4 py-2 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all ${formData.badges.includes(badge) ? 'bg-[#5D38F0] text-white' : 'bg-slate-50 text-slate-400'}`}>{badge}</button>
+                                            <button key={badge} type="button" onClick={() => toggleBadge(badge)} className={`px-4 py-2 rounded-xl text-[10px] font-medium uppercase tracking-normal transition-all ${formData.badges.includes(badge) ? 'bg-[#5D38F0] text-white' : 'bg-slate-50 text-slate-400'}`}>{badge}</button>
                                         ))}
                                     </div>
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
-                                    <label className="text-[10px] font-medium text-indigo-500 uppercase tracking-widest ml-1">🔗 Meeting Link</label>
+                                    <label className="text-[10px] font-medium text-indigo-500 uppercase tracking-normal ml-1">🔗 Meeting Link</label>
                                     <input
                                         type="url"
                                         value={formData.meetingLink}
@@ -570,8 +570,8 @@ const BusinessContent = () => {
                                         className="w-full bg-indigo-50/30 border border-indigo-100 rounded-xl px-4 py-3 text-sm font-bold outline-none text-indigo-600 placeholder:text-slate-300 focus:ring-2 focus:ring-indigo-500/20"
                                     />
                                 </div>
-                                <div className="md:col-span-2 p-6 bg-slate-50 rounded-[2.5rem] border border-slate-100 space-y-6">
-                                    <h3 className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] mb-2">Business Card Details</h3>
+                                <div className="md:col-span-2 p-4 bg-slate-50 rounded-[2.5rem] border border-slate-100 space-y-6">
+                                    <h3 className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-2">Business Card Details</h3>
                                     <div className="space-y-4">
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-medium text-emerald-500 uppercase ml-1">How it Works (कैसे करें)</label>
@@ -588,7 +588,7 @@ const BusinessContent = () => {
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" disabled={submitting || isUploading} className="w-full bg-slate-900 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-[0.2em] shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
+                            <button type="submit" disabled={submitting || isUploading} className="w-full bg-slate-900 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
                                 {submitting ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />} SAVE STRATEGY
                             </button>
                         </form>

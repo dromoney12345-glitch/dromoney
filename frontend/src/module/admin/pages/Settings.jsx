@@ -55,10 +55,10 @@ const Settings = () => {
             {/* Success Toast */}
             {showToast && (
                 <div className="fixed top-24 right-8 z-50 animate-in slide-in-from-right duration-300">
-                    <div className="bg-emerald-500 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
+                    <div className="bg-emerald-500 text-white px-4 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
                         <CheckCircle2 size={24} />
                         <div>
-                            <p className="text-xs font-medium uppercase tracking-widest">Settings Saved</p>
+                            <p className="text-xs font-medium uppercase tracking-normal">Settings Saved</p>
                             <p className="text-[10px] font-bold opacity-80">Platform parameters updated successfully.</p>
                         </div>
                     </div>
@@ -80,7 +80,7 @@ const Settings = () => {
                                     <div className={`p-2 rounded-xl ${activeTab === tab.id ? 'bg-white/10' : tab.bg} ${activeTab === tab.id ? 'text-white' : tab.color}`}>
                                         <tab.icon size={18} />
                                     </div>
-                                    <span className="text-[11px] font-medium uppercase tracking-widest">{tab.label}</span>
+                                    <span className="text-[11px] font-medium uppercase tracking-normal">{tab.label}</span>
                                 </div>
                                 {activeTab === tab.id && <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>}
                             </button>
@@ -91,7 +91,7 @@ const Settings = () => {
                         <div className="absolute -top-4 -right-4 text-amber-100 rotate-12">
                             <AlertTriangle size={80} />
                         </div>
-                        <h4 className="text-[11px] font-medium text-amber-900 uppercase tracking-widest mb-2 flex items-center gap-2 relative z-10">
+                        <h4 className="text-[11px] font-medium text-amber-900 uppercase tracking-normal mb-2 flex items-center gap-2 relative z-10">
                             <AlertTriangle size={14} /> Attention
                         </h4>
                         <p className="text-[10px] font-bold text-amber-900/60 leading-relaxed relative z-10">
@@ -123,28 +123,28 @@ const Settings = () => {
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <Globe size={14} className="text-slate-400" />
-                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Platform Name</label>
+                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal">Platform Name</label>
                                             </div>
                                             <input 
                                                 type="text" 
                                                 value={config.appName}
                                                 onChange={(e) => handleChange('appName', e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all" 
                                             />
                                         </div>
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <Mail size={14} className="text-slate-400" />
-                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">System Email</label>
+                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal">System Email</label>
                                             </div>
                                             <input 
                                                 type="email" 
                                                 value={config.contactEmail}
                                                 onChange={(e) => handleChange('contactEmail', e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all" 
                                             />
                                         </div>
-                                        <div className="lg:col-span-2 p-6 bg-slate-50 rounded-3xl border border-slate-100 flex items-center justify-between">
+                                        <div className="lg:col-span-2 p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
                                             <div>
                                                 <h4 className="text-[13px] font-medium text-slate-800 uppercase tracking-tight">Maintenance Mode</h4>
                                                 <p className="text-[11px] font-bold text-slate-400 mt-1">Temporarily block user access for updates</p>
@@ -162,7 +162,7 @@ const Settings = () => {
 
                             {activeTab === 'payments' && (
                                 <div className="space-y-8 animate-in fade-in duration-300">
-                                    <div className="p-6 bg-indigo-50/50 rounded-3xl border border-indigo-100 flex items-start gap-4">
+                                    <div className="p-6 bg-indigo-50/50 rounded-xl border border-indigo-100 flex items-start gap-4">
                                         <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-indigo-500 shadow-sm shrink-0">
                                             <CreditCard size={24} />
                                         </div>
@@ -173,23 +173,23 @@ const Settings = () => {
                                     </div>
                                     <div className="space-y-6">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Admin UPI ID</label>
+                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Admin UPI ID</label>
                                             <input 
                                                 type="text" 
                                                 value={config.adminUpiId}
                                                 onChange={(e) => handleChange('adminUpiId', e.target.value)}
                                                 placeholder="yourname@upi" 
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" 
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Manual Bank Details</label>
+                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Manual Bank Details</label>
                                             <textarea 
                                                 rows={4} 
                                                 value={config.bankDetails}
                                                 onChange={(e) => handleChange('bankDetails', e.target.value)}
                                                 placeholder="Account Number, IFSC, Branch Name..." 
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none" 
                                             />
                                         </div>
                                     </div>
@@ -204,12 +204,12 @@ const Settings = () => {
                                             { label: 'Coin Value', field: 'coinRate', unit: '₹', icon: '🪙', info: '1 Coin = ₹ Value', step: 0.01 },
                                             { label: 'Minimum Payout', field: 'minWithdrawal', unit: '₹', icon: '🏧', info: 'Withdrawal limit' }
                                         ].map((item, idx) => (
-                                            <div key={idx} className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 hover:border-emerald-200 transition-all group">
+                                            <div key={idx} className="bg-slate-50 p-4 rounded-[2rem] border border-slate-100 hover:border-emerald-200 transition-all group">
                                                 <div className="flex items-center justify-between mb-4">
                                                     <span className="text-2xl">{item.icon}</span>
-                                                    <span className="bg-white/80 px-2 py-1 rounded-lg text-[9px] font-medium text-slate-400 uppercase tracking-widest border border-slate-200">System Parameter</span>
+                                                    <span className="bg-white/80 px-2 py-1 rounded-lg text-[9px] font-medium text-slate-400 uppercase tracking-normal border border-slate-200">System Parameter</span>
                                                 </div>
-                                                <label className="text-[10px] font-medium text-slate-500 uppercase tracking-widest ml-1">{item.label}</label>
+                                                <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal ml-1">{item.label}</label>
                                                 <div className="relative mt-2">
                                                     <span className="absolute left-5 top-1/2 -translate-y-1/2 font-medium text-slate-400">{item.unit}</span>
                                                     <input 
@@ -220,11 +220,11 @@ const Settings = () => {
                                                         className="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-5 py-4 text-lg font-medium text-emerald-600 focus:outline-none focus:border-emerald-500 transition-all" 
                                                     />
                                                 </div>
-                                                <p className="text-[10px] font-bold text-slate-400 mt-3 ml-1 uppercase tracking-tight opacity-60 italic">{item.info}</p>
+                                                <p className="text-[10px] font-bold text-slate-400 mt-3 ml-1 uppercase tracking-tight opacity-60">{item.info}</p>
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="p-6 bg-emerald-50 rounded-3xl border border-emerald-100 flex items-center justify-between gap-4">
+                                    <div className="p-6 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-between gap-4">
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm">
                                                 <TrendingUpIcon size={24} />
@@ -247,7 +247,7 @@ const Settings = () => {
                             {activeTab === 'security' && (
                                 <div className="space-y-8 animate-in fade-in duration-300">
                                     <div className="max-w-md space-y-6">
-                                        <div className="p-6 bg-rose-50/50 rounded-3xl border border-rose-100 flex items-center gap-4 mb-2">
+                                        <div className="p-6 bg-rose-50/50 rounded-xl border border-rose-100 flex items-center gap-4 mb-2">
                                             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-rose-500 shadow-sm">
                                                 <Shield size={24} />
                                             </div>
@@ -259,25 +259,25 @@ const Settings = () => {
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <Mail size={14} className="text-slate-400" />
-                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Admin Login Email</label>
+                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal">Admin Login Email</label>
                                             </div>
                                             <input 
                                                 type="email" 
                                                 value={config.adminEmail}
                                                 onChange={(e) => handleChange('adminEmail', e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:border-rose-500 transition-all mb-4" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:border-rose-500 transition-all mb-4" 
                                             />
                                         </div>
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <Lock size={14} className="text-slate-400" />
-                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Admin Dashboard Password</label>
+                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal">Admin Dashboard Password</label>
                                             </div>
                                             <input 
                                                 type="password" 
                                                 value={config.adminPassword}
                                                 onChange={(e) => handleChange('adminPassword', e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:border-rose-500 transition-all" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:border-rose-500 transition-all" 
                                             />
                                         </div>
                                     </div>
@@ -288,12 +288,12 @@ const Settings = () => {
                         {/* Footer / Save Action */}
                         <div className="mt-12 pt-8 border-t border-slate-100 flex items-center justify-between">
                             <div className="hidden md:block">
-                                <p className="text-[10px] font-bold text-slate-400 italic">Last Sync: {new Date().toLocaleTimeString()}</p>
+                                <p className="text-[10px] font-bold text-slate-400">Last Sync: {new Date().toLocaleTimeString()}</p>
                             </div>
                             <button 
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className={`flex items-center gap-3 bg-[#1A1C30] text-white px-12 py-5 rounded-[2rem] text-[12px] font-medium uppercase tracking-[0.2em] transition-all shadow-2xl shadow-slate-300
+                                className={`flex items-center gap-3 bg-[#1A1C30] text-white px-12 py-3 rounded-[2rem] text-[12px] font-medium uppercase tracking-normal transition-all shadow-2xl shadow-slate-300
                                     ${isSaving ? 'opacity-80 scale-95' : 'hover:scale-[1.02] active:scale-95'}`}
                             >
                                 {isSaving ? (

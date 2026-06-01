@@ -134,15 +134,15 @@ const Wallets = () => {
                         <thead>
                             <tr className="bg-slate-50/50 border-b border-slate-100">
                                 {['ID', 'User', 'Amount', 'Method', 'Date', 'Status', 'Actions'].map(h => (
-                                    <th key={h} className="text-left px-5 py-3.5 text-[10px] text-slate-400 uppercase tracking-widest">{h}</th>
+                                    <th key={h} className="text-left px-5 py-3.5 text-[10px] text-slate-400 uppercase tracking-normal">{h}</th>
                                 ))}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
                             {loading ? (
-                                <tr><td colSpan="7" className="py-16 text-center text-[11px] text-slate-400 uppercase tracking-widest">Loading...</td></tr>
+                                <tr><td colSpan="7" className="py-16 text-center text-[11px] text-slate-400 uppercase tracking-normal">Loading...</td></tr>
                             ) : list.length === 0 ? (
-                                <tr><td colSpan="7" className="py-16 text-center text-[11px] text-slate-400 uppercase tracking-widest">No withdrawal requests found</td></tr>
+                                <tr><td colSpan="7" className="py-16 text-center text-[11px] text-slate-400 uppercase tracking-normal">No withdrawal requests found</td></tr>
                             ) : list.map(w => (
                                 <tr key={w.id} className="hover:bg-slate-50/40 transition-colors">
                                     <td className="px-5 py-4 text-[11px] text-sky-600 font-mono">{w.id.slice(-8).toUpperCase()}</td>
@@ -212,7 +212,7 @@ const Wallets = () => {
             {/* ── CONFIRM ACTION MODAL ── */}
             {confirmAction && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+                    <div className="bg-white rounded-2xl w-full max-w-sm p-4 shadow-2xl animate-in zoom-in-95 duration-200">
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${confirmAction.status === 'Approved' ? 'bg-emerald-50' : 'bg-rose-50'}`}>
                             {confirmAction.status === 'Approved'
                                 ? <CheckCircle size={24} className="text-emerald-500" />
@@ -252,10 +252,10 @@ const Wallets = () => {
                 <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
                         {/* Header */}
-                        <div className="bg-slate-900 px-6 py-4 flex items-center justify-between">
+                        <div className="bg-slate-900 px-4 py-4 flex items-center justify-between">
                             <div>
                                 <h3 className="text-white text-[14px]">Withdrawal Details</h3>
-                                <p className="text-slate-400 text-[10px] uppercase tracking-widest mt-0.5">ID: {selectedDetail.id.slice(-8).toUpperCase()}</p>
+                                <p className="text-slate-400 text-[10px] uppercase tracking-normal mt-0.5">ID: {selectedDetail.id.slice(-8).toUpperCase()}</p>
                             </div>
                             <button onClick={() => setShowDetailModal(false)} className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center text-white transition-all cursor-pointer">
                                 <X size={16} />
@@ -266,7 +266,7 @@ const Wallets = () => {
                         <div className="p-6 space-y-4">
                             {/* Status badge */}
                             <div className="flex items-center justify-between">
-                                <span className="text-[10px] text-slate-400 uppercase tracking-widest">Status</span>
+                                <span className="text-[10px] text-slate-400 uppercase tracking-normal">Status</span>
                                 <span className={`text-[11px] px-3 py-1 rounded-full border ${statusColor(selectedDetail.status)}`}>
                                     {selectedDetail.status}
                                 </span>
@@ -274,20 +274,20 @@ const Wallets = () => {
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                                    <p className="text-[9px] text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1"><User size={9} /> User</p>
+                                    <p className="text-[9px] text-slate-400 uppercase tracking-normal mb-1 flex items-center gap-1"><User size={9} /> User</p>
                                     <p className="text-[13px] text-slate-800">{selectedDetail.user}</p>
                                 </div>
                                 <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                                    <p className="text-[9px] text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1"><IndianRupee size={9} /> Amount</p>
+                                    <p className="text-[9px] text-slate-400 uppercase tracking-normal mb-1 flex items-center gap-1"><IndianRupee size={9} /> Amount</p>
                                     <p className="text-[13px] text-emerald-600">{selectedDetail.amount}</p>
                                 </div>
                                 <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                                    <p className="text-[9px] text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1"><Calendar size={9} /> Date</p>
+                                    <p className="text-[9px] text-slate-400 uppercase tracking-normal mb-1 flex items-center gap-1"><Calendar size={9} /> Date</p>
                                     <p className="text-[12px] text-slate-700">{selectedDetail.date}</p>
                                     <p className="text-[10px] text-slate-400">{selectedDetail.time}</p>
                                 </div>
                                 <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                                    <p className="text-[9px] text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1"><CreditCard size={9} /> Method</p>
+                                    <p className="text-[9px] text-slate-400 uppercase tracking-normal mb-1 flex items-center gap-1"><CreditCard size={9} /> Method</p>
                                     <p className="text-[12px] text-slate-700">{selectedDetail.method}</p>
                                 </div>
                             </div>
@@ -295,7 +295,7 @@ const Wallets = () => {
                             {/* Bank Details */}
                             {selectedDetail.bankDetails && (
                                 <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 space-y-2">
-                                    <p className="text-[9px] text-slate-400 uppercase tracking-widest flex items-center gap-1 mb-2"><Building2 size={9} /> Bank Details</p>
+                                    <p className="text-[9px] text-slate-400 uppercase tracking-normal flex items-center gap-1 mb-2"><Building2 size={9} /> Bank Details</p>
                                     <div className="grid grid-cols-2 gap-2 text-[11px]">
                                         <div><span className="text-slate-400">Holder:</span> <span className="text-slate-700">{selectedDetail.bankDetails.holderName}</span></div>
                                         <div><span className="text-slate-400">Bank:</span> <span className="text-slate-700">{selectedDetail.bankDetails.bankName}</span></div>
@@ -306,7 +306,7 @@ const Wallets = () => {
                             )}
                             {selectedDetail.upiId && (
                                 <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                    <p className="text-[9px] text-slate-400 uppercase tracking-widest mb-1">UPI ID</p>
+                                    <p className="text-[9px] text-slate-400 uppercase tracking-normal mb-1">UPI ID</p>
                                     <p className="text-[12px] text-slate-700 font-mono">{selectedDetail.upiId}</p>
                                 </div>
                             )}
@@ -316,13 +316,13 @@ const Wallets = () => {
                                 <div className="flex gap-3 pt-2">
                                     <button
                                         onClick={() => setConfirmAction({ id: selectedDetail.id, status: 'Approved', name: selectedDetail.user, amount: selectedDetail.amount })}
-                                        className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all cursor-pointer"
+                                        className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-[11px] uppercase tracking-normal flex items-center justify-center gap-2 transition-all cursor-pointer"
                                     >
                                         <CheckCircle size={14} /> Approve
                                     </button>
                                     <button
                                         onClick={() => setConfirmAction({ id: selectedDetail.id, status: 'Rejected', name: selectedDetail.user, amount: selectedDetail.amount })}
-                                        className="flex-1 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all cursor-pointer"
+                                        className="flex-1 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-[11px] uppercase tracking-normal flex items-center justify-center gap-2 transition-all cursor-pointer"
                                     >
                                         <XCircle size={14} /> Reject
                                     </button>
@@ -336,7 +336,7 @@ const Wallets = () => {
             {/* ── WALLET BALANCE MODAL ── */}
             {showBalanceModal && selectedUser && (
                 <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+                    <div className="bg-white rounded-2xl w-full max-w-sm p-4 shadow-2xl animate-in zoom-in-95 duration-200">
                         <div className="flex items-center justify-between mb-5">
                             <h3 className="text-[14px] text-slate-800">Wallet Balance</h3>
                             <button onClick={() => setShowBalanceModal(false)} className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center text-slate-500 transition-all cursor-pointer">
@@ -345,7 +345,7 @@ const Wallets = () => {
                         </div>
 
                         <div className="bg-amber-50 border border-amber-100 rounded-xl p-5 text-center mb-4">
-                            <p className="text-[10px] text-amber-600 uppercase tracking-widest mb-1">{selectedUser.user}'s Balance</p>
+                            <p className="text-[10px] text-amber-600 uppercase tracking-normal mb-1">{selectedUser.user}'s Balance</p>
                             <p className="text-3xl text-slate-900">₹{selectedUser.walletBalance?.toLocaleString()}</p>
                         </div>
 
@@ -356,7 +356,7 @@ const Wallets = () => {
 
                         <button
                             onClick={() => setShowBalanceModal(false)}
-                            className="w-full py-3 bg-slate-900 hover:bg-black text-white rounded-xl text-[11px] uppercase tracking-widest transition-all cursor-pointer"
+                            className="w-full py-3 bg-slate-900 hover:bg-black text-white rounded-xl text-[11px] uppercase tracking-normal transition-all cursor-pointer"
                         >
                             Close
                         </button>

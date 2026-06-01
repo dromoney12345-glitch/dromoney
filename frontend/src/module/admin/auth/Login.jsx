@@ -42,7 +42,7 @@ const AdminLogin = () => {
                 <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[150px]"></div>
             </div>
 
-            <div className="w-full max-w-[800px] min-h-[500px] bg-white rounded-[32px] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.5)] flex flex-col md:flex-row transition-all duration-500 relative z-10">
+            <div className="w-full max-w-[800px] min-h-[500px] bg-white rounded-2xl overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.5)] flex flex-col md:flex-row transition-all duration-500 relative z-10">
                 
                 {/* ── Left Section: Welcome ── */}
                 <div className="flex-1 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] relative overflow-hidden flex flex-col justify-center px-10 py-12 text-white">
@@ -73,7 +73,7 @@ const AdminLogin = () => {
                         </p>
 
                         <div className="pt-6 animate-in fade-in duration-1000 delay-500">
-                             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+                             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 text-[10px] font-bold text-slate-300 uppercase tracking-normal">
                                 <CheckCircle2 size={12} className="text-emerald-500" /> System Status: Online
                              </div>
                         </div>
@@ -127,7 +127,7 @@ const AdminLogin = () => {
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-0 top-1/2 -translate-y-1/2 text-[11px] font-medium text-indigo-600 hover:text-indigo-800 uppercase tracking-widest transition-all px-2 py-1 rounded-md hover:bg-indigo-50"
+                                        className="absolute right-0 top-1/2 -translate-y-1/2 text-[11px] font-medium text-indigo-600 hover:text-indigo-800 uppercase tracking-normal transition-all px-2 py-1 rounded-md hover:bg-indigo-50"
                                     >
                                         {showPassword ? 'HIDE' : 'SHOW'}
                                     </button>
@@ -161,7 +161,7 @@ const AdminLogin = () => {
                                 
                                 <div className="relative flex items-center justify-center py-2">
                                     <div className="w-full h-px bg-slate-100"></div>
-                                    <span className="absolute bg-white px-4 text-[10px] font-medium text-slate-300 uppercase tracking-widest">secure gateway</span>
+                                    <span className="absolute bg-white px-4 text-[10px] font-medium text-slate-300 uppercase tracking-normal">secure gateway</span>
                                 </div>
 
                                 <button

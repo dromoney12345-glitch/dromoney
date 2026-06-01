@@ -117,7 +117,7 @@ const Reports = () => {
                     <button 
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-3 px-8 py-3.5 rounded-[22px] font-medium text-[11px] uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-[#0F172A] text-white shadow-xl shadow-slate-200' : 'text-slate-400 hover:bg-slate-50'}`}
+                        className={`flex items-center gap-3 px-8 py-3.5 rounded-[22px] font-medium text-[11px] uppercase tracking-normal transition-all ${activeTab === tab.id ? 'bg-[#0F172A] text-white shadow-xl shadow-slate-200' : 'text-slate-400 hover:bg-slate-50'}`}
                     >
                         <tab.icon size={14} className={activeTab === tab.id ? 'text-white' : tab.color} /> {tab.label}
                     </button>
@@ -136,7 +136,7 @@ const Reports = () => {
                     return (
                         <div className="space-y-8 animate-in fade-in duration-500">
                             {/* Dynamic App Rating Dashboard Card */}
-                            <div className="bg-white rounded-[36px] border border-slate-100 p-8 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-8 items-center max-w-5xl">
+                            <div className="bg-white rounded-[36px] border border-slate-100 p-5 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-8 items-center max-w-5xl">
                                 {/* Average Score Section */}
                                 <div className="flex flex-col items-center justify-center text-center md:border-r border-slate-100 md:pr-8 py-2">
                                     <h3 className="text-6xl font-medium text-slate-800 leading-none mb-4">{averageRating}</h3>
@@ -149,8 +149,8 @@ const Reports = () => {
                                             />
                                         ))}
                                     </div>
-                                    <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-1 leading-none">Dynamic App Rate</p>
-                                    <p className="text-[10px] font-bold text-indigo-500 bg-indigo-50 border border-indigo-100/30 px-3 py-1 rounded-full mt-3 uppercase tracking-wider">{totalFeedbacks} Total Reviews</p>
+                                    <p className="text-[11px] font-medium text-slate-400 uppercase tracking-normal mb-1 leading-none">Dynamic App Rate</p>
+                                    <p className="text-[10px] font-bold text-indigo-500 bg-indigo-50 border border-indigo-100/30 px-3 py-1 rounded-full mt-3 uppercase tracking-tight">{totalFeedbacks} Total Reviews</p>
                                 </div>
 
                                 {/* Star Breakdown Progress Bars */}
@@ -177,12 +177,12 @@ const Reports = () => {
 
                             {/* Feedbacks Grid */}
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium text-slate-700 uppercase tracking-wider pl-1 flex items-center gap-2">
+                                <h3 className="text-sm font-medium text-slate-700 uppercase tracking-tight pl-1 flex items-center gap-2">
                                     <MessageSquare size={16} className="text-sky-500" /> Active Unread Reviews
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {feedbacks.filter(f => f.status === 'Unread').map(f => (
-                                        <div key={f._id} className="bg-white rounded-[32px] border border-slate-100 p-6 shadow-sm hover:shadow-xl hover:shadow-slate-100 transition-all relative group overflow-hidden">
+                                        <div key={f._id} className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-xl hover:shadow-slate-100 transition-all relative group overflow-hidden">
                                             {/* Subtle Background Element */}
                                             <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-emerald-500/10 transition-colors"></div>
                                             
@@ -203,7 +203,7 @@ const Reports = () => {
                                                         </div>
                                                         <div className="min-w-0">
                                                             <h4 className="text-[13px] font-medium text-slate-800 tracking-tight leading-none uppercase truncate max-w-[120px]">{f.user?.name || 'Anonymous'}</h4>
-                                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 opacity-70">{formatTime(f.createdAt)}</p>
+                                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-normal mt-1 opacity-70">{formatTime(f.createdAt)}</p>
                                                         </div>
                                                     </div>
 
@@ -227,16 +227,16 @@ const Reports = () => {
 
                                             {/* Message Body */}
                                             <div className="mt-4 bg-slate-50/50 rounded-2xl p-4 border border-slate-50 relative z-10">
-                                                <p className="text-[12px] font-bold text-slate-600 leading-relaxed italic line-clamp-4 group-hover:line-clamp-none transition-all">
+                                                <p className="text-[12px] font-bold text-slate-600 leading-relaxed line-clamp-4 group-hover:line-clamp-none transition-all">
                                                     "{f.message}"
                                                 </p>
                                             </div>
                                         </div>
                                     ))}
                                     {feedbacks.filter(f => f.status === 'Unread').length === 0 && (
-                                        <div className="col-span-full py-16 text-center bg-white rounded-3xl border border-slate-100 shadow-sm max-w-5xl">
+                                        <div className="col-span-full py-16 text-center bg-white rounded-xl border border-slate-100 shadow-sm max-w-5xl">
                                             <MessageSquare size={40} className="text-slate-200 mx-auto mb-3" />
-                                            <p className="text-slate-400 font-medium uppercase tracking-widest text-[10px]">No unread feedbacks remaining!</p>
+                                            <p className="text-slate-400 font-medium uppercase tracking-normal text-[10px]">No unread feedbacks remaining!</p>
                                         </div>
                                     )}
                                 </div>
@@ -249,7 +249,7 @@ const Reports = () => {
                 {activeTab === 'problems' && (
                     <div className="grid grid-cols-1 gap-6 max-w-5xl mx-auto">
                         {reports.map(pr => (
-                            <div key={pr._id} className="bg-white rounded-[40px] border border-slate-100 p-8 shadow-sm flex flex-col md:flex-row gap-8 relative group overflow-hidden">
+                            <div key={pr._id} className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col md:flex-row gap-8 relative group overflow-hidden">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                                 <div className="flex flex-col gap-4 min-w-[200px] border-b md:border-b-0 md:border-r border-slate-100 pb-6 md:pb-0 md:pr-8">
                                     <div className="flex items-center gap-3 mb-2">
@@ -268,23 +268,23 @@ const Reports = () => {
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2 text-slate-400">
                                             <Clock size={12} strokeWidth={3} />
-                                            <span className="text-[10px] font-medium uppercase tracking-widest leading-none">{formatTime(pr.createdAt)}</span>
+                                            <span className="text-[10px] font-medium uppercase tracking-normal leading-none">{formatTime(pr.createdAt)}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <div className={`w-2 h-2 rounded-full ${pr.status === 'Resolved' ? 'bg-emerald-500' : pr.status === 'Rejected' ? 'bg-rose-500' : 'bg-amber-400 animate-pulse'}`}></div>
-                                            <span className={`text-[10px] font-medium uppercase tracking-widest ${pr.status === 'Resolved' ? 'text-emerald-600' : pr.status === 'Rejected' ? 'text-rose-600' : 'text-amber-600'}`}>{pr.status}</span>
+                                            <span className={`text-[10px] font-medium uppercase tracking-normal ${pr.status === 'Resolved' ? 'text-emerald-600' : pr.status === 'Rejected' ? 'text-rose-600' : 'text-amber-600'}`}>{pr.status}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="flex-1 space-y-4 pt-2">
-                                    <h5 className="text-[11px] font-medium text-slate-400 uppercase tracking-[0.2em] ml-1">Issue Description</h5>
-                                    <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 italic text-[14px] font-bold text-slate-600 leading-relaxed shadow-inner">
+                                    <h5 className="text-[11px] font-medium text-slate-400 uppercase tracking-normal ml-1">Issue Description</h5>
+                                    <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-[14px] font-bold text-slate-600 leading-relaxed shadow-inner">
                                         {pr.message}
                                     </div>
                                     {pr.status === 'Pending' && (
                                         <div className="flex gap-3 justify-end pt-2">
-                                            <button onClick={() => handleUpdateReportStatus(pr._id, 'Rejected')} className="flex items-center gap-2 text-slate-400 hover:text-rose-500 text-[11px] font-medium uppercase tracking-widest transition-all">Reject Claim</button>
-                                            <button onClick={() => handleUpdateReportStatus(pr._id, 'Resolved')} className="flex items-center gap-2 bg-[#0F172A] text-white px-6 py-3 rounded-xl text-[10px] font-medium uppercase tracking-widest shadow-xl active:scale-95 transition-all">Mark as Resolved</button>
+                                            <button onClick={() => handleUpdateReportStatus(pr._id, 'Rejected')} className="flex items-center gap-2 text-slate-400 hover:text-rose-500 text-[11px] font-medium uppercase tracking-normal transition-all">Reject Claim</button>
+                                            <button onClick={() => handleUpdateReportStatus(pr._id, 'Resolved')} className="flex items-center gap-2 bg-[#0F172A] text-white px-4 py-3 rounded-xl text-[10px] font-medium uppercase tracking-normal shadow-xl active:scale-95 transition-all">Mark as Resolved</button>
                                         </div>
                                     )}
                                 </div>
@@ -293,7 +293,7 @@ const Reports = () => {
                         {reports.length === 0 && !loading && (
                              <div className="col-span-full py-20 text-center">
                                 <ShieldAlert size={48} className="text-slate-200 mx-auto mb-4" />
-                                <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No active problem reports.</p>
+                                <p className="text-slate-400 font-bold uppercase tracking-normal text-xs">No active problem reports.</p>
                             </div>
                         )}
                     </div>
@@ -306,34 +306,34 @@ const Reports = () => {
                         <div className="space-y-6">
                             <h3 className="text-xl font-medium text-slate-800 tracking-tight uppercase flex items-center gap-3 ml-2"><List className="text-indigo-500" /> Help Guides List</h3>
                             {guides.map((guide, i) => (
-                                <div key={i} className="bg-white rounded-[40px] border border-slate-100 shadow-sm p-8 group relative overflow-hidden transition-all hover:bg-white hover:shadow-2xl hover:shadow-slate-100">
+                                <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 group relative overflow-hidden transition-all hover:bg-white hover:shadow-2xl hover:shadow-slate-100">
                                     <div className="flex items-start justify-between mb-8 pb-4 border-b border-slate-50">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center font-medium">0{i + 1}</div>
-                                            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-widest leading-none">Global Instruction Card</span>
+                                            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-normal leading-none">Global Instruction Card</span>
                                         </div>
                                         <button onClick={() => deleteGuide(i)} className="w-10 h-10 bg-rose-50 text-rose-400 rounded-xl flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"><Trash2 size={16} /></button>
                                     </div>
 
                                     <div className="space-y-6">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Question / Heading</label>
+                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Question / Heading</label>
                                             <input value={guide.q} onChange={(e) => updateGuide(i, 'q', e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-medium text-slate-800 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-400 transition-all shadow-sm" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Answer / Instruction Body</label>
+                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Answer / Instruction Body</label>
                                             <textarea value={guide.a} onChange={(e) => updateGuide(i, 'a', e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-bold text-slate-500 h-28 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-400 transition-all shadow-sm resize-none" />
                                         </div>
                                     </div>
                                     <button 
                                         onClick={handleSyncGuides}
-                                        className="w-full mt-8 bg-[#0F172A] text-white py-4 rounded-3xl font-medium text-[11px] uppercase tracking-widest shadow-xl hover:bg-indigo-600 transition-all flex items-center justify-center gap-2"
+                                        className="w-full mt-8 bg-[#0F172A] text-white py-4 rounded-xl font-medium text-[11px] uppercase tracking-normal shadow-xl hover:bg-indigo-600 transition-all flex items-center justify-center gap-2"
                                     >
                                         <Save size={16} /> Sync {i + 1}
                                     </button>
                                 </div>
                             ))}
-                            <button onClick={addGuide} className="w-full py-8 border-2 border-dashed border-slate-200 rounded-[44px] text-slate-400 font-extrabold text-[12px] uppercase tracking-widest hover:border-indigo-400 hover:text-indigo-500 transition-all flex flex-col items-center gap-3">
+                            <button onClick={addGuide} className="w-full py-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-extrabold text-[12px] uppercase tracking-normal hover:border-indigo-400 hover:text-indigo-500 transition-all flex flex-col items-center gap-3">
                                 <Plus size={24} /> Add New FAQ Guide Item
                             </button>
                         </div>
@@ -351,13 +351,13 @@ const Reports = () => {
                                         </div>
                                         <div>
                                             <h3 className="text-2xl font-medium text-white tracking-tight uppercase">Help Guide</h3>
-                                            <p className="text-[12px] font-bold text-white/30 uppercase tracking-widest mt-1">Basic Platform Usage</p>
+                                            <p className="text-[12px] font-bold text-white/30 uppercase tracking-normal mt-1">Basic Platform Usage</p>
                                         </div>
                                     </div>
 
                                     <div className="space-y-4">
                                         {guides.map((g, i) => (
-                                            <div key={i} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[32px] p-6 hover:bg-white/10 transition-all group/p cursor-pointer">
+                                            <div key={i} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all group/p cursor-pointer">
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-[13px] font-medium text-white/90 leading-tight group-hover/p:text-indigo-400 transition-colors">{g.q}</span>
                                                     <ChevronDown size={18} className="text-white/20 group-hover/p:text-white transition-all duration-300" />

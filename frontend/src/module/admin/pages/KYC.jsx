@@ -128,10 +128,10 @@ const KYC = () => {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-slate-50 bg-slate-50/50">
-                                <th className="text-left px-6 py-5 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">User Profile</th>
-                                <th className="text-left px-6 py-5 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">Submission Date</th>
-                                <th className="text-left px-6 py-5 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">Current Status</th>
-                                <th className="text-center px-6 py-5 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">Actions</th>
+                                <th className="text-left px-4 py-3 text-[10px] font-medium text-slate-400 uppercase tracking-normal">User Profile</th>
+                                <th className="text-left px-4 py-3 text-[10px] font-medium text-slate-400 uppercase tracking-normal">Submission Date</th>
+                                <th className="text-left px-4 py-3 text-[10px] font-medium text-slate-400 uppercase tracking-normal">Current Status</th>
+                                <th className="text-center px-4 py-3 text-[10px] font-medium text-slate-400 uppercase tracking-normal">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -174,7 +174,7 @@ const KYC = () => {
                                     <td colSpan="4" className="py-24 text-center">
                                         <div className="flex flex-col items-center gap-3 grayscale opacity-30">
                                             <ImageIcon size={48} />
-                                            <p className="text-[11px] font-medium uppercase tracking-widest text-slate-500">No verification requests found</p>
+                                            <p className="text-[11px] font-medium uppercase tracking-normal text-slate-500">No verification requests found</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -185,7 +185,7 @@ const KYC = () => {
 
                 {/* Pagination Footer */}
                 <div className="px-5 py-4 bg-slate-50/50 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="text-[10px] font-medium text-slate-400 uppercase tracking-widest order-2 sm:order-1">
+                    <div className="text-[10px] font-medium text-slate-400 uppercase tracking-normal order-2 sm:order-1">
                         Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filtered.length)} of {filtered.length} entries
                     </div>
                     <div className="flex items-center gap-2 order-1 sm:order-2">
@@ -222,13 +222,13 @@ const KYC = () => {
             {isModalOpen && selectedKyc && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-[#0F172A]/80 backdrop-blur-sm"></div>
-                    <div className="relative bg-white w-full max-w-[440px] rounded-[40px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
+                    <div className="relative bg-white w-full max-w-[440px] rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
                         {/* Modal Header */}
                         <div className="bg-[#0F172A] p-7 text-white relative">
                             <div className="flex justify-between items-start">
                                 <div>
                                     <h3 className="text-xl font-medium tracking-tight mb-1">KYC Review</h3>
-                                    <p className="text-[10px] text-sky-400 font-medium uppercase tracking-[0.2em]">{selectedKyc.name}</p>
+                                    <p className="text-[10px] text-sky-400 font-medium uppercase tracking-normal">{selectedKyc.name}</p>
                                 </div>
                                 <button onClick={() => setIsModalOpen(false)} className="w-9 h-9 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center transition-colors text-white/40 hover:text-white">
                                     <XCircle size={22} />
@@ -242,13 +242,13 @@ const KYC = () => {
                                 <div className="flex items-center justify-between px-1">
                                     <div className="flex items-center gap-2">
                                         <ShieldCheck size={14} className="text-sky-500" />
-                                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none">Aadhar Card Verification</p>
+                                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal leading-none">Aadhar Card Verification</p>
                                     </div>
                                     <span className="text-[13px] font-medium text-slate-800 tracking-[0.1em] tabular-nums">{selectedKyc.aadharNumber}</span>
                                 </div>
 
                                 {/* Premium Photo Preview */}
-                                <div className="aspect-[1.5/1] bg-slate-50 rounded-[32px] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
+                                <div className="aspect-[1.5/1] bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
                                     {selectedKyc.aadharImage ? (
                                         <img 
                                             src={selectedKyc.aadharImage} 
@@ -273,20 +273,20 @@ const KYC = () => {
                                 <div className="flex gap-4 pt-2">
                                     <button
                                         onClick={() => handleAction(selectedKyc.id, 'Rejected')}
-                                        className="flex-1 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-4.5 rounded-[20px] font-medium text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-rose-100/50"
+                                        className="flex-1 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-4.5 rounded-[20px] font-medium text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-lg shadow-rose-100/50"
                                     >
                                         Reject
                                     </button>
                                     <button
                                         onClick={() => handleAction(selectedKyc.id, 'Approved')}
-                                        className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-4.5 rounded-[20px] font-medium text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-sky-200"
+                                        className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-4.5 rounded-[20px] font-medium text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-xl shadow-sky-200"
                                     >
                                         Approve
                                     </button>
                                 </div>
                             ) : (
                                 <div className={`p-5 rounded-[24px] text-center border-2 ${selectedKyc.status === 'Approved' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
-                                    <p className="text-[10px] font-medium uppercase tracking-[0.2em] mb-1">Verification Record</p>
+                                    <p className="text-[10px] font-medium uppercase tracking-normal mb-1">Verification Record</p>
                                     <p className="text-[12px] font-bold">This submission was verified as <span className="underline decoration-2 underline-offset-4">{selectedKyc.status}</span></p>
                                 </div>
                             )}

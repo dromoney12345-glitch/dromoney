@@ -190,7 +190,7 @@ const Dashboard = () => {
                         <h1 className="text-2xl font-medium text-slate-900 tracking-tight flex items-center gap-3 uppercase">
                             Elite Control Room <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                         </h1>
-                        <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[9px] mt-1 flex items-center gap-2">
+                        <p className="text-slate-400 font-bold uppercase tracking-normal text-[9px] mt-1 flex items-center gap-2">
                             <Monitor size={10} /> System Node 01 • <span className="text-emerald-500 font-medium">Online & Secured</span>
                         </p>
                     </div>
@@ -199,7 +199,7 @@ const Dashboard = () => {
                 <div className="flex flex-wrap items-center gap-3">
                     <div className="flex items-center gap-4 bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm">
                         <div className="flex items-center gap-2.5">
-                            <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none">Maintenance</span>
+                            <span className="text-[10px] font-medium text-slate-400 uppercase tracking-normal leading-none">Maintenance</span>
                             <button
                                 onClick={handleMaintenanceToggle}
                                 disabled={!settingsLoaded}
@@ -210,7 +210,7 @@ const Dashboard = () => {
                         </div>
                         <div className="h-3 w-px bg-slate-100"></div>
                         <div className="flex items-center gap-2.5">
-                            <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none">Register</span>
+                            <span className="text-[10px] font-medium text-slate-400 uppercase tracking-normal leading-none">Register</span>
                             <button
                                 onClick={handleRegToggle}
                                 disabled={!settingsLoaded}
@@ -263,7 +263,7 @@ const Dashboard = () => {
                                 <div className={`w-9 h-9 bg-slate-50 rounded-lg flex items-center justify-center shadow-sm border border-slate-100 group-hover:bg-slate-100 transition-colors`}>
                                     <s.icon size={18} className={theme.icon} strokeWidth={2.5} />
                                 </div>
-                                <span className="text-[8px] font-medium text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded-full border border-slate-100 uppercase tracking-widest">{s.trend}</span>
+                                <span className="text-[8px] font-medium text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded-full border border-slate-100 uppercase tracking-normal">{s.trend}</span>
                             </div>
                             <div>
                                 <p className="text-[9px] font-medium text-slate-400 uppercase tracking-[0.12em] mb-1">{s.label}</p>
@@ -282,7 +282,7 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between mb-5">
                         <div>
                             <h2 className="text-[14px] font-medium uppercase tracking-tight flex items-center gap-2 text-slate-900"><Filter size={14} className="text-indigo-500" /> Conversion Funnel</h2>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">User Journey Tracker</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-normal mt-0.5">User Journey Tracker</p>
                         </div>
                         <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center border border-slate-100 group-hover:scale-110 transition-transform"><Target size={16} className="text-indigo-500" /></div>
                     </div>
@@ -297,7 +297,7 @@ const Dashboard = () => {
                                         className={`absolute h-full ${f.color} rounded-lg shadow-sm transition-all duration-1000 delay-${i * 100}`}
                                     ></div>
                                     <div className="absolute inset-x-3 h-full flex items-center justify-between">
-                                        <span className="text-[9px] font-medium uppercase tracking-widest text-slate-700">{f.label}</span>
+                                        <span className="text-[9px] font-medium uppercase tracking-normal text-slate-700">{f.label}</span>
                                         <span className="text-[9px] font-medium text-slate-900">{f.value}</span>
                                     </div>
                                 </div>
@@ -311,7 +311,7 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between mb-5">
                         <div>
                             <h2 className="text-[14px] font-medium text-slate-900 tracking-tight uppercase flex items-center gap-2"><ShieldAlert size={14} className="text-rose-500" /> Safety Guard</h2>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Anomaly Detection System</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-normal mt-0.5">Anomaly Detection System</p>
                         </div>
                         <div className="w-8 h-8 bg-rose-50 text-rose-500 rounded-lg flex items-center justify-center border border-rose-100"><ShieldQuestion size={16} /></div>
                     </div>
@@ -326,7 +326,7 @@ const Dashboard = () => {
                                          <p className="text-[9px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">{a.reason}</p>
                                      </div>
                                 </div>
-                                <span className="text-[8px] font-medium text-slate-300 uppercase tracking-widest">{a.time}</span>
+                                <span className="text-[8px] font-medium text-slate-300 uppercase tracking-normal">{a.time}</span>
                             </div>
                         ))}
                     </div>
@@ -341,14 +341,14 @@ const Dashboard = () => {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 mb-6 relative z-10">
                         <div>
                             <h2 className="text-[14px] font-medium text-slate-900 tracking-tight uppercase flex items-center gap-2"><BarChart3 size={16} className="text-indigo-500" /> Engagement Matrix</h2>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Platform adoption velocity</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-normal mt-0.5">Platform adoption velocity</p>
                         </div>
                         <div className="flex gap-2 bg-slate-50 p-1 rounded-lg border border-slate-100">
                             {['daily', 'weekly'].map(t => (
                                 <button
                                     key={t}
                                     onClick={() => setEngagementPeriod(t)}
-                                    className={`px-3 py-1.5 rounded-md text-[9px] font-medium uppercase tracking-widest transition-all ${engagementPeriod === t ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:bg-white'}`}
+                                    className={`px-3 py-1.5 rounded-md text-[9px] font-medium uppercase tracking-normal transition-all ${engagementPeriod === t ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:bg-white'}`}
                                 >
                                     {t}
                                 </button>
@@ -380,7 +380,7 @@ const Dashboard = () => {
                                     {series.map(s => (
                                         <div key={s.key} className="flex items-center gap-1.5">
                                             <div className="w-2.5 h-2.5 rounded-sm" style={{ background: s.color }}></div>
-                                            <span className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">{s.label}</span>
+                                            <span className="text-[9px] font-medium text-slate-400 uppercase tracking-normal">{s.label}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -439,14 +439,14 @@ const Dashboard = () => {
                                     {series.map(s => (
                                         <div key={s.key} className="text-center">
                                             <p className="text-[13px] font-medium text-slate-800">{s.data.reduce((a, b) => a + b, 0)}</p>
-                                            <p className="text-[8px] font-medium text-slate-400 uppercase tracking-widest">{s.label}</p>
+                                            <p className="text-[8px] font-medium text-slate-400 uppercase tracking-normal">{s.label}</p>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         );
                     })() : (
-                        <div className="h-48 flex items-center justify-center text-slate-300 text-[11px] font-medium uppercase tracking-widest">No data available</div>
+                        <div className="h-48 flex items-center justify-center text-slate-300 text-[11px] font-medium uppercase tracking-normal">No data available</div>
                     )}
                 </div>
 
@@ -456,7 +456,7 @@ const Dashboard = () => {
                         <div className="w-9 h-9 bg-[#FDF2D0] rounded-lg flex items-center justify-center text-[#856404] shadow-sm border border-[#F9E9B8] group-hover:scale-110 transition-transform"><Send size={16} /></div>
                         <div>
                             <h3 className="text-[13px] font-medium uppercase tracking-tight text-slate-900 leading-none">Broadcast</h3>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Global Announcement</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-normal mt-1">Global Announcement</p>
                         </div>
                     </div>
                     <div className="space-y-3 mb-4">
@@ -477,7 +477,7 @@ const Dashboard = () => {
                     <button 
                         disabled={!broadcastMsg || isSending}
                         onClick={handleBroadcast}
-                        className={`w-full mt-auto py-3 bg-slate-900 hover:bg-black disabled:bg-slate-100 disabled:text-slate-300 text-white rounded-xl text-[10px] font-medium uppercase tracking-[0.2em] shadow-lg shadow-slate-200 transition-all flex items-center justify-center gap-2 group/btn
+                        className={`w-full mt-auto py-3 bg-slate-900 hover:bg-black disabled:bg-slate-100 disabled:text-slate-300 text-white rounded-xl text-[10px] font-medium uppercase tracking-normal shadow-lg shadow-slate-200 transition-all flex items-center justify-center gap-2 group/btn
                             ${isSending ? 'opacity-80' : ''}`}
                     >
                         {isSending ? (
@@ -499,7 +499,7 @@ const Dashboard = () => {
                     <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
                         <div>
                             <h2 className="text-[12px] font-medium text-slate-800 uppercase tracking-tight">Global Payout Requests</h2>
-                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Pending verification batch</p>
+                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-normal mt-1">Pending verification batch</p>
                         </div>
                         <button onClick={() => navigate('/admin/withdrawals')} className="text-[9px] font-medium text-indigo-500 uppercase flex items-center gap-2 hover:gap-3 transition-all">Wallets <ChevronRight size={10} /></button>
                     </div>
@@ -513,12 +513,12 @@ const Dashboard = () => {
                                     <div>
                                         <div className="flex items-center gap-2">
                                             <p className="text-[13px] font-medium text-slate-800 tracking-tight leading-none">{k.name}</p>
-                                            <span className={`text-[7px] font-medium px-1.5 py-0.5 rounded-md uppercase tracking-widest ${k.type === 'KYC' ? 'bg-indigo-50 text-indigo-500' : 'bg-emerald-50 text-emerald-500'}`}>{k.type}</span>
+                                            <span className={`text-[7px] font-medium px-1.5 py-0.5 rounded-md uppercase tracking-normal ${k.type === 'KYC' ? 'bg-indigo-50 text-indigo-500' : 'bg-emerald-50 text-emerald-500'}`}>{k.type}</span>
                                         </div>
                                         <p className="text-[8px] font-medium text-slate-400 mt-1 uppercase tracking-tighter">{k.time} • Live System</p>
                                     </div>
                                 </div>
-                                <button onClick={() => navigate(k.type === 'KYC' ? '/admin/kyc' : '/admin/withdrawals')} className="bg-white border border-slate-100 text-slate-900 px-3 py-1.5 rounded-lg text-[9px] font-medium uppercase tracking-widest shadow-sm hover:bg-slate-900 hover:text-white transition-all">Review</button>
+                                <button onClick={() => navigate(k.type === 'KYC' ? '/admin/kyc' : '/admin/withdrawals')} className="bg-white border border-slate-100 text-slate-900 px-3 py-1.5 rounded-lg text-[9px] font-medium uppercase tracking-normal shadow-sm hover:bg-slate-900 hover:text-white transition-all">Review</button>
                             </div>
                         ))}
                     </div>
@@ -532,7 +532,7 @@ const Dashboard = () => {
                              <span className="text-[8px] font-medium text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-100">82% Cap</span>
                         </div>
                         <div className="mt-3">
-                             <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mb-1">Monthly Target</p>
+                             <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mb-1">Monthly Target</p>
                              <h4 className="text-lg font-medium text-slate-900 tracking-tighter">₹4.82k <span className="text-[9px] font-bold text-slate-300">/ 6L</span></h4>
                              <div className="w-full h-1 bg-slate-50 rounded-full mt-2 overflow-hidden">
                                  <div className="h-full bg-emerald-500 w-[82%] rounded-full shadow-lg shadow-emerald-100 transition-all duration-1000"></div>
@@ -548,9 +548,9 @@ const Dashboard = () => {
                              </div>
                         </div>
                         <div className="mt-3">
-                             <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mb-1">Open Tickets</p>
+                             <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mb-1">Open Tickets</p>
                              <h4 className="text-base font-medium text-slate-900 tracking-tight">14 Active</h4>
-                             <p className="text-[8px] font-bold text-indigo-500 mt-1 flex items-center gap-1 uppercase tracking-widest">Respond Now <ChevronRight size={8} /></p>
+                             <p className="text-[8px] font-bold text-indigo-500 mt-1 flex items-center gap-1 uppercase tracking-normal">Respond Now <ChevronRight size={8} /></p>
                         </div>
                     </div>
 
@@ -562,7 +562,7 @@ const Dashboard = () => {
                             <div className={`w-9 h-9 ${btn.bg} ${btn.color} ${btn.border} border rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
                                 <btn.icon size={18} />
                             </div>
-                            <span className="text-[9px] font-medium text-slate-500 uppercase tracking-widest">{btn.label}</span>
+                            <span className="text-[9px] font-medium text-slate-500 uppercase tracking-normal">{btn.label}</span>
                         </div>
                     ))}
                 </div>

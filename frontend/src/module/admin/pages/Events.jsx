@@ -29,7 +29,7 @@ const STATUS_COLORS = {
 const TabBtn = ({ active, onClick, icon: Icon, label }) => (
     <button
         onClick={onClick}
-        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[11px] font-medium uppercase tracking-widest transition-all font-['Poppins'] ${
+        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[11px] font-medium uppercase tracking-normal transition-all font-['Poppins'] ${
             active ? 'bg-sky-500 text-white shadow-lg shadow-sky-200' : 'text-slate-500 hover:bg-slate-50'
         }`}
     >
@@ -39,7 +39,7 @@ const TabBtn = ({ active, onClick, icon: Icon, label }) => (
 );
 
 const Toast = ({ msg, type }) => (
-    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl text-white text-[12px] font-medium uppercase tracking-widest animate-in slide-in-from-bottom-4 duration-300 font-['Poppins'] ${type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`}>
+    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl text-white text-[12px] font-medium uppercase tracking-normal animate-in slide-in-from-bottom-4 duration-300 font-['Poppins'] ${type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`}>
         {type === 'success' ? <Check size={16} /> : <AlertCircle size={16} />}
         {msg}
     </div>
@@ -114,7 +114,7 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast }) => {
                                     ) : (
                                         <h3 className="font-medium text-slate-800 text-[14px] leading-none font-['Poppins']">{event.title}</h3>
                                     )}
-                                    <span className={`inline-block mt-1 px-2 py-0.5 rounded-md text-[9px] font-medium uppercase tracking-widest border font-['Poppins'] ${TAG_COLORS[event.tag] || 'bg-slate-50 border-slate-100'}`}>
+                                    <span className={`inline-block mt-1 px-2 py-0.5 rounded-md text-[9px] font-medium uppercase tracking-normal border font-['Poppins'] ${TAG_COLORS[event.tag] || 'bg-slate-50 border-slate-100'}`}>
                                         {event.tag}
                                     </span>
                                 </div>
@@ -131,7 +131,7 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast }) => {
                                     <option value="Coming Soon">Coming Soon</option>
                                 </select>
                             ) : (
-                                <span className={`px-2.5 py-1 rounded-xl text-[9px] font-medium uppercase tracking-widest border font-['Poppins'] ${STATUS_COLORS[event.status] || STATUS_COLORS.Inactive}`}>
+                                <span className={`px-2.5 py-1 rounded-xl text-[9px] font-medium uppercase tracking-normal border font-['Poppins'] ${STATUS_COLORS[event.status] || STATUS_COLORS.Inactive}`}>
                                     {event.status}
                                 </span>
                             )}
@@ -146,7 +146,7 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast }) => {
                                 { label: 'Awarded', value: event.awardedCount || 0 },
                             ].map((stat, i) => (
                                 <div key={i} className="bg-slate-50 rounded-xl p-2.5 border border-slate-100 text-center font-['Poppins']">
-                                    <p className="text-[8px] font-medium text-slate-400 uppercase tracking-widest mb-1 font-['Poppins']">{stat.label}</p>
+                                    <p className="text-[8px] font-medium text-slate-400 uppercase tracking-normal mb-1 font-['Poppins']">{stat.label}</p>
                                     {(i === 0 || i === 1) && isEditing
                                         ? <div className="flex justify-center">{stat.edit}</div>
                                         : <p className="text-sm font-medium text-slate-900 font-['Poppins']">{stat.value}</p>
@@ -157,7 +157,7 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast }) => {
 
                         {/* Start Time */}
                         <div className="mb-4 font-['Poppins']">
-                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mb-1 font-['Poppins']">Start Time</p>
+                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mb-1 font-['Poppins']">Start Time</p>
                             {isEditing ? (
                                 <input
                                     value={editData.startTime}
@@ -173,19 +173,19 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast }) => {
                         <div className="flex gap-2">
                             {isEditing ? (
                                 <>
-                                    <button onClick={saveEdit} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-[11px] uppercase tracking-widest bg-emerald-500 text-white active:scale-95 transition-all font-['Poppins']">
+                                    <button onClick={saveEdit} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-[11px] uppercase tracking-normal bg-emerald-500 text-white active:scale-95 transition-all font-['Poppins']">
                                         <Save size={13} /> Save
                                     </button>
-                                    <button onClick={() => setEditingId(null)} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-[11px] uppercase tracking-widest bg-slate-100 text-slate-500 font-['Poppins']">
+                                    <button onClick={() => setEditingId(null)} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-[11px] uppercase tracking-normal bg-slate-100 text-slate-500 font-['Poppins']">
                                         <X size={13} /> Cancel
                                     </button>
                                 </>
                             ) : (
                                 <>
-                                    <button onClick={() => startEdit(event)} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-[11px] uppercase tracking-widest bg-sky-50 text-sky-600 hover:bg-sky-100 transition-all font-['Poppins']">
+                                    <button onClick={() => startEdit(event)} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-[11px] uppercase tracking-normal bg-sky-50 text-sky-600 hover:bg-sky-100 transition-all font-['Poppins']">
                                         <Edit3 size={13} /> Edit
                                     </button>
-                                    <button onClick={() => toggleStatus(event)} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-[11px] uppercase tracking-widest transition-all font-['Poppins'] ${event.status === 'Active' ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}>
+                                    <button onClick={() => toggleStatus(event)} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-[11px] uppercase tracking-normal transition-all font-['Poppins'] ${event.status === 'Active' ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}>
                                         {event.status === 'Active' ? <><Square size={13} /> Stop</> : <><Play size={13} /> Activate</>}
                                     </button>
                                 </>
@@ -323,7 +323,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
             <div className="flex flex-wrap gap-2">
                 {events.map(ev => (
                     <button key={ev.id} onClick={() => setSelectedEventId(ev.id)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-medium uppercase tracking-widest border transition-all font-['Poppins'] ${selectedEventId === ev.id ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'}`}>
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-medium uppercase tracking-normal border transition-all font-['Poppins'] ${selectedEventId === ev.id ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'}`}>
                         <span className={`w-2 h-2 rounded-full ${ev.status === 'Active' ? 'bg-emerald-400' : 'bg-slate-300'}`}></span>
                         {ev.title}
                     </button>
@@ -332,14 +332,14 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
 
             {/* Quiz Content */}
             {sel.tag === 'Quiz' && (
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 animate-in fade-in font-['Poppins']">
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 animate-in fade-in font-['Poppins']">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-[15px] font-medium text-slate-800 font-['Poppins']">Quiz Questions ({questions.length})</h3>
                         <div className="flex gap-2">
-                            <button onClick={addQuestion} className="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-[11px] font-medium uppercase tracking-widest hover:bg-blue-100 transition-all font-['Poppins']">
+                            <button onClick={addQuestion} className="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-[11px] font-medium uppercase tracking-normal hover:bg-blue-100 transition-all font-['Poppins']">
                                 <Plus size={14} /> Add Question
                             </button>
-                            <button onClick={saveQuestions} className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 text-white rounded-xl text-[11px] font-medium uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-md font-['Poppins']">
+                            <button onClick={saveQuestions} className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 text-white rounded-xl text-[11px] font-medium uppercase tracking-normal hover:bg-emerald-600 transition-all shadow-md font-['Poppins']">
                                 <Save size={14} /> Save All
                             </button>
                         </div>
@@ -374,7 +374,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
                                         </div>
                                     ))}
                                 </div>
-                                <p className="ml-9 text-[9px] font-medium text-emerald-600 uppercase tracking-widest">● filled = correct answer</p>
+                                <p className="ml-9 text-[9px] font-medium text-emerald-600 uppercase tracking-normal">● filled = correct answer</p>
                             </div>
                         ))}
                     </div>
@@ -383,14 +383,14 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
 
             {/* Lucky Draw Content */}
             {sel.tag === 'Draw' && (
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 animate-in fade-in font-['Poppins']">
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 animate-in fade-in font-['Poppins']">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-[15px] font-medium text-slate-800 font-['Poppins']">Draw Prizes ({prizes.length})</h3>
                         <div className="flex gap-2">
-                            <button onClick={addPrize} className="flex items-center gap-1.5 px-4 py-2 bg-purple-50 text-purple-600 rounded-xl text-[11px] font-medium uppercase tracking-widest hover:bg-purple-100 transition-all font-['Poppins']">
+                            <button onClick={addPrize} className="flex items-center gap-1.5 px-4 py-2 bg-purple-50 text-purple-600 rounded-xl text-[11px] font-medium uppercase tracking-normal hover:bg-purple-100 transition-all font-['Poppins']">
                                 <Plus size={14} /> Add Prize
                             </button>
-                            <button onClick={savePrizes} className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 text-white rounded-xl text-[11px] font-medium uppercase tracking-widest shadow-md font-['Poppins']">
+                            <button onClick={savePrizes} className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 text-white rounded-xl text-[11px] font-medium uppercase tracking-normal shadow-md font-['Poppins']">
                                 <Save size={14} /> Save All
                             </button>
                         </div>
@@ -420,7 +420,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
 
             {/* Memory Master Content */}
             {sel.tag === 'Brain' && (
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 animate-in fade-in font-['Poppins']">
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 animate-in fade-in font-['Poppins']">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-[15px] font-medium text-slate-800 font-['Poppins']">Card Symbols ({cards.length})</h3>
                         <div className="flex items-center gap-3">
@@ -432,7 +432,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
                                 <span className="text-[10px] font-medium text-slate-400 uppercase font-['Poppins']">Game (s)</span>
                                 <input type="number" min="1" value={maxTime} onChange={e => setMaxTime(Math.max(1, e.target.value))} className="w-12 text-sm font-medium text-slate-800 outline-none text-center bg-transparent font-['Poppins']" />
                             </div>
-                            <button onClick={saveMemoryGame} className="flex items-center gap-1.5 px-4 py-2 bg-indigo-500 text-white rounded-xl text-[11px] font-medium uppercase tracking-widest shadow-md font-['Poppins']">
+                            <button onClick={saveMemoryGame} className="flex items-center gap-1.5 px-4 py-2 bg-indigo-500 text-white rounded-xl text-[11px] font-medium uppercase tracking-normal shadow-md font-['Poppins']">
                                 <Save size={14} /> Save Config
                             </button>
                         </div>
@@ -596,7 +596,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
             <div className="flex flex-wrap gap-2">
                 {events.map(ev => (
                     <button key={ev.id} onClick={() => { setSelectedEventId(ev.id); setAwardingId(null); }}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-medium uppercase tracking-widest border transition-all ${selectedEventId === ev.id ? 'bg-slate-800 text-white border-slate-800 shadow-lg' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'}`}>
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-medium uppercase tracking-normal border transition-all ${selectedEventId === ev.id ? 'bg-slate-800 text-white border-slate-800 shadow-lg' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'}`}>
                         <span className={`w-2.5 h-2.5 rounded-full ${ev.status === 'Active' ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]' : 'bg-slate-300'}`}></span>
                         {ev.title}
                     </button>
@@ -606,7 +606,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
             {/* Filter Controls */}
             <div className="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
                 <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mr-2 ml-1">Filter:</span>
+                    <span className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mr-2 ml-1">Filter:</span>
                     <select
                         value={timeFilter}
                         onChange={e => setTimeFilter(e.target.value)}
@@ -619,7 +619,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                         <option value="month">Past 30 Days</option>
                     </select>
 
-                    <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mr-2 ml-2">Sort:</span>
+                    <span className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mr-2 ml-2">Sort:</span>
                     <select
                         value={sortBy}
                         onChange={e => setSortBy(e.target.value)}
@@ -632,7 +632,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
 
                     <button
                         onClick={() => setStatusFilter(statusFilter === 'all' ? 'winner' : 'all')}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[11px] font-medium uppercase tracking-widest border transition-all ${statusFilter === 'winner' ? 'bg-amber-100 border-amber-300 text-amber-700 font-bold ml-2' : 'bg-slate-50 border-slate-200 text-slate-500 ml-2'}`}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[11px] font-medium uppercase tracking-normal border transition-all ${statusFilter === 'winner' ? 'bg-amber-100 border-amber-300 text-amber-700 font-bold ml-2' : 'bg-slate-50 border-slate-200 text-slate-500 ml-2'}`}
                     >
                         <Award size={14} className={statusFilter === 'winner' ? 'fill-amber-500' : ''} />
                         {statusFilter === 'winner' ? 'Showing Winners' : 'Filter Winners'}
@@ -670,7 +670,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                         </div>
                         <div className="text-right">
                             <p className={`text-xl md:text-2xl font-medium ${s.color}`}>{s.value}</p>
-                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mt-0.5">{s.label}</p>
+                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mt-0.5">{s.label}</p>
                         </div>
                     </div>
                 ))}
@@ -678,14 +678,14 @@ const ParticipantsTab = ({ events, onShowToast }) => {
 
             {/* Winner Spotlight Card */}
             {fastestParticipant && (
-                <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 rounded-3xl p-5 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 border border-orange-400 relative overflow-hidden">
+                <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 rounded-xl p-5 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 border border-orange-400 relative overflow-hidden">
                     <div className="absolute right-0 top-0 translate-x-1/4 -translate-y-1/4 opacity-10 text-[120px] select-none pointer-events-none">🏆</div>
                     <div className="flex items-center gap-4 relative z-10">
                         <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white text-xl font-medium shrink-0 shadow-inner">
                             🏅
                         </div>
                         <div className="text-left">
-                            <span className="bg-white/20 text-white px-2.5 py-0.5 rounded-lg text-[8px] font-medium uppercase tracking-widest">
+                            <span className="bg-white/20 text-white px-2.5 py-0.5 rounded-lg text-[8px] font-medium uppercase tracking-normal">
                                 👑 Record Holder (Minimum Completion Time)
                             </span>
                             <h4 className="text-lg font-medium tracking-tight mt-1">{fastestParticipant.name || 'Anonymous User'}</h4>
@@ -702,12 +702,12 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                     setAwardingId(fastestParticipant.id); 
                                     setAwardNote(`Winner with record-breaking speed of ${fastestParticipant.timeTaken} seconds! 🎉`); 
                                 }}
-                                className="bg-white text-orange-600 hover:bg-orange-50 px-4.5 py-2.5 rounded-xl text-[9px] font-medium uppercase tracking-widest active:scale-95 transition-all shadow-md cursor-pointer"
+                                className="bg-white text-orange-600 hover:bg-orange-50 px-4.5 py-2.5 rounded-xl text-[9px] font-medium uppercase tracking-normal active:scale-95 transition-all shadow-md cursor-pointer"
                             >
                                 🎁 Approve & Give Prize
                             </button>
                         ) : (
-                            <span className="bg-emerald-500/30 border border-emerald-400 px-3 py-1.5 rounded-xl text-[9px] font-medium uppercase tracking-widest flex items-center gap-1.5 text-white font-extrabold">
+                            <span className="bg-emerald-500/30 border border-emerald-400 px-3 py-1.5 rounded-xl text-[9px] font-medium uppercase tracking-normal flex items-center gap-1.5 text-white font-extrabold">
                                 <CheckCircle size={12} /> Approved Winner
                             </span>
                         )}
@@ -727,11 +727,11 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                     <div className="flex items-center gap-4">
                         <button 
                             onClick={() => onShowToast('Excel report generated and downloading...', 'success')}
-                            className="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-xl text-[10px] font-medium uppercase tracking-widest border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2"
+                            className="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-xl text-[10px] font-medium uppercase tracking-normal border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2"
                         >
                             <ClipboardList size={12} /> Export Excel
                         </button>
-                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Showing {sortedParticipants.length} results</p>
+                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal">Showing {sortedParticipants.length} results</p>
                     </div>
                 </div>
 
@@ -740,7 +740,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                         <div className="p-6 bg-slate-50 rounded-full mb-4">
                             <Users size={48} strokeWidth={1} />
                         </div>
-                        <p className="text-[11px] font-medium uppercase tracking-widest mb-1">No matching participants</p>
+                        <p className="text-[11px] font-medium uppercase tracking-normal mb-1">No matching participants</p>
                         <p className="text-[9px] font-bold text-slate-400">Try changing your filters or searching</p>
                     </div>
                 ) : (
@@ -763,10 +763,10 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                             <div className="flex items-center gap-2 flex-wrap">
                                                 <p className="font-medium text-slate-800 text-[13px] truncate">{p.name || 'Anonymous User'}</p>
                                                 {p.prizeStatus === 'Awarded' && (
-                                                    <span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-md text-[8px] font-medium uppercase tracking-widest border border-amber-200">WINNER</span>
+                                                    <span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-md text-[8px] font-medium uppercase tracking-normal border border-amber-200">WINNER</span>
                                                 )}
                                                 {isFastest && (
-                                                    <span className="bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded-md text-[8px] font-medium uppercase tracking-widest border border-rose-200 flex items-center gap-1 animate-pulse">⚡ FASTEST COMPLETION</span>
+                                                    <span className="bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded-md text-[8px] font-medium uppercase tracking-normal border border-rose-200 flex items-center gap-1 animate-pulse">⚡ FASTEST COMPLETION</span>
                                                 )}
                                             </div>
                                             <div className="flex items-center gap-3 mt-1.5 flex-wrap">
@@ -791,18 +791,18 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                         {/* Prize & Status */}
                                         <div className="flex items-center gap-6 pr-2">
                                             <div className="text-right hidden sm:block">
-                                                <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mb-0.5">Prize Won</p>
+                                                <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mb-0.5">Prize Won</p>
                                                 <p className="text-[13px] font-medium text-amber-600">{p.prize || 'No Prize'}</p>
                                             </div>
                                             <div className="flex flex-col items-end gap-1.5">
-                                                <span className={`px-2.5 py-1 rounded-xl text-[9px] font-medium uppercase tracking-widest border flex items-center gap-1.5 ${p.prizeStatus === 'Awarded' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                                                <span className={`px-2.5 py-1 rounded-xl text-[9px] font-medium uppercase tracking-normal border flex items-center gap-1.5 ${p.prizeStatus === 'Awarded' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
                                                     {p.prizeStatus === 'Awarded' ? <CheckCircle size={10} /> : <AlertCircle size={10} />}
                                                     {p.prizeStatus}
                                                 </span>
                                                 {p.prizeStatus !== 'Awarded' && (
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); setAwardingId(awardingId === p.id ? null : p.id); }}
-                                                        className="flex items-center gap-1 px-2.5 py-1.5 bg-sky-50 text-sky-600 rounded-xl text-[9px] font-medium uppercase tracking-widest hover:bg-sky-100 active:scale-95 transition-all border border-sky-100"
+                                                        className="flex items-center gap-1 px-2.5 py-1.5 bg-sky-50 text-sky-600 rounded-xl text-[9px] font-medium uppercase tracking-normal hover:bg-sky-100 active:scale-95 transition-all border border-sky-100"
                                                     >
                                                         <Award size={11} /> Give Prize
                                                     </button>
@@ -815,7 +815,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                     {awardingId === p.id && (
                                         <div className="mx-4 mb-4 bg-slate-50 border border-sky-200 rounded-2xl p-4 flex flex-col gap-3 animate-in slide-in-from-top-2 duration-300">
                                             <div className="flex items-center justify-between">
-                                                <p className="text-[10px] font-medium text-sky-600 uppercase tracking-widest">Award Prize to {p.name}</p>
+                                                <p className="text-[10px] font-medium text-sky-600 uppercase tracking-normal">Award Prize to {p.name}</p>
                                                 <button onClick={() => setAwardingId(null)}>
                                                     <X size={14} className="text-slate-400" />
                                                 </button>
@@ -829,7 +829,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                                 />
                                                 <button
                                                     onClick={() => handleAward(p)}
-                                                    className="flex items-center gap-2 px-6 py-3 bg-sky-500 text-white rounded-xl font-medium text-[11px] uppercase tracking-widest shadow-lg shadow-sky-200 active:scale-95 transition-all"
+                                                    className="flex items-center gap-2 px-4 py-3 bg-sky-500 text-white rounded-xl font-medium text-[11px] uppercase tracking-normal shadow-lg shadow-sky-200 active:scale-95 transition-all"
                                                 >
                                                     <CheckCircle size={16} /> Confirm
                                                 </button>
@@ -853,37 +853,37 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                             </button>
 
                             <div className="flex items-center gap-6 mb-8">
-                                <div className="w-20 h-20 bg-gradient-to-br from-sky-400 to-blue-600 rounded-3xl flex items-center justify-center text-white text-3xl font-medium shadow-xl shadow-sky-100">
+                                <div className="w-20 h-20 bg-gradient-to-br from-sky-400 to-blue-600 rounded-xl flex items-center justify-center text-white text-3xl font-medium shadow-xl shadow-sky-100">
                                     {(viewingParticipant.name || 'U')[0].toUpperCase()}
                                 </div>
                                 <div>
                                     <h2 className="text-2xl font-medium text-slate-800 tracking-tight">{viewingParticipant.name}</h2>
                                     <p className="text-slate-400 font-bold text-sm">Joined {viewingParticipant.joinedAt}</p>
                                     {viewingParticipant.prizeStatus === 'Awarded' && (
-                                        <span className="inline-block mt-2 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-widest border border-amber-200">Event Winner</span>
+                                        <span className="inline-block mt-2 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-normal border border-amber-200">Event Winner</span>
                                     )}
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-3 gap-3 mb-8">
                                 <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex flex-col justify-center">
-                                    <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mb-1 text-center">Performance</p>
+                                    <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mb-1 text-center">Performance</p>
                                     <p className="text-sm font-medium text-slate-800 text-center">{viewingParticipant.result || 'No Result'}</p>
                                 </div>
                                 <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex flex-col justify-center">
-                                    <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mb-1 text-center">Completion Time</p>
+                                    <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mb-1 text-center">Completion Time</p>
                                     <p className="text-sm font-medium text-slate-800 text-center">
                                         {viewingParticipant.timeTaken !== undefined && viewingParticipant.timeTaken !== null ? `${viewingParticipant.timeTaken}s` : 'N/A'}
                                     </p>
                                 </div>
                                 <div className="bg-amber-50 p-3 rounded-2xl border border-amber-100 flex flex-col justify-center">
-                                    <p className="text-[9px] font-medium text-amber-500 uppercase tracking-widest mb-1 text-center">Reward Status</p>
+                                    <p className="text-[9px] font-medium text-amber-500 uppercase tracking-normal mb-1 text-center">Reward Status</p>
                                     <p className="text-sm font-medium text-amber-700 text-center">{viewingParticipant.prize || 'Claimable'}</p>
                                 </div>
                             </div>
 
                             <div className="space-y-4">
-                                <h4 className="text-[11px] font-medium text-slate-400 uppercase tracking-[0.2em]">Contact Details</h4>
+                                <h4 className="text-[11px] font-medium text-slate-400 uppercase tracking-normal">Contact Details</h4>
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl">
                                         <span className="text-[11px] font-bold text-slate-400">Email Address</span>
@@ -903,7 +903,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                             {viewingParticipant.prizeStatus !== 'Awarded' ? (
                                 <button
                                     onClick={() => { setAwardingId(viewingParticipant.id); setViewingParticipant(null); }}
-                                    className="w-full mt-8 bg-sky-500 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-widest shadow-xl shadow-sky-200 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                    className="w-full mt-8 bg-sky-500 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-xl shadow-sky-200 active:scale-95 transition-all flex items-center justify-center gap-2"
                                 >
                                     <Award size={18} /> Award Prize Now
                                 </button>
@@ -1062,7 +1062,7 @@ const EventsAdmin = () => {
                 <PageHeader title="Events & Contests" subtitle="Manage live events, content, and participants" />
                 <button
                     onClick={() => setIsAddModalOpen(true)}
-                    className="flex items-center gap-2 px-5 py-3 bg-sky-500 text-white rounded-2xl font-medium text-[12px] uppercase tracking-widest shadow-lg shadow-sky-200 hover:bg-sky-600 active:scale-95 transition-all font-['Poppins']"
+                    className="flex items-center gap-2 px-5 py-3 bg-sky-500 text-white rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-lg shadow-sky-200 hover:bg-sky-600 active:scale-95 transition-all font-['Poppins']"
                 >
                     <Plus size={16} /> Add Event
                 </button>
@@ -1109,7 +1109,7 @@ const EventsAdmin = () => {
 
                             <div className="space-y-4 font-['Poppins']">
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest font-['Poppins']">Event Title</label>
+                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal font-['Poppins']">Event Title</label>
                                     <input
                                         required
                                         value={newEventData.title}
@@ -1121,7 +1121,7 @@ const EventsAdmin = () => {
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest font-['Poppins']">Game Type</label>
+                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal font-['Poppins']">Game Type</label>
                                         <select
                                             value={newEventData.tag}
                                             onChange={e => setNewEventData(p => ({ ...p, tag: e.target.value }))}
@@ -1134,7 +1134,7 @@ const EventsAdmin = () => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest font-['Poppins']">Entry Fee (Coins)</label>
+                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal font-['Poppins']">Entry Fee (Coins)</label>
                                         <input
                                             type="number"
                                             min="0"
@@ -1148,7 +1148,7 @@ const EventsAdmin = () => {
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest font-['Poppins']">Pool Prize Description</label>
+                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal font-['Poppins']">Pool Prize Description</label>
                                         <input
                                             required
                                             value={newEventData.prize}
@@ -1159,7 +1159,7 @@ const EventsAdmin = () => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest font-['Poppins']">Start Time</label>
+                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal font-['Poppins']">Start Time</label>
                                         <input
                                             required
                                             value={newEventData.startTime}
@@ -1170,7 +1170,7 @@ const EventsAdmin = () => {
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest font-['Poppins']">Status</label>
+                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal font-['Poppins']">Status</label>
                                     <select
                                         value={newEventData.status}
                                         onChange={e => setNewEventData(p => ({ ...p, status: e.target.value }))}
@@ -1187,7 +1187,7 @@ const EventsAdmin = () => {
                             <button
                                 type="submit"
                                 disabled={createLoading}
-                                className="w-full bg-sky-500 disabled:bg-sky-300 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-widest shadow-xl shadow-sky-200 hover:bg-sky-600 active:scale-95 transition-all flex items-center justify-center gap-2 font-['Poppins']"
+                                className="w-full bg-sky-500 disabled:bg-sky-300 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-xl shadow-sky-200 hover:bg-sky-600 active:scale-95 transition-all flex items-center justify-center gap-2 font-['Poppins']"
                             >
                                 {createLoading ? (
                                     <>

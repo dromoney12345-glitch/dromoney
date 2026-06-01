@@ -121,7 +121,7 @@ const Promotions = () => {
             <PageHeader title="Brand Promotions" subtitle="Review and manage brand promotion requests from users" />
 
             {promotions.length === 0 ? (
-                <div className="bg-white rounded-3xl border border-slate-100 p-20 text-center shadow-sm">
+                <div className="bg-white rounded-xl border border-slate-100 p-20 text-center shadow-sm">
                     <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
                         <Megaphone size={32} className="text-slate-300" />
                     </div>
@@ -131,7 +131,7 @@ const Promotions = () => {
             ) : (
                 <div className="grid grid-cols-1 gap-4">
                     {promotions.map((promo) => (
-                        <div key={promo.id} className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 hover:border-sky-100 transition-all border-l-[6px] border-l-sky-500">
+                        <div key={promo.id} className="bg-white rounded-xl border border-slate-100 shadow-sm p-4 hover:border-sky-100 transition-all border-l-[6px] border-l-sky-500">
                             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                                 
                                 {/* Info Section */}
@@ -142,7 +142,7 @@ const Promotions = () => {
                                         </div>
                                         <div>
                                             <h3 className="font-medium text-slate-800 text-lg leading-none">{promo.name}</h3>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 flex items-center gap-1">
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-normal mt-1.5 flex items-center gap-1">
                                                 <Clock size={12} /> Requested on {promo.date}
                                             </p>
                                         </div>
@@ -158,21 +158,21 @@ const Promotions = () => {
 
                                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                         <div className="space-y-1">
-                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Contact Info</p>
+                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">Contact Info</p>
                                             <p className="text-xs font-bold text-slate-700 flex items-center gap-1.5"><Phone size={12} className="text-slate-400"/> {promo.mobile}</p>
                                             <p className="text-xs font-bold text-sky-600 flex items-center gap-1.5 leading-none break-all mt-1">{promo.whatsapp}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Task Type</p>
+                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">Task Type</p>
                                             <p className="text-xs font-medium text-slate-800 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100 inline-block">{promo.category}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Budget Details</p>
+                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">Budget Details</p>
                                             <p className="text-xs font-medium text-amber-600 flex items-center gap-1.5">₹{promo.budget}</p>
                                             <p className="text-[10px] font-bold text-slate-500">{promo.usersRequired} Users Required</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Task Link</p>
+                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">Task Link</p>
                                             <a href={promo.link} target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-500 hover:underline flex items-center gap-1.5 truncate max-w-[150px]">
                                                 <Globe size={12} /> Visit Link
                                             </a>
@@ -181,14 +181,14 @@ const Promotions = () => {
 
                                     {promo.description && (
                                         <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-2">Description</p>
-                                             <p className="text-xs font-bold text-slate-600 leading-relaxed italic">"{promo.description}"</p>
+                                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tight mb-2">Description</p>
+                                             <p className="text-xs font-bold text-slate-600 leading-relaxed">"{promo.description}"</p>
                                         </div>
                                     )}
 
                                     {promo.adminResponse && (
                                         <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100 mt-2">
-                                             <p className="text-[10px] font-medium text-emerald-600 uppercase tracking-wider mb-1 flex items-center gap-1"><MessageSquare size={12}/> Your Response</p>
+                                             <p className="text-[10px] font-medium text-emerald-600 uppercase tracking-tight mb-1 flex items-center gap-1"><MessageSquare size={12}/> Your Response</p>
                                              <p className="text-xs font-bold text-emerald-800">{promo.adminResponse}</p>
                                         </div>
                                     )}
@@ -200,7 +200,7 @@ const Promotions = () => {
                                         <>
                                             <button 
                                                 onClick={() => { setSelectedPromo(promo); setIsMsgModalOpen(true); }}
-                                                className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-600 font-medium text-[10px] uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all active:scale-95 cursor-pointer"
+                                                className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-600 font-medium text-[10px] uppercase tracking-normal px-4 py-2.5 rounded-xl transition-all active:scale-95 cursor-pointer"
                                             >
                                                 <MessageSquare size={14} /> Message
                                             </button>
@@ -208,13 +208,13 @@ const Promotions = () => {
                                             <div className="flex gap-2">
                                                 <button 
                                                     onClick={() => updateStatus(promo.id, 'Approved')}
-                                                    className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-[10px] uppercase tracking-widest px-4 py-3 rounded-xl shadow-lg shadow-emerald-100 transition-all active:scale-95 cursor-pointer"
+                                                    className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-[10px] uppercase tracking-normal px-4 py-3 rounded-xl shadow-lg shadow-emerald-100 transition-all active:scale-95 cursor-pointer"
                                                 >
                                                     <CheckCircle2 size={14} /> Approve
                                                 </button>
                                                 <button 
                                                     onClick={() => updateStatus(promo.id, 'Rejected')}
-                                                    className="flex-1 flex items-center justify-center gap-1.5 bg-rose-500 hover:bg-rose-600 text-white font-medium text-[10px] uppercase tracking-widest px-4 py-3 rounded-xl shadow-lg shadow-rose-100 transition-all active:scale-95 cursor-pointer"
+                                                    className="flex-1 flex items-center justify-center gap-1.5 bg-rose-500 hover:bg-rose-600 text-white font-medium text-[10px] uppercase tracking-normal px-4 py-3 rounded-xl shadow-lg shadow-rose-100 transition-all active:scale-95 cursor-pointer"
                                                 >
                                                     <X size={14} /> Reject
                                                 </button>
@@ -233,7 +233,7 @@ const Promotions = () => {
 
                                     <button 
                                         onClick={() => deletePromo(promo.id)}
-                                        className="mt-2 md:mt-auto flex items-center justify-center gap-1.5 bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-500 font-medium text-[10px] uppercase tracking-widest py-2 rounded-xl border border-transparent hover:border-rose-100 transition-all cursor-pointer"
+                                        className="mt-2 md:mt-auto flex items-center justify-center gap-1.5 bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-500 font-medium text-[10px] uppercase tracking-normal py-2 rounded-xl border border-transparent hover:border-rose-100 transition-all cursor-pointer"
                                     >
                                         <Trash2 size={14} /> Delete Request
                                     </button>
@@ -249,7 +249,7 @@ const Promotions = () => {
             {isMsgModalOpen && (
                 <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
                     <div className="bg-white rounded-[2rem] w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
-                        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                        <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
                             <div className="flex items-center gap-2 text-sky-600">
                                 <MessageSquare size={22} />
                                 <h3 className="font-medium text-slate-800 uppercase tracking-tight">Send Message to {selectedPromo?.name}</h3>
@@ -269,7 +269,7 @@ const Promotions = () => {
                             
                             <button 
                                 onClick={handleMessageSubmit}
-                                className="w-full bg-sky-500 hover:bg-sky-600 text-white font-medium uppercase tracking-[0.2em] py-4 rounded-2xl shadow-lg shadow-sky-200 active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-2"
+                                className="w-full bg-sky-500 hover:bg-sky-600 text-white font-medium uppercase tracking-normal py-4 rounded-2xl shadow-lg shadow-sky-200 active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-2"
                             >
                                 <Send size={18} /> Send Message
                             </button>

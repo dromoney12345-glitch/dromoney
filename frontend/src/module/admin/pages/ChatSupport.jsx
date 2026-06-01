@@ -84,7 +84,7 @@ const AdminChatSupport = () => {
         <div className="flex h-[calc(100vh-80px)] bg-white overflow-hidden">
             <div className={`w-full md:w-80 border-r border-slate-100 flex flex-col shrink-0 ${activeUser ? 'hidden md:flex' : 'flex'}`}>
                 <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-                    <h2 className="text-sm font-medium uppercase tracking-widest text-slate-800 mb-4">Support Inbox</h2>
+                    <h2 className="text-sm font-medium uppercase tracking-normal text-slate-800 mb-4">Support Inbox</h2>
                     <div className="relative">
                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input 
@@ -104,7 +104,7 @@ const AdminChatSupport = () => {
                         </div>
                     ) : filteredThreads.length === 0 ? (
                         <div className="text-center py-10 px-4">
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No conversations</p>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-normal">No conversations</p>
                         </div>
                     ) : (
                         filteredThreads.map((thread) => (
@@ -152,7 +152,7 @@ const AdminChatSupport = () => {
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-medium uppercase tracking-tight text-slate-800">{activeUser.name}</h3>
-                                    <p className="text-[10px] font-bold text-emerald-500 flex items-center gap-1 uppercase tracking-widest">
+                                    <p className="text-[10px] font-bold text-emerald-500 flex items-center gap-1 uppercase tracking-normal">
                                         <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
                                         Active Support Session
                                     </p>
@@ -160,7 +160,7 @@ const AdminChatSupport = () => {
                             </div>
                         </div>
 
-                        <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6">
+                        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-6">
                             {messages.map((m, i) => (
                                 <div key={i} className={`flex ${m.sender === 'admin' ? 'justify-end' : 'justify-start'}`}>
                                     <div className="flex flex-col max-w-[70%]">
@@ -189,10 +189,10 @@ const AdminChatSupport = () => {
                             <button 
                                 type="submit"
                                 disabled={sending || !newMessage.trim()}
-                                className="bg-indigo-600 text-white px-6 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-all disabled:opacity-50"
+                                className="bg-indigo-600 text-white px-4 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-all disabled:opacity-50"
                             >
                                 {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-                                <span className="font-medium text-[11px] uppercase tracking-widest text-white">Send</span>
+                                <span className="font-medium text-[11px] uppercase tracking-normal text-white">Send</span>
                             </button>
                         </form>
                     </>

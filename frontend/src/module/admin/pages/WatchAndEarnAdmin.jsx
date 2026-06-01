@@ -198,13 +198,13 @@ const WatchAndEarnAdmin = () => {
                 <div className="bg-slate-100 p-1.5 rounded-[22px] flex items-center gap-1 self-start shadow-inner">
                     <button 
                         onClick={() => setActiveTab('campaigns')}
-                        className={`px-6 py-3 rounded-[18px] text-[11px] font-medium uppercase tracking-widest transition-all ${activeTab === 'campaigns' ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`px-6 py-3 rounded-[18px] text-[11px] font-medium uppercase tracking-normal transition-all ${activeTab === 'campaigns' ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                         Ad Campaigns
                     </button>
                     <button 
                         onClick={() => setActiveTab('intro')}
-                        className={`px-6 py-3 rounded-[18px] text-[11px] font-medium uppercase tracking-widest transition-all ${activeTab === 'intro' ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`px-6 py-3 rounded-[18px] text-[11px] font-medium uppercase tracking-normal transition-all ${activeTab === 'intro' ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                         Platform Intro
                     </button>
@@ -224,7 +224,7 @@ const WatchAndEarnAdmin = () => {
                                     </div>
                                     <div>
                                         <h3 className="text-2xl font-medium text-white tracking-tight uppercase leading-none">Home Dashboard Intro</h3>
-                                        <p className="text-[12px] font-medium text-slate-400 uppercase tracking-widest mt-2">Manage the video users see on their home screen</p>
+                                        <p className="text-[12px] font-medium text-slate-400 uppercase tracking-normal mt-2">Manage the video users see on their home screen</p>
                                     </div>
                                 </div>
 
@@ -256,7 +256,7 @@ const WatchAndEarnAdmin = () => {
                                              />
                                              <label 
                                                  htmlFor="intro-video-upload"
-                                                 className={`h-[44px] px-4 rounded-xl flex items-center justify-center gap-2 text-[10px] font-medium uppercase tracking-widest cursor-pointer transition-all ${isUploading ? 'bg-slate-800 text-slate-600' : 'bg-indigo-500 text-white hover:bg-indigo-600 shadow-lg shadow-indigo-500/20'}`}
+                                                 className={`h-[44px] px-4 rounded-xl flex items-center justify-center gap-2 text-[10px] font-medium uppercase tracking-normal cursor-pointer transition-all ${isUploading ? 'bg-slate-800 text-slate-600' : 'bg-indigo-500 text-white hover:bg-indigo-600 shadow-lg shadow-indigo-500/20'}`}
                                              >
                                                  {isUploading ? '...' : <><Video size={14} /> Upload Video</>}
                                              </label>
@@ -280,7 +280,7 @@ const WatchAndEarnAdmin = () => {
                                                 />
                                                 <label 
                                                     htmlFor="intro-thumb-upload"
-                                                    className={`h-[54px] px-6 rounded-2xl flex items-center justify-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] cursor-pointer transition-all ${isUploading ? 'bg-slate-800 text-slate-600 cursor-not-allowed' : 'bg-white/10 text-white hover:bg-white/20 border border-slate-700'}`}
+                                                    className={`h-[54px] px-4 rounded-2xl flex items-center justify-center gap-2 text-[11px] font-medium uppercase tracking-normal cursor-pointer transition-all ${isUploading ? 'bg-slate-800 text-slate-600 cursor-not-allowed' : 'bg-white/10 text-white hover:bg-white/20 border border-slate-700'}`}
                                                 >
                                                     {isUploading ? '...' : <><Plus size={16} /> Upload</>}
                                                 </label>
@@ -288,13 +288,13 @@ const WatchAndEarnAdmin = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center justify-between p-6 bg-white/5 rounded-[30px] border border-slate-800 mt-4 group/toggle transition-all hover:bg-white/[0.08]">
+                                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-[30px] border border-slate-800 mt-4 group/toggle transition-all hover:bg-white/[0.08]">
                                         <div className="flex items-center gap-4">
                                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${introVideo.isActive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
                                                 <Video size={20} />
                                             </div>
                                             <div>
-                                                <h4 className="text-[12px] font-medium text-white uppercase tracking-widest">Dashboard Visibility</h4>
+                                                <h4 className="text-[12px] font-medium text-white uppercase tracking-normal">Dashboard Visibility</h4>
                                                 <p className="text-[10px] font-bold text-slate-400 mt-1 max-w-[200px]">When active, this video replaces the Future Fund card on user dashboard.</p>
                                             </div>
                                         </div>
@@ -309,7 +309,7 @@ const WatchAndEarnAdmin = () => {
                                     <button
                                         onClick={handleSaveIntro}
                                         disabled={isProcessing}
-                                        className="w-full bg-gradient-to-r from-indigo-500 to-blue-600 hover:scale-[1.02] active:scale-[0.98] text-white font-medium uppercase tracking-[0.3em] py-5 rounded-[28px] shadow-2xl shadow-indigo-500/20 transition-all flex items-center justify-center gap-3 mt-6 text-sm"
+                                        className="w-full bg-gradient-to-r from-indigo-500 to-blue-600 hover:scale-[1.02] active:scale-[0.98] text-white font-medium uppercase tracking-[0.3em] py-3 rounded-[28px] shadow-2xl shadow-indigo-500/20 transition-all flex items-center justify-center gap-3 mt-6 text-sm"
                                     >
                                         {isProcessing ? 'Synchronizing...' : <><Save size={22} strokeWidth={2.5} /> Update Platform Config</>}
                                     </button>
@@ -319,7 +319,7 @@ const WatchAndEarnAdmin = () => {
                             {/* Preview Side */}
                             <div className="flex flex-col justify-center items-center text-center space-y-8 bg-white/5 rounded-[3rem] p-10 border border-white/5 backdrop-blur-sm">
                                 <span className="text-[10px] font-medium text-indigo-400 uppercase tracking-[0.6em] animate-pulse">Device Preview</span>
-                                <div className="w-[300px] h-[580px] bg-white rounded-[60px] p-8 border-[12px] border-slate-900 shadow-[0_0_80px_rgba(79,70,229,0.15)] relative overflow-hidden flex flex-col group/preview transition-transform hover:rotate-1">
+                                <div className="w-[300px] h-[580px] bg-white rounded-[60px] p-5 border-[12px] border-slate-900 shadow-[0_0_80px_rgba(79,70,229,0.15)] relative overflow-hidden flex flex-col group/preview transition-transform hover:rotate-1">
                                     {/* Phone Header Mock */}
                                     <div className="flex justify-between items-center mb-10 px-2 opacity-50">
                                         <div className="flex gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div><div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div></div>
@@ -342,7 +342,7 @@ const WatchAndEarnAdmin = () => {
                                         ) : (
                                             <div className="w-full h-44 bg-slate-200/50 rounded-[2.5rem] flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 space-y-2 text-center px-4">
                                                 <X size={32} className="opacity-20 mb-2" />
-                                                <p className="font-medium text-[9px] uppercase tracking-widest italic opacity-40">Intro Card is Disabled</p>
+                                                <p className="font-medium text-[9px] uppercase tracking-normal opacity-40">Intro Card is Disabled</p>
                                             </div>
                                         )}
                                         
@@ -359,7 +359,7 @@ const WatchAndEarnAdmin = () => {
                                     {/* Home Bar */}
                                     <div className="w-24 h-1 bg-slate-200 rounded-full mx-auto mt-6 opacity-40"></div>
                                 </div>
-                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed">Live Mobile Dashboard Preview</p>
+                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-normal leading-relaxed">Live Mobile Dashboard Preview</p>
                             </div>
                         </div>
                     </div>
@@ -367,10 +367,10 @@ const WatchAndEarnAdmin = () => {
             ) : (
                 /* --- Tab 2: Campaigns Manager --- */
                 <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex justify-between items-center bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm">
+                    <div className="flex justify-between items-center bg-white p-5 rounded-[3rem] border border-slate-100 shadow-sm">
                         <div>
                             <h3 className="text-xl font-medium text-slate-800 tracking-tight uppercase mb-1">Active Ad Campaigns</h3>
-                            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Total {ads.length} campaigns running globally</p>
+                            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-normal">Total {ads.length} campaigns running globally</p>
                         </div>
                         <button 
                             onClick={() => {
@@ -378,7 +378,7 @@ const WatchAndEarnAdmin = () => {
                                 setAdForm({ title: '', coins: '', duration: '', thumbnail: '', videoUrl: '' });
                                 setIsModalOpen(true);
                             }}
-                            className="bg-indigo-600 hover:bg-slate-900 text-white font-medium px-8 py-4 rounded-[22px] shadow-xl shadow-indigo-100 transition-all flex items-center gap-3 active:scale-95 text-xs uppercase tracking-widest"
+                            className="bg-indigo-600 hover:bg-slate-900 text-white font-medium px-8 py-4 rounded-[22px] shadow-xl shadow-indigo-100 transition-all flex items-center gap-3 active:scale-95 text-xs uppercase tracking-normal"
                         >
                             <Plus size={20} strokeWidth={3} /> Launch New Ad
                         </button>
@@ -392,7 +392,7 @@ const WatchAndEarnAdmin = () => {
                                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
                                     <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
                                         <div className="flex flex-col gap-2">
-                                            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-3 py-1.5 text-[10px] font-medium text-white uppercase tracking-widest w-fit">
+                                            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-3 py-1.5 text-[10px] font-medium text-white uppercase tracking-normal w-fit">
                                                 {ad.duration} Seconds
                                             </div>
                                             <h3 className="font-medium text-white text-xl uppercase tracking-tight">{ad.title}</h3>
@@ -409,20 +409,20 @@ const WatchAndEarnAdmin = () => {
                                             <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-slate-400 shadow-sm">
                                                 <Video size={16} />
                                             </div>
-                                            <p className="text-[11px] font-bold text-slate-500 truncate italic">{ad.videoUrl}</p>
+                                            <p className="text-[11px] font-bold text-slate-500 truncate">{ad.videoUrl}</p>
                                         </div>
                                         <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-2xl border border-emerald-100/50">
                                             <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-emerald-500 shadow-sm">
                                                 <CheckCircle2 size={16} />
                                             </div>
-                                            <p className="text-[11px] font-medium text-emerald-700 uppercase tracking-widest">Active & Earning</p>
+                                            <p className="text-[11px] font-medium text-emerald-700 uppercase tracking-normal">Active & Earning</p>
                                         </div>
                                     </div>
 
                                     <div className="flex gap-3">
                                         <button 
                                             onClick={() => handleEdit(ad)}
-                                            className="flex-1 bg-slate-900 hover:bg-indigo-600 text-white font-medium text-[11px] uppercase tracking-widest py-4 rounded-2xl transition-all flex justify-center items-center gap-2 shadow-lg shadow-slate-200"
+                                            className="flex-1 bg-slate-900 hover:bg-indigo-600 text-white font-medium text-[11px] uppercase tracking-normal py-4 rounded-2xl transition-all flex justify-center items-center gap-2 shadow-lg shadow-slate-200"
                                         >
                                             <Edit3 size={16} /> Configure
                                         </button>
@@ -451,7 +451,7 @@ const WatchAndEarnAdmin = () => {
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-medium text-slate-800 uppercase tracking-tight leading-none">{editId ? 'Modify Campaign' : 'Initialize Campaign'}</h3>
-                                    <p className="text-[11px] font-bold text-indigo-500 uppercase tracking-widest mt-2">{editId ? 'Update existing ad task' : 'Set coins and watch duration'}</p>
+                                    <p className="text-[11px] font-bold text-indigo-500 uppercase tracking-normal mt-2">{editId ? 'Update existing ad task' : 'Set coins and watch duration'}</p>
                                 </div>
                             </div>
                             <button onClick={handleCloseModal} className="w-12 h-12 bg-white text-slate-400 hover:text-slate-800 hover:shadow-md rounded-2xl transition-all flex items-center justify-center shadow-sm"><X size={30}/></button>
@@ -459,7 +459,7 @@ const WatchAndEarnAdmin = () => {
 
                         <form onSubmit={handleSubmit} className="p-10 space-y-6">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Campaign Title</label>
+                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Campaign Title</label>
                                 <input 
                                     required
                                     type="text"
@@ -472,21 +472,21 @@ const WatchAndEarnAdmin = () => {
 
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Reward (Coins)</label>
+                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Reward (Coins)</label>
                                     <div className="relative">
                                         <div className="absolute left-5 top-1/2 -translate-y-1/2 text-amber-500"><Coins size={20}/></div>
                                         <input 
                                             required
                                             type="number"
                                             placeholder="50"
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-[22px] py-5 pr-5 pl-14 pl-14-override text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-[22px] py-3 pr-5 pl-14 pl-14-override text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500"
                                             value={adForm.coins || ''}
                                             onChange={(e) => setAdForm(prev => ({...prev, coins: e.target.value}))}
                                         />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Duration (Sec)</label>
+                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Duration (Sec)</label>
                                     <div className="relative">
                                         <div className="absolute left-5 top-1/2 -translate-y-1/2 text-indigo-500"><Clock size={20}/></div>
                                         <input 
@@ -495,7 +495,7 @@ const WatchAndEarnAdmin = () => {
                                             min="30"
                                             max="60"
                                             placeholder="30"
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-[22px] py-5 pr-5 pl-14 pl-14-override text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-[22px] py-3 pr-5 pl-14 pl-14-override text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500"
                                             value={adForm.duration || ''}
                                             onChange={(e) => setAdForm(prev => ({...prev, duration: e.target.value}))}
                                         />
@@ -507,7 +507,7 @@ const WatchAndEarnAdmin = () => {
                             <div className="flex gap-6 items-start">
                                 <div className="flex-1 space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Thumbnail Overlay</label>
+                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Thumbnail Overlay</label>
                                         <div className="flex gap-2">
                                             <input 
                                                 required
@@ -527,7 +527,7 @@ const WatchAndEarnAdmin = () => {
                                                 />
                                                 <label 
                                                     htmlFor="ad-thumb-upload"
-                                                    className={`h-[62px] px-5 rounded-[22px] flex items-center justify-center gap-1.5 text-[10px] font-medium uppercase tracking-widest cursor-pointer transition-all ${isUploading ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200'}`}
+                                                    className={`h-[62px] px-5 rounded-[22px] flex items-center justify-center gap-1.5 text-[10px] font-medium uppercase tracking-normal cursor-pointer transition-all ${isUploading ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200'}`}
                                                 >
                                                     {isUploading ? '...' : <><ImageIcon size={14} /> Upload</>}
                                                 </label>
@@ -536,7 +536,7 @@ const WatchAndEarnAdmin = () => {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Video Source URL (YouTube/Direct Link)</label>
+                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Video Source URL (YouTube/Direct Link)</label>
                                         <input 
                                             required
                                             type="url"
@@ -550,7 +550,7 @@ const WatchAndEarnAdmin = () => {
 
                                 {adForm.thumbnail && (
                                     <div className="w-32 space-y-2 animate-in zoom-in-90 duration-300">
-                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest block text-center">Preview</label>
+                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal block text-center">Preview</label>
                                         <div className="aspect-square rounded-[22px] overflow-hidden border-2 border-slate-100 shadow-inner bg-slate-50">
                                             <img src={adForm.thumbnail} alt="Preview" className="w-full h-full object-cover" />
                                         </div>
@@ -561,7 +561,7 @@ const WatchAndEarnAdmin = () => {
                             <div className="flex justify-center pt-2">
                                 <button 
                                     type="submit"
-                                    className="px-12 py-5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 hover:from-indigo-600 hover:to-violet-600 text-white font-medium text-[11px] uppercase tracking-[0.3em] rounded-[22px] shadow-xl shadow-slate-200 active:scale-[0.98] transition-all"
+                                    className="px-12 py-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 hover:from-indigo-600 hover:to-violet-600 text-white font-medium text-[11px] uppercase tracking-[0.3em] rounded-[22px] shadow-xl shadow-slate-200 active:scale-[0.98] transition-all"
                                 >
                                     {editId ? 'Apply Changes' : 'Launch Campaign'}
                                 </button>
