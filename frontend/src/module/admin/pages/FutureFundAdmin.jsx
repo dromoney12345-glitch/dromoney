@@ -342,7 +342,7 @@ const FutureFundAdmin = () => {
                         </div>
                         <div className="p-6">
                             {historyLoading ? (
-                                <div className="flex flex-col items-center justify-center py-12 gap-3">
+                                <div className="flex flex-col items-center justify-center py-6 gap-3">
                                     <Loader2 className="animate-spin text-indigo-500 w-8 h-8" />
                                     <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal">Fetching transactions...</p>
                                 </div>

@@ -248,7 +248,7 @@ const Promotions = () => {
             {/* Message Modal */}
             {isMsgModalOpen && (
                 <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
-                    <div className="bg-white rounded-[2rem] w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+                    <div className="bg-white rounded-xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
                         <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between">
                             <div className="flex items-center gap-2 text-sky-600">
                                 <MessageSquare size={22} />

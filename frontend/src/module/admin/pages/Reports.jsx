@@ -340,7 +340,7 @@ const Reports = () => {
 
                         {/* User Panel Preview Replica */}
                         <div className="flex flex-col">
-                            <div className="sticky top-6 bg-slate-900 rounded-[60px] p-12 overflow-hidden shadow-2xl relative">
+                            <div className="sticky top-6 bg-slate-900 rounded-[60px] p-6 overflow-hidden shadow-2xl relative">
                                 <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
                                 
                                 <div className="relative z-10">

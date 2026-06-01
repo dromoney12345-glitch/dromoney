@@ -68,7 +68,7 @@ const Settings = () => {
             <div className="flex flex-col lg:flex-row gap-8">
                 {/* Sidebar Navigation */}
                 <div className="w-full lg:w-72 space-y-3">
-                    <div className="bg-white p-2 rounded-[2rem] border border-slate-100 shadow-sm space-y-1">
+                    <div className="bg-white p-2 rounded-xl border border-slate-100 shadow-sm space-y-1">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
@@ -102,7 +102,7 @@ const Settings = () => {
 
                 {/* Content Area */}
                 <div className="flex-1">
-                    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-10 min-h-[500px] flex flex-col">
+                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 min-h-[500px] flex flex-col">
                         {/* Tab Content Header */}
                         <div className="mb-10">
                             <div className="flex items-center gap-3 mb-2">
@@ -204,7 +204,7 @@ const Settings = () => {
                                             { label: 'Coin Value', field: 'coinRate', unit: '₹', icon: '🪙', info: '1 Coin = ₹ Value', step: 0.01 },
                                             { label: 'Minimum Payout', field: 'minWithdrawal', unit: '₹', icon: '🏧', info: 'Withdrawal limit' }
                                         ].map((item, idx) => (
-                                            <div key={idx} className="bg-slate-50 p-4 rounded-[2rem] border border-slate-100 hover:border-emerald-200 transition-all group">
+                                            <div key={idx} className="bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-emerald-200 transition-all group">
                                                 <div className="flex items-center justify-between mb-4">
                                                     <span className="text-2xl">{item.icon}</span>
                                                     <span className="bg-white/80 px-2 py-1 rounded-lg text-[9px] font-medium text-slate-400 uppercase tracking-normal border border-slate-200">System Parameter</span>
@@ -293,7 +293,7 @@ const Settings = () => {
                             <button 
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className={`flex items-center gap-3 bg-[#1A1C30] text-white px-12 py-3 rounded-[2rem] text-[12px] font-medium uppercase tracking-normal transition-all shadow-2xl shadow-slate-300
+                                className={`flex items-center gap-3 bg-[#1A1C30] text-white px-6 py-3 rounded-xl text-[12px] font-medium uppercase tracking-normal transition-all shadow-2xl shadow-slate-300
                                     ${isSaving ? 'opacity-80 scale-95' : 'hover:scale-[1.02] active:scale-95'}`}
                             >
                                 {isSaving ? (

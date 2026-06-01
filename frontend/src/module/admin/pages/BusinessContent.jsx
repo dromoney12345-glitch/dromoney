@@ -299,7 +299,7 @@ const BusinessContent = () => {
                     </div>
                 ) : (
                     ideas.map((idea) => (
-                        <div key={idea._id} className="bg-white rounded-[2.5rem] p-4 shadow-sm border border-slate-100 group hover:shadow-xl transition-all">
+                        <div key={idea._id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 group hover:shadow-xl transition-all">
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shrink-0">
                                     {idea.bannerImage ? <img src={idea.bannerImage} className="w-full h-full object-cover" alt="" /> : <ImageIcon className="text-slate-200" />}
@@ -329,7 +329,7 @@ const BusinessContent = () => {
             {/* Ecosystem Content Modal */}
             {showEcoModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-                    <div className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                    <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
                         <div className="px-8 pt-8 pb-4 flex items-center justify-between border-b border-slate-50">
                             <div>
                                 <h2 className="text-xl font-medium text-slate-900 uppercase tracking-tight">Ecosystem Content</h2>
@@ -378,7 +378,7 @@ const BusinessContent = () => {
             {/* Subscription Settings Modal */}
             {showSettingsModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-                    <div className="bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in duration-200 flex h-[85vh]">
+                    <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in duration-200 flex h-[85vh]">
                         {/* Sidebar: Plan List */}
                         <div className="w-64 bg-slate-50 border-r border-slate-100 p-4 flex flex-col gap-4 overflow-y-auto">
                             <div className="mb-2">
@@ -447,7 +447,7 @@ const BusinessContent = () => {
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             {settingsData.businessPlans[activePlanIdx].benefits.map((benefit, bIdx) => (
-                                                <div key={bIdx} className="bg-slate-50/50 border border-slate-100 p-5 rounded-[2rem] space-y-3 relative group hover:bg-white hover:shadow-lg transition-all border-dashed">
+                                                <div key={bIdx} className="bg-slate-50/50 border border-slate-100 p-5 rounded-xl space-y-3 relative group hover:bg-white hover:shadow-lg transition-all border-dashed">
                                                     <button onClick={() => {
                                                         const newBenefits = settingsData.businessPlans[activePlanIdx].benefits.filter((_, i) => i !== bIdx);
                                                         const newPlans = [...settingsData.businessPlans];
@@ -508,7 +508,7 @@ const BusinessContent = () => {
 
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-                    <div className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                    <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
                         <div className="px-8 pt-8 pb-4 flex items-center justify-between border-b border-slate-50">
                             <div>
                                 <h2 className="text-xl font-medium text-slate-900 uppercase tracking-tight">{editingId ? 'Update Strategy' : 'Create Strategy'}</h2>
@@ -570,7 +570,7 @@ const BusinessContent = () => {
                                         className="w-full bg-indigo-50/30 border border-indigo-100 rounded-xl px-4 py-3 text-sm font-bold outline-none text-indigo-600 placeholder:text-slate-300 focus:ring-2 focus:ring-indigo-500/20"
                                     />
                                 </div>
-                                <div className="md:col-span-2 p-4 bg-slate-50 rounded-[2.5rem] border border-slate-100 space-y-6">
+                                <div className="md:col-span-2 p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-6">
                                     <h3 className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-2">Business Card Details</h3>
                                     <div className="space-y-4">
                                         <div className="space-y-1">

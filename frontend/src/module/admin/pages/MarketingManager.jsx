@@ -436,8 +436,8 @@ const MarketingManager = () => {
                             {/* Card 1: Income Page UI Replica (Image 1) */}
                             <div className="space-y-4">
                                 <h4 className="text-[11px] font-medium text-slate-400 uppercase tracking-normal ml-4 flex items-center gap-2">Income Center Card Preview <ChevronRight size={12} /></h4>
-                                <div className="bg-white rounded-2xl p-10 border border-slate-200 shadow-inner flex justify-center">
-                                    <div className="w-[280px] bg-slate-50 border border-slate-200 rounded-[2.5rem] p-5 flex flex-col items-center text-center shadow-lg relative overflow-hidden group">
+                                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-inner flex justify-center">
+                                    <div className="w-[280px] bg-slate-50 border border-slate-200 rounded-2xl p-5 flex flex-col items-center text-center shadow-lg relative overflow-hidden group">
                                         <div className="w-16 h-16 bg-white rounded-[1.5rem] flex items-center justify-center mb-6 shadow-sm border border-black/[0.03]">
                                             <Sparkles size={32} className="text-slate-800" />
                                         </div>
@@ -455,7 +455,7 @@ const MarketingManager = () => {
                             {/* Card 2: Future Features Details UI (Image 2) */}
                             <div className="space-y-4">
                                 <h4 className="text-[11px] font-medium text-slate-400 uppercase tracking-normal ml-4 flex items-center gap-2">Details Page Preview <ChevronRight size={12} /></h4>
-                                <div className="bg-slate-900 rounded-[60px] p-10 relative overflow-hidden shadow-2xl scale-[0.98]">
+                                <div className="bg-slate-900 rounded-[60px] p-6 relative overflow-hidden shadow-2xl scale-[0.98]">
                                     <div className="absolute top-0 right-0 w-48 h-48 bg-sky-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
                                     <div className="absolute -left-10 top-0 opacity-10">
                                         <Rocket size={180} className="text-white" />
@@ -573,7 +573,7 @@ const MarketingManager = () => {
 
                         {/* Banner Preview Section */}
                         <div className="sticky top-6 max-h-[90vh] overflow-y-auto bg-[#0F172A] rounded-[48px] shadow-2xl shadow-slate-200 custom-scrollbar">
-                            <div className="flex items-center gap-3 sticky top-0 bg-[#0F172A] z-50 p-10 pb-6">
+                            <div className="flex items-center gap-3 sticky top-0 bg-[#0F172A] z-50 p-6 pb-6">
                                 <div className="p-3 bg-white/5 rounded-2xl text-sky-400"><MousePointer2 size={24} /></div>
                                 <h3 className="text-xl font-medium text-white tracking-tight">User Dashboard Preview</h3>
                             </div>
@@ -693,7 +693,7 @@ const MarketingManager = () => {
                 {/* ── TAB 3: LIFETIME PROMO ── */}
                 {activeTab === 'lifetime' && (
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
-                        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-10 space-y-8">
+                        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-8">
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center"><Rocket size={32} /></div>
                                 <div>
@@ -739,7 +739,7 @@ const MarketingManager = () => {
 
                         {/* Real-time Preview Card (Image 2 Replica) */}
                         <div className="flex flex-col justify-center">
-                            <div className="bg-slate-50 p-12 rounded-[60px] border border-slate-200 shadow-inner">
+                            <div className="bg-slate-50 p-6 rounded-[60px] border border-slate-200 shadow-inner">
                                 <p className="text-[10px] font-medium text-slate-300 uppercase tracking-[0.3em] mb-6 text-center">Live Preview in App</p>
                                 <div className="w-full bg-gradient-to-br from-slate-900 via-slate-800 to-sky-900 rounded-2xl p-5 shadow-2xl relative overflow-hidden ring-8 ring-white">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
@@ -775,7 +775,7 @@ const MarketingManager = () => {
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
                         {/* Editor Side */}
                         <div className="space-y-6">
-                            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-10 space-y-8 relative overflow-hidden group">
+                            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-8 relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 opacity-40 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform"></div>
                                 <div className="flex items-center gap-4 relative">
                                     <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center"><Briefcase size={30} /></div>
@@ -808,10 +808,10 @@ const MarketingManager = () => {
 
                         {/* Preview Side */}
                         <div className="flex flex-col justify-center">
-                            <div className="bg-slate-50 p-12 rounded-[60px] border border-slate-200 shadow-inner flex flex-col items-center">
+                            <div className="bg-slate-50 p-6 rounded-[60px] border border-slate-200 shadow-inner flex flex-col items-center">
                                 <p className="text-[10px] font-medium text-slate-300 uppercase tracking-[0.3em] mb-10 text-center">User Panel Live View</p>
 
-                                <div className="w-[320px] bg-white border border-slate-100 rounded-[2rem] p-5 flex items-center gap-4 shadow-xl ring-8 ring-white relative overflow-hidden group">
+                                <div className="w-[320px] bg-white border border-slate-100 rounded-xl p-5 flex items-center gap-4 shadow-xl ring-8 ring-white relative overflow-hidden group">
                                     <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
                                     <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0 border border-emerald-100">
                                         <Briefcase size={22} className="text-emerald-500" />

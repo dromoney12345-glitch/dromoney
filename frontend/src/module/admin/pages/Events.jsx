@@ -315,7 +315,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
         }
     };
 
-    if (!sel) return <div className="text-center py-12 text-slate-400">Please create an event first.</div>;
+    if (!sel) return <div className="text-center py-6 text-slate-400">Please create an event first.</div>;
 
     return (
         <div className="space-y-6 font-['Poppins']">
@@ -846,7 +846,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
             {/* Participant Detail Modal */}
             {viewingParticipant && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-lg rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+                    <div className="bg-white w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
                         <div className="p-8 relative">
                             <button onClick={() => setViewingParticipant(null)} className="absolute top-6 right-6 p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors">
                                 <X size={20} />
@@ -1096,7 +1096,7 @@ const EventsAdmin = () => {
             {/* Add Event Modal */}
             {isAddModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-md rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 font-['Poppins']">
+                    <div className="bg-white w-full max-w-md rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 font-['Poppins']">
                         <form onSubmit={handleAddEvent} className="p-8 relative space-y-6 font-['Poppins']">
                             <button type="button" onClick={() => setIsAddModalOpen(false)} className="absolute top-6 right-6 p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors">
                                 <X size={20} />

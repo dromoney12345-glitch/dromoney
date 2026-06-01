@@ -45,7 +45,7 @@ const AdminLogin = () => {
             <div className="w-full max-w-[800px] min-h-[500px] bg-white rounded-2xl overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.5)] flex flex-col md:flex-row transition-all duration-500 relative z-10">
                 
                 {/* ── Left Section: Welcome ── */}
-                <div className="flex-1 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] relative overflow-hidden flex flex-col justify-center px-10 py-12 text-white">
+                <div className="flex-1 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] relative overflow-hidden flex flex-col justify-center px-10 py-6 text-white">
                     {/* Dynamic Background Elements */}
                     <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-indigo-600/20 rounded-full blur-[80px] animate-pulse"></div>
                     <div className="absolute bottom-[-5%] left-[-5%] w-[250px] h-[250px] bg-sky-500/20 rounded-full blur-[60px]"></div>
@@ -81,7 +81,7 @@ const AdminLogin = () => {
                 </div>
 
                 {/* ── Right Section: Sign In Form ── */}
-                <div className="flex-1 bg-white p-10 py-12 flex flex-col justify-center relative">
+                <div className="flex-1 bg-white p-6 py-6 flex flex-col justify-center relative">
                     <div className="max-w-[300px] w-full mx-auto space-y-8">
                         <div className="space-y-1">
                             <h2 className="text-3xl font-medium text-slate-900 tracking-tight">Sign in</h2>

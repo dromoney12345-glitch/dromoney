@@ -214,7 +214,7 @@ const WatchAndEarnAdmin = () => {
             {activeTab === 'intro' ? (
                 /* --- Tab 1: Intro Video Settings --- */
                 <div className="animate-in slide-in-from-bottom-4 duration-500">
-                    <div className="bg-[#0F172A] rounded-[3rem] p-10 shadow-2xl relative overflow-hidden group border border-slate-800">
+                    <div className="bg-[#0F172A] rounded-2xl p-6 shadow-2xl relative overflow-hidden group border border-slate-800">
                         <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
                         <div className="relative z-10 grid grid-cols-1 xl:grid-cols-2 gap-16">
                             <div className="space-y-8">
@@ -317,7 +317,7 @@ const WatchAndEarnAdmin = () => {
                             </div>
 
                             {/* Preview Side */}
-                            <div className="flex flex-col justify-center items-center text-center space-y-8 bg-white/5 rounded-[3rem] p-10 border border-white/5 backdrop-blur-sm">
+                            <div className="flex flex-col justify-center items-center text-center space-y-8 bg-white/5 rounded-2xl p-6 border border-white/5 backdrop-blur-sm">
                                 <span className="text-[10px] font-medium text-indigo-400 uppercase tracking-[0.6em] animate-pulse">Device Preview</span>
                                 <div className="w-[300px] h-[580px] bg-white rounded-[60px] p-5 border-[12px] border-slate-900 shadow-[0_0_80px_rgba(79,70,229,0.15)] relative overflow-hidden flex flex-col group/preview transition-transform hover:rotate-1">
                                     {/* Phone Header Mock */}
@@ -328,7 +328,7 @@ const WatchAndEarnAdmin = () => {
                                     
                                     <div className="flex-1 bg-slate-50/50 rounded-[45px] flex flex-col p-5">
                                         {introVideo.isActive ? (
-                                            <div className="w-full h-44 bg-slate-900 rounded-[2.5rem] relative overflow-hidden shadow-2xl border-4 border-white animate-in zoom-in duration-500">
+                                            <div className="w-full h-44 bg-slate-900 rounded-2xl relative overflow-hidden shadow-2xl border-4 border-white animate-in zoom-in duration-500">
                                                 <img src={introVideo.thumbnailUrl || 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&q=80'} className="w-full h-full object-cover opacity-60" />
                                                 <div className="absolute inset-0 flex items-center justify-center">
                                                     <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-xl shadow-black/20 transform group-hover/preview:scale-110 transition-transform">
@@ -340,7 +340,7 @@ const WatchAndEarnAdmin = () => {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="w-full h-44 bg-slate-200/50 rounded-[2.5rem] flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 space-y-2 text-center px-4">
+                                            <div className="w-full h-44 bg-slate-200/50 rounded-2xl flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 space-y-2 text-center px-4">
                                                 <X size={32} className="opacity-20 mb-2" />
                                                 <p className="font-medium text-[9px] uppercase tracking-normal opacity-40">Intro Card is Disabled</p>
                                             </div>
@@ -367,7 +367,7 @@ const WatchAndEarnAdmin = () => {
             ) : (
                 /* --- Tab 2: Campaigns Manager --- */
                 <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex justify-between items-center bg-white p-5 rounded-[3rem] border border-slate-100 shadow-sm">
+                    <div className="flex justify-between items-center bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
                         <div>
                             <h3 className="text-xl font-medium text-slate-800 tracking-tight uppercase mb-1">Active Ad Campaigns</h3>
                             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-normal">Total {ads.length} campaigns running globally</p>
@@ -386,7 +386,7 @@ const WatchAndEarnAdmin = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {ads.map((ad) => (
-                            <div key={ad.id} className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden hover:shadow-2xl hover:translate-y-[-4px] transition-all group relative">
+                            <div key={ad.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-2xl hover:translate-y-[-4px] transition-all group relative">
                                 <div className="h-48 relative">
                                     <img src={ad.thumbnail || 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&q=80'} alt={ad.title} className="w-full h-full object-cover" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
