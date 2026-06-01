@@ -1,18 +1,37 @@
-import React from 'react';
-import { X, Users, IndianRupee } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Users, IndianRupee, Loader2 } from 'lucide-react';
+import api from '../../shared/services/api';
 
-const ReferralsModal = ({ isOpen, onClose, referralCount = 6 }) => {
+const ReferralsModal = ({ isOpen, onClose, referralCount = 0 }) => {
+    const [referralsList, setReferralsList] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            fetchReferrals();
+        }
+    }, [isOpen]);
+
+    const fetchReferrals = async () => {
+        setLoading(true);
+        try {
+            const res = await api.get('/user/data/referrals');
+            if (res.success) {
+                setReferralsList(res.data);
+            }
+        } catch (err) {
+            console.error('Failed to fetch referrals:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if (!isOpen) return null;
 
-    // Dummy data for visual representation
-    const friends = [
-        { name: 'Amit Kumar', date: 'Today, 10:30 AM', bonus: 200 },
-        { name: 'Neha Sharma', date: 'Yesterday', bonus: 200 },
-        { name: 'Priya Singh', date: '2 Days ago', bonus: 200 },
-        { name: 'Rahul V.', date: '3 Days ago', bonus: 200 },
-        { name: 'Sanjay M.', date: 'Last Week', bonus: 200 },
-        { name: 'Vikram Z.', date: 'Last Week', bonus: 200 }
-    ];
+    const formatDate = (dateString) => {
+        const options = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+    };
 
     return (
         <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center sm:p-4">
@@ -27,7 +46,7 @@ const ReferralsModal = ({ isOpen, onClose, referralCount = 6 }) => {
                         </div>
                         <div>
                             <h3 className="font-black text-slate-800 text-[16px] tracking-tight">My Referrals</h3>
-                            <p className="text-[9px] uppercase tracking-widest text-sky-500 font-black">{referralCount} Successful Invites</p>
+                            <p className="text-[9px] uppercase tracking-widest text-sky-500 font-black">{referralsList.length || referralCount} Successful Invites</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 active:scale-95 transition-all outline-none border border-slate-100">
@@ -37,24 +56,35 @@ const ReferralsModal = ({ isOpen, onClose, referralCount = 6 }) => {
 
                 <div className="p-4 overflow-y-auto bg-slate-50/80">
                     <div className="flex flex-col gap-3">
-                        {friends.slice(0, referralCount).map((friend, i) => (
-                            <div key={i} style={{ animationDelay: `${i * 50}ms` }} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex justify-between items-center animate-in slide-in-from-bottom-4 duration-500 fill-mode-both">
-                                <div className="flex items-center gap-3">
-                                    <div className={`w-11 h-11 rounded-full flex items-center justify-center font-black text-sm uppercase ${i % 2 === 0 ? 'bg-sky-50 text-sky-600' : 'bg-indigo-50 text-indigo-600'}`}>
-                                        {friend.name.charAt(0)}
+                        {loading ? (
+                            <div className="flex justify-center p-6"><Loader2 className="animate-spin text-sky-500" /></div>
+                        ) : referralsList.length === 0 ? (
+                            <div className="text-center p-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest">No successful invites yet.</div>
+                        ) : (
+                            referralsList.map((refData, i) => {
+                                const friendName = refData.referredUser?.name || 'Unknown User';
+                                const dateStr = formatDate(refData.createdAt);
+                                const bonus = refData.amount || 200;
+                                return (
+                                    <div key={refData._id || i} style={{ animationDelay: `${i * 50}ms` }} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex justify-between items-center animate-in slide-in-from-bottom-4 duration-500 fill-mode-both">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-11 h-11 rounded-full flex items-center justify-center font-black text-sm uppercase ${i % 2 === 0 ? 'bg-sky-50 text-sky-600' : 'bg-indigo-50 text-indigo-600'}`}>
+                                                {friendName.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <h4 className="text-[13px] font-black text-slate-800">{friendName}</h4>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{dateStr}</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-1.5 rounded-lg flex items-center gap-0.5 border border-emerald-100/50">
+                                                +<IndianRupee size={10} />{bonus}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h4 className="text-[13px] font-black text-slate-800">{friend.name}</h4>
-                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{friend.date}</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <span className="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-1.5 rounded-lg flex items-center gap-0.5 border border-emerald-100/50">
-                                        +<IndianRupee size={10} />{friend.bonus}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
+                                );
+                            })
+                        )}
                     </div>
                 </div>
 
