@@ -458,14 +458,14 @@ const Home = () => {
                     <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-4 mb-1">Premium Boosters</h3>
                     {/* Support Booster */}
                     <div className="bg-[#FFFBEB] border border-amber-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
-                        <div className="p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
+                        <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex items-start sm:items-center gap-3">
                                 <div className="w-11 h-11 bg-white rounded-xl flex items-center justify-center shadow-sm border border-amber-50">
                                     <Coins className="text-amber-500" size={24} />
                                 </div>
                                 <div>
                                     <h4 className="text-[14px] font-black text-amber-900 tracking-tight leading-none">{boosters.support.title}</h4>
-                                    <div className="flex items-center gap-2 mt-1">
+                                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1">
                                         <p className="text-[10px] font-bold text-amber-600/70 uppercase tracking-tight">{boosters.support.subtitle}</p>
                                         <span className="w-1 h-1 bg-amber-200 rounded-full"></span>
                                         <p className="text-[10px] font-black text-amber-500 uppercase tracking-tight flex items-center gap-1">
@@ -494,14 +494,14 @@ const Home = () => {
 
                     {/* Task Booster */}
                     <div className="bg-sky-50 border border-sky-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
-                        <div className="p-4 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
+                        <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex items-start sm:items-center gap-3">
                                 <div className="w-11 h-11 bg-white rounded-xl flex items-center justify-center shadow-sm border border-sky-50">
                                     <Zap className="text-sky-500" size={24} />
                                 </div>
                                 <div>
                                     <h4 className="text-[14px] font-black text-sky-900 tracking-tight leading-none">{boosters.task.title}</h4>
-                                    <div className="flex items-center gap-2 mt-1">
+                                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1">
                                         <p className="text-[10px] font-bold text-sky-600/70 uppercase tracking-tight">{boosters.task.subtitle}</p>
                                         <span className="w-1 h-1 bg-sky-200 rounded-full"></span>
                                         <p className="text-[10px] font-black text-sky-500 uppercase tracking-tight flex items-center gap-1">
