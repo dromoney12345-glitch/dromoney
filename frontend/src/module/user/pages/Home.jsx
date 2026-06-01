@@ -111,25 +111,28 @@ const AdBanners = ({ navigate }) => {
     const banner = banners[active];
     const BannerIcon = Icons[banner.iconName] || Icons.Megaphone;
 
+    const handleBannerClick = (e, path) => {
+        if (e) e.stopPropagation();
+        const targetUrl = path || '/user/home';
+        if (targetUrl.startsWith('http')) {
+            window.open(targetUrl, '_blank', 'noopener,noreferrer');
+        } else {
+            navigate(targetUrl);
+        }
+    };
+
     return (
         <div className="relative">
             <div
-                onClick={() => {
-                    const targetUrl = banner.path || '/user/home';
-                    if (targetUrl.startsWith('http')) {
-                        window.open(targetUrl, '_blank');
-                    } else {
-                        navigate(targetUrl);
-                    }
-                }}
+                onClick={(e) => handleBannerClick(e, banner.path)}
                 className={`cursor-pointer bg-gradient-to-br ${theme.gradient} rounded-2xl p-6 shadow-xl relative overflow-hidden transition-all duration-700 group min-h-[160px] flex flex-col justify-center`}
             >
                 {/* Background Glass Decor */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
 
                 {/* Background Icon Decor */}
-                <div className={`absolute -right-4 -bottom-4 opacity-20 text-white group-hover:scale-110 group-hover:-rotate-12 transition-all duration-700`}>
+                <div className={`absolute -right-4 -bottom-4 opacity-20 text-white group-hover:scale-110 group-hover:-rotate-12 transition-all duration-700 pointer-events-none`}>
                     <BannerIcon size={130} strokeWidth={1} />
                 </div>
 
@@ -139,10 +142,13 @@ const AdBanners = ({ navigate }) => {
                     </span>
                     <h2 className="text-2xl font-black tracking-tight mt-3 leading-none drop-shadow-sm">{banner.title}</h2>
                     <p className="text-[12px] font-medium text-white/80 mt-2 mb-5 leading-tight max-w-[80%]">{banner.subtitle}</p>
-                    <div className="inline-flex items-center gap-2 bg-white text-slate-900 px-5 py-2.5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-black/20 hover:bg-slate-50 transition-all active:scale-95 w-fit">
+                    <button 
+                        onClick={(e) => handleBannerClick(e, banner.path)}
+                        className="inline-flex items-center gap-2 bg-white text-slate-900 px-5 py-2.5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-black/20 hover:bg-slate-50 transition-all active:scale-95 w-fit"
+                    >
                         <span>{banner.ctaText || 'Get Started'}</span>
                         <ChevronRight size={14} strokeWidth={3} />
-                    </div>
+                    </button>
                 </div>
             </div>
 
