@@ -1,6 +1,7 @@
 const TaskSubmission = require('../models/TaskSubmission');
 const Task = require('../models/Task');
 const User = require('../models/User');
+const Transaction = require('../models/Transaction');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
@@ -111,10 +112,21 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('Task not found', 404));
     }
 
-    // Add coins to user
-    const coinsToAdd = submission.coinsReward;
+    // Calculate coins to add (apply 3X Booster if active)
+    const factor = user.isBoosterActive || user.isTaskBoosterActive ? 3 : 1;
+    const baseCoins = submission.coinsReward || task.coinsReward || 1;
+    const coinsToAdd = baseCoins * factor;
+
+    // Conversion logic: 1 Coin = ₹0.1
+    const coinToRupeeConversion = 0.1;
+    const earningsInRupee = parseFloat((coinsToAdd * coinToRupeeConversion).toFixed(2));
+
+    // Update balances
     user.coins.balance += coinsToAdd;
     user.coins.lifetimeCoins += coinsToAdd;
+    user.wallet.balance += earningsInRupee;
+    user.wallet.lifetimeEarnings += earningsInRupee;
+    user.wallet.todayEarnings += earningsInRupee;
 
     // Track completion
     if (task.isDaily) {
@@ -127,6 +139,25 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
     }
 
     await user.save();
+
+    // Record Transaction Logs
+    await Transaction.create({
+        user: user._id,
+        type: 'credit',
+        currency: 'COIN',
+        amount: coinsToAdd,
+        source: `Task Approved: ${task.title}`,
+        status: 'Success'
+    });
+
+    await Transaction.create({
+        user: user._id,
+        type: 'credit',
+        currency: 'INR',
+        amount: earningsInRupee,
+        source: `Task Approved (Conversion): ${task.title}`,
+        status: 'Success'
+    });
 
     // Check for High Value Milestones & Notify Admins
     try {
