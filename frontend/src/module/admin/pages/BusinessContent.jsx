@@ -8,6 +8,7 @@ import {
     MessageSquare, Users, Zap, ShieldCheck, ChevronRight
 } from 'lucide-react';
 import api from '../../shared/services/api';
+import { openGallery } from '../../../imageUploadUtils';
 
 const BusinessContent = () => {
     const [ideas, setIdeas] = useState([]);
@@ -524,10 +525,14 @@ const BusinessContent = () => {
                                         <div className="w-16 h-16 bg-slate-50 border rounded-xl flex items-center justify-center overflow-hidden shrink-0">
                                             {formData.bannerImage ? <img src={formData.bannerImage} className="w-full h-full object-cover" /> : <ImageIcon className="text-slate-200" />}
                                         </div>
-                                        <label className="flex-1 flex items-center justify-center gap-2 bg-slate-50 text-slate-600 rounded-xl font-medium text-[9px] uppercase cursor-pointer hover:bg-slate-100 transition-all border border-slate-100">
+                                        <div 
+                                            onClick={() => openGallery({
+                                                onSelectFile: (file) => handleFileUpload({ target: { files: [file] } }, 'image')
+                                            })}
+                                            className="flex-1 flex items-center justify-center gap-2 bg-slate-50 text-slate-600 rounded-xl font-medium text-[9px] uppercase cursor-pointer hover:bg-slate-100 transition-all border border-slate-100"
+                                        >
                                             {isUploading && uploadType === 'image' ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />} UPLOAD IMAGE
-                                            <input type="file" className="hidden" accept="image/png, image/jpeg, image/jpg, image/webp" onChange={(e) => handleFileUpload(e, 'image')} />
-                                        </label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="space-y-2">

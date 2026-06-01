@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
     Save, Plus, Trash2, FileText, Award, Download, Copy, AlertTriangle,
-    ChevronRight, ChevronLeft, Sparkles, Loader2, UploadCloud, AlertCircle, BookOpen
+    ChevronRight, ChevronLeft, Sparkles, Loader2, UploadCloud, AlertCircle, BookOpen, Image as ImageIcon
 } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useAdmin } from '../context/AdminContext';
+import { openGallery } from '../../../imageUploadUtils';
 
 const DocumentsCMS = () => {
     const { addNotification } = useAdmin();
@@ -248,14 +249,16 @@ const DocumentsCMS = () => {
                                         }} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-sky-500" placeholder="https://res.cloudinary.com/..." />
                                         
                                         {/* File upload trigger */}
-                                        <div className="relative group/upload bg-white rounded-xl border-2 border-dashed border-slate-200 hover:border-sky-500 transition-all flex items-center justify-center py-2 px-4 shadow-sm">
-                                            <input 
-                                                type="file" 
-                                                accept="image/png, image/jpeg, image/jpg, image/webp" 
-                                                onChange={handleLogoUpload} 
-                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
-                                                disabled={uploadingLogo}
-                                            />
+                                        <div 
+                                            onClick={() => {
+                                                if (!uploadingLogo) {
+                                                    openGallery({
+                                                        onSelectFile: (file) => handleLogoUpload({ target: { files: [file] } })
+                                                    });
+                                                }
+                                            }}
+                                            className={`relative group/upload bg-white rounded-xl border-2 border-dashed border-slate-200 transition-all flex items-center justify-center py-2 px-4 shadow-sm z-10 ${uploadingLogo ? 'opacity-50 cursor-not-allowed' : 'hover:border-sky-500 cursor-pointer'}`}
+                                        >
                                             <span className="text-[9px] font-medium uppercase tracking-normal text-slate-400 group-hover/upload:text-sky-500 flex items-center gap-1.5">
                                                 {uploadingLogo ? (
                                                     <>

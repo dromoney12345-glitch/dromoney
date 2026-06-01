@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
+import { openGallery } from '../../../imageUploadUtils';
 import { ChevronLeft, CheckCircle2, Play, UploadCloud, Link as LinkIcon, Loader2, Image as ImageIcon, Coins, Camera } from 'lucide-react';
 
 const TaskRunner = () => {
@@ -393,14 +394,12 @@ const TaskRunner = () => {
                                    {step2Text}
                                </p>
                                
-                               <div className="relative border-2 border-dashed border-slate-700/50 hover:border-amber-500/60 rounded-2xl p-6 flex flex-col items-center justify-center bg-slate-950/50 transition-colors cursor-pointer group h-32">
-                                    <input 
-                                        type="file" 
-                                        accept="image/png, image/jpeg, image/jpg, image/webp" 
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                        onChange={(e) => setScreenshotFile(e.target.files[0])}
-                                        required
-                                    />
+                               <div 
+                                    onClick={() => openGallery({
+                                        onSelectFile: (file) => setScreenshotFile(file)
+                                    })}
+                                    className="relative border-2 border-dashed border-slate-700/50 hover:border-amber-500/60 rounded-2xl p-6 flex flex-col items-center justify-center bg-slate-950/50 transition-colors cursor-pointer group h-32 z-10"
+                                >
                                     {!screenshotFile ? (
                                         <>
                                             <UploadCloud size={24} className="text-slate-500 group-hover:text-amber-500 mb-2 transition-colors relative z-0" />

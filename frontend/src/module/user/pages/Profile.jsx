@@ -11,6 +11,7 @@ import UnlockModal from '../components/UnlockModal';
 import KycModal from '../components/KycModal';
 import ReferralsModal from '../components/ReferralsModal';
 import FeedbackModal from '../components/FeedbackModal';
+import { openGallery } from '../../../imageUploadUtils';
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -67,7 +68,12 @@ const Profile = () => {
     };
 
     const triggerGalleryUpload = () => {
-        if (galleryInputRef.current) galleryInputRef.current.click();
+        openGallery({
+            onSelectFile: (file) => {
+                const e = { target: { files: [file] } };
+                handleImageChange(e);
+            }
+        });
     };
 
     const triggerCameraUpload = () => {
@@ -112,14 +118,6 @@ const Profile = () => {
                 {/* ── Profile Avatar Section ── */}
                 <div className="flex flex-col items-center py-2">
                     <div className="relative mb-4">
-                        {/* Hidden File Input for Gallery Selection */}
-                        <input 
-                            type="file" 
-                            ref={galleryInputRef}
-                            accept="image/png, image/jpeg, image/jpg, image/webp" 
-                            className="hidden" 
-                            onChange={handleImageChange} 
-                        />
 
                         <div className="w-24 h-24 bg-[#0B1221] rounded-[1.75rem] flex items-center justify-center text-white text-3xl font-bold shadow-xl shadow-slate-200 overflow-hidden border-[3px] border-white relative group">
                             <img src={profileImage || defaultRealImage} alt="Profile" className="w-full h-full object-cover" />

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MonitorPlay, Plus, Trash2, Clock, Coins, X, Link as LinkIcon, Edit3, Image as ImageIcon, Video, CheckCircle2, Save } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import api from '../../shared/services/api';
+import { openGallery } from '../../../imageUploadUtils';
 
 const WatchAndEarnAdmin = () => {
     const [ads, setAds] = useState([]);
@@ -271,19 +272,14 @@ const WatchAndEarnAdmin = () => {
                                                 <input value={introVideo.thumbnailUrl} onChange={(e) => setIntroVideo({...introVideo, thumbnailUrl: e.target.value})} className="w-full bg-white/5 border border-slate-800 rounded-2xl py-4 pr-4 pl-12 pl-12-override text-sm font-bold text-white focus:outline-none focus:border-indigo-500 transition-all outline-none" placeholder="https://..." />
                                             </div>
                                             <div className="relative">
-                                                <input 
-                                                    type="file" 
-                                                    id="intro-thumb-upload" 
-                                                    className="hidden" 
-                                                    accept="image/png, image/jpeg, image/jpg, image/webp"
-                                                    onChange={(e) => handleFileUpload(e, 'intro', 'thumbnail')}
-                                                />
-                                                <label 
-                                                    htmlFor="intro-thumb-upload"
+                                                <div 
+                                                    onClick={() => !isUploading && openGallery({
+                                                        onSelectFile: (file) => handleFileUpload({ target: { files: [file] } }, 'intro', 'thumbnail')
+                                                    })}
                                                     className={`h-[54px] px-4 rounded-2xl flex items-center justify-center gap-2 text-[11px] font-medium uppercase tracking-normal cursor-pointer transition-all ${isUploading ? 'bg-slate-800 text-slate-600 cursor-not-allowed' : 'bg-white/10 text-white hover:bg-white/20 border border-slate-700'}`}
                                                 >
                                                     {isUploading ? '...' : <><Plus size={16} /> Upload</>}
-                                                </label>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -518,19 +514,14 @@ const WatchAndEarnAdmin = () => {
                                                 onChange={(e) => setAdForm(prev => ({...prev, thumbnail: e.target.value}))}
                                             />
                                             <div className="relative">
-                                                <input 
-                                                    type="file" 
-                                                    id="ad-thumb-upload" 
-                                                    className="hidden" 
-                                                    accept="image/png, image/jpeg, image/jpg, image/webp"
-                                                    onChange={(e) => handleFileUpload(e, 'ad', 'thumbnail')}
-                                                />
-                                                <label 
-                                                    htmlFor="ad-thumb-upload"
+                                                <div 
+                                                    onClick={() => !isUploading && openGallery({
+                                                        onSelectFile: (file) => handleFileUpload({ target: { files: [file] } }, 'ad', 'thumbnail')
+                                                    })}
                                                     className={`h-[62px] px-5 rounded-[22px] flex items-center justify-center gap-1.5 text-[10px] font-medium uppercase tracking-normal cursor-pointer transition-all ${isUploading ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200'}`}
                                                 >
                                                     {isUploading ? '...' : <><ImageIcon size={14} /> Upload</>}
-                                                </label>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

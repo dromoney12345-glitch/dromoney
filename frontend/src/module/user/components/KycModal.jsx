@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { X, ShieldCheck, CheckCircle2, FileText, Clock, AlertCircle, Camera, Upload, Loader2 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import api from '../../shared/services/api';
+import { openGallery } from '../../../imageUploadUtils';
 
 const KycModal = ({ isOpen, onClose }) => {
     const { userData, addNotification, refreshUserProfile } = useUser();
@@ -151,7 +152,12 @@ const KycModal = ({ isOpen, onClose }) => {
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Front Photo</label>
                                 <div 
-                                    onClick={() => fileInputRef.current.click()}
+                                    onClick={() => openGallery({
+                                        onSelectFile: (file) => {
+                                            const e = { target: { files: [file] } };
+                                            handleFileChange(e);
+                                        }
+                                    })}
                                     className="w-full aspect-[16/9] bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition-all overflow-hidden relative"
                                 >
                                     {previewUrl ? (
@@ -162,7 +168,6 @@ const KycModal = ({ isOpen, onClose }) => {
                                             <span className="text-[10px] font-bold text-slate-400 uppercase">Click to Upload</span>
                                         </>
                                     )}
-                                    <input type="file" ref={fileInputRef} className="hidden" accept="image/png, image/jpeg, image/jpg, image/webp" onChange={handleFileChange} />
                                 </div>
                             </div>
                         </div>

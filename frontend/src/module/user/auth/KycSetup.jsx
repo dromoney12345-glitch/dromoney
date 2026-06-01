@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, ShieldCheck, UploadCloud, Camera, ArrowLeft, Info, Fingerprint, Lock, BadgeCheck } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
+import { openGallery } from '../../../imageUploadUtils';
 
 const KycSetup = () => {
     const navigate = useNavigate();
@@ -45,9 +46,12 @@ const KycSetup = () => {
     );
 
     const triggerFileSelect = () => {
-        if (fileInputRef.current) {
-            fileInputRef.current.click();
-        }
+        openGallery({
+            onSelectFile: (file) => {
+                const e = { target: { files: [file] } };
+                handleFileChange(e);
+            }
+        });
     };
 
     const handleFileChange = (e) => {
@@ -274,14 +278,7 @@ const KycSetup = () => {
                 </div>
             </div>
 
-            {/* Hidden Input */}
-            <input 
-                type="file" 
-                ref={fileInputRef}
-                accept="image/png, image/jpeg, image/jpg, image/webp" 
-                className="hidden"
-                onChange={handleFileChange}
-            />
+            {/* Hidden Input Removed */}
         </div>
     );
 };
