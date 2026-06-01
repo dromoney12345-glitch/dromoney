@@ -49,7 +49,10 @@ app.use(cors({
         // Check if origin is a private/local network IP address (e.g. 192.168.x.x, 10.x.x.x, 172.16.x.x - 172.31.x.x)
         const isPrivateIP = /^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$/.test(origin);
 
-        if (isLocalHost || isPrivateIP || allowedOrigins.indexOf(origin) !== -1) {
+        // Check if origin matches dromoney.com, dromoney.vercel.app, or any of their subdomains (HTTPS or HTTP)
+        const isProductionDomain = /^https?:\/\/(?:[a-zA-Z0-9-]+\.)*(?:dromoney\.com|dromoney\.vercel\.app)$/.test(origin);
+
+        if (isLocalHost || isPrivateIP || isProductionDomain || allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
