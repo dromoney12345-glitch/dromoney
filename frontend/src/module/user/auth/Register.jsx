@@ -109,6 +109,7 @@ const Register = () => {
         setLoading(false);
         if (result.success) {
             setStep(2);
+            setResendCooldown(30);
         } else {
             setError(result.error);
         }

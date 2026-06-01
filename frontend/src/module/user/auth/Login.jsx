@@ -62,6 +62,7 @@ const Login = () => {
         setLoading(false);
         if (result.success) {
             setStep(2);
+            setResendCooldown(30);
         } else {
             // Check if error represents non-existent account or other errors
             const errMsg = (typeof result.error === 'object' ? result.error.message : result.error) || '';
