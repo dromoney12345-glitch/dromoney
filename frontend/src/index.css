@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 .font-playfair {
@@ -45,87 +46,96 @@
 }
 
 /* ── Admin Panel Compact Layout Override ── */
-.admin-compact-container {
-    padding: 0.75rem !important; /* Reduces default outer margin spacing */
+.admin-compact-container, .font-\[\'Poppins\'\] {
+    font-family: 'Poppins', sans-serif !important;
+    padding: 0.5rem !important;
 }
 
 /* Scaled down paddings for card structures */
 .admin-compact-container .p-8 {
-    padding: 1.25rem !important; /* 20px instead of 32px */
+    padding: 1rem !important; 
 }
 .admin-compact-container .p-6 {
-    padding: 1rem !important; /* 16px instead of 24px */
+    padding: 0.75rem !important; 
 }
 .admin-compact-container .p-5 {
-    padding: 0.875rem !important; /* 14px instead of 20px */
+    padding: 0.6rem !important;
 }
 .admin-compact-container .p-4 {
-    padding: 0.75rem !important; /* 12px instead of 16px */
+    padding: 0.5rem !important;
 }
 
 .admin-compact-container .py-8 {
-    padding-top: 1.25rem !important;
-    padding-bottom: 1.25rem !important;
-}
-.admin-compact-container .py-6 {
     padding-top: 1rem !important;
     padding-bottom: 1rem !important;
 }
+.admin-compact-container .py-6 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+}
 .admin-compact-container .py-5 {
-    padding-top: 0.875rem !important;
-    padding-bottom: 0.875rem !important;
+    padding-top: 0.6rem !important;
+    padding-bottom: 0.6rem !important;
 }
 
 .admin-compact-container .px-8 {
-    padding-left: 1.25rem !important;
-    padding-right: 1.25rem !important;
-}
-.admin-compact-container .px-6 {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
 }
+.admin-compact-container .px-6 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+}
 .admin-compact-container .px-5 {
-    padding-left: 0.875rem !important;
-    padding-right: 0.875rem !important;
+    padding-left: 0.6rem !important;
+    padding-right: 0.6rem !important;
 }
 
 /* Scaled down vertical space dividers (space-y-*) */
 .admin-compact-container .space-y-8 > :not([hidden]) ~ :not([hidden]) {
-    margin-top: 1.25rem !important;
-}
-.admin-compact-container .space-y-6 > :not([hidden]) ~ :not([hidden]) {
     margin-top: 1rem !important;
 }
-.admin-compact-container .space-y-5 > :not([hidden]) ~ :not([hidden]) {
+.admin-compact-container .space-y-6 > :not([hidden]) ~ :not([hidden]) {
     margin-top: 0.75rem !important;
 }
+.admin-compact-container .space-y-5 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.5rem !important;
+}
 .admin-compact-container .space-y-4 > :not([hidden]) ~ :not([hidden]) {
-    margin-top: 0.625rem !important;
+    margin-top: 0.4rem !important;
 }
 
 /* Scaled down grid & flex layouts */
-.admin-compact-container .gap-8 {
-    gap: 1.25rem !important;
-}
-.admin-compact-container .gap-6 {
+.admin-compact-container .gap-10 {
     gap: 1rem !important;
 }
-.admin-compact-container .gap-5 {
+.admin-compact-container .gap-8 {
     gap: 0.75rem !important;
 }
+.admin-compact-container .gap-6 {
+    gap: 0.5rem !important;
+}
+.admin-compact-container .gap-5 {
+    gap: 0.4rem !important;
+}
 .admin-compact-container .gap-4 {
-    gap: 0.625rem !important;
+    gap: 0.35rem !important;
 }
 
 /* Compact rounded corner tokens */
+.admin-compact-container .rounded-\[44px\],
+.admin-compact-container .rounded-\[40px\],
+.admin-compact-container .rounded-\[32px\] {
+    border-radius: 0.75rem !important;
+}
 .admin-compact-container .rounded-3xl {
-    border-radius: 1rem !important; /* 16px instead of 24px */
+    border-radius: 0.75rem !important;
 }
 .admin-compact-container .rounded-2xl {
-    border-radius: 0.75rem !important; /* 12px instead of 16px */
+    border-radius: 0.5rem !important;
 }
 .admin-compact-container .rounded-xl {
-    border-radius: 0.625rem !important; /* 10px instead of 12px */
+    border-radius: 0.4rem !important;
 }
 
 /* Elegant and cohesive scaled down typography */
