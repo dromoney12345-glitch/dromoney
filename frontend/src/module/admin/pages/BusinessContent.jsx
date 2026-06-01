@@ -526,7 +526,7 @@ const BusinessContent = () => {
                                         </div>
                                         <label className="flex-1 flex items-center justify-center gap-2 bg-slate-50 text-slate-600 rounded-xl font-medium text-[9px] uppercase cursor-pointer hover:bg-slate-100 transition-all border border-slate-100">
                                             {isUploading && uploadType === 'image' ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />} UPLOAD IMAGE
-                                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'image')} />
+                                            <input type="file" className="hidden" accept="image/png, image/jpeg, image/jpg, image/webp" onChange={(e) => handleFileUpload(e, 'image')} />
                                         </label>
                                     </div>
                                 </div>

@@ -251,7 +251,7 @@ const DocumentsCMS = () => {
                                         <div className="relative group/upload bg-white rounded-xl border-2 border-dashed border-slate-200 hover:border-sky-500 transition-all flex items-center justify-center py-2 px-4 shadow-sm">
                                             <input 
                                                 type="file" 
-                                                accept="image/*" 
+                                                accept="image/png, image/jpeg, image/jpg, image/webp" 
                                                 onChange={handleLogoUpload} 
                                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
                                                 disabled={uploadingLogo}

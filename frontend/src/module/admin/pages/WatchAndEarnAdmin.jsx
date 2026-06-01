@@ -275,7 +275,7 @@ const WatchAndEarnAdmin = () => {
                                                     type="file" 
                                                     id="intro-thumb-upload" 
                                                     className="hidden" 
-                                                    accept="image/*"
+                                                    accept="image/png, image/jpeg, image/jpg, image/webp"
                                                     onChange={(e) => handleFileUpload(e, 'intro', 'thumbnail')}
                                                 />
                                                 <label 
@@ -522,7 +522,7 @@ const WatchAndEarnAdmin = () => {
                                                     type="file" 
                                                     id="ad-thumb-upload" 
                                                     className="hidden" 
-                                                    accept="image/*"
+                                                    accept="image/png, image/jpeg, image/jpg, image/webp"
                                                     onChange={(e) => handleFileUpload(e, 'ad', 'thumbnail')}
                                                 />
                                                 <label 

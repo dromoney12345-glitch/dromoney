@@ -162,7 +162,7 @@ const KycModal = ({ isOpen, onClose }) => {
                                             <span className="text-[10px] font-bold text-slate-400 uppercase">Click to Upload</span>
                                         </>
                                     )}
-                                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
+                                    <input type="file" ref={fileInputRef} className="hidden" accept="image/png, image/jpeg, image/jpg, image/webp" onChange={handleFileChange} />
                                 </div>
                             </div>
                         </div>

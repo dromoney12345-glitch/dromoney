@@ -116,7 +116,7 @@ const Profile = () => {
                         <input 
                             type="file" 
                             ref={galleryInputRef}
-                            accept="image/*" 
+                            accept="image/png, image/jpeg, image/jpg, image/webp" 
                             className="hidden" 
                             onChange={handleImageChange} 
                         />

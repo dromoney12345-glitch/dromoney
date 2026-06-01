@@ -278,7 +278,7 @@ const KycSetup = () => {
             <input 
                 type="file" 
                 ref={fileInputRef}
-                accept="image/*" 
+                accept="image/png, image/jpeg, image/jpg, image/webp" 
                 className="hidden"
                 onChange={handleFileChange}
             />

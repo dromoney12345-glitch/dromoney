@@ -3,7 +3,7 @@ export const openGallery = async ({ onSelectFile, fileNamePrefix = "gallery-phot
         if (isFlutterBridgeAvailable()) {
             const result = await window.flutter_inappwebview.callHandler("openGallery", {
                 source: "gallery",
-                accept: "image/*",
+                accept: "image/png, image/jpeg, image/jpg, image/webp",
                 multiple: false,
             })
 
@@ -45,7 +45,7 @@ export const openGallery = async ({ onSelectFile, fileNamePrefix = "gallery-phot
         // Fallback: browser picker is generally reliable across Android/iOS/Web.
         openTransientImageInput({
             onSelectFile,
-            accept: "image/*",
+            accept: "image/png, image/jpeg, image/jpg, image/webp",
         })
     } catch (error) {
         console.error("Gallery pick failed:", error)
