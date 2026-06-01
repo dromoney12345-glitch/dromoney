@@ -149,7 +149,7 @@ const Register = () => {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-white animate-in fade-in duration-700 overflow-hidden">
+        <div className="flex flex-col min-h-screen bg-white animate-in fade-in duration-700 overflow-y-auto pb-10">
             <style>
                 {`
                     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
@@ -178,7 +178,7 @@ const Register = () => {
             </div>
 
             {/* ── Registration Form Section ── */}
-            <div className="flex-1 px-8 pt-4 pb-4 flex flex-col justify-start overflow-hidden">
+            <div className="flex-1 px-8 pt-4 pb-12 flex flex-col justify-start">
                 <div className="w-full max-w-sm mx-auto">
                     {error && (
                         <div className="mb-3 p-3 bg-rose-50 border border-rose-100 rounded-xl text-center">

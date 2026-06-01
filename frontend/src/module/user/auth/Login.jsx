@@ -106,7 +106,7 @@ const Login = () => {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-white animate-in fade-in duration-700 overflow-y-auto scrollbar-hide">
+        <div className="flex flex-col min-h-screen bg-white animate-in fade-in duration-700 overflow-y-auto scrollbar-hide pb-12">
             <style>
                 {`
                     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');

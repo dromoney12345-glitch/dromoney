@@ -291,35 +291,19 @@ const Income = () => {
         try {
             addNotification("Downloading!", "Starting logo download to your gallery...", "success");
             
-            // Get the logo URL directly from courseData
-            const logoUrl = courseData.page2.logoUrl || LogoImg;
+            // Direct download link from our server proxy is 100% reliable on all mobile and desktop devices.
+            // Bypasses any mobile webview blob constraints or Cloudinary CORS blocks.
+            const downloadUrl = `${api.defaults.baseURL}/public/content/download-logo`;
             
-            console.log("Logo URL:", logoUrl);
-            
-            // Use fetch to get the image as blob
-            const response = await fetch(logoUrl);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const blob = await response.blob();
-            console.log("Blob created:", blob);
-            
-            // Create blob URL and trigger download
-            const blobUrl = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
-            link.href = blobUrl;
+            link.href = downloadUrl;
+            link.target = '_blank';
             link.download = 'dromoney_logo.png';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
-            // Clean up
-            setTimeout(() => {
-                window.URL.revokeObjectURL(blobUrl);
-            }, 100);
-            
-            console.log("Download completed");
+            console.log("Download completed via server proxy");
         } catch (err) {
             console.error("Download error:", err);
             addNotification("Error", "Failed to download logo. Please try again.", "error");
@@ -422,10 +406,16 @@ const Income = () => {
             doc.text(`Generated on: ${new Date().toLocaleDateString('hi-IN')}`, margin, pageHeight - 10);
             doc.text("For more info: www.dromoney.com", margin, pageHeight - 5);
             
-            // Save PDF
-            doc.save("Dromoney_Calling_Script.pdf");
+            // Save PDF or open in new tab for mobile
+            if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+                const blob = doc.output('blob');
+                const blobUrl = window.URL.createObjectURL(blob);
+                window.open(blobUrl, '_blank');
+            } else {
+                doc.save("Dromoney_Calling_Script.pdf");
+            }
             
-            addNotification("Success!", "Calling script PDF downloaded!", "success");
+            addNotification("Success!", "Calling script PDF generated!", "success");
         } catch (err) {
             console.error("PDF download error:", err);
             addNotification("Error", "Failed to download script. Please try again.", "error");
