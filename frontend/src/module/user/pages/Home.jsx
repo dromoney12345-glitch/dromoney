@@ -114,7 +114,14 @@ const AdBanners = ({ navigate }) => {
     return (
         <div className="relative">
             <div
-                onClick={() => navigate(banner.path || '/user/home')}
+                onClick={() => {
+                    const targetUrl = banner.path || '/user/home';
+                    if (targetUrl.startsWith('http')) {
+                        window.open(targetUrl, '_blank');
+                    } else {
+                        navigate(targetUrl);
+                    }
+                }}
                 className={`cursor-pointer bg-gradient-to-br ${theme.gradient} rounded-2xl p-6 shadow-xl relative overflow-hidden transition-all duration-700 group min-h-[160px] flex flex-col justify-center`}
             >
                 {/* Background Glass Decor */}
