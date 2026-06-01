@@ -462,7 +462,6 @@ const Wallet = () => {
             
             <div className="flex flex-col gap-2">
                 {[
-                    { id: 'withdraw', title: 'Instant Withdrawals', subtitle: 'Transfer to bank', icon: <ArrowUpRight size={16} className="text-blue-500" /> },
                     { id: 'refer', title: 'Referral Rewards', subtitle: 'Earn commission', icon: <Share2 size={16} className="text-emerald-500" /> },
                     { id: 'limits', title: 'Transfer Limits', subtitle: `Min ₹${minWithdrawal} · Daily cap`, icon: <Filter size={16} className="text-indigo-500" />, check: true },
                     { id: 'security', title: 'Security', subtitle: 'Encrypted & protected', icon: <AlertCircle size={16} className="text-sky-500" />, check: true },
