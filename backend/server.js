@@ -32,12 +32,29 @@ app.use(helmet({
     crossOriginResourcePolicy: false,
 })); // Set security headers
 app.use(cors({
-    origin: [
-        'https://dromoney.vercel.app',
-        'http://localhost:5173',
-        'http://localhost:3000',
-        process.env.FRONTEND_URL
-    ].filter(Boolean),
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps, curl, or server-to-server requests)
+        if (!origin) return callback(null, true);
+
+        const allowedOrigins = [
+            'https://dromoney.vercel.app',
+            'http://localhost:5173',
+            'http://localhost:3000',
+            process.env.FRONTEND_URL
+        ].filter(Boolean);
+
+        // Check if origin is localhost (any port) or 127.0.0.1 (any port)
+        const isLocalHost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+
+        // Check if origin is a private/local network IP address (e.g. 192.168.x.x, 10.x.x.x, 172.16.x.x - 172.31.x.x)
+        const isPrivateIP = /^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$/.test(origin);
+
+        if (isLocalHost || isPrivateIP || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true
 })); // Enable CORS
 // app.use(mongoSanitize()); // Sanitize data
