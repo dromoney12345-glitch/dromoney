@@ -143,7 +143,7 @@ const CoinsAndTasks = () => {
             <div className="flex gap-2 mb-6">
                 {['tasks', 'settings'].map(t => (
                     <button key={t} onClick={() => setActiveTab(t)}
-                        className={`px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === t ? 'bg-sky-500 text-white shadow-sm' : 'bg-white text-slate-400 border border-slate-100'}`}>
+                        className={`px-5 py-2.5 rounded-xl text-[11px] font-medium uppercase tracking-widest transition-all ${activeTab === t ? 'bg-sky-500 text-white shadow-sm' : 'bg-white text-slate-400 border border-slate-100'}`}>
                         {t === 'tasks' ? '📋 Tasks' : '⚙️ Coin Settings'}
                     </button>
                 ))}
@@ -152,7 +152,7 @@ const CoinsAndTasks = () => {
             {activeTab === 'tasks' ? (
                 <>
                     <div className="flex justify-end mb-4">
-                        <button onClick={openAddModal} className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-black text-[11px] uppercase tracking-widest px-4 py-2.5 rounded-xl shadow-md transition-all active:scale-95">
+                        <button onClick={openAddModal} className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-medium text-[11px] uppercase tracking-widest px-4 py-2.5 rounded-xl shadow-md transition-all active:scale-95">
                             <Plus size={15} /> Add Task
                         </button>
                     </div>
@@ -162,16 +162,16 @@ const CoinsAndTasks = () => {
                             <div key={task._id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center justify-between hover:border-slate-200 transition-all">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-slate-50 rounded-xl flex flex-col items-center justify-center border border-slate-100">
-                                        <span className="text-[10px] font-black text-slate-400 uppercase leading-none mb-1">{task.type}</span>
+                                        <span className="text-[10px] font-medium text-slate-400 uppercase leading-none mb-1">{task.type}</span>
                                     </div>
                                     <div>
-                                        <h3 className="font-black text-slate-800 text-[14px] leading-tight flex items-center gap-2">
+                                        <h3 className="font-medium text-slate-800 text-[14px] leading-tight flex items-center gap-2">
                                             {task.title}
-                                            <span className={`text-[9px] font-black px-2 py-0.5 rounded-md ${task.status === 'Active' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
+                                            <span className={`text-[9px] font-medium px-2 py-0.5 rounded-md ${task.status === 'Active' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
                                                 {task.status || 'Active'}
                                             </span>
                                             {task.isDaily && (
-                                                <span className="text-[9px] font-black px-2 py-0.5 rounded-md bg-purple-100 text-purple-600 uppercase">
+                                                <span className="text-[9px] font-medium px-2 py-0.5 rounded-md bg-purple-100 text-purple-600 uppercase">
                                                     Daily
                                                 </span>
                                             )}
@@ -180,12 +180,12 @@ const CoinsAndTasks = () => {
                                         {/* Task Config Badges for Admin to see what's inside */}
                                         <div className="mt-1.5 flex flex-wrap gap-1.5 max-w-[300px]">
                                             {task.config && Object.entries(task.config).map(([key, value]) => (
-                                                <span key={key} className="bg-slate-100 text-slate-500 text-[9px] px-1.5 py-0.5 rounded font-black uppercase tracking-widest border border-slate-200">
+                                                <span key={key} className="bg-slate-100 text-slate-500 text-[9px] px-1.5 py-0.5 rounded font-medium uppercase tracking-widest border border-slate-200">
                                                     {key}: <span className="text-sky-600 truncate max-w-[100px] inline-block align-bottom">{String(value)}</span>
                                                 </span>
                                             ))}
                                         </div>
-                                        <div className="mt-2 text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-1 rounded-lg inline-flex items-center gap-1 border border-amber-100/50">
+                                        <div className="mt-2 text-[10px] font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-lg inline-flex items-center gap-1 border border-amber-100/50">
                                             <Coins size={12} /> {task.coinsReward || task.reward} Coins Reward
                                         </div>
                                     </div>
@@ -201,28 +201,28 @@ const CoinsAndTasks = () => {
             ) : (
                 <div className="space-y-4">
                     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                        <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-5 flex items-center gap-2"><Coins size={16} className="text-amber-500" /> Coin Economy</h3>
+                        <h3 className="text-sm font-medium text-slate-800 uppercase tracking-widest mb-5 flex items-center gap-2"><Coins size={16} className="text-amber-500" /> Coin Economy</h3>
                         <div className="space-y-5">
                             <div>
-                                <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">1 Coin = ₹</label>
+                                <label className="text-[11px] font-medium text-slate-500 uppercase tracking-widest">1 Coin = ₹</label>
                                 <div className="flex items-center gap-3 mt-2">
                                     <input type="number" step="0.01" min="0" value={coinValue} onChange={e => setCoinValue(Math.max(0, e.target.value))}
-                                        className="w-32 border border-slate-200 rounded-xl px-4 py-2.5 text-lg font-black text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                                        className="w-32 border border-slate-200 rounded-xl px-4 py-2.5 text-lg font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
                                     <span className="text-sm font-bold text-slate-400">rupees per coin</span>
                                 </div>
                             </div>
                             <div>
-                                <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Max Coins Per Day</label>
+                                <label className="text-[11px] font-medium text-slate-500 uppercase tracking-widest">Max Coins Per Day</label>
                                 <div className="flex items-center gap-3 mt-2">
                                     <input type="number" min="0" value={dailyLimit} onChange={e => setDailyLimit(Math.max(0, e.target.value))}
-                                        className="w-32 border border-slate-200 rounded-xl px-4 py-2.5 text-lg font-black text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                                        className="w-32 border border-slate-200 rounded-xl px-4 py-2.5 text-lg font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
                                     <span className="text-sm font-bold text-slate-400">coins/day limit per user</span>
                                 </div>
                             </div>
                             <button 
                                 onClick={handleSaveSettings}
                                 disabled={saveLoading}
-                                className="bg-sky-500 hover:bg-sky-600 disabled:bg-sky-300 text-white font-black text-[12px] uppercase tracking-widest px-6 py-3 rounded-xl transition-all active:scale-95 shadow-md shadow-sky-100 flex items-center gap-2">
+                                className="bg-sky-500 hover:bg-sky-600 disabled:bg-sky-300 text-white font-medium text-[12px] uppercase tracking-widest px-6 py-3 rounded-xl transition-all active:scale-95 shadow-md shadow-sky-100 flex items-center gap-2">
                                 {saveLoading ? (
                                     <>
                                         <Loader className="w-4 h-4 animate-spin" />
@@ -243,7 +243,7 @@ const CoinsAndTasks = () => {
                     <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
                         {/* Header */}
                         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                            <h2 className="text-base font-black text-slate-800">Create New Task</h2>
+                            <h2 className="text-base font-medium text-slate-800">Create New Task</h2>
                             <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1.5 rounded-full transition-colors"><X size={20} /></button>
                         </div>
                         
@@ -252,13 +252,13 @@ const CoinsAndTasks = () => {
                             
                             {/* Task Type Switcher */}
                             <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">1. Select Task Type</label>
+                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-3 block">1. Select Task Type</label>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                     {['Social', 'Survey', 'Watch', 'Join', 'Bonus', 'Sponsored', 'Video', 'Web', 'Quiz', 'Spin', 'Scratch', 'Tapper', 'Treasure'].map(type => (
                                         <button 
                                             key={type}
                                             onClick={() => { setNewTaskType(type); setNewTaskData({...newTaskData, config: {}}); }}
-                                            className={`py-2 px-3 rounded-xl text-[10px] font-black transition-all border ${newTaskType === type ? 'bg-sky-50 text-sky-600 border-sky-200 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}
+                                            className={`py-2 px-3 rounded-xl text-[10px] font-medium transition-all border ${newTaskType === type ? 'bg-sky-50 text-sky-600 border-sky-200 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}
                                         >
                                             {type}
                                         </button>
@@ -268,13 +268,13 @@ const CoinsAndTasks = () => {
 
                             {/* Category Switcher */}
                             <div>
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">2. Category</label>
+                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-3 block">2. Category</label>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                     {['Instagram', 'YouTube', 'Telegram', 'WhatsApp', 'Other'].map(cat => (
                                         <button 
                                             key={cat}
                                             onClick={() => { setNewTaskData({...newTaskData, category: cat}); }}
-                                            className={`py-2 px-3 rounded-xl text-[10px] font-black transition-all border ${newTaskData.category === cat ? 'bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}
+                                            className={`py-2 px-3 rounded-xl text-[10px] font-medium transition-all border ${newTaskData.category === cat ? 'bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}
                                         >
                                             {cat}
                                         </button>                                    ))}
@@ -283,7 +283,7 @@ const CoinsAndTasks = () => {
 
                             {/* Common Details */}
                             <div className="space-y-4 pt-4 border-t border-slate-100">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">3. Basic Details</label>
+                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest block">3. Basic Details</label>
                                 
                                 <div>
                                     <label className="text-xs font-bold text-slate-600 block mb-1">Task Title <span className="text-rose-500">*</span></label>
@@ -304,7 +304,7 @@ const CoinsAndTasks = () => {
                                     <label className="text-xs font-bold text-slate-600 block mb-1">Coins Reward <span className="text-rose-500">*</span></label>
                                     <div className="relative">
                                         <Coins size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500" />
-                                        <input type="number" min="1" value={newTaskData.reward} onChange={e => setNewTaskData({...newTaskData, reward: Math.max(1, e.target.value)})} className="w-full border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm font-black text-slate-800 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+                                        <input type="number" min="1" value={newTaskData.reward} onChange={e => setNewTaskData({...newTaskData, reward: Math.max(1, e.target.value)})} className="w-full border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
                                     </div>
                                 </div>
 
@@ -317,7 +317,7 @@ const CoinsAndTasks = () => {
                                         className="w-5 h-5 rounded-lg border-slate-300 text-sky-600 focus:ring-sky-500"
                                     />
                                     <div>
-                                        <label htmlFor="isDaily" className="text-sm font-black text-slate-700 block leading-none mb-1">Daily Task</label>
+                                        <label htmlFor="isDaily" className="text-sm font-medium text-slate-700 block leading-none mb-1">Daily Task</label>
                                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">User can repeat this daily</p>
                                     </div>
                                 </div>
@@ -325,7 +325,7 @@ const CoinsAndTasks = () => {
 
                             {/* 🛠️ DYNAMIC FIELDS BASED ON TYPE 🛠️ */}
                             <div className="space-y-4 pt-4 border-t border-slate-100 bg-slate-50 p-4 rounded-2xl border">
-                                <label className="text-[10px] font-black text-sky-500 uppercase tracking-widest block flex items-center gap-2"><Settings size={12}/> {newTaskType} Settings</label>
+                                <label className="text-[10px] font-medium text-sky-500 uppercase tracking-widest block flex items-center gap-2"><Settings size={12}/> {newTaskType} Settings</label>
                                 
                                 {/* Video Fields */}
                                 {newTaskType === 'Video' && (
@@ -409,8 +409,8 @@ const CoinsAndTasks = () => {
 
                         {/* Footer */}
                         <div className="p-4 border-t border-slate-100 flex gap-3 bg-white">
-                            <button onClick={() => setIsAddModalOpen(false)} className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-xs uppercase tracking-widest rounded-xl transition-colors">Cancel</button>
-                            <button onClick={handleSaveTask} className="flex-1 py-3 bg-sky-500 hover:bg-sky-600 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-md transition-colors shadow-sky-500/20">Create Task</button>
+                            <button onClick={() => setIsAddModalOpen(false)} className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium text-xs uppercase tracking-widest rounded-xl transition-colors">Cancel</button>
+                            <button onClick={handleSaveTask} className="flex-1 py-3 bg-sky-500 hover:bg-sky-600 text-white font-medium text-xs uppercase tracking-widest rounded-xl shadow-md transition-colors shadow-sky-500/20">Create Task</button>
                         </div>
                     </div>
                 </div>

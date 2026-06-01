@@ -125,7 +125,7 @@ const Promotions = () => {
                     <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
                         <Megaphone size={32} className="text-slate-300" />
                     </div>
-                    <h3 className="text-slate-800 font-black text-lg">No promotion requests yet</h3>
+                    <h3 className="text-slate-800 font-medium text-lg">No promotion requests yet</h3>
                     <p className="text-slate-400 font-bold text-sm">When users fill the Promote Your Brand form, they will appear here.</p>
                 </div>
             ) : (
@@ -141,12 +141,12 @@ const Promotions = () => {
                                             <User size={20} className="text-sky-600" />
                                         </div>
                                         <div>
-                                            <h3 className="font-black text-slate-800 text-lg leading-none">{promo.name}</h3>
+                                            <h3 className="font-medium text-slate-800 text-lg leading-none">{promo.name}</h3>
                                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 flex items-center gap-1">
                                                 <Clock size={12} /> Requested on {promo.date}
                                             </p>
                                         </div>
-                                        <span className={`ml-auto md:ml-4 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter ${
+                                        <span className={`ml-auto md:ml-4 text-[10px] font-medium px-3 py-1 rounded-full uppercase tracking-tighter ${
                                             promo.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 
                                             promo.status === 'Approved' ? 'bg-emerald-100 text-emerald-600' :
                                             promo.status === 'Rejected' ? 'bg-rose-100 text-rose-600' :
@@ -158,21 +158,21 @@ const Promotions = () => {
 
                                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                         <div className="space-y-1">
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Contact Info</p>
+                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Contact Info</p>
                                             <p className="text-xs font-bold text-slate-700 flex items-center gap-1.5"><Phone size={12} className="text-slate-400"/> {promo.mobile}</p>
                                             <p className="text-xs font-bold text-sky-600 flex items-center gap-1.5 leading-none break-all mt-1">{promo.whatsapp}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Task Type</p>
-                                            <p className="text-xs font-black text-slate-800 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100 inline-block">{promo.category}</p>
+                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Task Type</p>
+                                            <p className="text-xs font-medium text-slate-800 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100 inline-block">{promo.category}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Budget Details</p>
-                                            <p className="text-xs font-black text-amber-600 flex items-center gap-1.5">₹{promo.budget}</p>
+                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Budget Details</p>
+                                            <p className="text-xs font-medium text-amber-600 flex items-center gap-1.5">₹{promo.budget}</p>
                                             <p className="text-[10px] font-bold text-slate-500">{promo.usersRequired} Users Required</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Task Link</p>
+                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Task Link</p>
                                             <a href={promo.link} target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-500 hover:underline flex items-center gap-1.5 truncate max-w-[150px]">
                                                 <Globe size={12} /> Visit Link
                                             </a>
@@ -181,14 +181,14 @@ const Promotions = () => {
 
                                     {promo.description && (
                                         <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Description</p>
+                                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-2">Description</p>
                                              <p className="text-xs font-bold text-slate-600 leading-relaxed italic">"{promo.description}"</p>
                                         </div>
                                     )}
 
                                     {promo.adminResponse && (
                                         <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100 mt-2">
-                                             <p className="text-[10px] font-black text-emerald-600 uppercase tracking-wider mb-1 flex items-center gap-1"><MessageSquare size={12}/> Your Response</p>
+                                             <p className="text-[10px] font-medium text-emerald-600 uppercase tracking-wider mb-1 flex items-center gap-1"><MessageSquare size={12}/> Your Response</p>
                                              <p className="text-xs font-bold text-emerald-800">{promo.adminResponse}</p>
                                         </div>
                                     )}
@@ -200,7 +200,7 @@ const Promotions = () => {
                                         <>
                                             <button 
                                                 onClick={() => { setSelectedPromo(promo); setIsMsgModalOpen(true); }}
-                                                className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-600 font-black text-[10px] uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all active:scale-95 cursor-pointer"
+                                                className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-600 font-medium text-[10px] uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all active:scale-95 cursor-pointer"
                                             >
                                                 <MessageSquare size={14} /> Message
                                             </button>
@@ -208,20 +208,20 @@ const Promotions = () => {
                                             <div className="flex gap-2">
                                                 <button 
                                                     onClick={() => updateStatus(promo.id, 'Approved')}
-                                                    className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] uppercase tracking-widest px-4 py-3 rounded-xl shadow-lg shadow-emerald-100 transition-all active:scale-95 cursor-pointer"
+                                                    className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-[10px] uppercase tracking-widest px-4 py-3 rounded-xl shadow-lg shadow-emerald-100 transition-all active:scale-95 cursor-pointer"
                                                 >
                                                     <CheckCircle2 size={14} /> Approve
                                                 </button>
                                                 <button 
                                                     onClick={() => updateStatus(promo.id, 'Rejected')}
-                                                    className="flex-1 flex items-center justify-center gap-1.5 bg-rose-500 hover:bg-rose-600 text-white font-black text-[10px] uppercase tracking-widest px-4 py-3 rounded-xl shadow-lg shadow-rose-100 transition-all active:scale-95 cursor-pointer"
+                                                    className="flex-1 flex items-center justify-center gap-1.5 bg-rose-500 hover:bg-rose-600 text-white font-medium text-[10px] uppercase tracking-widest px-4 py-3 rounded-xl shadow-lg shadow-rose-100 transition-all active:scale-95 cursor-pointer"
                                                 >
                                                     <X size={14} /> Reject
                                                 </button>
                                             </div>
                                         </>
                                     ) : (
-                                        <div className={`flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-[0.15em] px-4 py-3.5 rounded-xl text-center shadow-md select-none border ${
+                                        <div className={`flex items-center justify-center gap-2 font-medium text-[10px] uppercase tracking-[0.15em] px-4 py-3.5 rounded-xl text-center shadow-md select-none border ${
                                             ['approved', 'active'].includes(String(promo.status).toLowerCase()) 
                                                 ? 'bg-emerald-500 border-emerald-600 text-white shadow-emerald-100' 
                                                 : 'bg-rose-500 border-rose-600 text-white shadow-rose-100'
@@ -233,7 +233,7 @@ const Promotions = () => {
 
                                     <button 
                                         onClick={() => deletePromo(promo.id)}
-                                        className="mt-2 md:mt-auto flex items-center justify-center gap-1.5 bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-500 font-black text-[10px] uppercase tracking-widest py-2 rounded-xl border border-transparent hover:border-rose-100 transition-all cursor-pointer"
+                                        className="mt-2 md:mt-auto flex items-center justify-center gap-1.5 bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-500 font-medium text-[10px] uppercase tracking-widest py-2 rounded-xl border border-transparent hover:border-rose-100 transition-all cursor-pointer"
                                     >
                                         <Trash2 size={14} /> Delete Request
                                     </button>
@@ -252,7 +252,7 @@ const Promotions = () => {
                         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
                             <div className="flex items-center gap-2 text-sky-600">
                                 <MessageSquare size={22} />
-                                <h3 className="font-black text-slate-800 uppercase tracking-tight">Send Message to {selectedPromo?.name}</h3>
+                                <h3 className="font-medium text-slate-800 uppercase tracking-tight">Send Message to {selectedPromo?.name}</h3>
                             </div>
                             <button onClick={() => setIsMsgModalOpen(false)} className="text-slate-400 hover:bg-slate-50 p-2 rounded-full transition-colors"><X size={24}/></button>
                         </div>
@@ -269,7 +269,7 @@ const Promotions = () => {
                             
                             <button 
                                 onClick={handleMessageSubmit}
-                                className="w-full bg-sky-500 hover:bg-sky-600 text-white font-black uppercase tracking-[0.2em] py-4 rounded-2xl shadow-lg shadow-sky-200 active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-2"
+                                className="w-full bg-sky-500 hover:bg-sky-600 text-white font-medium uppercase tracking-[0.2em] py-4 rounded-2xl shadow-lg shadow-sky-200 active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-2"
                             >
                                 <Send size={18} /> Send Message
                             </button>

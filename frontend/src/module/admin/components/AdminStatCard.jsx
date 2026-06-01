@@ -6,8 +6,8 @@ const AdminStatCard = ({ label, value, change, icon: Icon, color = 'bg-sky-500' 
             <Icon size={20} className="text-white" />
         </div>
         <div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{label}</p>
-            <p className="text-lg font-black text-slate-900 leading-tight">{value}</p>
+            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none mb-1">{label}</p>
+            <p className="text-lg font-medium text-slate-900 leading-tight">{value}</p>
             {change && <p className="text-[9px] font-bold text-slate-400 mt-0.5">{change}</p>}
         </div>
     </div>

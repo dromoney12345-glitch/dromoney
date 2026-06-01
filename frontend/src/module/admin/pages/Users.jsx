@@ -347,12 +347,12 @@ const Users = () => {
                             {/* Info Grid */}
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="bg-white p-4 rounded-2xl border border-slate-100">
-                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 font-['Poppins']">Mobile</p>
-                                    <p className="text-[12px] font-black text-slate-700 font-['Poppins']">{activeUserInDrawer.mobile}</p>
+                                    <p className="text-[8px] font-medium text-slate-400 uppercase tracking-widest mb-1 font-['Poppins']">Mobile</p>
+                                    <p className="text-[12px] font-medium text-slate-700 font-['Poppins']">{activeUserInDrawer.mobile}</p>
                                 </div>
                                 <div className="bg-white p-4 rounded-2xl border border-slate-100">
-                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 font-['Poppins']">Joined</p>
-                                    <p className="text-[12px] font-black text-slate-700 font-['Poppins']">{activeUserInDrawer.joined}</p>
+                                    <p className="text-[8px] font-medium text-slate-400 uppercase tracking-widest mb-1 font-['Poppins']">Joined</p>
+                                    <p className="text-[12px] font-medium text-slate-700 font-['Poppins']">{activeUserInDrawer.joined}</p>
                                 </div>
                             </div>
 
@@ -361,17 +361,17 @@ const Users = () => {
                                 <div className="bg-emerald-500 p-4 rounded-[28px] text-white shadow-lg shadow-emerald-500/10">
                                     <div className="flex items-center justify-between mb-3">
                                         <Wallet size={16} />
-                                        <span className="text-[8px] font-black uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full font-['Poppins']">Earnings</span>
+                                        <span className="text-[8px] font-medium uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full font-['Poppins']">Earnings</span>
                                     </div>
-                                    <h4 className="text-2xl font-black font-['Poppins']">{activeUserInDrawer.earnings}</h4>
+                                    <h4 className="text-2xl font-medium font-['Poppins']">{activeUserInDrawer.earnings}</h4>
                                     <p className="text-emerald-100 text-[9px] font-bold mt-1 font-['Poppins']">Lifetime total revenue</p>
                                 </div>
                                 <div className="bg-sky-500 p-4 rounded-[28px] text-white shadow-lg shadow-sky-500/10">
                                     <div className="flex items-center justify-between mb-3">
                                         <UsersIcon size={16} />
-                                        <span className="text-[8px] font-black uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full font-['Poppins']">Network</span>
+                                        <span className="text-[8px] font-medium uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full font-['Poppins']">Network</span>
                                     </div>
-                                    <h4 className="text-2xl font-black font-['Poppins']">{activeUserInDrawer.referrals}</h4>
+                                    <h4 className="text-2xl font-medium font-['Poppins']">{activeUserInDrawer.referrals}</h4>
                                     <p className="text-sky-100 text-[9px] font-bold mt-1 font-['Poppins']">Direct invitations sent</p>
                                 </div>
                             </div>
@@ -381,7 +381,7 @@ const Users = () => {
                         <div className="p-5 bg-white border-t border-slate-100">
                             <button 
                                 onClick={() => toggleStatus(activeUserInDrawer.id)} 
-                                className={`w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-xl font-['Poppins']
+                                className={`w-full py-4 rounded-2xl font-medium text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-xl font-['Poppins']
                                 ${activeUserInDrawer.status === 'Active' ? 'bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white' : 'bg-emerald-50 text-emerald-500 hover:bg-emerald-500 hover:text-white'}`}
                             >
                                 {activeUserInDrawer.status === 'Active' ? 'Block Account' : 'Unblock Account'}
@@ -397,7 +397,7 @@ const Users = () => {
                     <div onClick={() => setIsEditModalOpen(false)} className="absolute inset-0 bg-[#0F172A]/80 backdrop-blur-sm"></div>
                     <form onSubmit={handleSaveEdit} className="relative bg-white w-full max-w-[400px] rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 font-['Poppins']">
                         <div className="bg-[#0F172A] p-6 text-white text-center relative">
-                            <h3 className="text-lg font-black tracking-tight font-['Poppins']">Edit Profile</h3>
+                            <h3 className="text-lg font-medium tracking-tight font-['Poppins']">Edit Profile</h3>
                             <button title="Close" type="button" onClick={() => setIsEditModalOpen(false)} className="absolute top-6 right-6 text-white/30 hover:text-white transition-colors">
                                 <XCircle size={20} />
                             </button>
@@ -405,15 +405,15 @@ const Users = () => {
                         <div className="p-8 space-y-6">
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 font-['Poppins']">Full Name</label>
+                                    <label className="block text-[10px] font-medium uppercase tracking-widest text-slate-400 mb-2 font-['Poppins']">Full Name</label>
                                     <input type="text" value={editingUser.name} onChange={(e) => setEditingUser({...editingUser, name: e.target.value})} className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-[13px] font-bold text-slate-700 font-['Poppins']" />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 font-['Poppins']">Email</label>
+                                    <label className="block text-[10px] font-medium uppercase tracking-widest text-slate-400 mb-2 font-['Poppins']">Email</label>
                                     <input type="email" value={editingUser.email} onChange={(e) => setEditingUser({...editingUser, email: e.target.value})} className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-[13px] font-bold text-slate-700 font-['Poppins']" />
                                 </div>
                             </div>
-                            <button type="submit" className="w-full bg-sky-500 hover:bg-sky-600 text-white py-4 rounded-2xl font-black text-[12px] uppercase tracking-widest shadow-xl shadow-sky-500/25 transition-all font-['Poppins']">Save Changes</button>
+                            <button type="submit" className="w-full bg-sky-500 hover:bg-sky-600 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-widest shadow-xl shadow-sky-500/25 transition-all font-['Poppins']">Save Changes</button>
                         </div>
                     </form>
                 </div>

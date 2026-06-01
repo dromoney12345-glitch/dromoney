@@ -44,7 +44,7 @@ const Toast = ({ notification, onRemove }) => {
                     )}
                 </div>
                 <div className="flex-1">
-                    <h4 className="text-[13px] font-black text-slate-800 uppercase tracking-tight">{notification.title}</h4>
+                    <h4 className="text-[13px] font-medium text-slate-800 uppercase tracking-tight">{notification.title}</h4>
                     <p className="text-[11px] font-bold text-slate-400 mt-0.5 leading-tight">{notification.message}</p>
                 </div>
                 <button onClick={() => onRemove(notification.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
@@ -129,7 +129,7 @@ const AdminLayout = () => {
     };
 
     return (
-        <div className="fixed inset-0 flex bg-slate-50 font-playfair overflow-hidden">
+        <div className="fixed inset-0 flex bg-slate-50 font-['Poppins'] tracking-tight overflow-hidden">
 
             {/* ── Notification Drawer ── */}
             <div className={`fixed inset-0 z-[100] transition-all duration-500 ${isNotifOpen ? 'visible' : 'invisible'}`}>
@@ -140,7 +140,7 @@ const AdminLayout = () => {
                             <div className="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-sky-100">
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
                             </div>
-                            <h2 className="font-black text-slate-800 text-lg tracking-tight uppercase">Admin Activity</h2>
+                            <h2 className="font-medium text-slate-800 text-lg tracking-tight uppercase">Admin Activity</h2>
                         </div>
                         <button onClick={() => setIsNotifOpen(false)} className="w-10 h-10 hover:bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-500 transition-all">
                             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 18M6 6l12 12" /></svg>
@@ -151,14 +151,14 @@ const AdminLayout = () => {
                         {notifications.length > 0 ? notifications.map((notif) => (
                             <div key={notif.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-xl hover:shadow-slate-100/40 transition-all cursor-pointer group">
                                 <div className="flex justify-between items-start mb-2">
-                                    <h4 className="text-[13px] font-black text-slate-800 group-hover:text-sky-600 transition-colors uppercase tracking-tight">{notif.title}</h4>
-                                    <span className="text-[9px] font-black text-slate-400 bg-white px-2 py-1 rounded-lg border border-slate-100 shrink-0 ml-3">Just now</span>
+                                    <h4 className="text-[13px] font-medium text-slate-800 group-hover:text-sky-600 transition-colors uppercase tracking-tight">{notif.title}</h4>
+                                    <span className="text-[9px] font-medium text-slate-400 bg-white px-2 py-1 rounded-lg border border-slate-100 shrink-0 ml-3">Just now</span>
                                 </div>
                                 <p className="text-[11px] font-bold text-slate-500 leading-relaxed">{notif.message}</p>
                             </div>
                         )) : (
                             <div className="text-center py-20">
-                                <p className="text-[11px] font-black text-slate-300 uppercase tracking-widest">No recent activity</p>
+                                <p className="text-[11px] font-medium text-slate-300 uppercase tracking-widest">No recent activity</p>
                             </div>
                         )}
                     </div>
@@ -168,7 +168,7 @@ const AdminLayout = () => {
             {/* ── Sidebar ── */}
             <aside
                 className={`${sidebarOpen ? 'w-64' : 'w-16'} bg-[#0f172a] flex flex-col shrink-0 transition-all duration-300 relative z-30 h-full border-r border-slate-800/40`}
-                style={{ overscrollBehaviorY: 'contain', fontFamily: "'Roboto', sans-serif" }}
+                style={{ overscrollBehaviorY: 'contain' }}
             >
                 <div className="flex flex-col items-center px-3 py-3 border-b border-slate-800/40 shrink-0 gap-1.5">
                     <div className="w-12 h-12 flex items-center justify-center shrink-0">
@@ -176,8 +176,8 @@ const AdminLayout = () => {
                     </div>
                     {sidebarOpen && (
                         <div className="text-center">
-                            <h1 className="text-sm font-black text-white leading-none tracking-wide mb-0.5 uppercase">Dromoney</h1>
-                            <p className="text-[8px] font-black text-amber-500 uppercase tracking-[0.2em] leading-none">Admin Control</p>
+                            <h1 className="text-sm font-medium text-white leading-none tracking-wide mb-0.5 uppercase">Dromoney</h1>
+                            <p className="text-[8px] font-medium text-amber-500 uppercase tracking-[0.2em] leading-none">Admin Control</p>
                         </div>
                     )}
                 </div>
@@ -191,7 +191,7 @@ const AdminLayout = () => {
                                 className={({ isActive }) => `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group relative ${isActive ? 'bg-[#FDF2D0] text-[#856404] shadow-lg shadow-black/20 border border-[#F9E9B8]' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}
                             >
                                 <item.icon className={`w-5 h-5 shrink-0 ${sidebarOpen ? 'mr-1' : ''}`} />
-                                {sidebarOpen && <span className="text-[12px] font-black tracking-tight whitespace-nowrap uppercase">{item.label}</span>}
+                                {sidebarOpen && <span className="text-[12px] font-medium tracking-tight whitespace-nowrap uppercase">{item.label}</span>}
                                 {sidebarOpen && (
                                     <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
                                         <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6" /></svg>
@@ -203,7 +203,7 @@ const AdminLayout = () => {
 
                     {/* Logout moved here - directly after Nav */}
                     <div className="pt-4 border-t border-slate-800/40 mt-2">
-                        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-all group font-black uppercase text-[12px]">
+                        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-all group font-medium uppercase text-[12px]">
                             <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" /></svg>
                             {sidebarOpen && <span className="whitespace-nowrap">Logout Session</span>}
                         </button>
@@ -224,9 +224,9 @@ const AdminLayout = () => {
                             <span className="absolute top-2 right-2.5 w-1.5 h-1.5 bg-sky-500 rounded-full"></span>
                         </button>
                         <div className="flex items-center gap-2.5 bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
-                            <div className="w-7 h-7 bg-gradient-to-br from-sky-500 to-indigo-500 rounded-lg flex items-center justify-center text-white font-black text-[11px]">A</div>
+                            <div className="w-7 h-7 bg-gradient-to-br from-sky-500 to-indigo-500 rounded-lg flex items-center justify-center text-white font-medium text-[11px]">A</div>
                             <div className="hidden sm:block">
-                                <p className="text-[12px] font-black text-slate-800 leading-none">Admin</p>
+                                <p className="text-[12px] font-medium text-slate-800 leading-none">Admin</p>
                                 <p className="text-[9px] font-bold text-slate-400 leading-none mt-0.5 uppercase tracking-tighter">Super Admin</p>
                             </div>
                         </div>

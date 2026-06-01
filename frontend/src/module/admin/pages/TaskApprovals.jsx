@@ -91,7 +91,7 @@ const TaskApprovals = () => {
                         <button
                             key={status}
                             onClick={() => setStatusFilter(status)}
-                            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all
+                            className={`px-4 py-2 rounded-xl text-[10px] font-medium uppercase tracking-tight transition-all
                             ${statusFilter === status ? 'bg-[#0F172A] text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}
                         >
                             {status}
@@ -106,11 +106,11 @@ const TaskApprovals = () => {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-slate-50 bg-slate-50/50">
-                                <th className="text-left px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">User / Task</th>
-                                <th className="text-left px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Reward</th>
-                                <th className="text-left px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Date</th>
-                                <th className="text-left px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
-                                <th className="text-center px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Actions</th>
+                                <th className="text-left px-6 py-5 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">User / Task</th>
+                                <th className="text-left px-6 py-5 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">Reward</th>
+                                <th className="text-left px-6 py-5 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">Date</th>
+                                <th className="text-left px-6 py-5 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">Status</th>
+                                <th className="text-center px-6 py-5 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
@@ -118,24 +118,24 @@ const TaskApprovals = () => {
                                 <tr key={sub._id} className="hover:bg-slate-50/40 transition-colors group">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-sky-400 font-black text-[13px]">
+                                            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-sky-400 font-medium text-[13px]">
                                                 {sub.user?.name?.charAt(0) || 'U'}
                                             </div>
                                             <div>
-                                                <p className="font-black text-slate-800 text-[13px] tracking-tight">{sub.user?.name || 'Unknown User'}</p>
-                                                <p className="text-[10px] text-sky-500 font-black uppercase tracking-tight leading-none mt-0.5">{sub.task?.title || 'Unknown Task'}</p>
+                                                <p className="font-medium text-slate-800 text-[13px] tracking-tight">{sub.user?.name || 'Unknown User'}</p>
+                                                <p className="text-[10px] text-sky-500 font-medium uppercase tracking-tight leading-none mt-0.5">{sub.task?.title || 'Unknown Task'}</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center gap-1.5 font-black text-amber-600 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100/50 inline-flex">
+                                        <div className="flex items-center gap-1.5 font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100/50 inline-flex">
                                             <CheckCircle size={12} /> {sub.coinsReward} Coins
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2 text-slate-500">
                                             <Calendar size={13} className="text-slate-400" />
-                                            <span className="text-[11px] font-black tabular-nums">{new Date(sub.createdAt).toLocaleDateString()}</span>
+                                            <span className="text-[11px] font-medium tabular-nums">{new Date(sub.createdAt).toLocaleDateString()}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
@@ -157,7 +157,7 @@ const TaskApprovals = () => {
                                     <td colSpan="5" className="py-24 text-center">
                                         <div className="flex flex-col items-center gap-3 grayscale opacity-30">
                                             <Clock size={48} className="text-slate-300" />
-                                            <p className="text-[11px] font-black uppercase tracking-widest text-slate-500">No submissions found</p>
+                                            <p className="text-[11px] font-medium uppercase tracking-widest text-slate-500">No submissions found</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -175,8 +175,8 @@ const TaskApprovals = () => {
                         <div className="bg-[#0F172A] p-7 text-white relative">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <h3 className="text-xl font-black tracking-tight mb-1">Proof Review</h3>
-                                    <p className="text-[10px] text-sky-400 font-black uppercase tracking-[0.2em]">{selectedSubmission.task?.title}</p>
+                                    <h3 className="text-xl font-medium tracking-tight mb-1">Proof Review</h3>
+                                    <p className="text-[10px] text-sky-400 font-medium uppercase tracking-[0.2em]">{selectedSubmission.task?.title}</p>
                                 </div>
                                 <button onClick={() => setIsModalOpen(false)} className="w-9 h-9 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center transition-colors text-white/40 hover:text-white">
                                     <XCircle size={22} />
@@ -187,18 +187,18 @@ const TaskApprovals = () => {
                         <div className="p-8 space-y-7">
                             <div className="flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-100">
                                 <div>
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Submitted By</p>
-                                    <p className="text-[13px] font-black text-slate-800">{selectedSubmission.user?.name}</p>
+                                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-0.5">Submitted By</p>
+                                    <p className="text-[13px] font-medium text-slate-800">{selectedSubmission.user?.name}</p>
                                     <p className="text-[11px] font-bold text-slate-500">{selectedSubmission.user?.phone}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Reward</p>
-                                    <p className="text-[15px] font-black text-amber-600">{selectedSubmission.coinsReward} Coins</p>
+                                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-0.5">Reward</p>
+                                    <p className="text-[15px] font-medium text-amber-600">{selectedSubmission.coinsReward} Coins</p>
                                 </div>
                             </div>
 
                             <div className="space-y-3">
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Proof Image</p>
+                                <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest px-1">Proof Image</p>
                                 <div className="aspect-[4/3] bg-slate-50 rounded-[32px] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
                                     <img 
                                         src={selectedSubmission.proofImage} 
@@ -216,13 +216,13 @@ const TaskApprovals = () => {
                                 <div className="flex gap-4">
                                     <button
                                         onClick={() => handleAction(selectedSubmission._id, 'reject')}
-                                        className="flex-1 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-4.5 rounded-[20px] font-black text-[11px] uppercase tracking-widest transition-all active:scale-95 border border-rose-100"
+                                        className="flex-1 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-4.5 rounded-[20px] font-medium text-[11px] uppercase tracking-widest transition-all active:scale-95 border border-rose-100"
                                     >
                                         Reject
                                     </button>
                                     <button
                                         onClick={() => handleAction(selectedSubmission._id, 'approve')}
-                                        className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-4.5 rounded-[20px] font-black text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-sky-200"
+                                        className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-4.5 rounded-[20px] font-medium text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-sky-200"
                                     >
                                         Approve
                                     </button>
@@ -231,7 +231,7 @@ const TaskApprovals = () => {
                                 <div className={`p-5 rounded-[24px] text-center border-2 ${selectedSubmission.status === 'Approved' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
                                     <div className="flex items-center justify-center gap-2 mb-1">
                                         {selectedSubmission.status === 'Approved' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-                                        <p className="text-[10px] font-black uppercase tracking-[0.2em]">Record Processed</p>
+                                        <p className="text-[10px] font-medium uppercase tracking-[0.2em]">Record Processed</p>
                                     </div>
                                     <p className="text-[12px] font-bold">This submission was <span className="underline decoration-2 underline-offset-4 uppercase">{selectedSubmission.status}</span></p>
                                     {selectedSubmission.rejectionReason && (

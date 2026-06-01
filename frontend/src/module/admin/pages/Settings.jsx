@@ -39,7 +39,7 @@ const Settings = () => {
         }
     };
 
-    if (!config) return <div className="p-10 text-center font-black animate-pulse">Loading Platform Config...</div>;
+    if (!config) return <div className="p-10 text-center font-medium animate-pulse">Loading Platform Config...</div>;
 
     const tabs = [
         { id: 'general', label: 'General', icon: Layout, color: 'text-sky-500', bg: 'bg-sky-50' },
@@ -58,7 +58,7 @@ const Settings = () => {
                     <div className="bg-emerald-500 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
                         <CheckCircle2 size={24} />
                         <div>
-                            <p className="text-xs font-black uppercase tracking-widest">Settings Saved</p>
+                            <p className="text-xs font-medium uppercase tracking-widest">Settings Saved</p>
                             <p className="text-[10px] font-bold opacity-80">Platform parameters updated successfully.</p>
                         </div>
                     </div>
@@ -80,7 +80,7 @@ const Settings = () => {
                                     <div className={`p-2 rounded-xl ${activeTab === tab.id ? 'bg-white/10' : tab.bg} ${activeTab === tab.id ? 'text-white' : tab.color}`}>
                                         <tab.icon size={18} />
                                     </div>
-                                    <span className="text-[11px] font-black uppercase tracking-widest">{tab.label}</span>
+                                    <span className="text-[11px] font-medium uppercase tracking-widest">{tab.label}</span>
                                 </div>
                                 {activeTab === tab.id && <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>}
                             </button>
@@ -91,7 +91,7 @@ const Settings = () => {
                         <div className="absolute -top-4 -right-4 text-amber-100 rotate-12">
                             <AlertTriangle size={80} />
                         </div>
-                        <h4 className="text-[11px] font-black text-amber-900 uppercase tracking-widest mb-2 flex items-center gap-2 relative z-10">
+                        <h4 className="text-[11px] font-medium text-amber-900 uppercase tracking-widest mb-2 flex items-center gap-2 relative z-10">
                             <AlertTriangle size={14} /> Attention
                         </h4>
                         <p className="text-[10px] font-bold text-amber-900/60 leading-relaxed relative z-10">
@@ -109,7 +109,7 @@ const Settings = () => {
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${tabs.find(t => t.id === activeTab).bg} ${tabs.find(t => t.id === activeTab).color}`}>
                                     {React.createElement(tabs.find(t => t.id === activeTab).icon, { size: 20 })}
                                 </div>
-                                <h2 className="text-xl font-black text-slate-900 tracking-tight uppercase">
+                                <h2 className="text-xl font-medium text-slate-900 tracking-tight uppercase">
                                     {tabs.find(t => t.id === activeTab).label} Configuration
                                 </h2>
                             </div>
@@ -123,7 +123,7 @@ const Settings = () => {
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <Globe size={14} className="text-slate-400" />
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Platform Name</label>
+                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Platform Name</label>
                                             </div>
                                             <input 
                                                 type="text" 
@@ -135,7 +135,7 @@ const Settings = () => {
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <Mail size={14} className="text-slate-400" />
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">System Email</label>
+                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">System Email</label>
                                             </div>
                                             <input 
                                                 type="email" 
@@ -146,7 +146,7 @@ const Settings = () => {
                                         </div>
                                         <div className="lg:col-span-2 p-6 bg-slate-50 rounded-3xl border border-slate-100 flex items-center justify-between">
                                             <div>
-                                                <h4 className="text-[13px] font-black text-slate-800 uppercase tracking-tight">Maintenance Mode</h4>
+                                                <h4 className="text-[13px] font-medium text-slate-800 uppercase tracking-tight">Maintenance Mode</h4>
                                                 <p className="text-[11px] font-bold text-slate-400 mt-1">Temporarily block user access for updates</p>
                                             </div>
                                             <button 
@@ -167,13 +167,13 @@ const Settings = () => {
                                             <CreditCard size={24} />
                                         </div>
                                         <div>
-                                            <p className="text-[13px] font-black text-indigo-900 tracking-tight">Financial Hub Configuration</p>
+                                            <p className="text-[13px] font-medium text-indigo-900 tracking-tight">Financial Hub Configuration</p>
                                             <p className="text-[11px] font-bold text-indigo-600/70 mt-1 max-w-md">Configure UPI and Bank details for user registration fees (Default: ₹{config.registrationFee}).</p>
                                         </div>
                                     </div>
                                     <div className="space-y-6">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Admin UPI ID</label>
+                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Admin UPI ID</label>
                                             <input 
                                                 type="text" 
                                                 value={config.adminUpiId}
@@ -183,7 +183,7 @@ const Settings = () => {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Manual Bank Details</label>
+                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Manual Bank Details</label>
                                             <textarea 
                                                 rows={4} 
                                                 value={config.bankDetails}
@@ -207,17 +207,17 @@ const Settings = () => {
                                             <div key={idx} className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 hover:border-emerald-200 transition-all group">
                                                 <div className="flex items-center justify-between mb-4">
                                                     <span className="text-2xl">{item.icon}</span>
-                                                    <span className="bg-white/80 px-2 py-1 rounded-lg text-[9px] font-black text-slate-400 uppercase tracking-widest border border-slate-200">System Parameter</span>
+                                                    <span className="bg-white/80 px-2 py-1 rounded-lg text-[9px] font-medium text-slate-400 uppercase tracking-widest border border-slate-200">System Parameter</span>
                                                 </div>
-                                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">{item.label}</label>
+                                                <label className="text-[10px] font-medium text-slate-500 uppercase tracking-widest ml-1">{item.label}</label>
                                                 <div className="relative mt-2">
-                                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-slate-400">{item.unit}</span>
+                                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 font-medium text-slate-400">{item.unit}</span>
                                                     <input 
                                                         type="number" 
                                                         step={item.step || 1}
                                                         value={config[item.field]}
                                                         onChange={(e) => handleChange(item.field, parseFloat(e.target.value))}
-                                                        className="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-5 py-4 text-lg font-black text-emerald-600 focus:outline-none focus:border-emerald-500 transition-all" 
+                                                        className="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-5 py-4 text-lg font-medium text-emerald-600 focus:outline-none focus:border-emerald-500 transition-all" 
                                                     />
                                                 </div>
                                                 <p className="text-[10px] font-bold text-slate-400 mt-3 ml-1 uppercase tracking-tight opacity-60 italic">{item.info}</p>
@@ -230,7 +230,7 @@ const Settings = () => {
                                                 <TrendingUpIcon size={24} />
                                             </div>
                                             <div>
-                                                <p className="text-[13px] font-black text-emerald-900 tracking-tight">Referral Reward System</p>
+                                                <p className="text-[13px] font-medium text-emerald-900 tracking-tight">Referral Reward System</p>
                                                 <p className="text-[11px] font-bold text-emerald-600/70 mt-1">Enable/Disable referral bonuses for all users.</p>
                                             </div>
                                         </div>
@@ -252,14 +252,14 @@ const Settings = () => {
                                                 <Shield size={24} />
                                             </div>
                                             <div>
-                                                <p className="text-[13px] font-black text-rose-900 tracking-tight">Access Control</p>
+                                                <p className="text-[13px] font-medium text-rose-900 tracking-tight">Access Control</p>
                                                 <p className="text-[11px] font-bold text-rose-600/70 mt-1">Update primary administrator credentials.</p>
                                             </div>
                                         </div>
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <Mail size={14} className="text-slate-400" />
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Admin Login Email</label>
+                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Admin Login Email</label>
                                             </div>
                                             <input 
                                                 type="email" 
@@ -271,7 +271,7 @@ const Settings = () => {
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <Lock size={14} className="text-slate-400" />
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Admin Dashboard Password</label>
+                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Admin Dashboard Password</label>
                                             </div>
                                             <input 
                                                 type="password" 
@@ -293,7 +293,7 @@ const Settings = () => {
                             <button 
                                 onClick={handleSave}
                                 disabled={isSaving}
-                                className={`flex items-center gap-3 bg-[#1A1C30] text-white px-12 py-5 rounded-[2rem] text-[12px] font-black uppercase tracking-[0.2em] transition-all shadow-2xl shadow-slate-300
+                                className={`flex items-center gap-3 bg-[#1A1C30] text-white px-12 py-5 rounded-[2rem] text-[12px] font-medium uppercase tracking-[0.2em] transition-all shadow-2xl shadow-slate-300
                                     ${isSaving ? 'opacity-80 scale-95' : 'hover:scale-[1.02] active:scale-95'}`}
                             >
                                 {isSaving ? (

@@ -187,11 +187,11 @@ const Dashboard = () => {
                         <BarChart3 size={24} strokeWidth={2.5} />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-3 uppercase">
+                        <h1 className="text-2xl font-medium text-slate-900 tracking-tight flex items-center gap-3 uppercase">
                             Elite Control Room <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                         </h1>
                         <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[9px] mt-1 flex items-center gap-2">
-                            <Monitor size={10} /> System Node 01 • <span className="text-emerald-500 font-black">Online & Secured</span>
+                            <Monitor size={10} /> System Node 01 • <span className="text-emerald-500 font-medium">Online & Secured</span>
                         </p>
                     </div>
                 </div>
@@ -199,7 +199,7 @@ const Dashboard = () => {
                 <div className="flex flex-wrap items-center gap-3">
                     <div className="flex items-center gap-4 bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm">
                         <div className="flex items-center gap-2.5">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Maintenance</span>
+                            <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none">Maintenance</span>
                             <button
                                 onClick={handleMaintenanceToggle}
                                 disabled={!settingsLoaded}
@@ -210,7 +210,7 @@ const Dashboard = () => {
                         </div>
                         <div className="h-3 w-px bg-slate-100"></div>
                         <div className="flex items-center gap-2.5">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Register</span>
+                            <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none">Register</span>
                             <button
                                 onClick={handleRegToggle}
                                 disabled={!settingsLoaded}
@@ -244,7 +244,7 @@ const Dashboard = () => {
                         <div className={`w-10 h-10 bg-white/60 backdrop-blur-md ${action.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm border border-white/20`}>
                             <action.icon size={18} strokeWidth={2.5} />
                         </div>
-                        <span className="text-[9px] font-black text-slate-800 uppercase tracking-[0.1em] leading-none text-center">{action.label}</span>
+                        <span className="text-[9px] font-medium text-slate-800 uppercase tracking-[0.1em] leading-none text-center">{action.label}</span>
                     </div>
                 ))}
             </div>
@@ -263,11 +263,11 @@ const Dashboard = () => {
                                 <div className={`w-9 h-9 bg-slate-50 rounded-lg flex items-center justify-center shadow-sm border border-slate-100 group-hover:bg-slate-100 transition-colors`}>
                                     <s.icon size={18} className={theme.icon} strokeWidth={2.5} />
                                 </div>
-                                <span className="text-[8px] font-black text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded-full border border-slate-100 uppercase tracking-widest">{s.trend}</span>
+                                <span className="text-[8px] font-medium text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded-full border border-slate-100 uppercase tracking-widest">{s.trend}</span>
                             </div>
                             <div>
-                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.12em] mb-1">{s.label}</p>
-                                <h3 className="text-lg font-black text-slate-900 tracking-tight">{s.value}</h3>
+                                <p className="text-[9px] font-medium text-slate-400 uppercase tracking-[0.12em] mb-1">{s.label}</p>
+                                <h3 className="text-lg font-medium text-slate-900 tracking-tight">{s.value}</h3>
                             </div>
                         </div>
                     );
@@ -281,7 +281,7 @@ const Dashboard = () => {
                 <div className="bg-white rounded-xl p-5 shadow-sm relative overflow-hidden border border-slate-100 group">
                     <div className="flex items-center justify-between mb-5">
                         <div>
-                            <h2 className="text-[14px] font-black uppercase tracking-tight flex items-center gap-2 text-slate-900"><Filter size={14} className="text-indigo-500" /> Conversion Funnel</h2>
+                            <h2 className="text-[14px] font-medium uppercase tracking-tight flex items-center gap-2 text-slate-900"><Filter size={14} className="text-indigo-500" /> Conversion Funnel</h2>
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">User Journey Tracker</p>
                         </div>
                         <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center border border-slate-100 group-hover:scale-110 transition-transform"><Target size={16} className="text-indigo-500" /></div>
@@ -290,15 +290,15 @@ const Dashboard = () => {
                     <div className="space-y-3">
                         {conversionFunnel.map((f, i) => (
                             <div key={i} className="flex items-center gap-4 group/bar">
-                                <span className="w-10 text-[9px] font-black text-slate-400">{f.percent}</span>
+                                <span className="w-10 text-[9px] font-medium text-slate-400">{f.percent}</span>
                                 <div className="flex-1 relative h-7 bg-slate-50 rounded-lg border border-slate-100 overflow-hidden">
                                      <div 
                                         style={{ width: f.percent }} 
                                         className={`absolute h-full ${f.color} rounded-lg shadow-sm transition-all duration-1000 delay-${i * 100}`}
                                     ></div>
                                     <div className="absolute inset-x-3 h-full flex items-center justify-between">
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-700">{f.label}</span>
-                                        <span className="text-[9px] font-black text-slate-900">{f.value}</span>
+                                        <span className="text-[9px] font-medium uppercase tracking-widest text-slate-700">{f.label}</span>
+                                        <span className="text-[9px] font-medium text-slate-900">{f.value}</span>
                                     </div>
                                 </div>
                             </div>
@@ -310,7 +310,7 @@ const Dashboard = () => {
                 <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 flex flex-col group">
                     <div className="flex items-center justify-between mb-5">
                         <div>
-                            <h2 className="text-[14px] font-black text-slate-900 tracking-tight uppercase flex items-center gap-2"><ShieldAlert size={14} className="text-rose-500" /> Safety Guard</h2>
+                            <h2 className="text-[14px] font-medium text-slate-900 tracking-tight uppercase flex items-center gap-2"><ShieldAlert size={14} className="text-rose-500" /> Safety Guard</h2>
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Anomaly Detection System</p>
                         </div>
                         <div className="w-8 h-8 bg-rose-50 text-rose-500 rounded-lg flex items-center justify-center border border-rose-100"><ShieldQuestion size={16} /></div>
@@ -322,11 +322,11 @@ const Dashboard = () => {
                                 <div className="flex items-center gap-3">
                                      <div className={`w-2 h-2 rounded-full ${a.severity === 'high' ? 'bg-rose-500 animate-pulse' : a.severity === 'medium' ? 'bg-amber-500' : 'bg-sky-500'}`}></div>
                                      <div>
-                                         <p className="text-[11px] font-black text-slate-800 tracking-tight leading-none">@{a.user}</p>
+                                         <p className="text-[11px] font-medium text-slate-800 tracking-tight leading-none">@{a.user}</p>
                                          <p className="text-[9px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">{a.reason}</p>
                                      </div>
                                 </div>
-                                <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">{a.time}</span>
+                                <span className="text-[8px] font-medium text-slate-300 uppercase tracking-widest">{a.time}</span>
                             </div>
                         ))}
                     </div>
@@ -340,7 +340,7 @@ const Dashboard = () => {
                 <div className="xl:col-span-2 bg-white rounded-xl border border-slate-100 shadow-sm p-5 group relative overflow-hidden">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 mb-6 relative z-10">
                         <div>
-                            <h2 className="text-[14px] font-black text-slate-900 tracking-tight uppercase flex items-center gap-2"><BarChart3 size={16} className="text-indigo-500" /> Engagement Matrix</h2>
+                            <h2 className="text-[14px] font-medium text-slate-900 tracking-tight uppercase flex items-center gap-2"><BarChart3 size={16} className="text-indigo-500" /> Engagement Matrix</h2>
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Platform adoption velocity</p>
                         </div>
                         <div className="flex gap-2 bg-slate-50 p-1 rounded-lg border border-slate-100">
@@ -348,7 +348,7 @@ const Dashboard = () => {
                                 <button
                                     key={t}
                                     onClick={() => setEngagementPeriod(t)}
-                                    className={`px-3 py-1.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all ${engagementPeriod === t ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:bg-white'}`}
+                                    className={`px-3 py-1.5 rounded-md text-[9px] font-medium uppercase tracking-widest transition-all ${engagementPeriod === t ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:bg-white'}`}
                                 >
                                     {t}
                                 </button>
@@ -380,7 +380,7 @@ const Dashboard = () => {
                                     {series.map(s => (
                                         <div key={s.key} className="flex items-center gap-1.5">
                                             <div className="w-2.5 h-2.5 rounded-sm" style={{ background: s.color }}></div>
-                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{s.label}</span>
+                                            <span className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">{s.label}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -394,7 +394,7 @@ const Dashboard = () => {
                                             className="absolute left-0 right-0 border-t border-slate-100"
                                             style={{ bottom: 24 + (pct / 100) * CHART_H }}
                                         >
-                                            <span className="absolute -left-1 -top-2.5 text-[8px] text-slate-300 font-black">
+                                            <span className="absolute -left-1 -top-2.5 text-[8px] text-slate-300 font-medium">
                                                 {pct > 0 ? Math.round((pct / 100) * maxVal) : ''}
                                             </span>
                                         </div>
@@ -418,7 +418,7 @@ const Dashboard = () => {
                                                                 style={{ height: barH, background: s.color }}
                                                             >
                                                                 {/* Tooltip */}
-                                                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[8px] font-black px-1.5 py-0.5 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none">
+                                                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[8px] font-medium px-1.5 py-0.5 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none">
                                                                     {s.data[i]}
                                                                 </div>
                                                             </div>
@@ -426,7 +426,7 @@ const Dashboard = () => {
                                                     })}
                                                 </div>
                                                 {/* X label */}
-                                                <span className="text-[7px] font-black text-slate-400 uppercase tracking-wide mt-1 truncate w-full text-center absolute bottom-0">
+                                                <span className="text-[7px] font-medium text-slate-400 uppercase tracking-wide mt-1 truncate w-full text-center absolute bottom-0">
                                                     {label}
                                                 </span>
                                             </div>
@@ -438,15 +438,15 @@ const Dashboard = () => {
                                 <div className="mt-2 pt-3 border-t border-slate-50 grid grid-cols-3 gap-2">
                                     {series.map(s => (
                                         <div key={s.key} className="text-center">
-                                            <p className="text-[13px] font-black text-slate-800">{s.data.reduce((a, b) => a + b, 0)}</p>
-                                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{s.label}</p>
+                                            <p className="text-[13px] font-medium text-slate-800">{s.data.reduce((a, b) => a + b, 0)}</p>
+                                            <p className="text-[8px] font-medium text-slate-400 uppercase tracking-widest">{s.label}</p>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         );
                     })() : (
-                        <div className="h-48 flex items-center justify-center text-slate-300 text-[11px] font-black uppercase tracking-widest">No data available</div>
+                        <div className="h-48 flex items-center justify-center text-slate-300 text-[11px] font-medium uppercase tracking-widest">No data available</div>
                     )}
                 </div>
 
@@ -455,7 +455,7 @@ const Dashboard = () => {
                      <div className="flex items-center gap-3 mb-5">
                         <div className="w-9 h-9 bg-[#FDF2D0] rounded-lg flex items-center justify-center text-[#856404] shadow-sm border border-[#F9E9B8] group-hover:scale-110 transition-transform"><Send size={16} /></div>
                         <div>
-                            <h3 className="text-[13px] font-black uppercase tracking-tight text-slate-900 leading-none">Broadcast</h3>
+                            <h3 className="text-[13px] font-medium uppercase tracking-tight text-slate-900 leading-none">Broadcast</h3>
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Global Announcement</p>
                         </div>
                     </div>
@@ -465,7 +465,7 @@ const Dashboard = () => {
                             value={broadcastTitle}
                             onChange={(e) => setBroadcastTitle(e.target.value)}
                             placeholder="Message Title..."
-                            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-[11px] font-black text-slate-800 placeholder-slate-300 focus:ring-1 focus:ring-amber-500 focus:bg-white outline-none transition-all"
+                            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-[11px] font-medium text-slate-800 placeholder-slate-300 focus:ring-1 focus:ring-amber-500 focus:bg-white outline-none transition-all"
                         />
                         <textarea 
                             value={broadcastMsg}
@@ -477,7 +477,7 @@ const Dashboard = () => {
                     <button 
                         disabled={!broadcastMsg || isSending}
                         onClick={handleBroadcast}
-                        className={`w-full mt-auto py-3 bg-slate-900 hover:bg-black disabled:bg-slate-100 disabled:text-slate-300 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-slate-200 transition-all flex items-center justify-center gap-2 group/btn
+                        className={`w-full mt-auto py-3 bg-slate-900 hover:bg-black disabled:bg-slate-100 disabled:text-slate-300 text-white rounded-xl text-[10px] font-medium uppercase tracking-[0.2em] shadow-lg shadow-slate-200 transition-all flex items-center justify-center gap-2 group/btn
                             ${isSending ? 'opacity-80' : ''}`}
                     >
                         {isSending ? (
@@ -498,27 +498,27 @@ const Dashboard = () => {
                 <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden flex flex-col group">
                     <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
                         <div>
-                            <h2 className="text-[12px] font-black text-slate-800 uppercase tracking-tight">Global Payout Requests</h2>
+                            <h2 className="text-[12px] font-medium text-slate-800 uppercase tracking-tight">Global Payout Requests</h2>
                             <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Pending verification batch</p>
                         </div>
-                        <button onClick={() => navigate('/admin/withdrawals')} className="text-[9px] font-black text-indigo-500 uppercase flex items-center gap-2 hover:gap-3 transition-all">Wallets <ChevronRight size={10} /></button>
+                        <button onClick={() => navigate('/admin/withdrawals')} className="text-[9px] font-medium text-indigo-500 uppercase flex items-center gap-2 hover:gap-3 transition-all">Wallets <ChevronRight size={10} /></button>
                     </div>
                     <div className="divide-y divide-slate-50 max-h-[360px] overflow-y-auto custom-scrollbar">
                         {kycQueue.map((k, i) => (
                             <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-all group/row">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-9 h-9 bg-slate-50 border border-slate-100 text-slate-900 rounded-xl flex items-center justify-center font-black group-hover/row:bg-slate-900 group-hover/row:text-white transition-all">
+                                    <div className="w-9 h-9 bg-slate-50 border border-slate-100 text-slate-900 rounded-xl flex items-center justify-center font-medium group-hover/row:bg-slate-900 group-hover/row:text-white transition-all">
                                         {k.type === 'KYC' ? <ShieldCheck size={16} /> : <DollarSign size={16} />}
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2">
-                                            <p className="text-[13px] font-black text-slate-800 tracking-tight leading-none">{k.name}</p>
-                                            <span className={`text-[7px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-widest ${k.type === 'KYC' ? 'bg-indigo-50 text-indigo-500' : 'bg-emerald-50 text-emerald-500'}`}>{k.type}</span>
+                                            <p className="text-[13px] font-medium text-slate-800 tracking-tight leading-none">{k.name}</p>
+                                            <span className={`text-[7px] font-medium px-1.5 py-0.5 rounded-md uppercase tracking-widest ${k.type === 'KYC' ? 'bg-indigo-50 text-indigo-500' : 'bg-emerald-50 text-emerald-500'}`}>{k.type}</span>
                                         </div>
-                                        <p className="text-[8px] font-black text-slate-400 mt-1 uppercase tracking-tighter">{k.time} • Live System</p>
+                                        <p className="text-[8px] font-medium text-slate-400 mt-1 uppercase tracking-tighter">{k.time} • Live System</p>
                                     </div>
                                 </div>
-                                <button onClick={() => navigate(k.type === 'KYC' ? '/admin/kyc' : '/admin/withdrawals')} className="bg-white border border-slate-100 text-slate-900 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm hover:bg-slate-900 hover:text-white transition-all">Review</button>
+                                <button onClick={() => navigate(k.type === 'KYC' ? '/admin/kyc' : '/admin/withdrawals')} className="bg-white border border-slate-100 text-slate-900 px-3 py-1.5 rounded-lg text-[9px] font-medium uppercase tracking-widest shadow-sm hover:bg-slate-900 hover:text-white transition-all">Review</button>
                             </div>
                         ))}
                     </div>
@@ -529,11 +529,11 @@ const Dashboard = () => {
                     <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm flex flex-col justify-between group">
                         <div className="flex justify-between items-start">
                              <div className="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center border border-emerald-100"><PieChart size={16} /></div>
-                             <span className="text-[8px] font-black text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-100">82% Cap</span>
+                             <span className="text-[8px] font-medium text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-100">82% Cap</span>
                         </div>
                         <div className="mt-3">
-                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Monthly Target</p>
-                             <h4 className="text-lg font-black text-slate-900 tracking-tighter">₹4.82k <span className="text-[9px] font-bold text-slate-300">/ 6L</span></h4>
+                             <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mb-1">Monthly Target</p>
+                             <h4 className="text-lg font-medium text-slate-900 tracking-tighter">₹4.82k <span className="text-[9px] font-bold text-slate-300">/ 6L</span></h4>
                              <div className="w-full h-1 bg-slate-50 rounded-full mt-2 overflow-hidden">
                                  <div className="h-full bg-emerald-500 w-[82%] rounded-full shadow-lg shadow-emerald-100 transition-all duration-1000"></div>
                              </div>
@@ -548,8 +548,8 @@ const Dashboard = () => {
                              </div>
                         </div>
                         <div className="mt-3">
-                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Open Tickets</p>
-                             <h4 className="text-base font-black text-slate-900 tracking-tight">14 Active</h4>
+                             <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mb-1">Open Tickets</p>
+                             <h4 className="text-base font-medium text-slate-900 tracking-tight">14 Active</h4>
                              <p className="text-[8px] font-bold text-indigo-500 mt-1 flex items-center gap-1 uppercase tracking-widest">Respond Now <ChevronRight size={8} /></p>
                         </div>
                     </div>
@@ -562,7 +562,7 @@ const Dashboard = () => {
                             <div className={`w-9 h-9 ${btn.bg} ${btn.color} ${btn.border} border rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
                                 <btn.icon size={18} />
                             </div>
-                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{btn.label}</span>
+                            <span className="text-[9px] font-medium text-slate-500 uppercase tracking-widest">{btn.label}</span>
                         </div>
                     ))}
                 </div>

@@ -189,8 +189,8 @@ const LayoutManager = () => {
             {/* Header Area */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-12">
                 <div className="space-y-1">
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tight uppercase italic">Layout Manager</h1>
-                    <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                    <h1 className="text-4xl font-medium text-slate-900 tracking-tight uppercase italic">Layout Manager</h1>
+                    <p className="text-[12px] font-medium text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
                         <Layout size={14} className="text-sky-500" /> System UI & Onboarding Course CMS
                     </p>
                 </div>
@@ -198,12 +198,12 @@ const LayoutManager = () => {
                 <div className="bg-white p-1.5 rounded-[22px] border border-slate-100 shadow-sm flex flex-wrap gap-1">
                     <button 
                         onClick={() => setActiveTab('navbar')}
-                        className={`px-6 py-3 rounded-[18px] text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'navbar' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>
+                        className={`px-6 py-3 rounded-[18px] text-[10px] font-medium uppercase tracking-widest transition-all ${activeTab === 'navbar' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>
                         Section Content
                     </button>
                     <button 
                         onClick={() => setActiveTab('footer')}
-                        className={`px-6 py-3 rounded-[18px] text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'footer' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>
+                        className={`px-6 py-3 rounded-[18px] text-[10px] font-medium uppercase tracking-widest transition-all ${activeTab === 'footer' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>
                         Footer & Policies
                     </button>
                 </div>
@@ -216,19 +216,19 @@ const LayoutManager = () => {
                         <div key={section.id} className="bg-white rounded-[44px] border border-slate-100 shadow-sm p-8 group overflow-hidden">
                             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10 pb-8 border-b border-slate-50">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-14 h-14 bg-slate-900 text-sky-400 rounded-2xl flex items-center justify-center font-black text-xl shadow-xl">{section.id}</div>
+                                    <div className="w-14 h-14 bg-slate-900 text-sky-400 rounded-2xl flex items-center justify-center font-medium text-xl shadow-xl">{section.id}</div>
                                     <div className="space-y-1">
                                         <input type="text" value={section.label} onChange={(e) => {
                                             const ns = [...navbarSections]; ns[sIdx].label = e.target.value; setNavbarSections(ns);
-                                        }} className="text-xl font-black text-slate-800 uppercase tracking-tight bg-transparent border-none p-0 outline-none w-full" />
+                                        }} className="text-xl font-medium text-slate-800 uppercase tracking-tight bg-transparent border-none p-0 outline-none w-full" />
                                         <input type="text" value={section.headline} onChange={(e) => {
                                             const ns = [...navbarSections]; ns[sIdx].headline = e.target.value; setNavbarSections(ns);
-                                        }} className="text-[12px] font-black text-sky-600 uppercase tracking-[0.2em] bg-transparent border-none p-0 outline-none w-full" />
+                                        }} className="text-[12px] font-medium text-sky-600 uppercase tracking-[0.2em] bg-transparent border-none p-0 outline-none w-full" />
                                     </div>
                                 </div>
                                 <button 
                                     onClick={() => handleUpdateSection(section)}
-                                    className="flex items-center gap-2 bg-[#0F172A] text-white px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl hover:bg-black transition-all"
+                                    className="flex items-center gap-2 bg-[#0F172A] text-white px-8 py-4 rounded-2xl font-medium text-[11px] uppercase tracking-widest shadow-xl hover:bg-black transition-all"
                                 >
                                     <Save size={16} /> Update Section
                                 </button>
@@ -242,13 +242,13 @@ const LayoutManager = () => {
                                         </button>
                                         <div className="space-y-5">
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Step {stepIdx + 1} Title</label>
+                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Step {stepIdx + 1} Title</label>
                                                 <input value={step.title} onChange={(e) => {
                                                     const ns = [...navbarSections]; ns[sIdx].steps[stepIdx].title = e.target.value; setNavbarSections(ns);
-                                                }} className="w-full bg-white border border-slate-100 rounded-2xl px-5 py-4 text-[12px] font-black text-slate-800 outline-none focus:ring-2 focus:ring-sky-500 shadow-sm" />
+                                                }} className="w-full bg-white border border-slate-100 rounded-2xl px-5 py-4 text-[12px] font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-500 shadow-sm" />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Instructions (Hindi)</label>
+                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Instructions (Hindi)</label>
                                                 <textarea value={step.desc} onChange={(e) => {
                                                     const ns = [...navbarSections]; ns[sIdx].steps[stepIdx].desc = e.target.value; setNavbarSections(ns);
                                                 }} className="w-full bg-white border border-slate-100 rounded-2xl px-5 py-4 text-[12px] font-bold text-slate-500 h-28 outline-none focus:ring-2 focus:ring-sky-500 resize-none shadow-sm" />
@@ -258,7 +258,7 @@ const LayoutManager = () => {
                                 ))}
                                 <button onClick={() => addStep(sIdx)} className="min-w-[200px] bg-slate-50/30 border-2 border-dashed border-slate-200 rounded-[36px] flex flex-col items-center justify-center gap-3 hover:border-sky-500 hover:bg-sky-50/50 transition-all text-slate-300 hover:text-sky-500 group/plus">
                                     <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-lg group-hover/plus:scale-110 transition-transform"><Plus size={24} /></div>
-                                    <span className="text-[11px] font-black uppercase tracking-widest">Add New Step</span>
+                                    <span className="text-[11px] font-medium uppercase tracking-widest">Add New Step</span>
                                 </button>
                             </div>
                         </div>
@@ -277,21 +277,21 @@ const LayoutManager = () => {
                                         <div className="flex items-center gap-4">
                                             <div className={`p-4 rounded-2xl bg-slate-50 ${item.color}`}><item.icon size={28} /></div>
                                             <div>
-                                                <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">{item.label}</h3>
+                                                <h3 className="text-lg font-medium text-slate-800 uppercase tracking-tight">{item.label}</h3>
                                                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Edit path and page content</p>
                                             </div>
                                         </div>
                                         <div className="p-6 bg-slate-50/50 rounded-[28px] border border-slate-50 space-y-4">
                                             <div>
-                                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Link Display Label</label>
+                                                <label className="text-[9px] font-medium text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Link Display Label</label>
                                                 <input value={item.label} onChange={(e) => {
                                                     const nf = [...footerPolicies]; nf[idx].label = e.target.value; setFooterPolicies(nf);
-                                                }} className="w-full bg-white border border-slate-100 rounded-xl px-5 py-4 text-[13px] font-black text-slate-800 outline-none shadow-sm focus:ring-2 focus:ring-sky-500" />
+                                                }} className="w-full bg-white border border-slate-100 rounded-xl px-5 py-4 text-[13px] font-medium text-slate-800 outline-none shadow-sm focus:ring-2 focus:ring-sky-500" />
                                             </div>
                                         </div>
                                         <button 
                                             onClick={() => handleUpdatePolicy(item)}
-                                            className="lg:flex items-center gap-3 bg-[#0F172A] text-white px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl hover:bg-[#1E293B] transition-all w-full justify-center"
+                                            className="lg:flex items-center gap-3 bg-[#0F172A] text-white px-8 py-4 rounded-2xl font-medium text-[11px] uppercase tracking-widest shadow-xl hover:bg-[#1E293B] transition-all w-full justify-center"
                                         >
                                             <Save size={16} /> Update {item.label} Data
                                         </button>
@@ -299,8 +299,8 @@ const LayoutManager = () => {
 
                                     <div className="flex-[1.5] space-y-3">
                                         <div className="flex items-center justify-between px-2">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><FileText size={14} /> Page Content Editor</label>
-                                            <span className="text-[10px] font-black text-emerald-500 bg-emerald-50 px-3 py-1 rounded-lg uppercase tracking-widest">Live Preview</span>
+                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest flex items-center gap-2"><FileText size={14} /> Page Content Editor</label>
+                                            <span className="text-[10px] font-medium text-emerald-500 bg-emerald-50 px-3 py-1 rounded-lg uppercase tracking-widest">Live Preview</span>
                                         </div>
                                         <textarea
                                             value={item.content}

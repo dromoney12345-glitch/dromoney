@@ -60,11 +60,11 @@ const AdminLogin = () => {
                             <div className="p-1.5 bg-white/5 rounded-xl backdrop-blur-md border border-white/10">
                                 <img src={logo} alt="Dromoney" className="w-10 h-10 object-contain brightness-0 invert" />
                             </div>
-                            <span className="text-xl font-black tracking-tighter uppercase text-white/90">Dromoney</span>
+                            <span className="text-xl font-medium tracking-tighter uppercase text-white/90">Dromoney</span>
                         </div>
                         
                         <div className="space-y-1">
-                            <h1 className="text-5xl font-black tracking-tight leading-none text-white animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">WELCOME</h1>
+                            <h1 className="text-5xl font-medium tracking-tight leading-none text-white animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">WELCOME</h1>
                             <p className="text-base font-bold text-indigo-400 uppercase tracking-[0.3em] pl-1 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">Admin Gateway</p>
                         </div>
                         
@@ -84,7 +84,7 @@ const AdminLogin = () => {
                 <div className="flex-1 bg-white p-10 py-12 flex flex-col justify-center relative">
                     <div className="max-w-[300px] w-full mx-auto space-y-8">
                         <div className="space-y-1">
-                            <h2 className="text-3xl font-black text-slate-900 tracking-tight">Sign in</h2>
+                            <h2 className="text-3xl font-medium text-slate-900 tracking-tight">Sign in</h2>
                             <p className="text-xs text-slate-400 font-medium">Enter your authorized credentials.</p>
                         </div>
 
@@ -127,7 +127,7 @@ const AdminLogin = () => {
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-0 top-1/2 -translate-y-1/2 text-[11px] font-black text-indigo-600 hover:text-indigo-800 uppercase tracking-widest transition-all px-2 py-1 rounded-md hover:bg-indigo-50"
+                                        className="absolute right-0 top-1/2 -translate-y-1/2 text-[11px] font-medium text-indigo-600 hover:text-indigo-800 uppercase tracking-widest transition-all px-2 py-1 rounded-md hover:bg-indigo-50"
                                     >
                                         {showPassword ? 'HIDE' : 'SHOW'}
                                     </button>
@@ -161,7 +161,7 @@ const AdminLogin = () => {
                                 
                                 <div className="relative flex items-center justify-center py-2">
                                     <div className="w-full h-px bg-slate-100"></div>
-                                    <span className="absolute bg-white px-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">secure gateway</span>
+                                    <span className="absolute bg-white px-4 text-[10px] font-medium text-slate-300 uppercase tracking-widest">secure gateway</span>
                                 </div>
 
                                 <button
@@ -180,7 +180,7 @@ const AdminLogin = () => {
                         </form>
                     </div>
 
-                    <p className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[10px] font-black text-slate-200 uppercase tracking-[0.4em] whitespace-nowrap">
+                    <p className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[10px] font-medium text-slate-200 uppercase tracking-[0.4em] whitespace-nowrap">
                         © 2026 DROMONEY INTEL SYSTEMS
                     </p>
                 </div>

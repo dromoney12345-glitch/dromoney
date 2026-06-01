@@ -114,18 +114,18 @@ const Notifications = () => {
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {/* Compose */}
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                    <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-5 flex items-center gap-2">
+                    <h2 className="text-sm font-medium text-slate-800 uppercase tracking-widest mb-5 flex items-center gap-2">
                         <Bell size={16} className="text-sky-500" /> Compose Message
                     </h2>
                     <div className="space-y-4">
                         <div>
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Title</label>
+                            <label className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">Title</label>
                             <input type="text" value={title} onChange={e => setTitle(e.target.value)}
                                 placeholder="e.g. Special Weekend Offer!"
                                 className="mt-2 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[14px] font-bold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all" />
                         </div>
                         <div>
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Message</label>
+                            <label className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">Message</label>
                             <textarea value={message} onChange={e => setMessage(e.target.value)}
                                 placeholder="Write your broadcast message here..."
                                 rows={4}
@@ -133,12 +133,12 @@ const Notifications = () => {
                         </div>
                         <div className="flex items-center gap-3 p-3 bg-sky-50 rounded-xl border border-sky-100">
                             <Users size={16} className="text-sky-500 shrink-0" />
-                            <p className="text-[12px] font-bold text-sky-700">Will be sent to <span className="font-black">{userStats.totalActive.toLocaleString()} users</span></p>
+                            <p className="text-[12px] font-bold text-sky-700">Will be sent to <span className="font-medium">{userStats.totalActive.toLocaleString()} users</span></p>
                         </div>
                         <button 
                             disabled={loading}
                             onClick={handleSend}
-                            className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-black text-[12px] uppercase tracking-widest transition-all active:scale-95 shadow-md ${sent ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-slate-900 hover:bg-black text-white shadow-sky-100'}`}>
+                            className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-medium text-[12px] uppercase tracking-widest transition-all active:scale-95 shadow-md ${sent ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-slate-900 hover:bg-black text-white shadow-sky-100'}`}>
                             {loading ? <Loader2 size={15} className="animate-spin" /> : sent ? '✓ Sent Successfully!' : <><Send size={15} /> Send Broadcast</>}
                         </button>
                     </div>
@@ -147,13 +147,13 @@ const Notifications = () => {
                 {/* History */}
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
                     <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/20">
-                        <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                        <h2 className="text-sm font-medium text-slate-800 uppercase tracking-widest flex items-center gap-2">
                             <HistoryIcon size={16} className="text-slate-400" /> Broadcast History
                         </h2>
                         {history.length > 0 && (
                             <button 
                                 onClick={handleClearAll}
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase text-rose-500 hover:bg-rose-50 transition-all border border-transparent hover:border-rose-100"
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium uppercase text-rose-500 hover:bg-rose-50 transition-all border border-transparent hover:border-rose-100"
                                 title="Clear all history"
                             >
                                 <Trash2 size={12} /> Clear All
@@ -165,7 +165,7 @@ const Notifications = () => {
                             <div key={n._id} className="p-8 hover:bg-slate-50/60 transition-all group/item border-l-4 border-l-sky-200 hover:border-l-sky-400">
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex-1">
-                                        <h3 className="font-black text-slate-800 text-[20px] leading-tight mb-3">{n.title}</h3>
+                                        <h3 className="font-medium text-slate-800 text-[20px] leading-tight mb-3">{n.title}</h3>
                                         <div className="flex items-center gap-3 text-slate-500">
                                             <Clock size={16} />
                                             <span className="text-[13px] font-bold uppercase tracking-wide">
@@ -184,7 +184,7 @@ const Notifications = () => {
                                 <div className="mt-5 flex items-center justify-between">
                                     <div className="flex items-center gap-3 px-4 py-2.5 bg-sky-50 rounded-lg border border-sky-100">
                                         <Users size={16} className="text-sky-500" />
-                                        <span className="text-[13px] font-black text-sky-600 uppercase tracking-wide">{n.recipients?.toLocaleString()} Recipients</span>
+                                        <span className="text-[13px] font-medium text-sky-600 uppercase tracking-wide">{n.recipients?.toLocaleString()} Recipients</span>
                                     </div>
                                 </div>
                             </div>
@@ -193,7 +193,7 @@ const Notifications = () => {
                                 <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-slate-100">
                                     <Bell size={28} className="text-slate-200" />
                                 </div>
-                                <p className="text-sm font-black text-slate-300 uppercase tracking-widest leading-none">No Broadcast History</p>
+                                <p className="text-sm font-medium text-slate-300 uppercase tracking-widest leading-none">No Broadcast History</p>
                             </div>
                         )}
                     </div>
