@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useAdmin } from '../context/AdminContext';
-import { openGallery } from '../../../imageUploadUtils';
+import { openGallery } from '../../../../imageUploadUtils';
 
 const DocumentsCMS = () => {
     const { addNotification } = useAdmin();

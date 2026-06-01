@@ -8,7 +8,7 @@ import {
     MessageSquare, Users, Zap, ShieldCheck, ChevronRight
 } from 'lucide-react';
 import api from '../../shared/services/api';
-import { openGallery } from '../../../imageUploadUtils';
+import { openGallery } from '../../../../imageUploadUtils';
 
 const BusinessContent = () => {
     const [ideas, setIdeas] = useState([]);

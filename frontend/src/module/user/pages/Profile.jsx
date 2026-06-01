@@ -11,7 +11,7 @@ import UnlockModal from '../components/UnlockModal';
 import KycModal from '../components/KycModal';
 import ReferralsModal from '../components/ReferralsModal';
 import FeedbackModal from '../components/FeedbackModal';
-import { openGallery } from '../../../imageUploadUtils';
+import { openGallery } from '../../../../imageUploadUtils';
 
 const Profile = () => {
     const navigate = useNavigate();

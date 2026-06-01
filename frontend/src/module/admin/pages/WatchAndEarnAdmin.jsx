@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MonitorPlay, Plus, Trash2, Clock, Coins, X, Link as LinkIcon, Edit3, Image as ImageIcon, Video, CheckCircle2, Save } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import api from '../../shared/services/api';
-import { openGallery } from '../../../imageUploadUtils';
+import { openGallery } from '../../../../imageUploadUtils';
 
 const WatchAndEarnAdmin = () => {
     const [ads, setAds] = useState([]);

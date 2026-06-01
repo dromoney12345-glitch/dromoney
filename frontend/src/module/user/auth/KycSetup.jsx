@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, ShieldCheck, UploadCloud, Camera, ArrowLeft, Info, Fingerprint, Lock, BadgeCheck } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
-import { openGallery } from '../../../imageUploadUtils';
+import { openGallery } from '../../../../imageUploadUtils';
 
 const KycSetup = () => {
     const navigate = useNavigate();

@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { X, ShieldCheck, CheckCircle2, FileText, Clock, AlertCircle, Camera, Upload, Loader2 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import api from '../../shared/services/api';
-import { openGallery } from '../../../imageUploadUtils';
+import { openGallery } from '../../../../imageUploadUtils';
 
 const KycModal = ({ isOpen, onClose }) => {
     const { userData, addNotification, refreshUserProfile } = useUser();

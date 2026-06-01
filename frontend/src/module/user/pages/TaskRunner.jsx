@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
-import { openGallery } from '../../../imageUploadUtils';
+import { openGallery } from '../../../../imageUploadUtils';
 import { ChevronLeft, CheckCircle2, Play, UploadCloud, Link as LinkIcon, Loader2, Image as ImageIcon, Coins, Camera } from 'lucide-react';
 
 const TaskRunner = () => {
