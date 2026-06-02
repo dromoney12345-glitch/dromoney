@@ -966,8 +966,6 @@ const Income = () => {
                     );
                 })}
             </div>
-
-            </div>
         </div>
     );
 };
