@@ -159,11 +159,11 @@ const BusinessIdeas = () => {
                 </button>
             </div>
 
-            <div className="flex-1 flex flex-col items-center justify-between p-5 overflow-hidden">
-                <div className="w-full max-w-[320px] bg-gradient-to-br from-[#5D38F0] to-[#8643FF] rounded-[2rem] p-6 text-white shadow-xl relative overflow-hidden flex-1 flex flex-col items-center justify-center min-h-0 mb-5">
+            <div className="flex-1 flex flex-col items-center justify-center p-5 overflow-hidden gap-5">
+                <div className="w-full max-w-[320px] bg-gradient-to-br from-[#5D38F0] to-[#8643FF] rounded-[2rem] p-5 text-white shadow-xl relative overflow-hidden flex flex-col items-center justify-center min-h-0 mb-2">
                     {/* Decorative Elements */}
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 blur-2xl" />
-                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-indigo-400/20 rounded-full -ml-12 -mb-12 blur-2xl" />
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-8 -mt-8 blur-2xl" />
+                    <div className="absolute bottom-0 left-0 w-20 h-20 bg-indigo-400/20 rounded-full -ml-8 -mb-8 blur-2xl" />
 
                     <div className="text-center space-y-1 relative z-10">
                         <div className="flex items-center justify-center gap-1.5 mb-0.5">
@@ -176,14 +176,14 @@ const BusinessIdeas = () => {
                         </p>
                     </div>
 
-                    <div className="my-4 relative z-10 shrink-0">
+                    <div className="my-3 relative z-10 shrink-0">
                         <div className="absolute inset-0 bg-white/10 blur-[40px] rounded-full scale-125 animate-pulse" />
                         <div className="animate-boost relative">
                             <div className="absolute -bottom-6 -right-6 z-0 flex gap-1">
-                                <div className="animate-puff w-6 h-6 bg-white/40 rounded-full blur-md" style={{ animationDelay: '0s' }} />
-                                <div className="animate-puff w-8 h-8 bg-white/20 rounded-full blur-lg" style={{ animationDelay: '0.2s' }} />
+                                <div className="animate-puff w-4 h-4 bg-white/40 rounded-full blur-sm" style={{ animationDelay: '0s' }} />
+                                <div className="animate-puff w-6 h-6 bg-white/20 rounded-full blur-md" style={{ animationDelay: '0.2s' }} />
                             </div>
-                            <Rocket size={90} className="text-white drop-shadow-[0_15px_15px_rgba(255,255,255,0.25)] relative z-10" fill="white" fillOpacity={0.2} />
+                            <Rocket size={64} className="text-white drop-shadow-[0_10px_10px_rgba(255,255,255,0.25)] relative z-10" fill="white" fillOpacity={0.2} />
                         </div>
                     </div>
 
@@ -220,7 +220,7 @@ const BusinessIdeas = () => {
                 </div>
             </div>
 
-            <div className="p-4 space-y-4">
+            <div className="p-4 space-y-3">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-3">
                         <div className="w-12 h-12 border-4 border-[#5D38F0] border-t-transparent rounded-full animate-spin" />
@@ -231,10 +231,10 @@ const BusinessIdeas = () => {
                         <div 
                             key={idea._id}
                             onClick={() => handleIdeaSelect(idea)}
-                            className="bg-white rounded-[1.5rem] p-4 flex flex-col gap-3 shadow-md border border-slate-50 group hover:shadow-lg transition-all cursor-pointer active:scale-[0.98] relative overflow-hidden"
+                            className="bg-white rounded-[1.25rem] p-3 flex flex-col gap-2.5 shadow-sm border border-slate-100 group hover:shadow-md transition-all cursor-pointer active:scale-[0.98] relative overflow-hidden"
                         >
-                            <div className="flex items-center gap-4 relative z-10">
-                                <div className="w-14 h-14 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden border border-slate-50">
+                            <div className="flex items-center gap-3 relative z-10">
+                                <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden border border-slate-50">
                                     {idea.bannerImage ? (
                                         <img src={idea.bannerImage} className="w-full h-full object-cover relative z-10" alt="" />
                                     ) : (
@@ -254,12 +254,12 @@ const BusinessIdeas = () => {
                                 </div>
                             </div>
                             
-                            <div className="flex items-center justify-between border-t border-slate-50 pt-3 mt-1 relative z-10">
-                                <p className="text-[9px] font-medium text-slate-400 leading-relaxed max-w-[75%] line-clamp-2">
+                            <div className="flex items-center justify-between border-t border-slate-50 pt-2.5 mt-0.5 relative z-10">
+                                <p className="text-[9px] font-medium text-slate-400 leading-relaxed max-w-[80%] line-clamp-1">
                                     {idea.desc || "विशेषज्ञ मार्गदर्शन के साथ अपनी व्यावसायिक यात्रा शुरू करें..."}
                                 </p>
-                                <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 group-hover:bg-[#5D38F0] group-hover:text-white transition-all">
-                                    <ArrowRight size={14} />
+                                <div className="w-7 h-7 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 group-hover:bg-[#5D38F0] group-hover:text-white transition-all">
+                                    <ArrowRight size={12} />
                                 </div>
                             </div>
                         </div>

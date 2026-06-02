@@ -837,9 +837,9 @@ const Income = () => {
 
     // ── LAYER 4: Final Income Cards (Modern Mobile UI Redesign) ─────────────
     return (
-        <div className="flex flex-col gap-5 p-5 bg-[#F8FAFC] animate-in fade-in duration-700">
+        <div className="flex flex-col gap-3 p-4 bg-[#F8FAFC] animate-in fade-in duration-700">
             {/* Minimal Sub-Header */}
-            <div className="flex items-start justify-between px-1 mb-3">
+            <div className="flex items-start justify-between px-1 mb-1">
                 <div className="flex flex-col gap-1.5">
                     <h2 className="text-2xl font-medium text-slate-900 tracking-tight leading-none mt-1">Income Center</h2>
                     <div className="flex flex-wrap items-center gap-2.5 mt-0.5">
@@ -888,20 +888,20 @@ const Income = () => {
                     {/* Top Row: Brand & Wireless */}
                     <div className="flex justify-between items-start relative z-10">
                         <div className="flex flex-col">
-                            <span className="text-[9px] font-medium text-white/40 uppercase tracking-[0.3em] mb-0.5">Dromoney Card</span>
+                            <span className="text-[9px] font-medium text-white/40 uppercase tracking-[0.3em] mb-0">Dromoney Card</span>
                             <div className="flex items-center gap-2">
-                                <div className="w-7 h-5 bg-gradient-to-br from-amber-200 via-yellow-400 to-amber-500 rounded-sm shadow-inner relative overflow-hidden">
+                                <div className="w-6 h-4 bg-gradient-to-br from-amber-200 via-yellow-400 to-amber-500 rounded-sm shadow-inner relative overflow-hidden">
                                     <div className="absolute inset-0 opacity-20 border-t border-b border-black/20 grid grid-cols-3">
                                         <div className="border-r border-black/20"></div>
                                         <div className="border-r border-black/20"></div>
                                     </div>
                                 </div>
                                 <div className="text-white/30">
-                                    <Wifi size={14} className="rotate-90" />
+                                    <Wifi size={12} className="rotate-90" />
                                 </div>
                             </div>
                         </div>
-                        <img src={LogoImg} className="w-8 h-8 object-contain brightness-0 invert opacity-80" alt="Logo" />
+                        <img src={LogoImg} className="w-7 h-7 object-contain brightness-0 invert opacity-80" alt="Logo" />
                     </div>
 
                     {/* Middle Row: Numbers / Title */}
@@ -931,7 +931,7 @@ const Income = () => {
             </div>
 
             {/* Glassmorphism Card Grid (Compact & Rounded) */}
-            <div className="grid grid-cols-2 gap-2.5 pb-8">
+            <div className="grid grid-cols-2 gap-2 pb-6">
                 {INCOME_OPTIONS.slice(1).map((opt) => {
                     const Icon = opt.icon;
                     const THEMES = {
@@ -947,38 +947,35 @@ const Income = () => {
                         <div
                             key={opt.id}
                             onClick={() => handleCardClick(opt.route)}
-                            className={`relative bg-gradient-to-br ${theme.gradient} p-3.5 shadow-lg ${theme.shadow} border border-white active:scale-[0.98] transition-all cursor-pointer overflow-hidden group flex flex-col`}
-                            style={{ borderRadius: '1.5rem' }}
+                            className={`relative bg-gradient-to-br ${theme.gradient} p-2.5 shadow-md ${theme.shadow} border border-white active:scale-[0.98] transition-all cursor-pointer overflow-hidden group flex flex-col`}
+                            style={{ borderRadius: '1.25rem' }}
                         >
                             {/* Glass Background Decor */}
-                            <div className="absolute -right-6 -top-6 w-20 h-20 bg-white/40 rounded-full blur-2xl"></div>
+                            <div className="absolute -right-6 -top-6 w-16 h-16 bg-white/40 rounded-full blur-xl"></div>
 
                             {/* Top Dual Icons - More Compact */}
-                            <div className="flex gap-1.5 mb-2 relative z-10">
-                                <div className="w-7 h-7 bg-white/70 backdrop-blur-md rounded-lg flex items-center justify-center border border-white shadow-sm">
-                                    <Icon size={14} className={theme.accent} />
-                                </div>
-                                <div className="w-7 h-7 bg-white/40 backdrop-blur-sm rounded-lg flex items-center justify-center border border-white/50">
-                                    <Zap size={12} className="text-slate-400" />
+                            <div className="flex gap-1 mb-1.5 relative z-10">
+                                <div className="w-6 h-6 bg-white/70 backdrop-blur-md rounded-lg flex items-center justify-center border border-white shadow-sm">
+                                    <Icon size={12} className={theme.accent} />
                                 </div>
                             </div>
 
                             {/* Content - High Density */}
                             <div className="relative z-10 flex-1">
-                                <h3 className="text-[12px] font-medium text-slate-800 tracking-tight leading-none mb-1">
+                                <h3 className="text-[11px] font-medium text-slate-800 tracking-tight leading-none mb-0.5">
                                     {opt.id === 6 ? futureFeaturesConfig.title : opt.title}
                                 </h3>
-                                <p className="text-[8.5px] font-medium text-slate-500 leading-tight tracking-tight line-clamp-2">
+                                <p className="text-[8px] font-medium text-slate-500 leading-tight tracking-tight line-clamp-2">
                                     {opt.id === 6 ? futureFeaturesConfig.subtitle : opt.subtitle}
                                 </p>
                             </div>
 
                             {/* Bottom Row - Integrated Action */}
-                            <div className="flex items-center justify-between mt-2.5 relative z-10">
+                            <div className="flex items-center justify-between mt-1.5 relative z-10">
                                 <div className={`${theme.pill} px-1.5 py-0.5 rounded-full border border-white/20`}>
-                                    <span className="text-[6.5px] font-medium uppercase tracking-wider">{opt.locked ? 'Coming Soon' : 'Active'}</span>
+                                    <span className="text-[6px] font-medium uppercase tracking-wider">{opt.locked ? 'Coming Soon' : 'Active'}</span>
                                 </div>
-                                <div className="w-5 h-5 bg-slate-900 rounded-full flex items-center justify-center text-white active:scale-90 transition-transform">
+                                <div className="w-4 h-4 bg-slate-900 rounded-full flex items-center justify-center text-white active:scale-90 transition-transform">
                                     <ChevronRight size={10} strokeWidth={3} />
                                 </div>
                             </div>
