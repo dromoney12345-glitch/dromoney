@@ -75,19 +75,18 @@ const UserLayout = () => {
                 </div>
             </header>
 
-            {/* --- Notification Drawer (Right Side) --- */}
-            <div className={`fixed inset-0 z-[100] transition-all duration-500 ${isNotifOpen ? 'visible' : 'invisible disabled'}`}>
+            {/* --- Notification Modal (Popup Form) --- */}
+            <div className={`fixed inset-0 z-[100] transition-all duration-300 flex items-center justify-center ${isNotifOpen ? 'visible' : 'invisible'}`}>
                 {/* Backdrop Blur */}
                 <div
                     onClick={() => setIsNotifOpen(false)}
-                    className={`absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-500 ${isNotifOpen ? 'opacity-100' : 'opacity-0'}`}
+                    className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 ${isNotifOpen ? 'opacity-100' : 'opacity-0'}`}
                 ></div>
 
-                {/* Drawer Body */}
-                <div className={`absolute top-0 right-0 h-full w-full max-w-md bg-[#F1F9F3] shadow-2xl transition-transform duration-500 ease-out flex flex-col ${isNotifOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+                {/* Modal Body */}
+                <div className={`relative w-[92%] max-w-sm bg-[#F1F9F3] shadow-2xl rounded-3xl overflow-hidden transition-all duration-300 ease-out flex flex-col max-h-[80vh] ${isNotifOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4'}`}>
                     {/* Ultra-Compact Header Row - Navy Blue Theme */}
-                    <div className="relative h-16 bg-gradient-to-br from-[#0B1221] to-[#1E293B] rounded-b-3xl shadow-lg overflow-hidden flex items-center px-5 shrink-0">
-                        {/* Decorative Elements */}
+                    <div className="relative h-16 bg-gradient-to-br from-[#0B1221] to-[#1E293B] flex items-center px-5 shrink-0">
                         <div className="absolute right-[-10px] top-[-10px] opacity-[0.03] pointer-events-none">
                             <Bell size={100} className="text-white" />
                         </div>
