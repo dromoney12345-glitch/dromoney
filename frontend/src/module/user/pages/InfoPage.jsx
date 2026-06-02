@@ -177,9 +177,9 @@ const InfoPage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-white flex flex-col items-center justify-center font-sans">
+            <div className="min-h-screen bg-white flex flex-col items-center justify-center font-poppins">
                 <div className="w-12 h-12 border-4 border-slate-100 border-t-red-500 rounded-full animate-spin"></div>
-                <p className="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] animate-pulse">Syncing Design...</p>
+                <p className="mt-4 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] animate-pulse">Syncing Design...</p>
             </div>
         );
     }
@@ -188,7 +188,7 @@ const InfoPage = () => {
 
     // Premium Layout for Information Pages
     return (
-        <div className="flex flex-col min-h-screen bg-[#F8FAFC] font-sans pb-24 relative overflow-hidden">
+        <div className="flex flex-col min-h-screen bg-[#F8FAFC] font-poppins pb-24 relative overflow-hidden">
             {/* Ultra-Compact Header Row - Navy Blue Theme */}
             <div className="relative h-16 bg-gradient-to-br from-[#0B1221] to-[#1E293B] rounded-b-3xl shadow-lg overflow-hidden flex items-center px-5">
                 {/* Decorative Elements */}
@@ -206,10 +206,10 @@ const InfoPage = () => {
                     </button>
                     
                     <div className="flex flex-col">
-                        <p className="text-blue-400 text-[7px] font-black uppercase tracking-[0.2em] leading-none mb-1">
+                        <p className="text-blue-400 text-[7px] font-medium uppercase tracking-[0.2em] leading-none mb-1">
                             User Guide
                         </p>
-                        <h1 className="text-base font-black text-white tracking-tight leading-none uppercase">
+                        <h1 className="text-base font-medium text-white tracking-tight leading-none uppercase">
                             {pageData.title}
                         </h1>
                     </div>
@@ -219,7 +219,7 @@ const InfoPage = () => {
             <div className="px-4 pt-8 flex flex-col gap-4 relative z-10">
                 {/* Subtitle / Intro - Compact */}
                 <div className="px-2">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-relaxed">
                         {pageData.subtitle}
                     </p>
                 </div>
@@ -233,7 +233,7 @@ const InfoPage = () => {
                                     <CheckCircle2 size={14} />
                                 </div>
                                 <div className="flex-1">
-                                    <h4 className="text-[13px] font-bold text-slate-800 mb-0.5 uppercase tracking-wide">
+                                    <h4 className="text-[13px] font-medium text-slate-800 mb-0.5 uppercase tracking-wide">
                                         {section.title}
                                     </h4>
                                     <p className="text-[11px] font-medium text-slate-500 leading-relaxed whitespace-pre-line">

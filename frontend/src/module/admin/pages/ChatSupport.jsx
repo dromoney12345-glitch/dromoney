@@ -104,7 +104,7 @@ const AdminChatSupport = () => {
                         </div>
                     ) : filteredThreads.length === 0 ? (
                         <div className="text-center py-10 px-4">
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-normal">No conversations</p>
+                            <p className="text-xs font-medium text-slate-400 uppercase tracking-normal">No conversations</p>
                         </div>
                     ) : (
                         filteredThreads.map((thread) => (
@@ -120,7 +120,7 @@ const AdminChatSupport = () => {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start mb-0.5">
                                         <h4 className="text-[13px] font-medium text-slate-800 truncate uppercase">{thread.userName}</h4>
-                                        <span className="text-[9px] font-bold text-slate-400">
+                                        <span className="text-[9px] font-medium text-slate-400">
                                             {new Date(thread.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </div>
@@ -152,7 +152,7 @@ const AdminChatSupport = () => {
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-medium uppercase tracking-tight text-slate-800">{activeUser.name}</h3>
-                                    <p className="text-[10px] font-bold text-emerald-500 flex items-center gap-1 uppercase tracking-normal">
+                                    <p className="text-[10px] font-medium text-emerald-500 flex items-center gap-1 uppercase tracking-normal">
                                         <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
                                         Active Support Session
                                     </p>
@@ -170,7 +170,7 @@ const AdminChatSupport = () => {
                                                 : 'bg-white text-slate-800 rounded-tl-none border border-slate-100'}`}>
                                             {m.message}
                                         </div>
-                                        <p className={`text-[9px] font-bold text-slate-400 mt-2 ${m.sender === 'admin' ? 'text-right' : 'text-left'}`}>
+                                        <p className={`text-[9px] font-medium text-slate-400 mt-2 ${m.sender === 'admin' ? 'text-right' : 'text-left'}`}>
                                             {new Date(m.createdAt).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}
                                         </p>
                                     </div>

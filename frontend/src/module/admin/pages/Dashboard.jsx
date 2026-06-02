@@ -190,7 +190,7 @@ const Dashboard = () => {
                         <h1 className="text-2xl font-medium text-slate-900 tracking-tight flex items-center gap-3 uppercase">
                             Elite Control Room <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                         </h1>
-                        <p className="text-slate-400 font-bold uppercase tracking-normal text-[9px] mt-1 flex items-center gap-2">
+                        <p className="text-slate-400 font-medium uppercase tracking-normal text-[9px] mt-1 flex items-center gap-2">
                             <Monitor size={10} /> System Node 01 • <span className="text-emerald-500 font-medium">Online & Secured</span>
                         </p>
                     </div>
@@ -282,7 +282,7 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between mb-5">
                         <div>
                             <h2 className="text-[14px] font-medium uppercase tracking-tight flex items-center gap-2 text-slate-900"><Filter size={14} className="text-indigo-500" /> Conversion Funnel</h2>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-normal mt-0.5">User Journey Tracker</p>
+                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mt-0.5">User Journey Tracker</p>
                         </div>
                         <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center border border-slate-100 group-hover:scale-110 transition-transform"><Target size={16} className="text-indigo-500" /></div>
                     </div>
@@ -311,7 +311,7 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between mb-5">
                         <div>
                             <h2 className="text-[14px] font-medium text-slate-900 tracking-tight uppercase flex items-center gap-2"><ShieldAlert size={14} className="text-rose-500" /> Safety Guard</h2>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-normal mt-0.5">Anomaly Detection System</p>
+                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mt-0.5">Anomaly Detection System</p>
                         </div>
                         <div className="w-8 h-8 bg-rose-50 text-rose-500 rounded-lg flex items-center justify-center border border-rose-100"><ShieldQuestion size={16} /></div>
                     </div>
@@ -323,7 +323,7 @@ const Dashboard = () => {
                                      <div className={`w-2 h-2 rounded-full ${a.severity === 'high' ? 'bg-rose-500 animate-pulse' : a.severity === 'medium' ? 'bg-amber-500' : 'bg-sky-500'}`}></div>
                                      <div>
                                          <p className="text-[11px] font-medium text-slate-800 tracking-tight leading-none">@{a.user}</p>
-                                         <p className="text-[9px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">{a.reason}</p>
+                                         <p className="text-[9px] font-medium text-slate-400 mt-1 uppercase tracking-tighter">{a.reason}</p>
                                      </div>
                                 </div>
                                 <span className="text-[8px] font-medium text-slate-300 uppercase tracking-normal">{a.time}</span>
@@ -341,7 +341,7 @@ const Dashboard = () => {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 mb-6 relative z-10">
                         <div>
                             <h2 className="text-[14px] font-medium text-slate-900 tracking-tight uppercase flex items-center gap-2"><BarChart3 size={16} className="text-indigo-500" /> Engagement Matrix</h2>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-normal mt-0.5">Platform adoption velocity</p>
+                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mt-0.5">Platform adoption velocity</p>
                         </div>
                         <div className="flex gap-2 bg-slate-50 p-1 rounded-lg border border-slate-100">
                             {['daily', 'weekly'].map(t => (
@@ -456,7 +456,7 @@ const Dashboard = () => {
                         <div className="w-9 h-9 bg-[#FDF2D0] rounded-lg flex items-center justify-center text-[#856404] shadow-sm border border-[#F9E9B8] group-hover:scale-110 transition-transform"><Send size={16} /></div>
                         <div>
                             <h3 className="text-[13px] font-medium uppercase tracking-tight text-slate-900 leading-none">Broadcast</h3>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-normal mt-1">Global Announcement</p>
+                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mt-1">Global Announcement</p>
                         </div>
                     </div>
                     <div className="space-y-3 mb-4">
@@ -471,7 +471,7 @@ const Dashboard = () => {
                             value={broadcastMsg}
                             onChange={(e) => setBroadcastMsg(e.target.value)}
                             placeholder="Type message for all users..."
-                            className="w-full bg-slate-50 border border-slate-100 rounded-xl p-4 text-[11px] font-bold text-slate-600 placeholder-slate-300 h-24 focus:ring-1 focus:ring-amber-500 focus:bg-white outline-none resize-none transition-all"
+                            className="w-full bg-slate-50 border border-slate-100 rounded-xl p-4 text-[11px] font-medium text-slate-600 placeholder-slate-300 h-24 focus:ring-1 focus:ring-amber-500 focus:bg-white outline-none resize-none transition-all"
                         />
                     </div>
                     <button 
@@ -499,7 +499,7 @@ const Dashboard = () => {
                     <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between">
                         <div>
                             <h2 className="text-[12px] font-medium text-slate-800 uppercase tracking-tight">Global Payout Requests</h2>
-                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-normal mt-1">Pending verification batch</p>
+                            <p className="text-[8px] font-medium text-slate-400 uppercase tracking-normal mt-1">Pending verification batch</p>
                         </div>
                         <button onClick={() => navigate('/admin/withdrawals')} className="text-[9px] font-medium text-indigo-500 uppercase flex items-center gap-2 hover:gap-3 transition-all">Wallets <ChevronRight size={10} /></button>
                     </div>
@@ -525,7 +525,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Performance & Shortcuts */}
-                <div className="grid grid-cols-2 gap-3 h-full font-sans">
+                <div className="grid grid-cols-2 gap-3 h-full font-poppins">
                     <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm flex flex-col justify-between group">
                         <div className="flex justify-between items-start">
                              <div className="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center border border-emerald-100"><PieChart size={16} /></div>
@@ -533,7 +533,7 @@ const Dashboard = () => {
                         </div>
                         <div className="mt-3">
                              <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mb-1">Monthly Target</p>
-                             <h4 className="text-lg font-medium text-slate-900 tracking-tighter">₹4.82k <span className="text-[9px] font-bold text-slate-300">/ 6L</span></h4>
+                             <h4 className="text-lg font-medium text-slate-900 tracking-tighter">₹4.82k <span className="text-[9px] font-medium text-slate-300">/ 6L</span></h4>
                              <div className="w-full h-1 bg-slate-50 rounded-full mt-2 overflow-hidden">
                                  <div className="h-full bg-emerald-500 w-[82%] rounded-full shadow-lg shadow-emerald-100 transition-all duration-1000"></div>
                              </div>
@@ -550,7 +550,7 @@ const Dashboard = () => {
                         <div className="mt-3">
                              <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mb-1">Open Tickets</p>
                              <h4 className="text-base font-medium text-slate-900 tracking-tight">14 Active</h4>
-                             <p className="text-[8px] font-bold text-indigo-500 mt-1 flex items-center gap-1 uppercase tracking-normal">Respond Now <ChevronRight size={8} /></p>
+                             <p className="text-[8px] font-medium text-indigo-500 mt-1 flex items-center gap-1 uppercase tracking-normal">Respond Now <ChevronRight size={8} /></p>
                         </div>
                     </div>
 

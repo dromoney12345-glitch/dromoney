@@ -33,11 +33,11 @@ const PendingApproval = () => {
     );
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col items-center justify-center p-6 relative overflow-hidden font-outfit">
+        <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col items-center justify-center p-6 relative overflow-hidden font-poppins">
             <style>
                 {`
-                    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;400;700;900&display=swap');
-                    .font-outfit { font-family: 'Outfit', sans-serif; }
+                    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;700;900&display=swap');
+                    .font-poppins { font-family: 'Poppins', sans-serif !important; }
                 `}
             </style>
 
@@ -77,7 +77,7 @@ const PendingApproval = () => {
                     </div>
                 </div>
 
-                <h1 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">
+                <h1 className="text-2xl font-medium text-slate-900 mb-2 tracking-tight">
                     {status === 'pending' ? 'Verification Pending' : status === 'rejected' ? 'Verification Failed' : 'Account Verified'}
                 </h1>
                 
@@ -91,10 +91,10 @@ const PendingApproval = () => {
 
                 {status === 'pending' ? (
                     <div className="w-full space-y-4">
-                        <div className="w-full bg-slate-50 border border-slate-200 text-slate-400 font-black uppercase text-[11px] tracking-[0.2em] py-4.5 rounded-2xl shadow-inner">
+                        <div className="w-full bg-slate-50 border border-slate-200 text-slate-400 font-medium uppercase text-[11px] tracking-[0.2em] py-4.5 rounded-2xl shadow-inner">
                             Awaiting Admin Review
                         </div>
-                        <div className="flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        <div className="flex items-center justify-center gap-2 text-[10px] font-medium text-slate-400 uppercase tracking-widest">
                             <div className="w-1 h-1 bg-amber-500 rounded-full animate-pulse"></div>
                             Processing Live Queue
                         </div>
@@ -102,14 +102,14 @@ const PendingApproval = () => {
                 ) : status === 'rejected' ? (
                     <button 
                         onClick={() => navigate('/user/auth/kyc')}
-                        className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black uppercase text-[12px] tracking-[0.2em] py-4.5 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95 transition-all"
+                        className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-medium uppercase text-[12px] tracking-[0.2em] py-4.5 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95 transition-all"
                     >
                         Try Resubmitting <ChevronRight size={16} />
                     </button>
                 ) : (
                     <button 
                         onClick={() => navigate('/user/home')}
-                        className="w-full bg-[#0F172A] hover:bg-slate-800 text-white font-black uppercase text-[12px] tracking-[0.2em] py-4.5 rounded-2xl shadow-xl shadow-slate-200 transition-all active:scale-95"
+                        className="w-full bg-[#0F172A] hover:bg-slate-800 text-white font-medium uppercase text-[12px] tracking-[0.2em] py-4.5 rounded-2xl shadow-xl shadow-slate-200 transition-all active:scale-95"
                     >
                         Go to Dashboard
                     </button>

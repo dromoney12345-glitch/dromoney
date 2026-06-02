@@ -5,7 +5,6 @@ import {
 } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useAdmin } from '../context/AdminContext';
-import { openGallery } from '../../../../imageUploadUtils';
 
 const DocumentsCMS = () => {
     const { addNotification } = useAdmin();
@@ -149,7 +148,7 @@ const DocumentsCMS = () => {
                                 <div className="w-12 h-12 bg-sky-50 text-sky-500 rounded-2xl flex items-center justify-center"><Award size={24} /></div>
                                 <div>
                                     <h3 className="text-lg font-medium text-slate-800 tracking-tight uppercase">Onboarding Course Editor</h3>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-normal">Page {activeCoursePage} Content</p>
+                                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal">Page {activeCoursePage} Content</p>
                                 </div>
                             </div>
                             <button onClick={handleUpdateCourse} className="bg-slate-900 hover:bg-black text-white px-4 py-3.5 rounded-xl text-[10px] font-medium uppercase tracking-normal shadow-xl flex items-center gap-2 hover:scale-105 transition-all"><Save size={14} /> Save Page Changes</button>
@@ -162,19 +161,19 @@ const DocumentsCMS = () => {
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Page Title (Hindi)</label>
                                     <input value={courseData.page1.title || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page1.title = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-bold text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Introductory Text (Hindi)</label>
                                     <textarea value={courseData.page1.intro || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page1.intro = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-bold text-slate-500 h-28 outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
+                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-medium text-slate-500 h-28 outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Methods Section Heading (Hindi)</label>
                                     <input value={courseData.page1.methodsTitle || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page1.methodsTitle = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-bold text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                 </div>
 
                                 {/* Earning Methods List */}
@@ -197,7 +196,7 @@ const DocumentsCMS = () => {
                                                     <div key={pIdx} className="flex gap-2">
                                                         <input value={point} onChange={(e) => {
                                                             const nd = JSON.parse(JSON.stringify(courseData)); nd.page1.methods[mIdx].points[pIdx] = e.target.value; setCourseData(nd);
-                                                        }} className="flex-1 bg-white border border-slate-200 px-3 py-1.5 text-[12px] font-bold text-slate-500 outline-none rounded-lg" />
+                                                        }} className="flex-1 bg-white border border-slate-200 px-3 py-1.5 text-[12px] font-medium text-slate-500 outline-none rounded-lg" />
                                                         <button onClick={() => {
                                                             const nd = JSON.parse(JSON.stringify(courseData)); nd.page1.methods[mIdx].points.splice(pIdx, 1); setCourseData(nd);
                                                         }} className="text-rose-400 hover:text-rose-600"><Trash2 size={14} /></button>
@@ -229,7 +228,7 @@ const DocumentsCMS = () => {
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Page Title (Hindi)</label>
                                     <input value={courseData.page2.title || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page2.title = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-bold text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                 </div>
 
                                 {/* Download Assets Config */}
@@ -246,19 +245,18 @@ const DocumentsCMS = () => {
                                         
                                         <input value={courseData.page2.logoUrl || ''} onChange={(e) => {
                                             const nd = JSON.parse(JSON.stringify(courseData)); nd.page2.logoUrl = e.target.value; setCourseData(nd);
-                                        }} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-sky-500" placeholder="https://res.cloudinary.com/..." />
+                                        }} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-[11px] font-medium text-slate-700 outline-none focus:ring-2 focus:ring-sky-500" placeholder="https://res.cloudinary.com/..." />
                                         
                                         {/* File upload trigger */}
                                         <div 
                                             onClick={() => {
                                                 if (!uploadingLogo) {
-                                                    openGallery({
-                                                        onSelectFile: (file) => handleLogoUpload({ target: { files: [file] } })
-                                                    });
+                                                    document.getElementById('logoInput').click();
                                                 }
                                             }}
                                             className={`relative group/upload bg-white rounded-xl border-2 border-dashed border-slate-200 transition-all flex items-center justify-center py-2 px-4 shadow-sm z-10 ${uploadingLogo ? 'opacity-50 cursor-not-allowed' : 'hover:border-sky-500 cursor-pointer'}`}
                                         >
+                                            <input type="file" id="logoInput" className="hidden" accept="image/*" onChange={(e) => handleLogoUpload(e)} />
                                             <span className="text-[9px] font-medium uppercase tracking-normal text-slate-400 group-hover/upload:text-sky-500 flex items-center gap-1.5">
                                                 {uploadingLogo ? (
                                                     <>
@@ -279,8 +277,8 @@ const DocumentsCMS = () => {
                                         <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Call Script Doc Link</label>
                                         <input value={courseData.page2.callScriptLink || ''} onChange={(e) => {
                                             const nd = JSON.parse(JSON.stringify(courseData)); nd.page2.callScriptLink = e.target.value; setCourseData(nd);
-                                        }} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-sky-500" placeholder="https://docs.google.com/..." />
-                                        <p className="text-[9px] font-bold text-slate-400 leading-normal pl-1">
+                                        }} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-[11px] font-medium text-slate-700 outline-none focus:ring-2 focus:ring-sky-500" placeholder="https://docs.google.com/..." />
+                                        <p className="text-[9px] font-medium text-slate-400 leading-normal pl-1">
                                             Enter the full URL (Google Doc, PDF, etc.) that users will be redirected to when they click "View Calling Scripts" in Page 2.
                                         </p>
                                     </div>
@@ -305,7 +303,7 @@ const DocumentsCMS = () => {
                                             </div>
                                             <textarea value={step.details} onChange={(e) => {
                                                 const nd = JSON.parse(JSON.stringify(courseData)); nd.page2.steps[sIdx].details = e.target.value; setCourseData(nd);
-                                            }} className="w-full bg-white border border-slate-200 px-3 py-2 text-[11px] font-bold text-slate-500 h-16 outline-none rounded-xl resize-none" placeholder="Step description/Hindi guidelines" />
+                                            }} className="w-full bg-white border border-slate-200 px-3 py-2 text-[11px] font-medium text-slate-500 h-16 outline-none rounded-xl resize-none" placeholder="Step description/Hindi guidelines" />
                                         </div>
                                     ))}
                                     <button onClick={() => {
@@ -326,7 +324,7 @@ const DocumentsCMS = () => {
                                         <div key={tIdx} className="flex gap-2">
                                             <textarea value={template} onChange={(e) => {
                                                 const nd = JSON.parse(JSON.stringify(courseData)); nd.page2.templates[tIdx] = e.target.value; setCourseData(nd);
-                                            }} className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[12px] font-bold text-slate-600 outline-none focus:ring-2 focus:ring-sky-500 h-24 resize-none" />
+                                            }} className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[12px] font-medium text-slate-600 outline-none focus:ring-2 focus:ring-sky-500 h-24 resize-none" />
                                             <button onClick={() => {
                                                 const nd = JSON.parse(JSON.stringify(courseData)); nd.page2.templates.splice(tIdx, 1); setCourseData(nd);
                                             }} className="text-rose-400 hover:text-rose-600"><Trash2 size={16} /></button>
@@ -348,7 +346,7 @@ const DocumentsCMS = () => {
                                     }} className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-[13px] font-medium text-slate-800 outline-none" />
                                     <textarea value={courseData.page2.step5Details || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page2.step5Details = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-[12px] font-bold text-slate-500 h-20 outline-none resize-none" />
+                                    }} className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-[12px] font-medium text-slate-500 h-20 outline-none resize-none" />
                                 </div>
                             </div>
                         )}
@@ -360,7 +358,7 @@ const DocumentsCMS = () => {
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Page Title (Hindi)</label>
                                     <input value={courseData.page3.title || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page3.title = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-bold text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                 </div>
 
                                 {/* Daily Plan List */}
@@ -373,7 +371,7 @@ const DocumentsCMS = () => {
                                         <div key={idx} className="flex gap-2">
                                             <input value={plan} onChange={(e) => {
                                                 const nd = JSON.parse(JSON.stringify(courseData)); nd.page3.dailyPlans[idx] = e.target.value; setCourseData(nd);
-                                            }} className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[12px] font-bold text-slate-600 outline-none" />
+                                            }} className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[12px] font-medium text-slate-600 outline-none" />
                                             <button onClick={() => {
                                                 const nd = JSON.parse(JSON.stringify(courseData)); nd.page3.dailyPlans.splice(idx, 1); setCourseData(nd);
                                             }} className="text-rose-400 hover:text-rose-600"><Trash2 size={16} /></button>
@@ -421,7 +419,7 @@ const DocumentsCMS = () => {
                                         <div key={idx} className="flex gap-2">
                                             <input value={rule} onChange={(e) => {
                                                 const nd = JSON.parse(JSON.stringify(courseData)); nd.page3.rules[idx] = e.target.value; setCourseData(nd);
-                                            }} className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[12px] font-bold text-slate-600 outline-none" />
+                                            }} className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[12px] font-medium text-slate-600 outline-none" />
                                             <button onClick={() => {
                                                 const nd = JSON.parse(JSON.stringify(courseData)); nd.page3.rules.splice(idx, 1); setCourseData(nd);
                                             }} className="text-rose-400 hover:text-rose-600"><Trash2 size={16} /></button>
@@ -464,7 +462,7 @@ const DocumentsCMS = () => {
                                 {activeCoursePage === 1 && (
                                     <div className="space-y-4">
                                         <h2 className="text-md font-medium text-slate-800 leading-snug">{courseData.page1.title}</h2>
-                                        <p className="text-[11px] font-bold text-slate-500 leading-relaxed whitespace-pre-wrap">{courseData.page1.intro}</p>
+                                        <p className="text-[11px] font-medium text-slate-500 leading-relaxed whitespace-pre-wrap">{courseData.page1.intro}</p>
                                         
                                         <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm space-y-4">
                                             <h3 className="text-[11px] font-medium text-slate-700 uppercase tracking-tight">{courseData.page1.methodsTitle}</h3>
@@ -472,7 +470,7 @@ const DocumentsCMS = () => {
                                                 <div key={idx} className="space-y-1 pb-2 border-b border-slate-50 last:border-none">
                                                     <h4 className="text-[11px] font-medium text-sky-600">{m.title}</h4>
                                                     {m.points?.map((p, pIdx) => (
-                                                        <p key={pIdx} className="text-[10px] font-bold text-slate-400 pl-2">🔹 {p}</p>
+                                                        <p key={pIdx} className="text-[10px] font-medium text-slate-400 pl-2">🔹 {p}</p>
                                                     ))}
                                                 </div>
                                             ))}
@@ -492,7 +490,7 @@ const DocumentsCMS = () => {
                                                         <span className="text-[10px] font-medium text-orange-500 uppercase tracking-normal">{step.stepNum}</span>
                                                         <h3 className="text-[11px] font-medium text-slate-800">{step.title}</h3>
                                                     </div>
-                                                    <p className="text-[10px] font-bold text-slate-400 leading-relaxed whitespace-pre-wrap">{step.details}</p>
+                                                    <p className="text-[10px] font-medium text-slate-400 leading-relaxed whitespace-pre-wrap">{step.details}</p>
                                                     
                                                     {step.stepNum?.includes('Step 3') && (
                                                         <button className="w-full mt-2 py-2 bg-slate-900 text-white rounded-lg font-medium text-[9px] uppercase tracking-tight flex items-center justify-center gap-1">
@@ -506,7 +504,7 @@ const DocumentsCMS = () => {
                                         {/* Step 5 */}
                                         <div className="bg-amber-50 rounded-2xl border border-amber-100 p-4 space-y-2">
                                             <h3 className="text-[11px] font-medium text-amber-800 flex items-center gap-1"><AlertTriangle size={12} /> {courseData.page2.step5Title}</h3>
-                                            <p className="text-[10px] font-bold text-slate-600 leading-relaxed">{courseData.page2.step5Details}</p>
+                                            <p className="text-[10px] font-medium text-slate-600 leading-relaxed">{courseData.page2.step5Details}</p>
                                             <button className="w-full py-2 bg-amber-600 text-white rounded-lg font-medium text-[9px] uppercase tracking-normal flex items-center justify-center gap-1">
                                                 <Download size={10} /> Download Call Script
                                             </button>
@@ -517,7 +515,7 @@ const DocumentsCMS = () => {
                                             <h3 className="text-[11px] font-medium text-slate-700 uppercase tracking-normal">{courseData.page2.templatesTitle}</h3>
                                             {courseData.page2.templates?.map((t, idx) => (
                                                 <div key={idx} className="bg-slate-100 rounded-xl p-3 border border-slate-200 relative">
-                                                    <p className="text-[10px] font-bold text-slate-500 whitespace-pre-wrap">{t}</p>
+                                                    <p className="text-[10px] font-medium text-slate-500 whitespace-pre-wrap">{t}</p>
                                                     <button className="absolute top-2.5 right-2.5 w-6 h-6 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-sky-500 shadow-sm"><Copy size={10} /></button>
                                                 </div>
                                             ))}
@@ -535,7 +533,7 @@ const DocumentsCMS = () => {
                                             {courseData.page3.dailyPlans?.map((p, idx) => (
                                                 <div key={idx} className="flex items-center gap-2">
                                                     <div className="w-4 h-4 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500"><BookOpen size={8} /></div>
-                                                    <span className="text-[10px] font-bold text-slate-500">{p}</span>
+                                                    <span className="text-[10px] font-medium text-slate-500">{p}</span>
                                                 </div>
                                             ))}
                                         </div>
@@ -553,7 +551,7 @@ const DocumentsCMS = () => {
                                         <div className="bg-rose-50/50 rounded-2xl border border-rose-100 p-4 space-y-2">
                                             <h3 className="text-[11px] font-medium text-rose-800 flex items-center gap-1 uppercase tracking-tight"><AlertCircle size={12} /> {courseData.page3.rulesTitle}</h3>
                                             {courseData.page3.rules?.map((rule, idx) => (
-                                                <p key={idx} className="text-[10px] font-bold text-slate-600 leading-tight">🛑 {rule}</p>
+                                                <p key={idx} className="text-[10px] font-medium text-slate-600 leading-tight">🛑 {rule}</p>
                                             ))}
                                         </div>
                                     </div>

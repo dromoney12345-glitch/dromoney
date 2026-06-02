@@ -172,7 +172,7 @@ const MemoryMasterView = () => {
                     <button onClick={() => navigate('/user/events')} className="p-2 bg-white/10 rounded-full backdrop-blur transition-all active:scale-90">
                         <ChevronLeft size={24} className="text-white" />
                     </button>
-                    <h1 className="text-xl font-black tracking-tight uppercase">🧩 Memory Master</h1>
+                    <h1 className="text-xl font-medium tracking-tight uppercase">🧩 Memory Master</h1>
                 </header>
 
                 <div className="flex-1 flex flex-col items-center justify-center space-y-8 text-center pt-10">
@@ -186,32 +186,32 @@ const MemoryMasterView = () => {
                     </div>
 
                     <div className="space-y-3">
-                        <h2 className="text-4xl font-black leading-tight bg-gradient-to-r from-white to-indigo-300 bg-clip-text text-transparent">Train Your Brain,<br />Win Coins!</h2>
-                        <p className="text-white/60 font-bold text-sm max-w-xs mx-auto leading-relaxed">
+                        <h2 className="text-4xl font-medium leading-tight bg-gradient-to-r from-white to-indigo-300 bg-clip-text text-transparent">Train Your Brain,<br />Win Coins!</h2>
+                        <p className="text-white/60 font-medium text-sm max-w-xs mx-auto leading-relaxed">
                             Match all {cardIcons.length} pairs of cards as fast as you can. Every second saved gives you more coins! 🧠✨
                         </p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
                         <div className="bg-white/5 p-4 rounded-3xl border border-white/10 backdrop-blur">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">Pairs</p>
-                            <p className="text-2xl font-black text-indigo-400">{cardIcons.length} Pairs</p>
+                            <p className="text-[10px] font-medium uppercase tracking-widest text-white/40 mb-1">Pairs</p>
+                            <p className="text-2xl font-medium text-indigo-400">{cardIcons.length} Pairs</p>
                         </div>
                         <div className="bg-white/5 p-4 rounded-3xl border border-white/10 backdrop-blur">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">Max Time</p>
-                            <p className="text-2xl font-black text-rose-400">{maxTime}s</p>
+                            <p className="text-[10px] font-medium uppercase tracking-widest text-white/40 mb-1">Max Time</p>
+                            <p className="text-2xl font-medium text-rose-400">{maxTime}s</p>
                         </div>
                     </div>
                 </div>
 
                 <div className="mt-auto space-y-4">
-                     <div className="flex items-center gap-2 bg-indigo-500/10 p-4 rounded-2xl border border-indigo-500/20 text-indigo-300 text-[10px] font-bold">
+                     <div className="flex items-center gap-2 bg-indigo-500/10 p-4 rounded-2xl border border-indigo-500/20 text-indigo-300 text-[10px] font-medium">
                         <Sparkles size={16} />
                         TIP: You will get {peekTime} seconds to see all cards at the start. Watch closely!
                     </div>
                     <button
                         onClick={initializeGame}
-                        className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-5 rounded-[2rem] font-black text-lg uppercase tracking-widest shadow-2xl shadow-indigo-500/30 active:scale-[0.98] transition-all"
+                        className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-5 rounded-[2rem] font-medium text-lg uppercase tracking-widest shadow-2xl shadow-indigo-500/30 active:scale-[0.98] transition-all"
                     >
                         🚀 Enter Game
                     </button>
@@ -226,21 +226,21 @@ const MemoryMasterView = () => {
             {/* HUD */}
             <div className="p-6 flex items-center justify-between z-10">
                 <div className="flex flex-col">
-                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Status</span>
+                    <span className="text-[10px] font-medium text-white/40 uppercase tracking-widest mb-1">Status</span>
                     <div className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${step === 1 ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400'}`} />
-                        <span className="text-sm font-black uppercase">{step === 1 ? 'Remembering...' : 'Playing'}</span>
+                        <span className="text-sm font-medium uppercase">{step === 1 ? 'Remembering...' : 'Playing'}</span>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                     <div className="bg-white/5 rounded-2xl p-3 border border-white/10 text-center min-w-[70px]">
-                        <p className="text-[9px] font-black text-white/30 uppercase mb-0.5">Time</p>
-                        <p className={`text-xl font-black ${timeLeft < 10 ? 'text-rose-500 animate-pulse' : 'text-white'}`}>{timeLeft}s</p>
+                        <p className="text-[9px] font-medium text-white/30 uppercase mb-0.5">Time</p>
+                        <p className={`text-xl font-medium ${timeLeft < 10 ? 'text-rose-500 animate-pulse' : 'text-white'}`}>{timeLeft}s</p>
                     </div>
                     <div className="bg-white/5 rounded-2xl p-3 border border-white/10 text-center min-w-[70px]">
-                        <p className="text-[9px] font-black text-white/30 uppercase mb-0.5">Pairs</p>
-                        <p className="text-xl font-black text-indigo-400">{matched.length}/{cardIcons.length}</p>
+                        <p className="text-[9px] font-medium text-white/30 uppercase mb-0.5">Pairs</p>
+                        <p className="text-xl font-medium text-indigo-400">{matched.length}/{cardIcons.length}</p>
                     </div>
                 </div>
             </div>
@@ -291,8 +291,8 @@ const MemoryMasterView = () => {
                     />
                 </div>
                 <div className="flex justify-between items-center px-1">
-                    <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Efficiency: {moves > 0 ? Math.round((matched.length/moves)*100) : 0}%</p>
-                    <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Moves: {moves}</p>
+                    <p className="text-[10px] font-medium text-white/30 uppercase tracking-widest">Efficiency: {moves > 0 ? Math.round((matched.length/moves)*100) : 0}%</p>
+                    <p className="text-[10px] font-medium text-white/30 uppercase tracking-widest">Moves: {moves}</p>
                 </div>
             </div>
 
@@ -303,8 +303,8 @@ const MemoryMasterView = () => {
                         <Trophy size={48} className="text-amber-900" />
                     </div>
                     
-                    <h2 className="text-4xl font-black mb-2">{timeLeft > 0 ? 'Brainy Victory! 🧠' : 'Time\'s Up!'}</h2>
-                    <p className="text-white/50 font-bold mb-10">
+                    <h2 className="text-4xl font-medium mb-2">{timeLeft > 0 ? 'Brainy Victory! 🧠' : 'Time\'s Up!'}</h2>
+                    <p className="text-white/50 font-medium mb-10">
                         {timeLeft > 0 
                             ? `Awesome! You cleared the board in ${maxTime - timeLeft} seconds.` 
                             : 'So close! Try to be focus and faster next time.'
@@ -313,14 +313,14 @@ const MemoryMasterView = () => {
 
                     <div className="grid grid-cols-2 gap-4 w-full max-w-xs mb-10">
                          <div className="bg-white/5 p-5 rounded-[2rem] border border-white/10">
-                            <p className="text-[9px] font-black text-white/40 uppercase mb-1">Remaining</p>
-                            <p className="text-2xl font-black text-amber-400">{timeLeft}s</p>
+                            <p className="text-[9px] font-medium text-white/40 uppercase mb-1">Remaining</p>
+                            <p className="text-2xl font-medium text-amber-400">{timeLeft}s</p>
                         </div>
                         <div className="bg-white/5 p-5 rounded-[2rem] border border-white/10">
-                            <p className="text-[9px] font-black text-white/40 uppercase mb-1">Prize</p>
+                            <p className="text-[9px] font-medium text-white/40 uppercase mb-1">Prize</p>
                             <div className="flex items-center justify-center gap-1.5">
                                 <Coins size={14} className="text-amber-400" />
-                                <p className="text-2xl font-black text-white">+{Math.max(10, Math.floor((timeLeft / maxTime) * 100))}</p>
+                                <p className="text-2xl font-medium text-white">+{Math.max(10, Math.floor((timeLeft / maxTime) * 100))}</p>
                             </div>
                         </div>
                     </div>
@@ -328,13 +328,13 @@ const MemoryMasterView = () => {
                     <div className="w-full space-y-3">
                         <button
                             onClick={() => navigate('/user/events')}
-                            className="w-full bg-white text-slate-900 py-5 rounded-[2rem] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3"
+                            className="w-full bg-white text-slate-900 py-5 rounded-[2rem] font-medium uppercase tracking-widest shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3"
                         >
                             Back to Events <ArrowRight size={20} />
                         </button>
                         <button
                             onClick={() => setStep(0)}
-                            className="w-full bg-white/5 text-white/60 py-4 rounded-[2rem] font-black uppercase tracking-widest flex items-center justify-center gap-3"
+                            className="w-full bg-white/5 text-white/60 py-4 rounded-[2rem] font-medium uppercase tracking-widest flex items-center justify-center gap-3"
                         >
                             <RefreshCcw size={16} /> Try Again
                         </button>

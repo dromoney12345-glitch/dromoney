@@ -95,9 +95,9 @@ const ScratchCard = ({ onComplete, rewardPerCard, quote }) => {
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-1 shadow-2xl ${isScratched ? 'bg-white/20' : 'bg-amber-50'}`}>
                     <Coins size={18} className={isScratched ? 'text-white' : 'text-amber-500'} />
                 </div>
-                <p className={`text-[15px] font-black tracking-tight ${isScratched ? 'text-white' : 'text-slate-800'}`}>+{rewardPerCard} Coins</p>
+                <p className={`text-[15px] font-medium tracking-tight ${isScratched ? 'text-white' : 'text-slate-800'}`}>+{rewardPerCard} Coins</p>
                 <div className={`h-[1px] w-8 my-1.5 ${isScratched ? 'bg-white/30' : 'bg-slate-100'}`}></div>
-                <p className={`text-[9px] font-bold italic leading-tight px-1 ${isScratched ? 'text-white/80' : 'text-slate-400'}`}>"{quote}"</p>
+                <p className={`text-[9px] font-medium italic leading-tight px-1 ${isScratched ? 'text-white/80' : 'text-slate-400'}`}>"{quote}"</p>
             </div>
 
             <canvas
@@ -163,13 +163,13 @@ const ScratchCardView = () => {
                         <ChevronLeft size={22} className="text-slate-600" />
                     </button>
                     <div>
-                        <h1 className="text-[19px] font-black text-slate-800 tracking-tighter leading-none">{task.title}</h1>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Daily Lucky Board</p>
+                        <h1 className="text-[19px] font-medium text-slate-800 tracking-tighter leading-none">{task.title}</h1>
+                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-1">Daily Lucky Board</p>
                     </div>
                 </div>
                 <div className="bg-slate-900 px-5 py-2.5 rounded-[1.25rem] shadow-xl flex flex-col items-center">
-                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em] leading-none mb-1">DONE</span>
-                    <span className="text-[15px] font-black text-white leading-none tracking-tight">{completedCount}/3</span>
+                    <span className="text-[8px] font-medium text-slate-500 uppercase tracking-[0.2em] leading-none mb-1">DONE</span>
+                    <span className="text-[15px] font-medium text-white leading-none tracking-tight">{completedCount}/3</span>
                 </div>
             </header>
 
@@ -178,8 +178,8 @@ const ScratchCardView = () => {
                     <div className="w-14 h-14 bg-amber-50 rounded-[1.25rem] flex items-center justify-center mx-auto mb-4 border border-amber-100 shadow-sm transition-transform group-hover:scale-110">
                         <Sparkles size={28} className="text-amber-500" />
                     </div>
-                    <h2 className="text-2xl font-black text-slate-800 mb-1 tracking-tight">Rub & Reveal!</h2>
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-none">Scratch all 3 silver cards</p>
+                    <h2 className="text-2xl font-medium text-slate-800 mb-1 tracking-tight">Rub & Reveal!</h2>
+                    <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest leading-none">Scratch all 3 silver cards</p>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 w-full">
@@ -196,7 +196,7 @@ const ScratchCardView = () => {
                 <div className="w-full">
                     {completedCount < 3 ? (
                         <div className="bg-white/60 backdrop-blur-sm border border-slate-100 p-5 rounded-[2rem] text-center shadow-sm">
-                            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest">
                                 Scratch every card to reveal your total prize
                             </p>
                         </div>
@@ -206,10 +206,10 @@ const ScratchCardView = () => {
                             <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-4 border border-emerald-100 relative z-10">
                                 <Trophy size={32} className="text-emerald-500" />
                             </div>
-                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight relative z-10">All Cards Done!</h3>
+                            <h3 className="text-lg font-medium text-slate-800 uppercase tracking-tight relative z-10">All Cards Done!</h3>
                             <button
                                 onClick={() => navigate('/user/earn')}
-                                className="mt-6 w-full bg-blue-600 text-white font-black text-[12px] uppercase tracking-[0.3em] py-5 rounded-2xl shadow-xl shadow-blue-500/20 active:scale-95 transition-all relative z-10"
+                                className="mt-6 w-full bg-blue-600 text-white font-medium text-[12px] uppercase tracking-[0.3em] py-5 rounded-2xl shadow-xl shadow-blue-500/20 active:scale-95 transition-all relative z-10"
                             >
                                 Submit & Go Back
                             </button>

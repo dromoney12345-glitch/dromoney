@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { MonitorPlay, Plus, Trash2, Clock, Coins, X, Link as LinkIcon, Edit3, Image as ImageIcon, Video, CheckCircle2, Save } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import api from '../../shared/services/api';
-import { openGallery } from '../../../../imageUploadUtils';
 
 const WatchAndEarnAdmin = () => {
     const [ads, setAds] = useState([]);
@@ -233,11 +232,11 @@ const WatchAndEarnAdmin = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-medium text-slate-500 uppercase tracking-[0.25em] ml-1">Card Heading</label>
-                                            <input value={introVideo.title} onChange={(e) => setIntroVideo({...introVideo, title: e.target.value})} className="w-full bg-white/5 border border-slate-800 rounded-2xl p-4 text-sm font-bold text-white focus:outline-none focus:border-indigo-500 transition-all outline-none" />
+                                            <input value={introVideo.title} onChange={(e) => setIntroVideo({...introVideo, title: e.target.value})} className="w-full bg-white/5 border border-slate-800 rounded-2xl p-4 text-sm font-medium text-white focus:outline-none focus:border-indigo-500 transition-all outline-none" />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-medium text-slate-500 uppercase tracking-[0.25em] ml-1">Card Subtitle</label>
-                                            <input value={introVideo.subtitle} onChange={(e) => setIntroVideo({...introVideo, subtitle: e.target.value})} className="w-full bg-white/5 border border-slate-800 rounded-2xl p-4 text-sm font-bold text-white focus:outline-none focus:border-indigo-500 transition-all outline-none" />
+                                            <input value={introVideo.subtitle} onChange={(e) => setIntroVideo({...introVideo, subtitle: e.target.value})} className="w-full bg-white/5 border border-slate-800 rounded-2xl p-4 text-sm font-medium text-white focus:outline-none focus:border-indigo-500 transition-all outline-none" />
                                         </div>
                                     </div>
                                     
@@ -245,7 +244,7 @@ const WatchAndEarnAdmin = () => {
                                         <label className="text-[10px] font-medium text-slate-500 uppercase tracking-[0.25em] ml-1">Direct Video URL (.mp4)</label>
                                         <div className="relative">
                                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"><LinkIcon size={18} /></div>
-                                            <input value={introVideo.videoUrl} onChange={(e) => setIntroVideo({...introVideo, videoUrl: e.target.value})} className="w-full bg-white/5 border border-slate-800 rounded-2xl py-4 pr-4 pl-12 pl-12-override text-sm font-bold text-white focus:outline-none focus:border-indigo-500 transition-all outline-none" placeholder="https://..." />
+                                            <input value={introVideo.videoUrl} onChange={(e) => setIntroVideo({...introVideo, videoUrl: e.target.value})} className="w-full bg-white/5 border border-slate-800 rounded-2xl py-4 pr-4 pl-12 pl-12-override text-sm font-medium text-white focus:outline-none focus:border-indigo-500 transition-all outline-none" placeholder="https://..." />
                                         </div>
                                         <div className="absolute right-2 top-[38px]">
                                              <input 
@@ -269,17 +268,22 @@ const WatchAndEarnAdmin = () => {
                                         <div className="flex gap-3">
                                             <div className="relative flex-1">
                                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"><ImageIcon size={18} /></div>
-                                                <input value={introVideo.thumbnailUrl} onChange={(e) => setIntroVideo({...introVideo, thumbnailUrl: e.target.value})} className="w-full bg-white/5 border border-slate-800 rounded-2xl py-4 pr-4 pl-12 pl-12-override text-sm font-bold text-white focus:outline-none focus:border-indigo-500 transition-all outline-none" placeholder="https://..." />
+                                                <input value={introVideo.thumbnailUrl} onChange={(e) => setIntroVideo({...introVideo, thumbnailUrl: e.target.value})} className="w-full bg-white/5 border border-slate-800 rounded-2xl py-4 pr-4 pl-12 pl-12-override text-sm font-medium text-white focus:outline-none focus:border-indigo-500 transition-all outline-none" placeholder="https://..." />
                                             </div>
                                             <div className="relative">
-                                                <div 
-                                                    onClick={() => !isUploading && openGallery({
-                                                        onSelectFile: (file) => handleFileUpload({ target: { files: [file] } }, 'intro', 'thumbnail')
-                                                    })}
+                                                <input 
+                                                    type="file" 
+                                                    id="intro-thumbnail-upload" 
+                                                    className="hidden" 
+                                                    accept="image/*"
+                                                    onChange={(e) => handleFileUpload(e, 'intro', 'thumbnail')}
+                                                />
+                                                <label 
+                                                    htmlFor="intro-thumbnail-upload"
                                                     className={`h-[54px] px-4 rounded-2xl flex items-center justify-center gap-2 text-[11px] font-medium uppercase tracking-normal cursor-pointer transition-all ${isUploading ? 'bg-slate-800 text-slate-600 cursor-not-allowed' : 'bg-white/10 text-white hover:bg-white/20 border border-slate-700'}`}
                                                 >
                                                     {isUploading ? '...' : <><Plus size={16} /> Upload</>}
-                                                </div>
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
@@ -291,7 +295,7 @@ const WatchAndEarnAdmin = () => {
                                             </div>
                                             <div>
                                                 <h4 className="text-[12px] font-medium text-white uppercase tracking-normal">Dashboard Visibility</h4>
-                                                <p className="text-[10px] font-bold text-slate-400 mt-1 max-w-[200px]">When active, this video replaces the Future Fund card on user dashboard.</p>
+                                                <p className="text-[10px] font-medium text-slate-400 mt-1 max-w-[200px]">When active, this video replaces the Future Fund card on user dashboard.</p>
                                             </div>
                                         </div>
                                         <button
@@ -355,7 +359,7 @@ const WatchAndEarnAdmin = () => {
                                     {/* Home Bar */}
                                     <div className="w-24 h-1 bg-slate-200 rounded-full mx-auto mt-6 opacity-40"></div>
                                 </div>
-                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-normal leading-relaxed">Live Mobile Dashboard Preview</p>
+                                <p className="text-[11px] font-medium text-slate-500 uppercase tracking-normal leading-relaxed">Live Mobile Dashboard Preview</p>
                             </div>
                         </div>
                     </div>
@@ -366,7 +370,7 @@ const WatchAndEarnAdmin = () => {
                     <div className="flex justify-between items-center bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
                         <div>
                             <h3 className="text-xl font-medium text-slate-800 tracking-tight uppercase mb-1">Active Ad Campaigns</h3>
-                            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-normal">Total {ads.length} campaigns running globally</p>
+                            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-normal">Total {ads.length} campaigns running globally</p>
                         </div>
                         <button 
                             onClick={() => {
@@ -405,7 +409,7 @@ const WatchAndEarnAdmin = () => {
                                             <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-slate-400 shadow-sm">
                                                 <Video size={16} />
                                             </div>
-                                            <p className="text-[11px] font-bold text-slate-500 truncate">{ad.videoUrl}</p>
+                                            <p className="text-[11px] font-medium text-slate-500 truncate">{ad.videoUrl}</p>
                                         </div>
                                         <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-2xl border border-emerald-100/50">
                                             <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-emerald-500 shadow-sm">
@@ -447,7 +451,7 @@ const WatchAndEarnAdmin = () => {
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-medium text-slate-800 uppercase tracking-tight leading-none">{editId ? 'Modify Campaign' : 'Initialize Campaign'}</h3>
-                                    <p className="text-[11px] font-bold text-indigo-500 uppercase tracking-normal mt-2">{editId ? 'Update existing ad task' : 'Set coins and watch duration'}</p>
+                                    <p className="text-[11px] font-medium text-indigo-500 uppercase tracking-normal mt-2">{editId ? 'Update existing ad task' : 'Set coins and watch duration'}</p>
                                 </div>
                             </div>
                             <button onClick={handleCloseModal} className="w-12 h-12 bg-white text-slate-400 hover:text-slate-800 hover:shadow-md rounded-2xl transition-all flex items-center justify-center shadow-sm"><X size={30}/></button>
@@ -460,7 +464,7 @@ const WatchAndEarnAdmin = () => {
                                     required
                                     type="text"
                                     placeholder="Enter ad campaign name"
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-[22px] p-5 text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500 transition-all outline-none"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-[22px] p-5 text-sm font-medium text-slate-800 focus:outline-none focus:border-indigo-500 transition-all outline-none"
                                     value={adForm.title || ''}
                                     onChange={(e) => setAdForm(prev => ({...prev, title: e.target.value}))}
                                 />
@@ -475,7 +479,7 @@ const WatchAndEarnAdmin = () => {
                                             required
                                             type="number"
                                             placeholder="50"
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-[22px] py-3 pr-5 pl-14 pl-14-override text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-[22px] py-3 pr-5 pl-14 pl-14-override text-sm font-medium text-slate-800 focus:outline-none focus:border-indigo-500"
                                             value={adForm.coins || ''}
                                             onChange={(e) => setAdForm(prev => ({...prev, coins: e.target.value}))}
                                         />
@@ -491,12 +495,12 @@ const WatchAndEarnAdmin = () => {
                                             min="30"
                                             max="60"
                                             placeholder="30"
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-[22px] py-3 pr-5 pl-14 pl-14-override text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-[22px] py-3 pr-5 pl-14 pl-14-override text-sm font-medium text-slate-800 focus:outline-none focus:border-indigo-500"
                                             value={adForm.duration || ''}
                                             onChange={(e) => setAdForm(prev => ({...prev, duration: e.target.value}))}
                                         />
                                     </div>
-                                    <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wide ml-1">Must be between 30 and 60 seconds</p>
+                                    <p className="text-[8px] font-medium text-slate-400 uppercase tracking-wide ml-1">Must be between 30 and 60 seconds</p>
                                 </div>
                             </div>
 
@@ -509,19 +513,24 @@ const WatchAndEarnAdmin = () => {
                                                 required
                                                 type="url"
                                                 placeholder="Paste image link..."
-                                                className="flex-1 bg-slate-50 border border-slate-200 rounded-[22px] p-5 text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500 transition-all outline-none"
+                                                className="flex-1 bg-slate-50 border border-slate-200 rounded-[22px] p-5 text-sm font-medium text-slate-800 focus:outline-none focus:border-indigo-500 transition-all outline-none"
                                                 value={adForm.thumbnail || ''}
                                                 onChange={(e) => setAdForm(prev => ({...prev, thumbnail: e.target.value}))}
                                             />
                                             <div className="relative">
-                                                <div 
-                                                    onClick={() => !isUploading && openGallery({
-                                                        onSelectFile: (file) => handleFileUpload({ target: { files: [file] } }, 'ad', 'thumbnail')
-                                                    })}
+                                                <input 
+                                                    type="file" 
+                                                    id="ad-thumbnail-upload" 
+                                                    className="hidden" 
+                                                    accept="image/*"
+                                                    onChange={(e) => handleFileUpload(e, 'ad', 'thumbnail')}
+                                                />
+                                                <label 
+                                                    htmlFor="ad-thumbnail-upload"
                                                     className={`h-[62px] px-5 rounded-[22px] flex items-center justify-center gap-1.5 text-[10px] font-medium uppercase tracking-normal cursor-pointer transition-all ${isUploading ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200'}`}
                                                 >
                                                     {isUploading ? '...' : <><ImageIcon size={14} /> Upload</>}
-                                                </div>
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
@@ -532,7 +541,7 @@ const WatchAndEarnAdmin = () => {
                                             required
                                             type="url"
                                             placeholder="Paste video link here..."
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-[22px] p-5 text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500 transition-all outline-none"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-[22px] p-5 text-sm font-medium text-slate-800 focus:outline-none focus:border-indigo-500 transition-all outline-none"
                                             value={adForm.videoUrl || ''}
                                             onChange={(e) => setAdForm(prev => ({...prev, videoUrl: e.target.value}))}
                                         />

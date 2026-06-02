@@ -251,7 +251,7 @@ const LayoutManager = () => {
                                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Instructions (Hindi)</label>
                                                 <textarea value={step.desc} onChange={(e) => {
                                                     const ns = [...navbarSections]; ns[sIdx].steps[stepIdx].desc = e.target.value; setNavbarSections(ns);
-                                                }} className="w-full bg-white border border-slate-100 rounded-2xl px-5 py-4 text-[12px] font-bold text-slate-500 h-28 outline-none focus:ring-2 focus:ring-sky-500 resize-none shadow-sm" />
+                                                }} className="w-full bg-white border border-slate-100 rounded-2xl px-5 py-4 text-[12px] font-medium text-slate-500 h-28 outline-none focus:ring-2 focus:ring-sky-500 resize-none shadow-sm" />
                                             </div>
                                         </div>
                                     </div>
@@ -278,7 +278,7 @@ const LayoutManager = () => {
                                             <div className={`p-4 rounded-2xl bg-slate-50 ${item.color}`}><item.icon size={28} /></div>
                                             <div>
                                                 <h3 className="text-lg font-medium text-slate-800 uppercase tracking-tight">{item.label}</h3>
-                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-normal mt-0.5">Edit path and page content</p>
+                                                <p className="text-[10px] text-slate-400 font-medium uppercase tracking-normal mt-0.5">Edit path and page content</p>
                                             </div>
                                         </div>
                                         <div className="p-6 bg-slate-50/50 rounded-[28px] border border-slate-50 space-y-4">
@@ -307,7 +307,7 @@ const LayoutManager = () => {
                                             onChange={(e) => {
                                                 const nf = [...footerPolicies]; nf[idx].content = e.target.value; setFooterPolicies(nf);
                                             }}
-                                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-5 text-[13px] font-bold text-slate-700 h-[220px] outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all resize-none shadow-inner"
+                                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-5 text-[13px] font-medium text-slate-700 h-[220px] outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all resize-none shadow-inner"
                                             placeholder={`Write full text for ${item.label}...`}
                                         />
                                     </div>

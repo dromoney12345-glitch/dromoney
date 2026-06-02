@@ -18,7 +18,7 @@ const History = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] flex flex-col relative overflow-hidden font-sans">
+        <div className="min-h-screen bg-[#F8FAFC] flex flex-col relative overflow-hidden font-poppins">
             {/* --- Premium Background Decorative Elements --- */}
             <div className="absolute top-[-5%] left-[-5%] w-[40%] h-[30%] bg-emerald-100/30 blur-[100px] rounded-full"></div>
             <div className="absolute top-[15%] right-[-5%] w-[40%] h-[30%] bg-sky-100/30 blur-[100px] rounded-full"></div>
@@ -45,7 +45,7 @@ const History = () => {
                                     <span className="text-[10px] font-normal text-white/40 uppercase tracking-[0.2em]">Platinum Member</span>
                                 </div>
                                 <div className="text-right">
-                                    <h3 className="font-bold text-[14px] italic tracking-widest">
+                                    <h3 className="font-medium text-[14px] italic tracking-widest">
                                         <span className="text-[#8B4513]">DRO</span>
                                         <span className="text-white">MONEY</span>
                                     </h3>

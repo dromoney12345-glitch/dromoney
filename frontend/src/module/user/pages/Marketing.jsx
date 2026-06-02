@@ -55,7 +55,7 @@ const Marketing = () => {
 
     if (showReferralLink) {
         return (
-            <div className="flex flex-col min-h-fit bg-[#f0f4f9] font-sans pb-20">
+            <div className="flex flex-col min-h-fit bg-[#f0f4f9] font-poppins pb-20">
                 {/* ── Compact Header ── */}
                 <div className="bg-white px-5 py-2.5 flex items-center justify-between border-b border-slate-100 sticky top-0 z-40">
                     <div className="flex items-center gap-3">
@@ -63,12 +63,12 @@ const Marketing = () => {
                             <ChevronLeft size={22} />
                         </button>
                         <div className="flex flex-col">
-                            <h1 className="text-[16px] font-bold text-slate-800 tracking-tight leading-none">Affiliate Center</h1>
-                            <p className="text-[9px] font-bold text-sky-600 uppercase tracking-widest mt-0.5">Share & Earn</p>
+                            <h1 className="text-[16px] font-medium text-slate-800 tracking-tight leading-none">Affiliate Center</h1>
+                            <p className="text-[9px] font-medium text-sky-600 uppercase tracking-widest mt-0.5">Share & Earn</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 border border-emerald-100">
-                        <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">Active</span>
+                        <span className="text-[9px] font-medium text-emerald-600 uppercase tracking-widest">Active</span>
                     </div>
                 </div>
 
@@ -80,7 +80,7 @@ const Marketing = () => {
                                 <Users size={22} />
                             </div>
                             <div>
-                                <h3 className="text-[15px] font-bold text-slate-800 leading-tight">Affiliate Program</h3>
+                                <h3 className="text-[15px] font-medium text-slate-800 leading-tight">Affiliate Program</h3>
                                 <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider mt-1 flex items-center gap-1">
                                     ₹{rewardAmount} Reward per referral <CheckCircle2 size={10} className="text-emerald-500" />
                                 </p>
@@ -94,7 +94,7 @@ const Marketing = () => {
                             </p>
                             <button
                                 onClick={handleCopy}
-                                className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 shrink-0
+                                className={`px-4 py-2 text-[10px] font-medium uppercase tracking-widest transition-all active:scale-95 shrink-0
                                     ${copied ? 'bg-emerald-500 text-white' : 'bg-white text-blue-600 border-l border-slate-200'}`}
                             >
                                 {copied ? 'COPIED' : 'COPY'}
@@ -103,7 +103,7 @@ const Marketing = () => {
 
                         <button 
                             onClick={handleInvite}
-                            className="w-full bg-[#1e293b] hover:bg-black active:scale-95 text-white font-bold uppercase tracking-widest py-3.5 rounded-none flex items-center justify-center gap-2.5 transition-all text-[11px] shadow-md"
+                            className="w-full bg-[#1e293b] hover:bg-black active:scale-95 text-white font-medium uppercase tracking-widest py-3.5 rounded-none flex items-center justify-center gap-2.5 transition-all text-[11px] shadow-md"
                         >
                             <Send size={16} className="rotate-[-20deg]" />
                             INVITE & EARN NOW
@@ -116,17 +116,17 @@ const Marketing = () => {
                             <div className="w-8 h-8 bg-slate-50 border border-slate-100 flex items-center justify-center">
                                 <Users size={16} className="text-blue-500" />
                             </div>
-                            <span className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Total Members</span>
+                            <span className="text-[11px] font-medium text-slate-800 uppercase tracking-widest">Total Members</span>
                         </div>
-                        <span className="text-[13px] font-bold text-slate-900">{userData?.referrals?.count || 0} Participants</span>
+                        <span className="text-[13px] font-medium text-slate-900">{userData?.referrals?.count || 0} Participants</span>
                     </div>
 
                     {/* ── Earnings Section (Payment Style) ── */}
                     <div className="bg-white border-y border-slate-100 p-5">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex flex-col">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] mb-1">Total Affiliate Earnings</span>
-                                <h4 className="text-2xl font-bold text-slate-800 tracking-tighter">₹{Number(userData?.earnings?.referral || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</h4>
+                                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.15em] mb-1">Total Affiliate Earnings</span>
+                                <h4 className="text-2xl font-medium text-slate-800 tracking-tighter">₹{Number(userData?.earnings?.referral || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</h4>
                             </div>
                             <div className="w-10 h-10 bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
                                 <Wallet size={20} />
@@ -138,7 +138,7 @@ const Marketing = () => {
                             className="w-full bg-slate-50 border border-slate-200 py-3 flex items-center justify-center gap-2 hover:bg-slate-100 active:scale-95 transition-all group"
                         >
                             <History size={16} className="text-slate-400" />
-                            <span className="text-[10px] font-bold text-slate-700 uppercase tracking-widest">Transaction History</span>
+                            <span className="text-[10px] font-medium text-slate-700 uppercase tracking-widest">Transaction History</span>
                             <ArrowUpRight size={14} className="text-slate-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
                         </button>
                     </div>
@@ -146,7 +146,7 @@ const Marketing = () => {
                     {/* ── Information Strip ── */}
                     <div className="px-5 py-4">
                         <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
-                            <h5 className="text-[11px] font-bold text-blue-800 uppercase tracking-wider mb-1">How it works</h5>
+                            <h5 className="text-[11px] font-medium text-blue-800 uppercase tracking-wider mb-1">How it works</h5>
                             <p className="text-[10px] font-medium text-blue-600 leading-relaxed">
                                 Share your referral link with friends. When they join and verify their account, you instantly receive ₹200 in your wallet.
                             </p>
@@ -159,7 +159,7 @@ const Marketing = () => {
 
     // Otherwise show the 4 cards Information Center (guide to earning systems)
     return (
-        <div className="flex flex-col min-h-fit bg-[#F8FAFC] font-sans pb-24 relative overflow-hidden">
+        <div className="flex flex-col min-h-fit bg-[#F8FAFC] font-poppins pb-24 relative overflow-hidden">
             {/* ── Header ── */}
             <div className="bg-white px-5 py-2.5 flex items-center gap-4 sticky top-0 z-40 border-b border-slate-100 shadow-sm">
                 <button 
@@ -169,8 +169,8 @@ const Marketing = () => {
                     <ChevronLeft size={20} strokeWidth={2.5} />
                 </button>
                 <div className="flex flex-col">
-                    <h1 className="text-[17px] font-black text-slate-800 uppercase tracking-wide leading-none">Information Center</h1>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.15em] mt-1.5 leading-none">Guide to Earning Systems</p>
+                    <h1 className="text-[17px] font-medium text-slate-800 uppercase tracking-wide leading-none">Information Center</h1>
+                    <p className="text-[9px] font-medium text-slate-400 uppercase tracking-[0.15em] mt-1.5 leading-none">Guide to Earning Systems</p>
                 </div>
             </div>
 
@@ -183,21 +183,21 @@ const Marketing = () => {
                             <Share2 size={24} />
                         </div>
                         <div>
-                            <h3 className="text-[18px] font-black text-slate-800 leading-none tracking-tight flex items-center gap-1.5 font-sans italic">
+                            <h3 className="text-[18px] font-medium text-slate-800 leading-none tracking-tight flex items-center gap-1.5 font-poppins italic">
                                 Referral System
                             </h3>
-                            <p className="text-[10px] font-black uppercase tracking-wider mt-1.5 text-[#2563EB]">
+                            <p className="text-[10px] font-medium uppercase tracking-wider mt-1.5 text-[#2563EB]">
                                 EARN ₹{rewardAmount} REWARD
                             </p>
                         </div>
                     </div>
                     <div className="space-y-4 mb-6">
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold bg-[#EFF6FF] text-[#2563EB]">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-medium bg-[#EFF6FF] text-[#2563EB]">
                                 1
                             </div>
                             <div className="flex-1 pt-0.5">
-                                <h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-wide mb-1 leading-none">
+                                <h4 className="text-[12px] font-medium text-slate-800 uppercase tracking-wide mb-1 leading-none">
                                     SHARE YOUR LINK
                                 </h4>
                                 <p className="text-[11px] font-semibold text-slate-500 leading-normal">
@@ -206,11 +206,11 @@ const Marketing = () => {
                             </div>
                         </div>
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold bg-[#EFF6FF] text-[#2563EB]">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-medium bg-[#EFF6FF] text-[#2563EB]">
                                 2
                             </div>
                             <div className="flex-1 pt-0.5">
-                                <h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-wide mb-1 leading-none">
+                                <h4 className="text-[12px] font-medium text-slate-800 uppercase tracking-wide mb-1 leading-none">
                                     EARN ₹{rewardAmount} INSTANT
                                 </h4>
                                 <p className="text-[11px] font-semibold text-slate-500 leading-normal">
@@ -219,11 +219,11 @@ const Marketing = () => {
                             </div>
                         </div>
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold bg-[#EFF6FF] text-[#2563EB]">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-medium bg-[#EFF6FF] text-[#2563EB]">
                                 3
                             </div>
                             <div className="flex-1 pt-0.5">
-                                <h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-wide mb-1 leading-none">
+                                <h4 className="text-[12px] font-medium text-slate-800 uppercase tracking-wide mb-1 leading-none">
                                     DIRECT WALLET CREDIT
                                 </h4>
                                 <p className="text-[11px] font-semibold text-slate-500 leading-normal">
@@ -234,7 +234,7 @@ const Marketing = () => {
                     </div>
                     <button 
                         onClick={() => setShowReferralLink(true)}
-                        className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-black uppercase text-[12px] tracking-wider transition-all duration-300 active:scale-95 shadow-md bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/10"
+                        className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-medium uppercase text-[12px] tracking-wider transition-all duration-300 active:scale-95 shadow-md bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/10"
                     >
                         GET REFERRAL LINK ❯
                     </button>
@@ -250,21 +250,21 @@ const Marketing = () => {
                             <CheckCircle2 size={24} />
                         </div>
                         <div>
-                            <h3 className="text-[18px] font-black text-slate-800 leading-none tracking-tight flex items-center gap-1.5 font-sans italic">
+                            <h3 className="text-[18px] font-medium text-slate-800 leading-none tracking-tight flex items-center gap-1.5 font-poppins italic">
                                 Daily Tasks
                             </h3>
-                            <p className="text-[10px] font-black uppercase tracking-wider mt-1.5 text-[#10B981]">
+                            <p className="text-[10px] font-medium uppercase tracking-wider mt-1.5 text-[#10B981]">
                                 COLLECT REWARD COINS
                             </p>
                         </div>
                     </div>
                     <div className="space-y-4 mb-6">
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold bg-[#ECFDF5] text-[#059669]">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-medium bg-[#ECFDF5] text-[#059669]">
                                 1
                             </div>
                             <div className="flex-1 pt-0.5">
-                                <h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-wide mb-1 leading-none">
+                                <h4 className="text-[12px] font-medium text-slate-800 uppercase tracking-wide mb-1 leading-none">
                                     COMPLETE TASKS
                                 </h4>
                                 <p className="text-[11px] font-semibold text-slate-500 leading-normal">
@@ -273,11 +273,11 @@ const Marketing = () => {
                             </div>
                         </div>
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold bg-[#ECFDF5] text-[#059669]">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-medium bg-[#ECFDF5] text-[#059669]">
                                 2
                             </div>
                             <div className="flex-1 pt-0.5">
-                                <h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-wide mb-1 leading-none">
+                                <h4 className="text-[12px] font-medium text-slate-800 uppercase tracking-wide mb-1 leading-none">
                                     REDEEM FOR CASH
                                 </h4>
                                 <p className="text-[11px] font-semibold text-slate-500 leading-normal">
@@ -286,11 +286,11 @@ const Marketing = () => {
                             </div>
                         </div>
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold bg-[#ECFDF5] text-[#059669]">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-medium bg-[#ECFDF5] text-[#059669]">
                                 3
                             </div>
                             <div className="flex-1 pt-0.5">
-                                <h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-wide mb-1 leading-none">
+                                <h4 className="text-[12px] font-medium text-slate-800 uppercase tracking-wide mb-1 leading-none">
                                     3X BOOSTER BENEFIT
                                 </h4>
                                 <p className="text-[11px] font-semibold text-slate-500 leading-normal">
@@ -301,7 +301,7 @@ const Marketing = () => {
                     </div>
                     <button 
                         onClick={(e) => { e.stopPropagation(); navigate('/user/earn'); }}
-                        className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-black uppercase text-[12px] tracking-wider transition-all duration-300 active:scale-95 shadow-md bg-[#059669] hover:bg-[#047857] text-white shadow-emerald-500/10"
+                        className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-medium uppercase text-[12px] tracking-wider transition-all duration-300 active:scale-95 shadow-md bg-[#059669] hover:bg-[#047857] text-white shadow-emerald-500/10"
                     >
                         VIEW TASKS ❇️
                     </button>
@@ -317,21 +317,21 @@ const Marketing = () => {
                             <TrendingUp size={24} />
                         </div>
                         <div>
-                            <h3 className="text-[18px] font-black text-slate-800 leading-none tracking-tight flex items-center gap-1.5 font-sans italic">
+                            <h3 className="text-[18px] font-medium text-slate-800 leading-none tracking-tight flex items-center gap-1.5 font-poppins italic">
                                 Future Fund
                             </h3>
-                            <p className="text-[10px] font-black uppercase tracking-wider mt-1.5 text-[#3B82F6]">
+                            <p className="text-[10px] font-medium uppercase tracking-wider mt-1.5 text-[#3B82F6]">
                                 PASSIVE INCOME SECURITY
                             </p>
                         </div>
                     </div>
                     <div className="space-y-4 mb-6">
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold bg-[#EFF6FF] text-[#2563EB]">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-medium bg-[#EFF6FF] text-[#2563EB]">
                                 1
                             </div>
                             <div className="flex-1 pt-0.5">
-                                <h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-wide mb-1 leading-none">
+                                <h4 className="text-[12px] font-medium text-slate-800 uppercase tracking-wide mb-1 leading-none">
                                     PLATFORM STAKE
                                 </h4>
                                 <p className="text-[11px] font-semibold text-slate-500 leading-normal">
@@ -340,11 +340,11 @@ const Marketing = () => {
                             </div>
                         </div>
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold bg-[#EFF6FF] text-[#2563EB]">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-medium bg-[#EFF6FF] text-[#2563EB]">
                                 2
                             </div>
                             <div className="flex-1 pt-0.5">
-                                <h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-wide mb-1 leading-none">
+                                <h4 className="text-[12px] font-medium text-slate-800 uppercase tracking-wide mb-1 leading-none">
                                     MONTHLY PAYOUTS
                                 </h4>
                                 <p className="text-[11px] font-semibold text-slate-500 leading-normal">
@@ -353,11 +353,11 @@ const Marketing = () => {
                             </div>
                         </div>
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold bg-[#EFF6FF] text-[#2563EB]">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-medium bg-[#EFF6FF] text-[#2563EB]">
                                 3
                             </div>
                             <div className="flex-1 pt-0.5">
-                                <h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-wide mb-1 leading-none">
+                                <h4 className="text-[12px] font-medium text-slate-800 uppercase tracking-wide mb-1 leading-none">
                                     LONG TERM GROWTH
                                 </h4>
                                 <p className="text-[11px] font-semibold text-slate-500 leading-normal">
@@ -368,7 +368,7 @@ const Marketing = () => {
                     </div>
                     <button 
                         onClick={(e) => { e.stopPropagation(); navigate('/user/future-fund'); }}
-                        className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-black uppercase text-[12px] tracking-wider transition-all duration-300 active:scale-95 shadow-md bg-[#034C6A] hover:bg-[#023E56] text-white shadow-[#034C6A]/10"
+                        className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-medium uppercase text-[12px] tracking-wider transition-all duration-300 active:scale-95 shadow-md bg-[#034C6A] hover:bg-[#023E56] text-white shadow-[#034C6A]/10"
                     >
                         CHECK ELIGIBILITY 🛡️
                     </button>
@@ -384,21 +384,21 @@ const Marketing = () => {
                             <Trophy size={24} />
                         </div>
                         <div>
-                            <h3 className="text-[18px] font-black text-slate-800 leading-none tracking-tight flex items-center gap-1.5 font-sans italic">
+                            <h3 className="text-[18px] font-medium text-slate-800 leading-none tracking-tight flex items-center gap-1.5 font-poppins italic">
                                 Events & Contests
                             </h3>
-                            <p className="text-[10px] font-black uppercase tracking-wider mt-1.5 text-[#8B5CF6]">
+                            <p className="text-[10px] font-medium uppercase tracking-wider mt-1.5 text-[#8B5CF6]">
                                 WIN BIG PRIZES
                             </p>
                         </div>
                     </div>
                     <div className="space-y-4 mb-6">
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold bg-[#F5F3FF] text-[#7C3AED]">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-medium bg-[#F5F3FF] text-[#7C3AED]">
                                 1
                             </div>
                             <div className="flex-1 pt-0.5">
-                                <h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-wide mb-1 leading-none">
+                                <h4 className="text-[12px] font-medium text-slate-800 uppercase tracking-wide mb-1 leading-none">
                                     WEEKLY CONTESTS
                                 </h4>
                                 <p className="text-[11px] font-semibold text-slate-500 leading-normal">
@@ -407,11 +407,11 @@ const Marketing = () => {
                             </div>
                         </div>
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold bg-[#F5F3FF] text-[#7C3AED]">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-medium bg-[#F5F3FF] text-[#7C3AED]">
                                 2
                             </div>
                             <div className="flex-1 pt-0.5">
-                                <h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-wide mb-1 leading-none">
+                                <h4 className="text-[12px] font-medium text-slate-800 uppercase tracking-wide mb-1 leading-none">
                                     MEGA JACKPOTS
                                 </h4>
                                 <p className="text-[11px] font-semibold text-slate-500 leading-normal">
@@ -420,11 +420,11 @@ const Marketing = () => {
                             </div>
                         </div>
                         <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-bold bg-[#F5F3FF] text-[#7C3AED]">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[12px] font-medium bg-[#F5F3FF] text-[#7C3AED]">
                                 3
                             </div>
                             <div className="flex-1 pt-0.5">
-                                <h4 className="text-[12px] font-bold text-slate-800 uppercase tracking-wide mb-1 leading-none">
+                                <h4 className="text-[12px] font-medium text-slate-800 uppercase tracking-wide mb-1 leading-none">
                                     LEADERBOARD REWARDS
                                 </h4>
                                 <p className="text-[11px] font-semibold text-slate-500 leading-normal">
@@ -435,7 +435,7 @@ const Marketing = () => {
                     </div>
                     <button 
                         onClick={(e) => { e.stopPropagation(); navigate('/user/events'); }}
-                        className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-black uppercase text-[12px] tracking-wider transition-all duration-300 active:scale-95 shadow-md bg-[#0F172A] hover:bg-[#1E293B] text-white shadow-slate-900/10"
+                        className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-medium uppercase text-[12px] tracking-wider transition-all duration-300 active:scale-95 shadow-md bg-[#0F172A] hover:bg-[#1E293B] text-white shadow-slate-900/10"
                     >
                         VIEW EVENTS 🏆
                     </button>

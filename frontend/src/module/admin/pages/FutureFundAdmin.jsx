@@ -151,7 +151,7 @@ const FutureFundAdmin = () => {
 
     if (loadingSettings || usersLoading) {
         return (
-            <div className="p-8 text-center bg-slate-50 min-h-screen flex flex-col items-center justify-center font-bold gap-3">
+            <div className="p-8 text-center bg-slate-50 min-h-screen flex flex-col items-center justify-center font-medium gap-3">
                 <Loader2 className="animate-spin text-indigo-600 w-10 h-10" />
                 <p className="text-xs uppercase font-medium text-slate-400">Loading Future Fund CMS...</p>
             </div>
@@ -184,11 +184,11 @@ const FutureFundAdmin = () => {
                     <div className="space-y-6 relative">
                         <div>
                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-3 flex items-center gap-2"><Info size={12} /> Description Text</p>
-                            {editingCms ? <textarea value={cms.description} onChange={(e) => setCms({ ...cms, description: e.target.value })} className="w-full bg-slate-50 border border-sky-200 rounded-2xl p-4 text-[13px] font-bold text-slate-700 h-24 outline-none focus:ring-2 focus:ring-sky-500" /> : <p className="text-[13px] font-bold text-slate-600 leading-relaxed bg-slate-50/50 p-4 rounded-2xl border border-slate-50">"{cms.description}"</p>}
+                            {editingCms ? <textarea value={cms.description} onChange={(e) => setCms({ ...cms, description: e.target.value })} className="w-full bg-slate-50 border border-sky-200 rounded-2xl p-4 text-[13px] font-medium text-slate-700 h-24 outline-none focus:ring-2 focus:ring-sky-500" /> : <p className="text-[13px] font-medium text-slate-600 leading-relaxed bg-slate-50/50 p-4 rounded-2xl border border-slate-50">"{cms.description}"</p>}
                         </div>
                         <div>
                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-3 flex items-center gap-2"><ShieldAlert size={12} /> Guidelines Box</p>
-                            {editingCms ? <textarea value={cms.guideline} onChange={(e) => setCms({ ...cms, guideline: e.target.value })} className="w-full bg-slate-50 border border-sky-200 rounded-2xl p-4 text-[13px] font-bold text-slate-700 h-20 outline-none focus:ring-2 focus:ring-sky-500" /> : <div className="flex items-start gap-3 bg-sky-50/50 p-4 rounded-2xl border border-sky-100"><Info size={16} className="text-sky-400 mt-0.5" /><p className="text-[11px] font-bold text-sky-800 leading-normal">{cms.guideline}</p></div>}
+                            {editingCms ? <textarea value={cms.guideline} onChange={(e) => setCms({ ...cms, guideline: e.target.value })} className="w-full bg-slate-50 border border-sky-200 rounded-2xl p-4 text-[13px] font-medium text-slate-700 h-20 outline-none focus:ring-2 focus:ring-sky-500" /> : <div className="flex items-start gap-3 bg-sky-50/50 p-4 rounded-2xl border border-sky-100"><Info size={16} className="text-sky-400 mt-0.5" /><p className="text-[11px] font-medium text-sky-800 leading-normal">{cms.guideline}</p></div>}
                         </div>
                     </div>
                 </div>
@@ -266,7 +266,7 @@ const FutureFundAdmin = () => {
                         </div>
                     </div>
                     
-                    <div className="mt-4 p-3 bg-slate-50 rounded-2xl border border-slate-100 text-[10px] text-slate-400 font-bold leading-normal">
+                    <div className="mt-4 p-3 bg-slate-50 rounded-2xl border border-slate-100 text-[10px] text-slate-400 font-medium leading-normal">
                         These dynamic settings configure the targets shown in the User's Active Future Fund screen and are saved directly into the database.
                     </div>
                 </div>
@@ -277,11 +277,11 @@ const FutureFundAdmin = () => {
                 <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-100 font-medium">FF</div>
-                        <div><h2 className="text-sm font-medium text-slate-800 uppercase tracking-normal">User Progress Tracker</h2><p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter leading-none mt-1">Milestone Stages</p></div>
+                        <div><h2 className="text-sm font-medium text-slate-800 uppercase tracking-normal">User Progress Tracker</h2><p className="text-[10px] text-slate-400 font-medium uppercase tracking-tighter leading-none mt-1">Milestone Stages</p></div>
                     </div>
                     <div className="relative w-full md:w-80">
                         <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                        <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }} placeholder="Search user history..." className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-4 py-3 text-[12px] font-bold text-slate-700 outline-none transition-all shadow-inner" />
+                        <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }} placeholder="Search user history..." className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-4 py-3 text-[12px] font-medium text-slate-700 outline-none transition-all shadow-inner" />
                     </div>
                 </div>
                 <div className="overflow-x-auto min-h-[360px]">
@@ -350,7 +350,7 @@ const FutureFundAdmin = () => {
                                 <div className="space-y-2 mb-6 max-h-[280px] overflow-y-auto scrollbar-hide">
                                     {selectedUserHistory.length > 0 ? selectedUserHistory.map((day, idx) => (
                                         <div key={idx} className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-100 rounded-2xl">
-                                            <div className="flex items-center gap-3"><Calendar size={12} className="text-slate-300" /><p className="text-[11px] font-bold text-slate-600 tracking-tight">{day.date}</p></div>
+                                            <div className="flex items-center gap-3"><Calendar size={12} className="text-slate-300" /><p className="text-[11px] font-medium text-slate-600 tracking-tight">{day.date}</p></div>
                                             <p className={`text-[13px] font-medium ${day.total > 0 ? 'text-emerald-600' : 'text-slate-400'}`}>{day.total > 0 ? `+ ₹${day.total}` : '₹0.00'}</p>
                                         </div>
                                     )) : (

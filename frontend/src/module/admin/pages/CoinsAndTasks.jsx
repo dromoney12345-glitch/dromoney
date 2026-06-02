@@ -157,7 +157,7 @@ const CoinsAndTasks = () => {
                         </button>
                     </div>
                     <div className="space-y-3">
-                        {tasks.length === 0 && <p className="text-center text-slate-400 text-sm py-10 font-bold">No tasks available.</p>}
+                        {tasks.length === 0 && <p className="text-center text-slate-400 text-sm py-10 font-medium">No tasks available.</p>}
                         {tasks.map(task => (
                             <div key={task._id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center justify-between hover:border-slate-200 transition-all">
                                 <div className="flex items-center gap-4">
@@ -208,7 +208,7 @@ const CoinsAndTasks = () => {
                                 <div className="flex items-center gap-3 mt-2">
                                     <input type="number" step="0.01" min="0" value={coinValue} onChange={e => setCoinValue(Math.max(0, e.target.value))}
                                         className="w-32 border border-slate-200 rounded-xl px-4 py-2.5 text-lg font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
-                                    <span className="text-sm font-bold text-slate-400">rupees per coin</span>
+                                    <span className="text-sm font-medium text-slate-400">rupees per coin</span>
                                 </div>
                             </div>
                             <div>
@@ -216,7 +216,7 @@ const CoinsAndTasks = () => {
                                 <div className="flex items-center gap-3 mt-2">
                                     <input type="number" min="0" value={dailyLimit} onChange={e => setDailyLimit(Math.max(0, e.target.value))}
                                         className="w-32 border border-slate-200 rounded-xl px-4 py-2.5 text-lg font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
-                                    <span className="text-sm font-bold text-slate-400">coins/day limit per user</span>
+                                    <span className="text-sm font-medium text-slate-400">coins/day limit per user</span>
                                 </div>
                             </div>
                             <button 
@@ -286,22 +286,22 @@ const CoinsAndTasks = () => {
                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal block">3. Basic Details</label>
                                 
                                 <div>
-                                    <label className="text-xs font-bold text-slate-600 block mb-1">Task Title <span className="text-rose-500">*</span></label>
+                                    <label className="text-xs font-medium text-slate-600 block mb-1">Task Title <span className="text-rose-500">*</span></label>
                                     <input type="text" placeholder="e.g. Follow us on Instagram" value={newTaskData.title} onChange={e => setNewTaskData({...newTaskData, title: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 placeholder-slate-300 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-bold text-slate-600 block mb-1">Short Description</label>
+                                    <label className="text-xs font-medium text-slate-600 block mb-1">Short Description</label>
                                     <input type="text" placeholder="Describe what the user has to do" value={newTaskData.description} onChange={e => setNewTaskData({...newTaskData, description: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 placeholder-slate-300 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-bold text-slate-600 block mb-1">Direct Link <span className="text-rose-500">*</span></label>
+                                    <label className="text-xs font-medium text-slate-600 block mb-1">Direct Link <span className="text-rose-500">*</span></label>
                                     <input type="text" placeholder="e.g. https://instagram.com/dromoney" value={newTaskData.link} onChange={e => setNewTaskData({...newTaskData, link: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 placeholder-slate-300 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-bold text-slate-600 block mb-1">Coins Reward <span className="text-rose-500">*</span></label>
+                                    <label className="text-xs font-medium text-slate-600 block mb-1">Coins Reward <span className="text-rose-500">*</span></label>
                                     <div className="relative">
                                         <Coins size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500" />
                                         <input type="number" min="1" value={newTaskData.reward} onChange={e => setNewTaskData({...newTaskData, reward: Math.max(1, e.target.value)})} className="w-full border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
@@ -318,7 +318,7 @@ const CoinsAndTasks = () => {
                                     />
                                     <div>
                                         <label htmlFor="isDaily" className="text-sm font-medium text-slate-700 block leading-none mb-1">Daily Task</label>
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">User can repeat this daily</p>
+                                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">User can repeat this daily</p>
                                     </div>
                                 </div>
                             </div>
@@ -331,11 +331,11 @@ const CoinsAndTasks = () => {
                                 {newTaskType === 'Video' && (
                                     <>
                                         <div>
-                                            <label className="text-xs font-bold text-slate-600 block mb-1">YouTube URL</label>
+                                            <label className="text-xs font-medium text-slate-600 block mb-1">YouTube URL</label>
                                             <input type="text" placeholder="https://youtube.com/..." value={newTaskData.config?.url || ''} onChange={e => setNewTaskData({...newTaskData, config: {...newTaskData.config, url: e.target.value}})} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-sky-500" />
                                         </div>
                                         <div>
-                                            <label className="text-xs font-bold text-slate-600 block mb-1">Watch Timer (Seconds)</label>
+                                            <label className="text-xs font-medium text-slate-600 block mb-1">Watch Timer (Seconds)</label>
                                             <input type="number" min="1" value={newTaskData.config?.timer || 30} onChange={e => setNewTaskData({...newTaskData, config: {...newTaskData.config, timer: Math.max(1, e.target.value)}})} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-sky-500" />
                                         </div>
                                     </>
@@ -345,11 +345,11 @@ const CoinsAndTasks = () => {
                                 {newTaskType === 'Web' && (
                                     <>
                                         <div>
-                                            <label className="text-xs font-bold text-slate-600 block mb-1">Target URL</label>
+                                            <label className="text-xs font-medium text-slate-600 block mb-1">Target URL</label>
                                             <input type="url" placeholder="https://example.com" value={newTaskData.config?.url || ''} onChange={e => setNewTaskData({...newTaskData, config: {...newTaskData.config, url: e.target.value}})} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-sky-500" />
                                         </div>
                                         <div>
-                                            <label className="text-xs font-bold text-slate-600 block mb-1">Wait Timer (Seconds)</label>
+                                            <label className="text-xs font-medium text-slate-600 block mb-1">Wait Timer (Seconds)</label>
                                             <input type="number" min="1" value={newTaskData.config?.timer || 15} onChange={e => setNewTaskData({...newTaskData, config: {...newTaskData.config, timer: Math.max(1, e.target.value)}})} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-sky-500" />
                                         </div>
                                     </>
@@ -359,7 +359,7 @@ const CoinsAndTasks = () => {
                                 {newTaskType === 'Quiz' && (
                                     <div className="space-y-3">
                                         <div>
-                                            <label className="text-xs font-bold text-slate-600 block mb-1">Question</label>
+                                            <label className="text-xs font-medium text-slate-600 block mb-1">Question</label>
                                             <input type="text" placeholder="What is the capital of France?" value={newTaskData.config?.question || ''} onChange={e => setNewTaskData({...newTaskData, config: {...newTaskData.config, question: e.target.value}})} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-sky-500" />
                                         </div>
                                         <div className="grid grid-cols-2 gap-2">
@@ -368,7 +368,7 @@ const CoinsAndTasks = () => {
                                             ))}
                                         </div>
                                         <div>
-                                            <label className="text-xs font-bold text-slate-600 block mb-1">Correct Answer (A/B/C/D)</label>
+                                            <label className="text-xs font-medium text-slate-600 block mb-1">Correct Answer (A/B/C/D)</label>
                                             <select value={newTaskData.config?.answer || ''} onChange={e => setNewTaskData({...newTaskData, config: {...newTaskData.config, answer: e.target.value}})} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-sky-500">
                                                 <option value="">Select...</option>
                                                 <option value="A">A</option>
@@ -390,7 +390,7 @@ const CoinsAndTasks = () => {
                                 {/* Sponsored / Proof / Download */}
                                 {(newTaskType === 'Sponsored' || newTaskType === 'Proof' || newTaskType === 'Download') && (
                                     <div>
-                                        <label className="text-xs font-bold text-slate-600 block mb-1">
+                                        <label className="text-xs font-medium text-slate-600 block mb-1">
                                             Verification/Download Instructions for User
                                         </label>
                                         <textarea 

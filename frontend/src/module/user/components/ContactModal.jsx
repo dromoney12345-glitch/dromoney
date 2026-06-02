@@ -15,8 +15,8 @@ const ContactModal = ({ isOpen, onClose }) => {
                             <Building2 size={20} />
                         </div>
                         <div>
-                            <h3 className="font-black text-white text-lg tracking-tight">Contact Support</h3>
-                            <p className="text-[9px] uppercase tracking-widest text-slate-300 font-black">24/7 Enterprise Helpdesk</p>
+                            <h3 className="font-medium text-white text-lg tracking-tight">Contact Support</h3>
+                            <p className="text-[9px] uppercase tracking-widest text-slate-300 font-medium">24/7 Enterprise Helpdesk</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 bg-white/10 rounded-full text-slate-200 hover:bg-white/20 transition-colors active:scale-95 shadow-sm">
@@ -30,8 +30,8 @@ const ContactModal = ({ isOpen, onClose }) => {
                             <Mail size={16} className="text-sky-500" strokeWidth={2.5} />
                         </div>
                         <div className="overflow-hidden">
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Email Support</p>
-                            <p className="text-[13px] font-black text-slate-800 truncate">support@earningapp.com</p>
+                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">Email Support</p>
+                            <p className="text-[13px] font-medium text-slate-800 truncate">support@earningapp.com</p>
                         </div>
                     </div>
 
@@ -40,8 +40,8 @@ const ContactModal = ({ isOpen, onClose }) => {
                             <Phone size={16} className="text-amber-500" strokeWidth={2.5} />
                         </div>
                         <div>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Toll-Free Helpline</p>
-                            <p className="text-[13px] font-black text-slate-800">1800-123-4567</p>
+                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">Toll-Free Helpline</p>
+                            <p className="text-[13px] font-medium text-slate-800">1800-123-4567</p>
                         </div>
                     </div>
 
@@ -50,8 +50,8 @@ const ContactModal = ({ isOpen, onClose }) => {
                             <MapPin size={16} className="text-rose-500" strokeWidth={2.5} />
                         </div>
                         <div>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Corporate Office</p>
-                            <p className="text-[11px] font-black text-slate-800 leading-snug truncate">124 Cyber Hub, Gurugram</p>
+                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">Corporate Office</p>
+                            <p className="text-[11px] font-medium text-slate-800 leading-snug truncate">124 Cyber Hub, Gurugram</p>
                         </div>
                     </div>
                 </div>
@@ -59,7 +59,7 @@ const ContactModal = ({ isOpen, onClose }) => {
                 <div className="p-5 bg-sky-50 border-t border-sky-100">
                     <button 
                         onClick={() => window.open('https://api.whatsapp.com/send?phone=919876543210', '_blank')}
-                        className="w-full py-3.5 bg-emerald-500 text-white font-black text-[11px] uppercase tracking-[0.2em] rounded-xl hover:bg-emerald-600 active:scale-[0.98] transition-all shadow-md flex items-center justify-center gap-2">
+                        className="w-full py-3.5 bg-emerald-500 text-white font-medium text-[11px] uppercase tracking-[0.2em] rounded-xl hover:bg-emerald-600 active:scale-[0.98] transition-all shadow-md flex items-center justify-center gap-2">
                         <MessageCircle size={16} strokeWidth={2.5} /> Chat on WhatsApp
                     </button>
                 </div>

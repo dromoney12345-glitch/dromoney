@@ -364,7 +364,7 @@ const Users = () => {
                                         <span className="text-[8px] font-medium uppercase tracking-normal bg-white/20 px-2 py-0.5 rounded-full font-['Poppins']">Earnings</span>
                                     </div>
                                     <h4 className="text-2xl font-medium font-['Poppins']">{activeUserInDrawer.earnings}</h4>
-                                    <p className="text-emerald-100 text-[9px] font-bold mt-1 font-['Poppins']">Lifetime total revenue</p>
+                                    <p className="text-emerald-100 text-[9px] font-medium mt-1 font-['Poppins']">Lifetime total revenue</p>
                                 </div>
                                 <div className="bg-sky-500 p-4 rounded-[28px] text-white shadow-lg shadow-sky-500/10">
                                     <div className="flex items-center justify-between mb-3">
@@ -372,7 +372,7 @@ const Users = () => {
                                         <span className="text-[8px] font-medium uppercase tracking-normal bg-white/20 px-2 py-0.5 rounded-full font-['Poppins']">Network</span>
                                     </div>
                                     <h4 className="text-2xl font-medium font-['Poppins']">{activeUserInDrawer.referrals}</h4>
-                                    <p className="text-sky-100 text-[9px] font-bold mt-1 font-['Poppins']">Direct invitations sent</p>
+                                    <p className="text-sky-100 text-[9px] font-medium mt-1 font-['Poppins']">Direct invitations sent</p>
                                 </div>
                             </div>
                         </div>
@@ -406,11 +406,11 @@ const Users = () => {
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-[10px] font-medium uppercase tracking-normal text-slate-400 mb-2 font-['Poppins']">Full Name</label>
-                                    <input type="text" value={editingUser.name} onChange={(e) => setEditingUser({...editingUser, name: e.target.value})} className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-[13px] font-bold text-slate-700 font-['Poppins']" />
+                                    <input type="text" value={editingUser.name} onChange={(e) => setEditingUser({...editingUser, name: e.target.value})} className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-[13px] font-medium text-slate-700 font-['Poppins']" />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-medium uppercase tracking-normal text-slate-400 mb-2 font-['Poppins']">Email</label>
-                                    <input type="email" value={editingUser.email} onChange={(e) => setEditingUser({...editingUser, email: e.target.value})} className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-[13px] font-bold text-slate-700 font-['Poppins']" />
+                                    <input type="email" value={editingUser.email} onChange={(e) => setEditingUser({...editingUser, email: e.target.value})} className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-[13px] font-medium text-slate-700 font-['Poppins']" />
                                 </div>
                             </div>
                             <button type="submit" className="w-full bg-sky-500 hover:bg-sky-600 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-xl shadow-sky-500/25 transition-all font-['Poppins']">Save Changes</button>

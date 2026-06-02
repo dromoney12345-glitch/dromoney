@@ -253,7 +253,7 @@ const PromoteBrand = () => {
 
     if (fetching) {
         return (
-            <div className="p-8 text-center text-slate-800 min-h-screen bg-[#F1F9F3] flex flex-col items-center justify-center font-bold uppercase tracking-widest gap-4">
+            <div className="p-8 text-center text-slate-800 min-h-screen bg-[#F1F9F3] flex flex-col items-center justify-center font-medium uppercase tracking-widest gap-4">
                 <Loader2 className="animate-spin text-sky-500 w-12 h-12" />
                 <p>Loading Campaigns...</p>
             </div>
@@ -279,10 +279,10 @@ const PromoteBrand = () => {
                             <ChevronLeft size={16} />
                         </button>
                         <div className="flex flex-col">
-                            <p className="text-blue-400 text-[7px] font-black uppercase tracking-[0.2em] leading-none mb-1">
+                            <p className="text-blue-400 text-[7px] font-medium uppercase tracking-[0.2em] leading-none mb-1">
                                 Brand Portal
                             </p>
-                            <h1 className="text-sm font-black text-white tracking-tight leading-none uppercase">
+                            <h1 className="text-sm font-medium text-white tracking-tight leading-none uppercase">
                                 My Promotions
                             </h1>
                         </div>
@@ -308,7 +308,7 @@ const PromoteBrand = () => {
                         </button>
                         <div className="flex items-center gap-1.5">
                             <Rocket size={18} className="text-white fill-white animate-pulse" />
-                            <h1 className="text-sm font-black text-white tracking-tight leading-none uppercase">
+                            <h1 className="text-sm font-medium text-white tracking-tight leading-none uppercase">
                                 Promotion Details
                             </h1>
                         </div>
@@ -324,18 +324,18 @@ const PromoteBrand = () => {
                         {isSubmitted && (
                              <div className="bg-emerald-500 text-white p-4 rounded-2xl flex items-center gap-3 shadow-lg shadow-emerald-200 animate-bounce">
                                 <CheckCircle2 size={24} />
-                                <span className="text-xs font-black uppercase tracking-widest leading-none">Campaign Created Successfully!</span>
+                                <span className="text-xs font-medium uppercase tracking-widest leading-none">Campaign Created Successfully!</span>
                              </div>
                         )}
 
                         <div className="mb-1">
-                            <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none">Your Ad Requests History</h2>
+                            <h2 className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] leading-none">Your Ad Requests History</h2>
                         </div>
 
                         {myPromotions.length === 0 ? (
                             <div className="bg-white border border-dashed border-slate-200 rounded-3xl p-10 text-center">
                                 <Rocket size={32} className="text-slate-200 mx-auto mb-3" />
-                                <p className="text-slate-400 font-bold text-[12px] leading-relaxed">No active promotions. Start your first campaign!</p>
+                                <p className="text-slate-400 font-medium text-[12px] leading-relaxed">No active promotions. Start your first campaign!</p>
                             </div>
                         ) : (
                             myPromotions.map((promo) => (
@@ -346,11 +346,11 @@ const PromoteBrand = () => {
                                                 <Briefcase size={18} />
                                             </div>
                                             <div>
-                                                <h3 className="font-black text-slate-800 text-[13px] uppercase tracking-wide leading-none">{promo.category}</h3>
-                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 leading-none">{promo.brandName}</p>
+                                                <h3 className="font-medium text-slate-800 text-[13px] uppercase tracking-wide leading-none">{promo.category}</h3>
+                                                <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mt-1.5 leading-none">{promo.brandName}</p>
                                             </div>
                                         </div>
-                                        <span className={`text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest border ${
+                                        <span className={`text-[8px] font-medium px-2.5 py-1 rounded-full uppercase tracking-widest border ${
                                             promo.status === 'Pending' ? 'bg-amber-50 text-amber-500 border-amber-100' : 
                                             promo.status === 'Rejected' ? 'bg-rose-50 text-rose-500 border-rose-100' :
                                             'bg-emerald-50 text-emerald-500 border-emerald-100'
@@ -361,18 +361,18 @@ const PromoteBrand = () => {
 
                                     <div className="grid grid-cols-2 gap-3 mb-4">
                                         <div className="bg-[#F8FAFC] rounded-2xl p-4 border border-slate-50">
-                                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Budget</p>
-                                            <p className="text-[14px] font-black text-slate-800 leading-none">₹{promo.budget}</p>
+                                            <p className="text-[8px] font-medium text-slate-400 uppercase tracking-widest mb-1.5">Budget</p>
+                                            <p className="text-[14px] font-medium text-slate-800 leading-none">₹{promo.budget}</p>
                                         </div>
                                         <div className="bg-[#F8FAFC] rounded-2xl p-4 border border-slate-50">
-                                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Target Users</p>
-                                            <p className="text-[14px] font-black text-slate-800 leading-none">{promo.usersRequired}</p>
+                                            <p className="text-[8px] font-medium text-slate-400 uppercase tracking-widest mb-1.5">Target Users</p>
+                                            <p className="text-[14px] font-medium text-slate-800 leading-none">{promo.usersRequired}</p>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center justify-between text-[9px] font-bold text-slate-400 border-t border-slate-50 pt-4 mt-2">
+                                    <div className="flex items-center justify-between text-[9px] font-medium text-slate-400 border-t border-slate-50 pt-4 mt-2">
                                         <span className="flex items-center gap-1"><Clock size={12}/> {new Date(promo.createdAt).toLocaleDateString()}</span>
-                                        <a href={promo.brandLink} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-sky-500 font-bold hover:underline">
+                                        <a href={promo.brandLink} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-sky-500 font-medium hover:underline">
                                             View Campaign <ExternalLink size={12}/>
                                         </a>
                                     </div>
@@ -387,7 +387,7 @@ const PromoteBrand = () => {
                     <form onSubmit={handleSubmit} className="space-y-3 animate-in fade-in duration-500 pb-12 text-left bg-white p-5 rounded-3xl shadow-sm border border-slate-100/50">
                         {/* NAME */}
                         <div className="space-y-1">
-                            <label className="text-[9px] font-black text-[#5B718F] tracking-widest uppercase ml-1">Name</label>
+                            <label className="text-[9px] font-medium text-[#5B718F] tracking-widest uppercase ml-1">Name</label>
                             <div className={`relative flex items-center bg-white border rounded-xl h-11 shadow-sm group focus-within:ring-1 transition-all ${
                                 errors.name ? 'border-red-300 focus-within:border-red-500 focus-within:ring-red-500/20' : 'border-[#E2E8F0] focus-within:border-[#1B75FF] focus-within:ring-[#1B75FF]/20'
                             }`}>
@@ -400,17 +400,17 @@ const PromoteBrand = () => {
                                     required
                                     type="text"
                                     placeholder="Enter your name"
-                                    className="flex-1 h-full px-3 text-xs font-bold text-slate-700 bg-transparent outline-none placeholder:text-slate-300"
+                                    className="flex-1 h-full px-3 text-xs font-medium text-slate-700 bg-transparent outline-none placeholder:text-slate-300"
                                     value={formData.name}
                                     onChange={(e) => handleFieldChange('name', e.target.value)}
                                 />
                             </div>
-                            {errors.name && <p className="text-[9px] font-bold text-red-500 ml-1">{errors.name}</p>}
+                            {errors.name && <p className="text-[9px] font-medium text-red-500 ml-1">{errors.name}</p>}
                         </div>
 
                         {/* MOBILE NUMBER */}
                         <div className="space-y-1">
-                            <label className="text-[9px] font-black text-[#5B718F] tracking-widest uppercase ml-1">Mobile Number</label>
+                            <label className="text-[9px] font-medium text-[#5B718F] tracking-widest uppercase ml-1">Mobile Number</label>
                             <div className={`relative flex items-center bg-white border rounded-xl h-11 shadow-sm group focus-within:ring-1 transition-all ${
                                 errors.mobile ? 'border-red-300 focus-within:border-red-500 focus-within:ring-red-500/20' : 'border-[#E2E8F0] focus-within:border-[#1B75FF] focus-within:ring-[#1B75FF]/20'
                             }`}>
@@ -424,17 +424,17 @@ const PromoteBrand = () => {
                                     type="tel"
                                     placeholder="Mobile"
                                     maxLength={10}
-                                    className="flex-1 h-full px-3 text-xs font-bold text-slate-700 bg-transparent outline-none placeholder:text-slate-300"
+                                    className="flex-1 h-full px-3 text-xs font-medium text-slate-700 bg-transparent outline-none placeholder:text-slate-300"
                                     value={formData.mobile}
                                     onChange={(e) => handleFieldChange('mobile', e.target.value.replace(/\D/g, '').slice(0, 10))}
                                 />
                             </div>
-                            {errors.mobile && <p className="text-[9px] font-bold text-red-500 ml-1">{errors.mobile}</p>}
+                            {errors.mobile && <p className="text-[9px] font-medium text-red-500 ml-1">{errors.mobile}</p>}
                         </div>
 
                         {/* WHATSAPP/EMAIL */}
                         <div className="space-y-1">
-                            <label className="text-[9px] font-black text-[#5B718F] tracking-widest uppercase ml-1">Whatsapp/Email</label>
+                            <label className="text-[9px] font-medium text-[#5B718F] tracking-widest uppercase ml-1">Whatsapp/Email</label>
                             <div className={`relative flex items-center bg-white border rounded-xl h-11 shadow-sm group focus-within:ring-1 transition-all ${
                                 errors.whatsapp ? 'border-red-300 focus-within:border-red-500 focus-within:ring-red-500/20' : 'border-[#E2E8F0] focus-within:border-[#1B75FF] focus-within:ring-[#1B75FF]/20'
                             }`}>
@@ -448,7 +448,7 @@ const PromoteBrand = () => {
                                     type="text"
                                     placeholder="Contact"
                                     maxLength={50}
-                                    className="flex-1 h-full px-3 text-xs font-bold text-slate-700 bg-transparent outline-none placeholder:text-slate-300"
+                                    className="flex-1 h-full px-3 text-xs font-medium text-slate-700 bg-transparent outline-none placeholder:text-slate-300"
                                     value={formData.whatsapp}
                                     onChange={(e) => {
                                         const val = e.target.value;
@@ -462,19 +462,19 @@ const PromoteBrand = () => {
                                     }}
                                 />
                             </div>
-                            {errors.whatsapp && <p className="text-[9px] font-bold text-red-500 ml-1">{errors.whatsapp}</p>}
+                            {errors.whatsapp && <p className="text-[9px] font-medium text-red-500 ml-1">{errors.whatsapp}</p>}
                         </div>
 
                         {/* TASK CATEGORY */}
                         <div className="space-y-1">
-                            <label className="text-[9px] font-black text-[#5B718F] tracking-widest uppercase ml-1">Task Category</label>
+                            <label className="text-[9px] font-medium text-[#5B718F] tracking-widest uppercase ml-1">Task Category</label>
                             <div className="relative flex items-center bg-white border border-[#E2E8F0] rounded-xl h-11 shadow-sm group focus-within:border-[#1B75FF] focus-within:ring-1 focus-within:ring-[#1B75FF]/20 transition-all">
                                 <div className="w-11 h-full flex items-center justify-center border-r border-[#F1F5F9] text-slate-300 group-focus-within:text-[#1B75FF] transition-colors">
                                     <Briefcase size={16} />
                                 </div>
                                 <select 
                                     required
-                                    className="flex-1 h-full px-3 text-xs font-bold text-slate-700 bg-transparent outline-none appearance-none cursor-pointer"
+                                    className="flex-1 h-full px-3 text-xs font-medium text-slate-700 bg-transparent outline-none appearance-none cursor-pointer"
                                     value={formData.category}
                                     onChange={(e) => setFormData({...formData, category: e.target.value})}
                                 >
@@ -489,7 +489,7 @@ const PromoteBrand = () => {
 
                         {/* TASK LINK */}
                         <div className="space-y-1">
-                            <label className="text-[9px] font-black text-[#5B718F] tracking-widest uppercase ml-1">Task Link</label>
+                            <label className="text-[9px] font-medium text-[#5B718F] tracking-widest uppercase ml-1">Task Link</label>
                             <div className="relative flex items-center bg-white border border-[#E2E8F0] rounded-xl h-11 shadow-sm group focus-within:border-[#1B75FF] focus-within:ring-1 focus-within:ring-[#1B75FF]/20 transition-all">
                                 <div className="w-11 h-full flex items-center justify-center border-r border-[#F1F5F9] text-slate-300 group-focus-within:text-[#1B75FF] transition-colors">
                                     <Link size={16} />
@@ -498,7 +498,7 @@ const PromoteBrand = () => {
                                     required
                                     type="url"
                                     placeholder="Paste link here"
-                                    className="flex-1 h-full px-3 text-xs font-bold text-slate-700 bg-transparent outline-none placeholder:text-slate-300"
+                                    className="flex-1 h-full px-3 text-xs font-medium text-slate-700 bg-transparent outline-none placeholder:text-slate-300"
                                     value={formData.link}
                                     onChange={(e) => setFormData({...formData, link: e.target.value})}
                                 />
@@ -508,23 +508,23 @@ const PromoteBrand = () => {
                         {/* BUDGET & TARGET USERS SIDE-BY-SIDE */}
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                                <label className="text-[9px] font-black text-[#5B718F] tracking-widest uppercase ml-1">Budget (₹)</label>
+                                <label className="text-[9px] font-medium text-[#5B718F] tracking-widest uppercase ml-1">Budget (₹)</label>
                                 <div className="relative flex items-center bg-white border border-[#E2E8F0] rounded-xl h-11 shadow-sm group focus-within:border-[#1B75FF] focus-within:ring-1 focus-within:ring-[#1B75FF]/20 transition-all">
-                                    <div className="w-8 h-full flex items-center justify-center border-r border-[#F1F5F9] text-slate-300 font-bold text-xs">
+                                    <div className="w-8 h-full flex items-center justify-center border-r border-[#F1F5F9] text-slate-300 font-medium text-xs">
                                         ₹
                                     </div>
                                     <input 
                                         required
                                         type="number"
                                         placeholder="Budget"
-                                        className="flex-1 h-full px-2 text-xs font-bold text-slate-700 bg-transparent outline-none placeholder:text-slate-300"
+                                        className="flex-1 h-full px-2 text-xs font-medium text-slate-700 bg-transparent outline-none placeholder:text-slate-300"
                                         value={formData.budget}
                                         onChange={(e) => handleBudgetChange(e.target.value)}
                                     />
                                 </div>
                             </div>
                             <div className="space-y-1">
-                                <label className="text-[9px] font-black text-[#5B718F] tracking-widest uppercase ml-1">Target Users</label>
+                                <label className="text-[9px] font-medium text-[#5B718F] tracking-widest uppercase ml-1">Target Users</label>
                                 <div className="relative flex items-center bg-white border border-[#E2E8F0] rounded-xl h-11 shadow-sm group focus-within:border-[#1B75FF] focus-within:ring-1 focus-within:ring-[#1B75FF]/20 transition-all">
                                     <div className="w-8 h-full flex items-center justify-center border-r border-[#F1F5F9] text-slate-300">
                                         <Users size={14} />
@@ -533,7 +533,7 @@ const PromoteBrand = () => {
                                         required
                                         type="number"
                                         placeholder="Users"
-                                        className="flex-1 h-full px-2 text-xs font-bold text-slate-700 bg-transparent outline-none placeholder:text-slate-300"
+                                        className="flex-1 h-full px-2 text-xs font-medium text-slate-700 bg-transparent outline-none placeholder:text-slate-300"
                                         value={formData.usersRequired}
                                         onChange={(e) => handleUsersChange(e.target.value)}
                                     />
@@ -543,21 +543,21 @@ const PromoteBrand = () => {
 
                         {/* Dynamic Estimator yellow panel */}
                         <div className="bg-[#FFFDF0] border border-[#FEF3C7] rounded-xl p-3 text-center shadow-sm relative overflow-hidden">
-                            <p className="text-[#D97706] text-[8px] font-black uppercase tracking-[0.15em] mb-1 leading-none">
+                            <p className="text-[#D97706] text-[8px] font-medium uppercase tracking-[0.15em] mb-1 leading-none">
                                 Estimate: ₹1/User Cost
                             </p>
-                            <p className="text-slate-800 text-sm font-black tracking-tight leading-none">
+                            <p className="text-slate-800 text-sm font-medium tracking-tight leading-none">
                                 ₹{formData.budget || 0} = {formData.usersRequired || 0} Users
                             </p>
                         </div>
 
                         {/* DESCRIPTION (OPTIONAL) */}
                         <div className="space-y-1">
-                            <label className="text-[9px] font-black text-[#5B718F] tracking-widest uppercase ml-1">Description (Optional)</label>
+                            <label className="text-[9px] font-medium text-[#5B718F] tracking-widest uppercase ml-1">Description (Optional)</label>
                             <div className="relative bg-white border border-[#E2E8F0] rounded-xl p-3 shadow-sm group focus-within:border-[#1B75FF] focus-within:ring-1 focus-within:ring-[#1B75FF]/20 transition-all">
                                 <textarea 
                                     placeholder="Explain your promotion goal..."
-                                    className="w-full bg-transparent outline-none text-xs font-bold text-slate-700 placeholder:text-slate-300 h-20 resize-none"
+                                    className="w-full bg-transparent outline-none text-xs font-medium text-slate-700 placeholder:text-slate-300 h-20 resize-none"
                                     value={formData.description}
                                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                                 />
@@ -568,7 +568,7 @@ const PromoteBrand = () => {
                         <button 
                             type="submit" 
                             disabled={loading}
-                            className="w-full bg-[#FFB600] hover:bg-[#E5A300] text-white font-black uppercase tracking-[0.2em] py-3.5 rounded-xl shadow-lg shadow-amber-100 active:scale-[0.98] transition-all text-[11px] border border-white/5 disabled:opacity-50 flex items-center justify-center gap-2 mt-4 cursor-pointer"
+                            className="w-full bg-[#FFB600] hover:bg-[#E5A300] text-white font-medium uppercase tracking-[0.2em] py-3.5 rounded-xl shadow-lg shadow-amber-100 active:scale-[0.98] transition-all text-[11px] border border-white/5 disabled:opacity-50 flex items-center justify-center gap-2 mt-4 cursor-pointer"
                         >
                             {loading ? <Loader2 className="animate-spin" size={16} /> : 'SUBMIT & CONTINUE'}
                         </button>

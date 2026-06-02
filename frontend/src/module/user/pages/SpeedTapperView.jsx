@@ -68,8 +68,8 @@ const SpeedTapperView = () => {
                     <ChevronLeft size={24} className="text-slate-600" />
                 </button>
                 <div>
-                    <h1 className="text-lg font-black tracking-tight text-slate-900">{task.title}</h1>
-                    <p className="text-[10px] font-bold text-rose-500 uppercase tracking-widest leading-none mt-1">Reflex Challenge</p>
+                    <h1 className="text-lg font-medium tracking-tight text-slate-900">{task.title}</h1>
+                    <p className="text-[10px] font-medium text-rose-500 uppercase tracking-widest leading-none mt-1">Reflex Challenge</p>
                 </div>
             </header>
 
@@ -79,13 +79,13 @@ const SpeedTapperView = () => {
                 <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
                     <div className="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col items-center">
                         <Timer size={20} className="text-slate-400 mb-2" />
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Time Left</p>
-                        <p className={`text-3xl font-black ${timeLeft < 3 ? 'text-rose-500 animate-pulse' : 'text-slate-900'}`}>{timeLeft}s</p>
+                        <p className="text-[10px] font-medium uppercase tracking-widest text-slate-400">Time Left</p>
+                        <p className={`text-3xl font-medium ${timeLeft < 3 ? 'text-rose-500 animate-pulse' : 'text-slate-900'}`}>{timeLeft}s</p>
                     </div>
                     <div className="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col items-center">
                         <Zap size={20} className="text-amber-500 mb-2" />
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Target</p>
-                        <p className="text-3xl font-black text-slate-900">{taps}/{target}</p>
+                        <p className="text-[10px] font-medium uppercase tracking-widest text-slate-400">Target</p>
+                        <p className="text-3xl font-medium text-slate-900">{taps}/{target}</p>
                     </div>
                 </div>
 
@@ -105,29 +105,29 @@ const SpeedTapperView = () => {
                         {status === 'idle' && (
                             <div className="flex flex-col items-center gap-2" onClick={startGame}>
                                 <MousePointer2 size={48} className="text-slate-400" />
-                                <span className="font-black text-slate-800 uppercase tracking-widest text-xs">Tap to Start</span>
+                                <span className="font-medium text-slate-800 uppercase tracking-widest text-xs">Tap to Start</span>
                             </div>
                         )}
 
                         {status === 'playing' && (
                              <div className="text-white text-center">
-                                <p className="text-6xl font-black">{taps}</p>
-                                <p className="text-[11px] font-black uppercase tracking-[0.2em] mt-2 text-sky-100">GO! GO! GO!</p>
+                                <p className="text-6xl font-medium">{taps}</p>
+                                <p className="text-[11px] font-medium uppercase tracking-[0.2em] mt-2 text-sky-100">GO! GO! GO!</p>
                              </div>
                         )}
 
                         {status === 'won' && (
                              <div className="text-white text-center animate-in zoom-in duration-300">
                                 <Trophy size={60} className="mx-auto mb-3" />
-                                <p className="text-xl font-black uppercase tracking-widest leading-none">Perfect!</p>
-                                <p className="text-[11px] font-bold text-emerald-100 uppercase mt-2">Task Completed</p>
+                                <p className="text-xl font-medium uppercase tracking-widest leading-none">Perfect!</p>
+                                <p className="text-[11px] font-medium text-emerald-100 uppercase mt-2">Task Completed</p>
                              </div>
                         )}
 
                         {status === 'lost' && (
                              <div className="text-white text-center">
-                                <p className="text-xl font-black text-rose-100 uppercase tracking-widest">Too Slow!</p>
-                                <button onClick={startGame} className="mt-4 bg-white/20 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest backdrop-blur">
+                                <p className="text-xl font-medium text-rose-100 uppercase tracking-widest">Too Slow!</p>
+                                <button onClick={startGame} className="mt-4 bg-white/20 px-4 py-2 rounded-xl text-[10px] font-medium uppercase tracking-widest backdrop-blur">
                                     Try Again
                                 </button>
                              </div>
@@ -149,15 +149,15 @@ const SpeedTapperView = () => {
                         <Coins size={24} className="text-white" />
                     </div>
                     <div>
-                        <p className="text-[11px] font-black text-amber-800 tracking-tight leading-tight uppercase">Reward on success</p>
-                        <p className="text-xl font-black text-amber-600 mt-0.5">+{task.reward} Coins</p>
+                        <p className="text-[11px] font-medium text-amber-800 tracking-tight leading-tight uppercase">Reward on success</p>
+                        <p className="text-xl font-medium text-amber-600 mt-0.5">+{task.reward} Coins</p>
                     </div>
                 </div>
 
                 {status === 'won' && (
                     <button
                         onClick={() => navigate('/user/earn')}
-                        className="w-full max-w-sm bg-slate-900 text-white py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all text-xs"
+                        className="w-full max-w-sm bg-slate-900 text-white py-5 rounded-[2rem] font-medium uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all text-xs"
                     >
                         Collect & Rewards
                     </button>

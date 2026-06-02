@@ -131,8 +131,8 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                     <>
                         <div className="p-5 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
                             <div>
-                                <h3 className="font-black text-slate-800 text-lg uppercase tracking-tight">Checkout</h3>
-                                <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold max-w-[150px] truncate">{plan}</p>
+                                <h3 className="font-medium text-slate-800 text-lg uppercase tracking-tight">Checkout</h3>
+                                <p className="text-[10px] uppercase tracking-widest text-slate-400 font-medium max-w-[150px] truncate">{plan}</p>
                             </div>
                             <button onClick={onClose} className="p-2 bg-white rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 shadow-sm border border-slate-100 transition-all">
                                 <X size={16} />
@@ -140,11 +140,11 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                         </div>
 
                         <div className="p-6 text-center border-b border-slate-100 border-dashed bg-gradient-to-b from-slate-50 to-white">
-                            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Total Amount</p>
-                            <h2 className="text-4xl font-black text-slate-800 flex items-center justify-center">
-                                <span className="text-xl text-slate-400 font-bold mr-1 translate-y-0.5">₹</span>{parseFloat(amount).toFixed(2)}
+                            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-1.5">Total Amount</p>
+                            <h2 className="text-4xl font-medium text-slate-800 flex items-center justify-center">
+                                <span className="text-xl text-slate-400 font-medium mr-1 translate-y-0.5">₹</span>{parseFloat(amount).toFixed(2)}
                             </h2>
-                            <p className="text-[9px] text-emerald-600 font-black uppercase tracking-widest mt-2 bg-emerald-50 px-3 py-1 rounded-full inline-block">
+                            <p className="text-[9px] text-emerald-600 font-medium uppercase tracking-widest mt-2 bg-emerald-50 px-3 py-1 rounded-full inline-block">
                                 {type.includes('BOOSTER') ? 'Premium Booster' : 'Lifetime Access'}
                             </p>
                         </div>
@@ -153,7 +153,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                         {isPlatformAlreadyUnlocked && (
                             <div className="mx-5 mt-4 p-3 bg-rose-50 rounded-xl border border-rose-100 flex items-start gap-2">
                                 <AlertCircle size={14} className="text-rose-500 mt-0.5 flex-shrink-0" />
-                                <p className="text-[10px] font-bold text-rose-600">Platform already unlocked.</p>
+                                <p className="text-[10px] font-medium text-rose-600">Platform already unlocked.</p>
                             </div>
                         )}
 
@@ -161,7 +161,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                         {status === 'error' && !isPlatformAlreadyUnlocked && (
                             <div className="mx-5 mt-4 p-3 bg-red-50 rounded-xl border border-red-100 flex items-start gap-2">
                                 <AlertCircle size={14} className="text-red-500 mt-0.5 flex-shrink-0" />
-                                <p className="text-[10px] font-bold text-red-600">{errorMsg}</p>
+                                <p className="text-[10px] font-medium text-red-600">{errorMsg}</p>
                             </div>
                         )}
 
@@ -169,17 +169,17 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                             <button
                                 onClick={isPlatformAlreadyUnlocked ? undefined : handlePay}
                                 disabled={isPlatformAlreadyUnlocked}
-                                className={`w-full ${isPlatformAlreadyUnlocked ? 'bg-slate-300 cursor-not-allowed text-slate-500' : 'bg-sky-500 hover:bg-sky-600 active:scale-[0.98] text-white shadow-lg shadow-sky-200'} font-black py-4 rounded-xl text-[12px] uppercase tracking-widest transition-all flex items-center justify-center gap-2`}
+                                className={`w-full ${isPlatformAlreadyUnlocked ? 'bg-slate-300 cursor-not-allowed text-slate-500' : 'bg-sky-500 hover:bg-sky-600 active:scale-[0.98] text-white shadow-lg shadow-sky-200'} font-medium py-4 rounded-xl text-[12px] uppercase tracking-widest transition-all flex items-center justify-center gap-2`}
                             >
                                 <ShieldCheck size={16} />
                                 {isPlatformAlreadyUnlocked ? 'Already Unlocked' : `Pay ₹${parseFloat(amount).toFixed(2)} via Razorpay`}
                             </button>
-                            <p className="text-center text-[9px] text-slate-400 font-bold mt-3 uppercase tracking-widest">UPI · Card · Netbanking · Wallets</p>
+                            <p className="text-center text-[9px] text-slate-400 font-medium mt-3 uppercase tracking-widest">UPI · Card · Netbanking · Wallets</p>
                         </div>
 
                         <div className="bg-emerald-50 py-2.5 flex items-center justify-center gap-1.5 border-t border-emerald-100">
                             <ShieldCheck size={12} className="text-emerald-500" />
-                            <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-600">Secured by Razorpay</span>
+                            <span className="text-[9px] font-medium uppercase tracking-widest text-emerald-600">Secured by Razorpay</span>
                         </div>
                     </>
                 )}
@@ -189,8 +189,8 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                     <div className="p-12 flex flex-col items-center justify-center text-center gap-4">
                         <Loader2 size={36} className="text-sky-500 animate-spin" />
                         <div>
-                            <p className="font-black text-slate-800 text-[15px]">Preparing Checkout...</p>
-                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Please wait</p>
+                            <p className="font-medium text-slate-800 text-[15px]">Preparing Checkout...</p>
+                            <p className="text-[10px] text-slate-400 font-medium uppercase tracking-widest mt-1">Please wait</p>
                         </div>
                     </div>
                 )}
@@ -203,8 +203,8 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                             <div className="w-16 h-16 border-4 border-sky-500 rounded-full border-t-transparent animate-spin absolute inset-0" />
                         </div>
                         <div>
-                            <p className="font-black text-slate-800 text-[15px]">Processing...</p>
-                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Complete payment in popup</p>
+                            <p className="font-medium text-slate-800 text-[15px]">Processing...</p>
+                            <p className="text-[10px] text-slate-400 font-medium uppercase tracking-widest mt-1">Complete payment in popup</p>
                         </div>
                     </div>
                 )}
@@ -216,8 +216,8 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                             <CheckCircle2 size={32} className="text-emerald-500" />
                         </div>
                         <div>
-                            <p className="font-black text-emerald-600 text-[17px]">Payment Successful!</p>
-                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Unlocked successfully 🎉</p>
+                            <p className="font-medium text-emerald-600 text-[17px]">Payment Successful!</p>
+                            <p className="text-[10px] text-slate-400 font-medium uppercase tracking-widest mt-1">Unlocked successfully 🎉</p>
                         </div>
                     </div>
                 )}

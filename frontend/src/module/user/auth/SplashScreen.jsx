@@ -17,7 +17,7 @@ const SplashScreen = ({ onComplete }) => {
         <div className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#060b1a] transition-all duration-1000 ease-in-out ${isVisible ? 'opacity-100' : 'opacity-0 scale-110 pointer-events-none'}`}>
             <style>
                 {`
-                    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;400;700;900&display=swap');
+                    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;700;900&display=swap');
                     
                     @keyframes logo-pop {
                         0% { transform: scale(0); opacity: 0; }
@@ -46,7 +46,7 @@ const SplashScreen = ({ onComplete }) => {
                         opacity: 0;
                     }
                     .premium-text {
-                        font-family: 'Outfit', sans-serif;
+                        font-family: 'Poppins', sans-serif !important;
                         background: linear-gradient(135deg, #fff 0%, #f59e0b 50%, #fff 100%);
                         background-size: 200% auto;
                         -webkit-background-clip: text;
@@ -55,7 +55,7 @@ const SplashScreen = ({ onComplete }) => {
                         text-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
                     }
                     .dro-text {
-                        font-family: 'Outfit', sans-serif;
+                        font-family: 'Poppins', sans-serif !important;
                         color: #f59e0b;
                         text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
                     }
@@ -76,13 +76,13 @@ const SplashScreen = ({ onComplete }) => {
 
                 {/* Brand Identity */}
                 <div className="relative z-10 text-center animate-text-reveal">
-                    <h2 className="text-[42px] font-black tracking-[-0.02em] flex items-center justify-center">
+                    <h2 className="text-[42px] font-medium tracking-[-0.02em] flex items-center justify-center">
                         <span className="dro-text">DRO</span>
                         <span className="premium-text ml-1">MONEY</span>
                     </h2>
                     <div className="flex items-center justify-center gap-4 mt-2">
                         <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-amber-500/50"></div>
-                        <p className="text-white/50 text-[10px] font-bold uppercase tracking-[0.5em] whitespace-nowrap">The Future of Earning</p>
+                        <p className="text-white/50 text-[10px] font-medium uppercase tracking-[0.5em] whitespace-nowrap">The Future of Earning</p>
                         <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-amber-500/50"></div>
                     </div>
                 </div>
@@ -92,7 +92,7 @@ const SplashScreen = ({ onComplete }) => {
                     <div className="w-56 h-[3px] bg-white/5 rounded-full relative overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 via-amber-500 to-amber-500/0 w-full animate-[shimmer_2s_infinite_linear]"></div>
                     </div>
-                    <span className="text-[8px] font-bold text-amber-500/40 uppercase tracking-widest">Initialising Secure Session</span>
+                    <span className="text-[8px] font-medium text-amber-500/40 uppercase tracking-widest">Initialising Secure Session</span>
                 </div>
             </div>
         </div>

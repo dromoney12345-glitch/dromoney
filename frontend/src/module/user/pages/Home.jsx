@@ -113,7 +113,10 @@ const AdBanners = ({ navigate }) => {
 
     const handleBannerClick = (e, path) => {
         if (e) e.stopPropagation();
-        const targetUrl = path || '/user/home';
+        let targetUrl = path || '/user/events';
+        if (targetUrl === '/user/home') {
+            targetUrl = '/user/events'; // default to events if path is empty or recursive
+        }
         if (targetUrl.startsWith('http')) {
             window.open(targetUrl, '_blank', 'noopener,noreferrer');
         } else {
@@ -124,7 +127,6 @@ const AdBanners = ({ navigate }) => {
     return (
         <div className="relative">
             <div
-                onClick={(e) => handleBannerClick(e, banner.path)}
                 className={`cursor-pointer bg-gradient-to-br ${theme.gradient} rounded-2xl p-6 shadow-xl relative overflow-hidden transition-all duration-700 group min-h-[160px] flex flex-col justify-center`}
             >
                 {/* Background Glass Decor */}
@@ -136,15 +138,17 @@ const AdBanners = ({ navigate }) => {
                     <BannerIcon size={130} strokeWidth={1} />
                 </div>
 
-                <div className={`relative z-10 ${theme.text}`}>
-                    <span className="text-[9px] font-black uppercase tracking-[0.2em] bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10">
+                <div className={`relative z-10 ${theme.text} font-poppins`}>
+                    <span className="text-[9px] uppercase tracking-[0.2em] bg-white/20 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10">
                         {banner.tag}
                     </span>
-                    <h2 className="text-2xl font-black tracking-tight mt-3 leading-none drop-shadow-sm">{banner.title}</h2>
-                    <p className="text-[12px] font-medium text-white/80 mt-2 mb-5 leading-tight max-w-[80%]">{banner.subtitle}</p>
+                    <h2 className="text-2xl tracking-tight mt-3 leading-none drop-shadow-sm">{banner.title}</h2>
+                    <p className="text-[12px] text-white/80 mt-2 mb-5 leading-tight max-w-[80%]">{banner.subtitle}</p>
                     <button 
                         onClick={(e) => handleBannerClick(e, banner.path)}
-                        className="inline-flex items-center gap-2 bg-white text-slate-900 px-5 py-2.5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-black/20 hover:bg-slate-50 transition-all active:scale-95 w-fit"
+                        type="button"
+                        style={{ cursor: 'pointer', zIndex: 50, position: 'relative' }}
+                        className="inline-flex items-center gap-2 bg-white text-slate-900 px-5 py-2.5 rounded-xl uppercase text-[10px] tracking-widest shadow-lg shadow-black/20 hover:bg-slate-50 transition-all active:scale-95 w-fit"
                     >
                         <span>{banner.ctaText || 'Get Started'}</span>
                         <ChevronRight size={14} strokeWidth={3} />
@@ -384,10 +388,10 @@ const Home = () => {
                         <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 mb-4 group-hover:scale-110 transition-all shadow-2xl">
                             <Video size={28} className="text-white fill-white/20" />
                         </div>
-                        <h3 className="text-xl font-black text-white tracking-tight uppercase leading-tight max-w-[280px]">
+                        <h3 className="text-xl font-medium text-white tracking-tight uppercase leading-tight max-w-[280px]">
                             {introConfig.title}
                         </h3>
-                        <p className="text-[10px] font-bold text-sky-400 uppercase tracking-[0.2em] mt-2">
+                        <p className="text-[10px] font-medium text-sky-400 uppercase tracking-[0.2em] mt-2">
                             {introConfig.subtitle}
                         </p>
                     </div>
@@ -396,7 +400,7 @@ const Home = () => {
 
             {/* --- 4. Marketplace & Services (Moved Up) --- */}
             <div className="px-4 pt-2 pb-1">
-                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Marketplace & Services</h3>
+                <h3 className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-3 ml-1">Marketplace & Services</h3>
                 <div className="grid grid-cols-4 gap-y-4 gap-x-2 bg-white rounded-2xl p-5 shadow-xl shadow-slate-200/40 border border-slate-50">
                     {[
                         { icon: Share2, label: 'Refer', color: 'bg-emerald-50 text-emerald-500', path: '/user/income-info' },
@@ -412,7 +416,7 @@ const Home = () => {
                             <div className={`w-12 h-12 ${service.color} rounded-2xl flex items-center justify-center shadow-sm group-hover:-translate-y-1 transition-transform`}>
                                 <service.icon size={22} strokeWidth={2.2} />
                             </div>
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">{service.label}</span>
+                            <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest leading-none">{service.label}</span>
                         </button>
                     ))}
                 </div>
@@ -432,7 +436,7 @@ const Home = () => {
 
                 {/* --- 3. Wallet Section --- */}
                 <div className="mx-[-12px]">
-                    <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-4">Your Wallet</h3>
+                    <h3 className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-3 ml-4">Your Wallet</h3>
                     <div className="bg-gradient-to-br from-teal-800 to-emerald-700 rounded-2xl p-4 shadow-lg relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
                         <div className="flex justify-between items-start mb-1 relative z-10">
@@ -445,7 +449,7 @@ const Home = () => {
                             </div>
                         </div>
 
-                        <h2 className="text-2xl font-bold text-white mb-5 tracking-tight relative z-10">₹ {Number(userData?.wallet?.balance || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</h2>
+                        <h2 className="text-2xl font-medium text-white mb-5 tracking-tight relative z-10">₹ {Number(userData?.wallet?.balance || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</h2>
 
                         <div className="flex justify-around items-center relative z-10">
                             {[
@@ -457,7 +461,7 @@ const Home = () => {
                                     <div className="w-11 h-11 bg-black/20 backdrop-blur-sm rounded-full flex items-center justify-center text-teal-50 transition-all group-hover/btn:bg-white/20">
                                         <action.icon size={18} strokeWidth={2.5} />
                                     </div>
-                                    <span className="text-[9px] text-teal-100 font-bold uppercase group-hover/btn:text-white transition-colors text-center w-full">{action.label}</span>
+                                    <span className="text-[9px] text-teal-100 font-medium uppercase group-hover/btn:text-white transition-colors text-center w-full">{action.label}</span>
                                 </div>
                             ))}
                         </div>
@@ -468,7 +472,7 @@ const Home = () => {
 
                 {/* --- 6. Booster Sections --- */}
                 <div className="space-y-4 mx-[-12px]">
-                    <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-4 mb-1">Premium Boosters</h3>
+                    <h3 className="text-[11px] font-medium text-slate-400 uppercase tracking-widest ml-4 mb-1">Premium Boosters</h3>
                     {/* Support Booster */}
                     <div className="bg-[#FFFBEB] border border-amber-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
                         <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -477,11 +481,11 @@ const Home = () => {
                                     <Coins className="text-amber-500" size={24} />
                                 </div>
                                 <div>
-                                    <h4 className="text-[14px] font-black text-amber-900 tracking-tight leading-none">{boosters.support.title}</h4>
+                                    <h4 className="text-[14px] font-medium text-amber-900 tracking-tight leading-none">{boosters.support.title}</h4>
                                     <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1">
-                                        <p className="text-[10px] font-bold text-amber-600/70 uppercase tracking-tight">{boosters.support.subtitle}</p>
+                                        <p className="text-[10px] font-medium text-amber-600/70 uppercase tracking-tight">{boosters.support.subtitle}</p>
                                         <span className="w-1 h-1 bg-amber-200 rounded-full"></span>
-                                        <p className="text-[10px] font-black text-amber-500 uppercase tracking-tight flex items-center gap-1">
+                                        <p className="text-[10px] font-medium text-amber-500 uppercase tracking-tight flex items-center gap-1">
                                             <Clock size={10} /> {boosters.support.validity || '30 Days'}
                                         </p>
                                     </div>
@@ -497,7 +501,7 @@ const Home = () => {
                                             : isTaskBoosterActive
                                             ? 'bg-slate-100 text-slate-400 cursor-not-allowed shadow-none'
                                             : 'bg-[#10B981] text-white hover:bg-[#059669] shadow-lg shadow-emerald-500/30'
-                                    } px-5 py-2.5 rounded-xl text-[11px] font-black tracking-tight active:scale-95 transition-all w-full sm:w-auto`}
+                                    } px-5 py-2.5 rounded-xl text-[11px] font-medium tracking-tight active:scale-95 transition-all w-full sm:w-auto`}
                                 >
                                     {isSupportBoosterActive ? '✓ Active' : isTaskBoosterActive ? 'Locked' : 'Boost Support'}
                                 </button>
@@ -513,11 +517,11 @@ const Home = () => {
                                     <Zap className="text-sky-500" size={24} />
                                 </div>
                                 <div>
-                                    <h4 className="text-[14px] font-black text-sky-900 tracking-tight leading-none">{boosters.task.title}</h4>
+                                    <h4 className="text-[14px] font-medium text-sky-900 tracking-tight leading-none">{boosters.task.title}</h4>
                                     <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1">
-                                        <p className="text-[10px] font-bold text-sky-600/70 uppercase tracking-tight">{boosters.task.subtitle}</p>
+                                        <p className="text-[10px] font-medium text-sky-600/70 uppercase tracking-tight">{boosters.task.subtitle}</p>
                                         <span className="w-1 h-1 bg-sky-200 rounded-full"></span>
-                                        <p className="text-[10px] font-black text-sky-500 uppercase tracking-tight flex items-center gap-1">
+                                        <p className="text-[10px] font-medium text-sky-500 uppercase tracking-tight flex items-center gap-1">
                                             <Clock size={10} /> {boosters.task.validity || '30 Days'}
                                         </p>
                                     </div>
@@ -533,7 +537,7 @@ const Home = () => {
                                             : isSupportBoosterActive
                                             ? 'bg-slate-100 text-slate-400 cursor-not-allowed shadow-none'
                                             : 'bg-sky-500 hover:bg-sky-600 text-white shadow-lg shadow-sky-500/30'
-                                    } px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-tight active:scale-95 transition-all`}
+                                    } px-5 py-2.5 rounded-xl text-[10px] font-medium uppercase tracking-tight active:scale-95 transition-all`}
                                 >
                                     {isTaskBoosterActive ? '✓ Active' : isSupportBoosterActive ? 'Locked' : 'Buy Now'}
                                 </button>
@@ -551,7 +555,10 @@ const Home = () => {
                         transition={{ duration: 0.6 }}
                         className="mx-[-2px]"
                     >
-                        <div className="w-full bg-slate-900 rounded-2xl p-5 shadow-2xl relative overflow-hidden border border-white/5 group">
+                        <div 
+                            onClick={() => setPaymentConfig({ isOpen: true, plan: lifetimePromo.title, amount: 499, type: 'PLATFORM_UNLOCK' })}
+                            className="w-full bg-slate-900 rounded-2xl p-5 shadow-2xl relative overflow-hidden border border-white/5 group cursor-pointer active:scale-[0.98] transition-all"
+                        >
                             {/* Static Accent Glow for performance/simplicity */}
                             <div className="absolute -top-10 -right-10 w-32 h-32 bg-sky-500/10 rounded-full blur-[60px]"></div>
 
@@ -560,15 +567,15 @@ const Home = () => {
                                 <div className="space-y-1.5">
                                     <div className="flex items-center gap-2">
                                         <Sparkles size={12} className="text-sky-400" />
-                                        <h3 className="text-[10px] font-bold text-sky-400/80 tracking-[0.2em] uppercase font-outfit not-italic">Exclusive Offer</h3>
+                                        <h3 className="text-[10px] font-medium text-sky-400/80 tracking-[0.2em] uppercase font-poppins not-italic">Exclusive Offer</h3>
                                     </div>
-                                    <h2 className="text-lg font-black text-white tracking-tight leading-none font-outfit uppercase not-italic">{lifetimePromo.title}</h2>
+                                    <h2 className="text-lg font-semibold text-white tracking-tight leading-none font-poppins uppercase not-italic">{lifetimePromo.title}</h2>
                                     <div className="h-0.5 w-8 bg-sky-500 rounded-full"></div>
                                 </div>
 
                                 {/* Main Pricing / Info */}
                                 <div className="space-y-2">
-                                    <p className="text-[20px] font-bold text-white tracking-tight not-italic font-outfit leading-none">
+                                    <p className="text-[20px] font-medium text-white tracking-tight not-italic font-poppins leading-none">
                                         {lifetimePromo.priceTag?.replace(/[^\x00-\x7F\u0900-\u097F\u20B9]/g, '')}
                                     </p>
                                     <p className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.1em] not-italic leading-none">
@@ -613,14 +620,14 @@ const Home = () => {
                                     <img src={LogoImg} className="w-full h-full object-contain brightness-0 invert" alt="Dromoney Logo" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <h2 className="text-xl font-bold text-white tracking-tight leading-none uppercase not-italic font-sans">Dromoney</h2>
-                                    <p className="text-[9px] font-medium text-emerald-400 uppercase tracking-widest mt-1.5 not-italic font-sans">Official Affiliate Partner</p>
+                                    <h2 className="text-xl font-semibold text-white tracking-tight leading-none uppercase not-italic font-poppins">Dromoney</h2>
+                                    <p className="text-[9px] font-medium text-emerald-400 uppercase tracking-widest mt-1.5 not-italic font-poppins">Official Affiliate Partner</p>
                                 </div>
                             </div>
 
                         </div>
 
-                        <p className="text-[12px] font-medium text-slate-400 leading-relaxed max-w-[320px] not-italic font-sans">
+                        <p className="text-[12px] font-medium text-slate-400 leading-relaxed max-w-[320px] not-italic font-poppins">
                             India's most trusted affiliate and task-based earning platform. Empowering thousands to earn from home with secure connectivity.
                         </p>
                     </div>
@@ -628,13 +635,13 @@ const Home = () => {
                     {/* Middle Section: Quick Links Grid */}
                     <div className="grid grid-cols-2 gap-10">
                         <div className="space-y-4">
-                            <h4 className="text-[10px] font-bold text-emerald-500/80 uppercase tracking-[0.2em] not-italic font-sans">Legal Policies</h4>
+                            <h4 className="text-[10px] font-medium text-emerald-500/80 uppercase tracking-[0.2em] not-italic font-poppins">Legal Policies</h4>
                             <div className="flex flex-col gap-3">
                                 {footerPolicies.filter(p => p.path !== 'guidelines').map((policy, pIdx) => (
                                     <a
                                         key={pIdx}
                                         href={`/user/info/${policy.path}`}
-                                        className="text-[11.5px] font-medium text-slate-300 hover:text-white transition-colors uppercase not-italic font-sans tracking-wide"
+                                        className="text-[11.5px] font-medium text-slate-300 hover:text-white transition-colors uppercase not-italic font-poppins tracking-wide"
                                     >
                                         {policy.label}
                                     </a>
@@ -642,13 +649,13 @@ const Home = () => {
                             </div>
                         </div>
                         <div className="space-y-4">
-                            <h4 className="text-[10px] font-bold text-emerald-500/80 uppercase tracking-[0.2em] not-italic font-sans">Organization</h4>
+                            <h4 className="text-[10px] font-medium text-emerald-500/80 uppercase tracking-[0.2em] not-italic font-poppins">Organization</h4>
                             <div className="flex flex-col gap-3">
                                 {footerPolicies.filter(p => p.path === 'guidelines').map((policy, pIdx) => (
                                     <a
                                         key={pIdx}
                                         href={`/user/info/${policy.path}`}
-                                        className="text-[11.5px] font-medium text-slate-300 hover:text-white transition-colors uppercase not-italic font-sans tracking-wide"
+                                        className="text-[11.5px] font-medium text-slate-300 hover:text-white transition-colors uppercase not-italic font-poppins tracking-wide"
                                     >
                                         Community Guidelines
                                     </a>
@@ -661,11 +668,11 @@ const Home = () => {
                     <div className="pt-8 border-t border-white/5 flex flex-col items-center gap-4">
                         <div className="flex items-center gap-2.5 px-3 py-1 bg-white/5 rounded-full border border-white/10">
                             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest not-italic font-sans">Network Online</span>
+                            <span className="text-[9px] font-medium text-slate-400 uppercase tracking-widest not-italic font-poppins">Network Online</span>
                         </div>
                         <div className="flex items-center justify-between w-full opacity-40">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest not-italic font-sans">© 2026 Dromoney</p>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest not-italic font-sans">All Rights Reserved</p>
+                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest not-italic font-poppins">© 2026 Dromoney</p>
+                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest not-italic font-poppins">All Rights Reserved</p>
                         </div>
                     </div>
                 </div>

@@ -59,7 +59,7 @@ const Settings = () => {
                         <CheckCircle2 size={24} />
                         <div>
                             <p className="text-xs font-medium uppercase tracking-normal">Settings Saved</p>
-                            <p className="text-[10px] font-bold opacity-80">Platform parameters updated successfully.</p>
+                            <p className="text-[10px] font-medium opacity-80">Platform parameters updated successfully.</p>
                         </div>
                     </div>
                 </div>
@@ -94,7 +94,7 @@ const Settings = () => {
                         <h4 className="text-[11px] font-medium text-amber-900 uppercase tracking-normal mb-2 flex items-center gap-2 relative z-10">
                             <AlertTriangle size={14} /> Attention
                         </h4>
-                        <p className="text-[10px] font-bold text-amber-900/60 leading-relaxed relative z-10">
+                        <p className="text-[10px] font-medium text-amber-900/60 leading-relaxed relative z-10">
                             Changes made to 'Earnings' affect user calculations in real-time. Double check before saving.
                         </p>
                     </div>
@@ -129,7 +129,7 @@ const Settings = () => {
                                                 type="text" 
                                                 value={config.appName}
                                                 onChange={(e) => handleChange('appName', e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all" 
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -141,13 +141,13 @@ const Settings = () => {
                                                 type="email" 
                                                 value={config.contactEmail}
                                                 onChange={(e) => handleChange('contactEmail', e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all" 
                                             />
                                         </div>
                                         <div className="lg:col-span-2 p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
                                             <div>
                                                 <h4 className="text-[13px] font-medium text-slate-800 uppercase tracking-tight">Maintenance Mode</h4>
-                                                <p className="text-[11px] font-bold text-slate-400 mt-1">Temporarily block user access for updates</p>
+                                                <p className="text-[11px] font-medium text-slate-400 mt-1">Temporarily block user access for updates</p>
                                             </div>
                                             <button 
                                                 onClick={() => handleChange('maintenanceMode', !config.maintenanceMode)}
@@ -168,7 +168,7 @@ const Settings = () => {
                                         </div>
                                         <div>
                                             <p className="text-[13px] font-medium text-indigo-900 tracking-tight">Financial Hub Configuration</p>
-                                            <p className="text-[11px] font-bold text-indigo-600/70 mt-1 max-w-md">Configure UPI and Bank details for user registration fees (Default: ₹{config.registrationFee}).</p>
+                                            <p className="text-[11px] font-medium text-indigo-600/70 mt-1 max-w-md">Configure UPI and Bank details for user registration fees (Default: ₹{config.registrationFee}).</p>
                                         </div>
                                     </div>
                                     <div className="space-y-6">
@@ -179,7 +179,7 @@ const Settings = () => {
                                                 value={config.adminUpiId}
                                                 onChange={(e) => handleChange('adminUpiId', e.target.value)}
                                                 placeholder="yourname@upi" 
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" 
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -189,7 +189,7 @@ const Settings = () => {
                                                 value={config.bankDetails}
                                                 onChange={(e) => handleChange('bankDetails', e.target.value)}
                                                 placeholder="Account Number, IFSC, Branch Name..." 
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none" 
                                             />
                                         </div>
                                     </div>
@@ -220,7 +220,7 @@ const Settings = () => {
                                                         className="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-5 py-4 text-lg font-medium text-emerald-600 focus:outline-none focus:border-emerald-500 transition-all" 
                                                     />
                                                 </div>
-                                                <p className="text-[10px] font-bold text-slate-400 mt-3 ml-1 uppercase tracking-tight opacity-60">{item.info}</p>
+                                                <p className="text-[10px] font-medium text-slate-400 mt-3 ml-1 uppercase tracking-tight opacity-60">{item.info}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -231,7 +231,7 @@ const Settings = () => {
                                             </div>
                                             <div>
                                                 <p className="text-[13px] font-medium text-emerald-900 tracking-tight">Referral Reward System</p>
-                                                <p className="text-[11px] font-bold text-emerald-600/70 mt-1">Enable/Disable referral bonuses for all users.</p>
+                                                <p className="text-[11px] font-medium text-emerald-600/70 mt-1">Enable/Disable referral bonuses for all users.</p>
                                             </div>
                                         </div>
                                         <button 
@@ -253,7 +253,7 @@ const Settings = () => {
                                             </div>
                                             <div>
                                                 <p className="text-[13px] font-medium text-rose-900 tracking-tight">Access Control</p>
-                                                <p className="text-[11px] font-bold text-rose-600/70 mt-1">Update primary administrator credentials.</p>
+                                                <p className="text-[11px] font-medium text-rose-600/70 mt-1">Update primary administrator credentials.</p>
                                             </div>
                                         </div>
                                         <div className="space-y-2">
@@ -265,7 +265,7 @@ const Settings = () => {
                                                 type="email" 
                                                 value={config.adminEmail}
                                                 onChange={(e) => handleChange('adminEmail', e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:border-rose-500 transition-all mb-4" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:border-rose-500 transition-all mb-4" 
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -277,7 +277,7 @@ const Settings = () => {
                                                 type="password" 
                                                 value={config.adminPassword}
                                                 onChange={(e) => handleChange('adminPassword', e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-bold text-slate-800 focus:outline-none focus:border-rose-500 transition-all" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:border-rose-500 transition-all" 
                                             />
                                         </div>
                                     </div>
@@ -288,7 +288,7 @@ const Settings = () => {
                         {/* Footer / Save Action */}
                         <div className="mt-12 pt-8 border-t border-slate-100 flex items-center justify-between">
                             <div className="hidden md:block">
-                                <p className="text-[10px] font-bold text-slate-400">Last Sync: {new Date().toLocaleTimeString()}</p>
+                                <p className="text-[10px] font-medium text-slate-400">Last Sync: {new Date().toLocaleTimeString()}</p>
                             </div>
                             <button 
                                 onClick={handleSave}

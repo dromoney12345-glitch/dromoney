@@ -2,8 +2,6 @@ import React, { useState, useRef } from 'react';
 import { X, ShieldCheck, CheckCircle2, FileText, Clock, AlertCircle, Camera, Upload, Loader2 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import api from '../../shared/services/api';
-import { openGallery } from '../../../../imageUploadUtils';
-
 const KycModal = ({ isOpen, onClose }) => {
     const { userData, addNotification, refreshUserProfile } = useUser();
     const [submitting, setSubmitting] = useState(false);
@@ -129,8 +127,8 @@ const KycModal = ({ isOpen, onClose }) => {
                             <Icon size={24} />
                         </div>
                         <div>
-                            <h3 className="font-black text-slate-800 text-lg tracking-tight leading-tight">{config.title}</h3>
-                            <p className="text-[10px] uppercase tracking-[0.15em] text-slate-400 font-bold mt-0.5">{config.subtitle}</p>
+                            <h3 className="font-medium text-slate-800 text-lg tracking-tight leading-tight">{config.title}</h3>
+                            <p className="text-[10px] uppercase tracking-[0.15em] text-slate-400 font-medium mt-0.5">{config.subtitle}</p>
                         </div>
                     </div>
                 </div>
@@ -139,33 +137,35 @@ const KycModal = ({ isOpen, onClose }) => {
                     {status === 'not started' || status === 'rejected' ? (
                         <div className="p-4 space-y-4">
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Aadhaar Number</label>
+                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Aadhaar Number</label>
                                 <input 
                                     type="text" 
                                     value={aadhaarNumber}
                                     onChange={(e) => setAadhaarNumber(e.target.value)}
                                     placeholder="12-digit Aadhaar Number"
-                                    className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[13px] font-bold text-slate-800 placeholder:text-slate-300 outline-none focus:border-blue-500"
+                                    className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[13px] font-medium text-slate-800 placeholder:text-slate-300 outline-none focus:border-blue-500"
                                 />
                             </div>
 
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Front Photo</label>
+                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Front Photo</label>
                                 <div 
-                                    onClick={() => openGallery({
-                                        onSelectFile: (file) => {
-                                            const e = { target: { files: [file] } };
-                                            handleFileChange(e);
-                                        }
-                                    })}
+                                    onClick={() => fileInputRef.current?.click()}
                                     className="w-full aspect-[16/9] bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition-all overflow-hidden relative"
                                 >
+                                    <input 
+                                        type="file" 
+                                        ref={fileInputRef} 
+                                        onChange={handleFileChange} 
+                                        className="hidden" 
+                                        accept="image/*"
+                                    />
                                     {previewUrl ? (
                                         <img src={previewUrl} className="w-full h-full object-cover" alt="Preview" />
                                     ) : (
                                         <>
                                             <Camera size={24} className="text-slate-300 mb-2" />
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase">Click to Upload</span>
+                                            <span className="text-[10px] font-medium text-slate-400 uppercase">Click to Upload</span>
                                         </>
                                     )}
                                 </div>
@@ -178,8 +178,8 @@ const KycModal = ({ isOpen, onClose }) => {
                                     <FileText className="text-slate-400" size={18} />
                                 </div>
                                 <div>
-                                    <span className="font-bold text-slate-800 text-[13px]">Identity Verification</span>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Aadhaar Authentication</p>
+                                    <span className="font-medium text-slate-800 text-[13px]">Identity Verification</span>
+                                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tighter">Aadhaar Authentication</p>
                                 </div>
                             </div>
                             {status === 'approved' || status === 'verified' ? (
@@ -196,12 +196,12 @@ const KycModal = ({ isOpen, onClose }) => {
                         <button 
                             onClick={handleSubmit} 
                             disabled={submitting}
-                            className={`w-full py-4 bg-slate-900 hover:bg-black text-white font-black text-[12px] uppercase tracking-[0.2em] rounded-2xl active:scale-[0.98] transition-all shadow-xl flex items-center justify-center gap-2`}
+                            className={`w-full py-4 bg-slate-900 hover:bg-black text-white font-medium text-[12px] uppercase tracking-[0.2em] rounded-2xl active:scale-[0.98] transition-all shadow-xl flex items-center justify-center gap-2`}
                         >
                             {submitting ? <Loader2 size={16} className="animate-spin" /> : 'Submit KYC'} <Upload size={16} />
                         </button>
                     ) : (
-                        <button onClick={onClose} className={`w-full py-4 ${config.buttonBg} text-white font-black text-[12px] uppercase tracking-[0.2em] rounded-2xl active:scale-[0.98] transition-all shadow-xl flex items-center justify-center gap-2`}>
+                        <button onClick={onClose} className={`w-full py-4 ${config.buttonBg} text-white font-medium text-[12px] uppercase tracking-[0.2em] rounded-2xl active:scale-[0.98] transition-all shadow-xl flex items-center justify-center gap-2`}>
                             {status === 'approved' ? 'Great, Close' : 'Understood'} <Icon size={16} />
                         </button>
                     )}

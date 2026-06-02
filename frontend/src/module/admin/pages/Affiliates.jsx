@@ -132,7 +132,7 @@ const Affiliates = () => {
                 <div className="flex flex-col sm:flex-row items-center gap-3 flex-1 max-w-2xl">
                     <div className="relative flex-1 w-full">
                         <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                        <input type="text" value={search} onChange={handleSearch} placeholder="Search referrers..." className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 py-2.5 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-sky-500 transition-all shadow-inner" />
+                        <input type="text" value={search} onChange={handleSearch} placeholder="Search referrers..." className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 py-2.5 text-[11px] font-medium text-slate-700 outline-none focus:ring-2 focus:ring-sky-500 transition-all shadow-inner" />
                     </div>
                     <div className="flex gap-1.5 bg-slate-50 p-1 rounded-xl border border-slate-100 shadow-inner">
                         {['All', 'Credited', 'Pending'].map(t => (
@@ -235,7 +235,7 @@ const Affiliates = () => {
                                     <div className="absolute -left-[50px] top-0 w-[42px] h-[42px] bg-slate-900 rounded-2xl flex items-center justify-center text-sky-400 text-[14px] shadow-lg">1</div>
                                     <p className="text-[11px] text-slate-400 uppercase tracking-normal mb-1">Registration</p>
                                     <p className="text-[14px] text-slate-800">{selectedAudit.date} at {selectedAudit.joinTime}</p>
-                                    <p className="text-[10px] font-bold text-slate-400 mt-1">IP Address: {selectedAudit.ip}</p>
+                                    <p className="text-[10px] font-medium text-slate-400 mt-1">IP Address: {selectedAudit.ip}</p>
                                 </div>
 
                                 <div className="relative">
@@ -244,13 +244,13 @@ const Affiliates = () => {
                                     <p className="text-[14px] text-slate-800 flex items-center gap-2">
                                         ₹499.00 <span className="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-md">VERIFIED</span>
                                     </p>
-                                    <p className="text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">Txn: {selectedAudit.txnId}</p>
+                                    <p className="text-[11px] font-medium text-slate-400 mt-1 uppercase tracking-tighter">Txn: {selectedAudit.txnId}</p>
                                 </div>
 
                                 <div className="relative">
                                     <div className="absolute -left-[50px] top-0 w-[42px] h-[42px] bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-[14px] shadow-lg">3</div>
                                     <p className="text-[11px] text-slate-400 uppercase tracking-normal mb-1">Commission Credit</p>
-                                    <p className="text-[16px] text-emerald-600">₹200.00 <span className="text-[10px] text-slate-400 font-bold ml-1">Paid to {selectedAudit.referrer}</span></p>
+                                    <p className="text-[16px] text-emerald-600">₹200.00 <span className="text-[10px] text-slate-400 font-medium ml-1">Paid to {selectedAudit.referrer}</span></p>
                                 </div>
                             </div>
 

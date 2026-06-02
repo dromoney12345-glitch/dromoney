@@ -146,7 +146,7 @@ const QuizView = () => {
                     <button onClick={() => navigate('/user/events')} className="p-2 bg-white/80 rounded-full active:scale-90 transition-all cursor-pointer shadow-sm border border-slate-100">
                         <ChevronLeft size={24} className="text-slate-600" />
                     </button>
-                    <h1 className="text-xl font-black text-slate-800 tracking-tight uppercase">{eventData?.title || 'Daily Quiz'}</h1>
+                    <h1 className="text-xl font-medium text-slate-800 tracking-tight uppercase">{eventData?.title || 'Daily Quiz'}</h1>
                 </header>
 
                 <div className="flex-1 flex flex-col items-center justify-center text-center space-y-8">
@@ -155,20 +155,20 @@ const QuizView = () => {
                     </div>
                     
                     <div className="space-y-4">
-                        <h2 className="text-3xl font-black text-slate-800 leading-tight">Ready for the challenge?</h2>
-                        <p className="text-slate-500 font-bold max-w-xs mx-auto text-sm leading-relaxed uppercase tracking-tighter">
+                        <h2 className="text-3xl font-medium text-slate-800 leading-tight">Ready for the challenge?</h2>
+                        <p className="text-slate-500 font-medium max-w-xs mx-auto text-sm leading-relaxed uppercase tracking-tighter">
                             Answer {totalQ || 5} simple questions and win up to {totalQ * 10 || 50} coins in your wallet instantly!
                         </p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 w-full max-w-xs">
                         <div className="bg-white/80 backdrop-blur-md p-4 rounded-3xl border border-slate-100/50 shadow-sm text-center">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Questions</p>
-                            <p className="text-lg font-black text-slate-800">{totalQ || 5}</p>
+                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none mb-2">Questions</p>
+                            <p className="text-lg font-medium text-slate-800">{totalQ || 5}</p>
                         </div>
                         <div className="bg-white/80 backdrop-blur-md p-4 rounded-3xl border border-slate-100/50 shadow-sm text-center">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Time/Ques</p>
-                            <p className="text-lg font-black text-slate-800">15s</p>
+                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none mb-2">Time/Ques</p>
+                            <p className="text-lg font-medium text-slate-800">15s</p>
                         </div>
                     </div>
                 </div>
@@ -176,12 +176,12 @@ const QuizView = () => {
                 {isEventClosed ? (
                     <div className="bg-amber-55/10 backdrop-blur-md border border-amber-200/60 p-4 rounded-2xl flex items-center gap-3 mb-6 max-w-xs mx-auto w-full bg-white/65 shadow-sm">
                         <AlertCircle className="text-amber-550 shrink-0" size={20} />
-                        <p className="text-[11px] font-black text-amber-700 uppercase tracking-widest text-left">You have already completed this quiz today!</p>
+                        <p className="text-[11px] font-medium text-amber-700 uppercase tracking-widest text-left">You have already completed this quiz today!</p>
                     </div>
                 ) : (
                     <button 
                         onClick={() => setCurrentStep(1)}
-                        className="w-full max-w-xs mx-auto bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-3xl font-black text-lg uppercase tracking-widest shadow-2xl shadow-blue-100 active:scale-95 transition-all mb-8 cursor-pointer"
+                        className="w-full max-w-xs mx-auto bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-3xl font-medium text-lg uppercase tracking-widest shadow-2xl shadow-blue-100 active:scale-95 transition-all mb-8 cursor-pointer"
                     >
                         Start Now
                     </button>
@@ -197,12 +197,12 @@ const QuizView = () => {
                 {/* Progress Header */}
                 <div className="bg-white px-6 py-8 rounded-b-[3rem] shadow-xl shadow-slate-200/50 z-10 border-b border-slate-100 sticky top-0">
                     <div className="flex items-center justify-between mb-6 max-w-md mx-auto">
-                        <span className="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-[12px] font-black uppercase tracking-widest border border-blue-100">
+                        <span className="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-[12px] font-medium uppercase tracking-widest border border-blue-100">
                             Question {currentQuestion + 1}/{totalQ}
                         </span>
                         <div className="flex items-center gap-2 bg-rose-50 px-4 py-1.5 rounded-full border border-rose-100">
                             <Timer size={16} className={`text-rose-500 ${timeLeft < 5 ? 'animate-pulse' : ''}`} />
-                            <span className={`text-[14px] font-black ${timeLeft < 5 ? 'text-rose-600' : 'text-slate-700'}`}>{timeLeft}s</span>
+                            <span className={`text-[14px] font-medium ${timeLeft < 5 ? 'text-rose-600' : 'text-slate-700'}`}>{timeLeft}s</span>
                         </div>
                     </div>
                     {/* Progress Bar */}
@@ -215,7 +215,7 @@ const QuizView = () => {
                 </div>
 
                 <div className="flex-1 px-6 py-10 flex flex-col justify-center max-w-md mx-auto w-full">
-                    <h2 className="text-2xl font-black text-slate-800 mb-10 leading-snug tracking-tight text-center">
+                    <h2 className="text-2xl font-medium text-slate-800 mb-10 leading-snug tracking-tight text-center">
                         {question?.question}
                     </h2>
 
@@ -239,7 +239,7 @@ const QuizView = () => {
                                     key={index}
                                     onClick={() => handleOptionSelect(index)}
                                     disabled={isAnswered}
-                                    className={`w-full p-5 rounded-3xl border-2 text-left font-black transition-all flex items-center justify-between group active:scale-[0.98] cursor-pointer shadow-sm ${statusClasses}`}
+                                    className={`w-full p-5 rounded-3xl border-2 text-left font-medium transition-all flex items-center justify-between group active:scale-[0.98] cursor-pointer shadow-sm ${statusClasses}`}
                                 >
                                     <span className="text-[15px] uppercase tracking-tight">{option}</span>
                                     {isAnswered && index === QUESTIONS[currentQuestion].answer && <CheckCircle2 size={24} className="text-emerald-500 shrink-0" />}
@@ -267,17 +267,17 @@ const QuizView = () => {
                 </div>
 
                 <div className="space-y-2">
-                    <h2 className="text-3xl font-black text-slate-800 tracking-tight leading-none uppercase">Victory!</h2>
-                    <p className="text-slate-400 font-extrabold uppercase tracking-widest text-[10px]">Quiz finished successfully</p>
+                    <h2 className="text-3xl font-medium text-slate-800 tracking-tight leading-none uppercase">Victory!</h2>
+                    <p className="text-slate-400 font-medium uppercase tracking-widest text-[10px]">Quiz finished successfully</p>
                 </div>
 
                 {/* Highly polished, compact Pastel score and coin reward card */}
                 <div className="bg-white/95 backdrop-blur-md p-6 rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-200/40 w-full max-w-xs space-y-5">
                     <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 leading-none">Your Final Score</p>
+                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] mb-2 leading-none">Your Final Score</p>
                         <div className="flex items-center justify-center gap-1">
-                             <span className="text-4.5xl font-black text-slate-800 leading-none">{score}</span>
-                             <span className="text-base font-black text-slate-300 mt-3">/ {totalQ || 5}</span>
+                             <span className="text-4.5xl font-medium text-slate-800 leading-none">{score}</span>
+                             <span className="text-base font-medium text-slate-300 mt-3">/ {totalQ || 5}</span>
                         </div>
                     </div>
                     
@@ -288,8 +288,8 @@ const QuizView = () => {
                             <Coins size={18} className="text-white fill-white" />
                         </div>
                         <div className="text-left">
-                            <p className="text-[9px] font-black text-amber-600 uppercase leading-none mb-1">Total Prize</p>
-                            <p className="text-lg font-black text-slate-800 tracking-tight leading-none">+{score * 10} Coins</p>
+                            <p className="text-[9px] font-medium text-amber-600 uppercase leading-none mb-1">Total Prize</p>
+                            <p className="text-lg font-medium text-slate-800 tracking-tight leading-none">+{score * 10} Coins</p>
                         </div>
                     </div>
                 </div>
@@ -300,15 +300,15 @@ const QuizView = () => {
                         <CheckCircle2 size={20} className="text-blue-500" />
                     </div>
                     <div className="text-left">
-                        <h4 className="text-[11px] font-black text-slate-700 uppercase tracking-tight">Event Status</h4>
-                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Closing for verification...</p>
+                        <h4 className="text-[11px] font-medium text-slate-700 uppercase tracking-tight">Event Status</h4>
+                        <p className="text-[9px] font-medium text-slate-400 uppercase tracking-wide">Closing for verification...</p>
                     </div>
                 </div>
             </div>
 
             <button 
                 onClick={() => navigate('/user/events')}
-                className="w-full max-w-xs mx-auto bg-slate-900 hover:bg-black text-white py-4.5 rounded-3xl font-black text-sm uppercase tracking-widest shadow-xl hover:shadow-2xl transition-all mb-8 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                className="w-full max-w-xs mx-auto bg-slate-900 hover:bg-black text-white py-4.5 rounded-3xl font-medium text-sm uppercase tracking-widest shadow-xl hover:shadow-2xl transition-all mb-8 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
             >
                 Continue <ArrowRight size={18} />
             </button>

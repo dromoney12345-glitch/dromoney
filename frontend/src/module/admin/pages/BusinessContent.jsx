@@ -8,7 +8,6 @@ import {
     MessageSquare, Users, Zap, ShieldCheck, ChevronRight
 } from 'lucide-react';
 import api from '../../shared/services/api';
-import { openGallery } from '../../../../imageUploadUtils';
 
 const BusinessContent = () => {
     const [ideas, setIdeas] = useState([]);
@@ -21,6 +20,7 @@ const BusinessContent = () => {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadType, setUploadType] = useState(null);
     const [activePlanIdx, setActivePlanIdx] = useState(0);
+    const bannerInputRef = React.useRef(null);
     
     // Idea Form Data
     const [formData, setFormData] = useState({
@@ -270,11 +270,11 @@ const BusinessContent = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] p-4 sm:p-8 font-inter">
+        <div className="min-h-screen bg-[#F8FAFC] p-4 sm:p-8 font-poppins">
             <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-2xl font-medium text-slate-900 tracking-tight">Business Hub Manager</h1>
-                    <p className="text-sm font-bold text-slate-400 uppercase tracking-normal mt-1">Manage Strategies & Plan Control</p>
+                    <p className="text-sm font-medium text-slate-400 uppercase tracking-normal mt-1">Manage Strategies & Plan Control</p>
                 </div>
                 <div className="flex gap-3">
                     <button 
@@ -315,7 +315,7 @@ const BusinessContent = () => {
                                     <p className="text-[10px] font-medium text-indigo-600 uppercase mt-0.5">₹{idea.potentialEarnings}+ Monthly</p>
                                 </div>
                             </div>
-                            <p className="text-xs font-bold text-slate-400 line-clamp-2 leading-relaxed mb-6">{idea.desc}</p>
+                            <p className="text-xs font-medium text-slate-400 line-clamp-2 leading-relaxed mb-6">{idea.desc}</p>
                             
                             <div className="flex items-center gap-2 pt-4 border-t border-slate-50">
                                 <button onClick={() => openEdit(idea)} className="flex-1 bg-slate-50 text-slate-600 py-3 rounded-xl font-medium text-[10px] uppercase tracking-normal hover:bg-indigo-50 transition-all flex items-center justify-center gap-2"><Edit2 size={14} /> EDIT</button>
@@ -334,7 +334,7 @@ const BusinessContent = () => {
                         <div className="px-8 pt-8 pb-4 flex items-center justify-between border-b border-slate-50">
                             <div>
                                 <h2 className="text-xl font-medium text-slate-900 uppercase tracking-tight">Ecosystem Content</h2>
-                                <p className="text-[10px] font-bold text-amber-500 uppercase tracking-normal mt-0.5">{ecoData.ideaTitle}</p>
+                                <p className="text-[10px] font-medium text-amber-500 uppercase tracking-normal mt-0.5">{ecoData.ideaTitle}</p>
                             </div>
                             <button onClick={() => setShowEcoModal(false)} className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400"><X size={20} /></button>
                         </div>
@@ -393,7 +393,7 @@ const BusinessContent = () => {
                                 >
                                     <div className="min-w-0">
                                         <p className={`font-medium text-xs truncate ${activePlanIdx === idx ? 'text-indigo-600' : 'text-slate-600'}`}>{plan.title || 'Untitled'}</p>
-                                        <p className="text-[9px] font-bold text-slate-400 mt-0.5">₹{plan.price}{plan.duration}</p>
+                                        <p className="text-[9px] font-medium text-slate-400 mt-0.5">₹{plan.price}{plan.duration}</p>
                                     </div>
                                     <ChevronRight size={14} className={activePlanIdx === idx ? 'text-indigo-500' : 'text-slate-300'} />
                                 </button>
@@ -411,7 +411,7 @@ const BusinessContent = () => {
                             <div className="px-8 pt-8 pb-4 flex items-center justify-between border-b border-slate-50 shrink-0">
                                 <div>
                                     <h2 className="text-xl font-medium text-slate-900 uppercase tracking-tight">Customize Membership</h2>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-normal mt-0.5">Edit title, price & duration</p>
+                                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mt-0.5">Edit title, price & duration</p>
                                 </div>
                                 <button onClick={() => setShowSettingsModal(false)} className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400"><X size={20} /></button>
                             </div>
@@ -421,23 +421,23 @@ const BusinessContent = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-medium text-slate-400 uppercase ml-1">Plan Title</label>
-                                            <input type="text" value={settingsData.businessPlans[activePlanIdx].title} onChange={(e) => updatePlanField(activePlanIdx, 'title', e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-bold outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all" />
+                                            <input type="text" value={settingsData.businessPlans[activePlanIdx].title} onChange={(e) => updatePlanField(activePlanIdx, 'title', e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all" />
                                         </div>
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-medium text-slate-400 uppercase ml-1">Price (₹)</label>
-                                            <input type="number" value={settingsData.businessPlans[activePlanIdx].price} onChange={(e) => updatePlanField(activePlanIdx, 'price', e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-bold outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all" />
+                                            <input type="number" value={settingsData.businessPlans[activePlanIdx].price} onChange={(e) => updatePlanField(activePlanIdx, 'price', e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all" />
                                         </div>
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-medium text-indigo-500 uppercase ml-1">Plan Duration</label>
-                                            <input type="text" value={settingsData.businessPlans[activePlanIdx].duration} onChange={(e) => updatePlanField(activePlanIdx, 'duration', e.target.value)} placeholder="e.g. / Yearly" className="w-full bg-indigo-50/30 border border-indigo-100 rounded-xl px-4 py-3 text-xs font-bold outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all text-indigo-600" />
+                                            <input type="text" value={settingsData.businessPlans[activePlanIdx].duration} onChange={(e) => updatePlanField(activePlanIdx, 'duration', e.target.value)} placeholder="e.g. / Yearly" className="w-full bg-indigo-50/30 border border-indigo-100 rounded-xl px-4 py-3 text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all text-indigo-600" />
                                         </div>
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-medium text-emerald-500 uppercase ml-1">Duration (Days)</label>
-                                            <input type="number" value={settingsData.businessPlans[activePlanIdx].durationInDays || 30} onChange={(e) => updatePlanField(activePlanIdx, 'durationInDays', parseInt(e.target.value))} className="w-full bg-emerald-50/30 border border-emerald-100 rounded-xl px-4 py-3 text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all text-emerald-600" />
+                                            <input type="number" value={settingsData.businessPlans[activePlanIdx].durationInDays || 30} onChange={(e) => updatePlanField(activePlanIdx, 'durationInDays', parseInt(e.target.value))} className="w-full bg-emerald-50/30 border border-emerald-100 rounded-xl px-4 py-3 text-xs font-medium outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all text-emerald-600" />
                                         </div>
                                         <div className="md:col-span-3 space-y-1">
                                             <label className="text-[9px] font-medium text-slate-400 uppercase ml-1">Subheading</label>
-                                            <textarea value={settingsData.businessPlans[activePlanIdx].subtitle} onChange={(e) => updatePlanField(activePlanIdx, 'subtitle', e.target.value)} rows="2" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-bold outline-none resize-none focus:ring-2 focus:ring-indigo-500/20 transition-all" />
+                                            <textarea value={settingsData.businessPlans[activePlanIdx].subtitle} onChange={(e) => updatePlanField(activePlanIdx, 'subtitle', e.target.value)} rows="2" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-medium outline-none resize-none focus:ring-2 focus:ring-indigo-500/20 transition-all" />
                                         </div>
                                     </div>
 
@@ -459,11 +459,11 @@ const BusinessContent = () => {
                                                     <div className="grid grid-cols-2 gap-3">
                                                         <div className="col-span-2 space-y-1">
                                                             <label className="text-[8px] font-medium text-slate-300 uppercase ml-1">Heading</label>
-                                                            <input type="text" value={benefit.title} onChange={(e) => updateBenefit(activePlanIdx, bIdx, 'title', e.target.value)} className="w-full bg-white border border-slate-100 rounded-xl px-3 py-2 text-[10px] font-bold outline-none" />
+                                                            <input type="text" value={benefit.title} onChange={(e) => updateBenefit(activePlanIdx, bIdx, 'title', e.target.value)} className="w-full bg-white border border-slate-100 rounded-xl px-3 py-2 text-[10px] font-medium outline-none" />
                                                         </div>
                                                         <div className="space-y-1">
                                                             <label className="text-[8px] font-medium text-slate-300 uppercase ml-1">Icon</label>
-                                                            <select value={benefit.iconType || 'support'} onChange={(e) => updateBenefit(activePlanIdx, bIdx, 'iconType', e.target.value)} className="w-full bg-white border border-slate-100 rounded-xl px-3 py-2 text-[9px] font-bold outline-none">
+                                                            <select value={benefit.iconType || 'support'} onChange={(e) => updateBenefit(activePlanIdx, bIdx, 'iconType', e.target.value)} className="w-full bg-white border border-slate-100 rounded-xl px-3 py-2 text-[9px] font-medium outline-none">
                                                                 <option value="support">Chat</option>
                                                                 <option value="meeting">Users</option>
                                                                 <option value="zap">Zap</option>
@@ -472,7 +472,7 @@ const BusinessContent = () => {
                                                         </div>
                                                         <div className="space-y-1">
                                                             <label className="text-[8px] font-medium text-slate-300 uppercase ml-1">Color</label>
-                                                            <select value={benefit.colorType || 'emerald'} onChange={(e) => updateBenefit(activePlanIdx, bIdx, 'colorType', e.target.value)} className="w-full bg-white border border-slate-100 rounded-xl px-3 py-2 text-[9px] font-bold outline-none">
+                                                            <select value={benefit.colorType || 'emerald'} onChange={(e) => updateBenefit(activePlanIdx, bIdx, 'colorType', e.target.value)} className="w-full bg-white border border-slate-100 rounded-xl px-3 py-2 text-[9px] font-medium outline-none">
                                                                 <option value="emerald">Emerald</option>
                                                                 <option value="indigo">Indigo</option>
                                                                 <option value="amber">Amber</option>
@@ -481,7 +481,7 @@ const BusinessContent = () => {
                                                         </div>
                                                         <div className="col-span-2 space-y-1">
                                                             <label className="text-[8px] font-medium text-slate-300 uppercase ml-1">Subheading</label>
-                                                            <input type="text" value={benefit.subtitle} onChange={(e) => updateBenefit(activePlanIdx, bIdx, 'subtitle', e.target.value)} className="w-full bg-white border border-slate-100 rounded-xl px-3 py-2 text-[9px] font-bold text-slate-400 outline-none" />
+                                                            <input type="text" value={benefit.subtitle} onChange={(e) => updateBenefit(activePlanIdx, bIdx, 'subtitle', e.target.value)} className="w-full bg-white border border-slate-100 rounded-xl px-3 py-2 text-[9px] font-medium text-slate-400 outline-none" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -513,7 +513,7 @@ const BusinessContent = () => {
                         <div className="px-8 pt-8 pb-4 flex items-center justify-between border-b border-slate-50">
                             <div>
                                 <h2 className="text-xl font-medium text-slate-900 uppercase tracking-tight">{editingId ? 'Update Strategy' : 'Create Strategy'}</h2>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-normal mt-0.5">Configure card & support video</p>
+                                <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mt-0.5">Configure card & support video</p>
                             </div>
                             <button onClick={() => setShowModal(false)} className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400"><X size={20} /></button>
                         </div>
@@ -525,10 +525,15 @@ const BusinessContent = () => {
                                         <div className="w-16 h-16 bg-slate-50 border rounded-xl flex items-center justify-center overflow-hidden shrink-0">
                                             {formData.bannerImage ? <img src={formData.bannerImage} className="w-full h-full object-cover" /> : <ImageIcon className="text-slate-200" />}
                                         </div>
+                                        <input 
+                                            type="file" 
+                                            ref={bannerInputRef} 
+                                            onChange={(e) => handleFileUpload(e, 'image')} 
+                                            className="hidden" 
+                                            accept="image/*" 
+                                        />
                                         <div 
-                                            onClick={() => openGallery({
-                                                onSelectFile: (file) => handleFileUpload({ target: { files: [file] } }, 'image')
-                                            })}
+                                            onClick={() => bannerInputRef.current?.click()}
                                             className="flex-1 flex items-center justify-center gap-2 bg-slate-50 text-slate-600 rounded-xl font-medium text-[9px] uppercase cursor-pointer hover:bg-slate-100 transition-all border border-slate-100"
                                         >
                                             {isUploading && uploadType === 'image' ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />} UPLOAD IMAGE
@@ -542,20 +547,20 @@ const BusinessContent = () => {
                                         value={formData.videoUrl}
                                         onChange={(e) => setFormData({...formData, videoUrl: e.target.value})}
                                         placeholder="https://www.youtube.com/watch?v=..."
-                                        className="w-full bg-rose-50/30 border border-rose-100 rounded-xl px-4 py-3 text-sm font-bold outline-none text-rose-600 placeholder:text-rose-300 focus:ring-2 focus:ring-rose-500/20"
+                                        className="w-full bg-rose-50/30 border border-rose-100 rounded-xl px-4 py-3 text-sm font-medium outline-none text-rose-600 placeholder:text-rose-300 focus:ring-2 focus:ring-rose-500/20"
                                     />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Heading</label>
-                                    <input type="text" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold outline-none" required />
+                                    <input type="text" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium outline-none" required />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Monthly Profit</label>
-                                    <input type="text" value={formData.potentialEarnings} onChange={(e) => setFormData({...formData, potentialEarnings: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold outline-none" required />
+                                    <input type="text" value={formData.potentialEarnings} onChange={(e) => setFormData({...formData, potentialEarnings: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium outline-none" required />
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Description</label>
-                                    <textarea value={formData.desc} onChange={(e) => setFormData({...formData, desc: e.target.value})} rows="2" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold outline-none resize-none" required />
+                                    <textarea value={formData.desc} onChange={(e) => setFormData({...formData, desc: e.target.value})} rows="2" className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium outline-none resize-none" required />
                                 </div>
                                 <div className="md:col-span-2 space-y-3">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Select Badges</label>
@@ -572,7 +577,7 @@ const BusinessContent = () => {
                                         value={formData.meetingLink}
                                         onChange={(e) => setFormData({...formData, meetingLink: e.target.value})}
                                         placeholder="https://meet.google.com/xxx-yyy-zzz"
-                                        className="w-full bg-indigo-50/30 border border-indigo-100 rounded-xl px-4 py-3 text-sm font-bold outline-none text-indigo-600 placeholder:text-slate-300 focus:ring-2 focus:ring-indigo-500/20"
+                                        className="w-full bg-indigo-50/30 border border-indigo-100 rounded-xl px-4 py-3 text-sm font-medium outline-none text-indigo-600 placeholder:text-slate-300 focus:ring-2 focus:ring-indigo-500/20"
                                     />
                                 </div>
                                 <div className="md:col-span-2 p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-6">

@@ -126,7 +126,7 @@ const Promotions = () => {
                         <Megaphone size={32} className="text-slate-300" />
                     </div>
                     <h3 className="text-slate-800 font-medium text-lg">No promotion requests yet</h3>
-                    <p className="text-slate-400 font-bold text-sm">When users fill the Promote Your Brand form, they will appear here.</p>
+                    <p className="text-slate-400 font-medium text-sm">When users fill the Promote Your Brand form, they will appear here.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 gap-4">
@@ -142,7 +142,7 @@ const Promotions = () => {
                                         </div>
                                         <div>
                                             <h3 className="font-medium text-slate-800 text-lg leading-none">{promo.name}</h3>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-normal mt-1.5 flex items-center gap-1">
+                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mt-1.5 flex items-center gap-1">
                                                 <Clock size={12} /> Requested on {promo.date}
                                             </p>
                                         </div>
@@ -159,8 +159,8 @@ const Promotions = () => {
                                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                         <div className="space-y-1">
                                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">Contact Info</p>
-                                            <p className="text-xs font-bold text-slate-700 flex items-center gap-1.5"><Phone size={12} className="text-slate-400"/> {promo.mobile}</p>
-                                            <p className="text-xs font-bold text-sky-600 flex items-center gap-1.5 leading-none break-all mt-1">{promo.whatsapp}</p>
+                                            <p className="text-xs font-medium text-slate-700 flex items-center gap-1.5"><Phone size={12} className="text-slate-400"/> {promo.mobile}</p>
+                                            <p className="text-xs font-medium text-sky-600 flex items-center gap-1.5 leading-none break-all mt-1">{promo.whatsapp}</p>
                                         </div>
                                         <div className="space-y-1">
                                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">Task Type</p>
@@ -169,11 +169,11 @@ const Promotions = () => {
                                         <div className="space-y-1">
                                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">Budget Details</p>
                                             <p className="text-xs font-medium text-amber-600 flex items-center gap-1.5">₹{promo.budget}</p>
-                                            <p className="text-[10px] font-bold text-slate-500">{promo.usersRequired} Users Required</p>
+                                            <p className="text-[10px] font-medium text-slate-500">{promo.usersRequired} Users Required</p>
                                         </div>
                                         <div className="space-y-1">
                                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">Task Link</p>
-                                            <a href={promo.link} target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-500 hover:underline flex items-center gap-1.5 truncate max-w-[150px]">
+                                            <a href={promo.link} target="_blank" rel="noreferrer" className="text-xs font-medium text-blue-500 hover:underline flex items-center gap-1.5 truncate max-w-[150px]">
                                                 <Globe size={12} /> Visit Link
                                             </a>
                                         </div>
@@ -182,14 +182,14 @@ const Promotions = () => {
                                     {promo.description && (
                                         <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
                                              <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tight mb-2">Description</p>
-                                             <p className="text-xs font-bold text-slate-600 leading-relaxed">"{promo.description}"</p>
+                                             <p className="text-xs font-medium text-slate-600 leading-relaxed">"{promo.description}"</p>
                                         </div>
                                     )}
 
                                     {promo.adminResponse && (
                                         <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100 mt-2">
                                              <p className="text-[10px] font-medium text-emerald-600 uppercase tracking-tight mb-1 flex items-center gap-1"><MessageSquare size={12}/> Your Response</p>
-                                             <p className="text-xs font-bold text-emerald-800">{promo.adminResponse}</p>
+                                             <p className="text-xs font-medium text-emerald-800">{promo.adminResponse}</p>
                                         </div>
                                     )}
                                 </div>
@@ -257,14 +257,14 @@ const Promotions = () => {
                             <button onClick={() => setIsMsgModalOpen(false)} className="text-slate-400 hover:bg-slate-50 p-2 rounded-full transition-colors"><X size={24}/></button>
                         </div>
                         <div className="p-6">
-                            <p className="text-xs font-bold text-slate-400 mb-4 leading-relaxed">
+                            <p className="text-xs font-medium text-slate-400 mb-4 leading-relaxed">
                                 This message will appear in the user's notification bell icon. You can confirm that you have added their task or ask for more details.
                             </p>
                             <textarea 
                                 value={adminMsg}
                                 onChange={(e) => setAdminMsg(e.target.value)}
                                 placeholder="Write your message here..."
-                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm font-bold text-slate-800 placeholder-slate-300 focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-500/5 transition-all outline-none resize-none h-32 mb-6"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm font-medium text-slate-800 placeholder-slate-300 focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-500/5 transition-all outline-none resize-none h-32 mb-6"
                             ></textarea>
                             
                             <button 

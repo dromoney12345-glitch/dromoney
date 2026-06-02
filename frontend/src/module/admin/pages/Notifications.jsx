@@ -122,18 +122,18 @@ const Notifications = () => {
                             <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal">Title</label>
                             <input type="text" value={title} onChange={e => setTitle(e.target.value)}
                                 placeholder="e.g. Special Weekend Offer!"
-                                className="mt-2 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[14px] font-bold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all" />
+                                className="mt-2 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[14px] font-medium text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all" />
                         </div>
                         <div>
                             <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal">Message</label>
                             <textarea value={message} onChange={e => setMessage(e.target.value)}
                                 placeholder="Write your broadcast message here..."
                                 rows={4}
-                                className="mt-2 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[14px] font-bold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all resize-none" />
+                                className="mt-2 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[14px] font-medium text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all resize-none" />
                         </div>
                         <div className="flex items-center gap-3 p-3 bg-sky-50 rounded-xl border border-sky-100">
                             <Users size={16} className="text-sky-500 shrink-0" />
-                            <p className="text-[12px] font-bold text-sky-700">Will be sent to <span className="font-medium">{userStats.totalActive.toLocaleString()} users</span></p>
+                            <p className="text-[12px] font-medium text-sky-700">Will be sent to <span className="font-medium">{userStats.totalActive.toLocaleString()} users</span></p>
                         </div>
                         <button 
                             disabled={loading}
@@ -168,7 +168,7 @@ const Notifications = () => {
                                         <h3 className="font-medium text-slate-800 text-[20px] leading-tight mb-3">{n.title}</h3>
                                         <div className="flex items-center gap-3 text-slate-500">
                                             <Clock size={16} />
-                                            <span className="text-[13px] font-bold uppercase tracking-wide">
+                                            <span className="text-[13px] font-medium uppercase tracking-wide">
                                                 {new Date(n.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                         </div>

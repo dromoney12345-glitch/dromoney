@@ -35,7 +35,7 @@ const UserLayout = () => {
     };
 
     return (
-        <div className="h-screen bg-slate-50 text-slate-900 font-sans overflow-hidden flex flex-col max-w-md mx-auto relative">
+        <div className="h-screen bg-slate-50 text-slate-900 font-poppins overflow-hidden flex flex-col max-w-md mx-auto relative">
             {/* --- New Dromoney Fixed Top Header --- */}
             <header className="shrink-0 z-50 bg-slate-900/95 backdrop-blur-md px-4 py-1.5 flex items-center justify-between border-b border-slate-800 shadow-xl min-h-[57px]">
                 {/* 1. Brand & Logo (Left Side) */}
@@ -43,7 +43,7 @@ const UserLayout = () => {
                     <div className="w-14 h-14 flex items-center justify-center">
                         <img src={LogoImg} alt="Logo" className="w-full h-full object-contain brightness-110 drop-shadow-xl" />
                     </div>
-                    <span className="text-[18px] font-black tracking-[0.1em] uppercase font-outfit truncate">
+                    <span className="text-[18px] font-semibold tracking-[0.1em] uppercase font-poppins truncate">
                         <span className="text-[#8B4513]">DRO</span>
                         <span className="text-white">MONEY</span>
                     </span>
@@ -98,10 +98,10 @@ const UserLayout = () => {
                             </div>
                             
                             <div className="flex flex-col flex-1">
-                                <p className="text-blue-400 text-[7px] font-black uppercase tracking-[0.2em] leading-none mb-1">
+                                <p className="text-blue-400 text-[7px] font-medium uppercase tracking-[0.2em] leading-none mb-1">
                                     In-App Updates
                                 </p>
-                                <h2 className="text-base font-black text-white tracking-tight leading-none uppercase">
+                                <h2 className="text-base font-medium text-white tracking-tight leading-none uppercase">
                                     Notifications
                                 </h2>
                             </div>
@@ -135,10 +135,10 @@ const UserLayout = () => {
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex justify-between items-start mb-0.5">
-                                            <h4 className={`text-[13px] font-bold tracking-tight transition-colors ${notif.isRead ? 'text-slate-500' : 'text-slate-800'} uppercase`}>
+                                            <h4 className={`text-[13px] font-medium tracking-tight transition-colors ${notif.isRead ? 'text-slate-500' : 'text-slate-800'} uppercase`}>
                                                 {notif.title}
                                             </h4>
-                                            <span className="text-[8px] font-bold text-slate-400 bg-slate-50/50 px-1.5 py-0.5 rounded-md border border-slate-100">
+                                            <span className="text-[8px] font-medium text-slate-400 bg-slate-50/50 px-1.5 py-0.5 rounded-md border border-slate-100">
                                                 {notif.time}
                                             </span>
                                         </div>
@@ -153,7 +153,7 @@ const UserLayout = () => {
                                 <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 opacity-40">
                                     <Bell size={32} className="text-slate-300 stroke-1" />
                                 </div>
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">All caught up</p>
+                                <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-400">All caught up</p>
                             </div>
                         )}
                     </div>
@@ -161,7 +161,7 @@ const UserLayout = () => {
                     <div className="p-4 bg-white/20 backdrop-blur-md border-t border-slate-200/50 text-center">
                         <button
                             onClick={clearNotifications}
-                            className="w-full py-3 text-[10px] font-black text-blue-600 uppercase tracking-widest bg-white border border-blue-100 rounded-xl shadow-sm active:scale-95 transition-all"
+                            className="w-full py-3 text-[10px] font-medium text-blue-600 uppercase tracking-widest bg-white border border-blue-100 rounded-xl shadow-sm active:scale-95 transition-all"
                         >
                             Clear all notifications
                         </button>

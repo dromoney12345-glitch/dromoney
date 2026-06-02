@@ -69,13 +69,13 @@ const ChatSupportPage = () => {
                     <ChevronLeft size={24} />
                 </button>
                 <div className="flex-1">
-                    <h1 className="text-lg font-black text-slate-900 tracking-tight leading-none">Support Chat</h1>
+                    <h1 className="text-lg font-medium text-slate-900 tracking-tight leading-none">Support Chat</h1>
                     <div className="flex items-center justify-between mt-1">
-                        <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1">
+                        <p className="text-[10px] font-medium text-emerald-500 uppercase tracking-widest flex items-center gap-1">
                             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Online
                         </p>
                         {userData.supportExpiry && !isExpired && (
-                            <p className="text-[9px] font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                            <p className="text-[9px] font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
                                 {Math.ceil((new Date(userData.supportExpiry) - new Date()) / (1000 * 60 * 60 * 24))} Days Left
                             </p>
                         )}
@@ -90,8 +90,8 @@ const ChatSupportPage = () => {
                         <div className="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
                             <Send size={32} />
                         </div>
-                        <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Ask us anything!</h3>
-                        <p className="text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-widest leading-relaxed px-10">Our expert team is here to guide your business journey.</p>
+                        <h3 className="text-sm font-medium text-slate-800 uppercase tracking-tight">Ask us anything!</h3>
+                        <p className="text-[11px] font-medium text-slate-400 mt-1 uppercase tracking-widest leading-relaxed px-10">Our expert team is here to guide your business journey.</p>
                     </div>
                 )}
 
@@ -100,7 +100,7 @@ const ChatSupportPage = () => {
                         <div className={`max-w-[85%] p-4 rounded-2xl text-[13px] font-medium shadow-sm leading-relaxed
                             ${m.sender === 'user' ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white text-slate-800 rounded-tl-none border border-slate-100'}`}>
                             {m.message}
-                            <p className="text-[9px] opacity-60 mt-2 text-right font-bold">
+                            <p className="text-[9px] opacity-60 mt-2 text-right font-medium">
                                 {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </p>
                         </div>
@@ -110,11 +110,11 @@ const ChatSupportPage = () => {
                 {isExpired && (
                     <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center space-y-4 shadow-sm">
                         <ShieldAlert className="mx-auto text-amber-500" size={32} />
-                        <h4 className="text-sm font-black text-amber-800 uppercase tracking-tight">Support Plan Expired</h4>
-                        <p className="text-[11px] text-amber-600 font-bold leading-relaxed px-4 uppercase tracking-widest">Your access to support has ended. Please unlock a business plan to continue.</p>
+                        <h4 className="text-sm font-medium text-amber-800 uppercase tracking-tight">Support Plan Expired</h4>
+                        <p className="text-[11px] text-amber-600 font-medium leading-relaxed px-4 uppercase tracking-widest">Your access to support has ended. Please unlock a business plan to continue.</p>
                         <button
                             onClick={() => navigate('/user/business-ideas')}
-                            className="w-full bg-slate-900 text-white py-4 rounded-xl text-[12px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all"
+                            className="w-full bg-slate-900 text-white py-4 rounded-xl text-[12px] font-medium uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all"
                         >
                             <CreditCard size={18} />
                             View Premium Plans

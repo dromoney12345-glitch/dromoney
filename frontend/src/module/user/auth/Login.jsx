@@ -109,8 +109,8 @@ const Login = () => {
         <div className="flex flex-col min-h-screen bg-white animate-in fade-in duration-700 overflow-y-auto scrollbar-hide pb-12">
             <style>
                 {`
-                    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
-                    body { font-family: 'Roboto', sans-serif; }
+                    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700;900&display=swap');
+                    body { font-family: 'Poppins', sans-serif !important; }
                 `}
             </style>
 
@@ -121,7 +121,7 @@ const Login = () => {
                 <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-2">
                         <img src={logoImg} alt="Dromoney" className="w-10 h-10 object-contain" />
-                        <span className="text-[20px] font-black tracking-[0.1em] uppercase">
+                        <span className="text-[20px] font-medium tracking-[0.1em] uppercase">
                             <span className="text-[#8B4513]">DRO</span>
                             <span className="text-white">MONEY</span>
                         </span>
@@ -165,7 +165,7 @@ const Login = () => {
 
                             {/* ── Consent & Policy Checkboxes ── */}
                             <div className="space-y-2 py-1">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 block">Consent & Agreements</span>
+                                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1 block">Consent & Agreements</span>
                                 
                                 <div className="space-y-2 bg-slate-50/50 p-4 rounded-2xl border border-slate-100/80">
                                     <label className="flex items-start gap-3 cursor-pointer group">
@@ -176,10 +176,10 @@ const Login = () => {
                                             className="mt-0.5 w-4 h-4 rounded text-sky-600 border-slate-300 focus:ring-sky-500/20 accent-[#0f1d3a] cursor-pointer"
                                         />
                                         <span className="text-[11.5px] font-semibold text-slate-600 group-hover:text-slate-800 transition-colors leading-relaxed">
-                                            I agree to the <Link to="/user/info/privacy" className="text-[#0f1d3a] font-bold hover:underline" target="_blank">Privacy Policy</Link>, 
-                                            <Link to="/user/info/terms" className="text-[#0f1d3a] font-bold hover:underline mx-1" target="_blank">Terms & Conditions</Link>, 
-                                            <Link to="/user/info/guidelines" className="text-[#0f1d3a] font-bold hover:underline mx-1" target="_blank">Community Guidelines</Link> 
-                                            and <Link to="/user/info/refund-policy" className="text-[#0f1d3a] font-bold hover:underline ml-1" target="_blank">No Refund Policy</Link>.
+                                            I agree to the <Link to="/user/info/privacy" className="text-[#0f1d3a] font-medium hover:underline" target="_blank">Privacy Policy</Link>, 
+                                            <Link to="/user/info/terms" className="text-[#0f1d3a] font-medium hover:underline mx-1" target="_blank">Terms & Conditions</Link>, 
+                                            <Link to="/user/info/guidelines" className="text-[#0f1d3a] font-medium hover:underline mx-1" target="_blank">Community Guidelines</Link> 
+                                            and <Link to="/user/info/refund-policy" className="text-[#0f1d3a] font-medium hover:underline ml-1" target="_blank">No Refund Policy</Link>.
                                         </span>
                                     </label>
                                 </div>
@@ -188,14 +188,14 @@ const Login = () => {
                             <button
                                 type="submit"
                                 disabled={phone.length < 10 || !agreeAll || loading}
-                                className="w-full bg-[#0f1d3a] hover:bg-[#1a2c52] disabled:opacity-50 disabled:pointer-events-none text-white py-4 rounded-full font-bold text-[14px] transition-all shadow-xl shadow-slate-200 active:scale-[0.98] flex items-center justify-center gap-2 mt-2"
+                                className="w-full bg-[#0f1d3a] hover:bg-[#1a2c52] disabled:opacity-50 disabled:pointer-events-none text-white py-4 rounded-full font-medium text-[14px] transition-all shadow-xl shadow-slate-200 active:scale-[0.98] flex items-center justify-center gap-2 mt-2"
                             >
                                 {loading ? <Loader2 size={18} className="animate-spin" /> : 'Sign In'}
                             </button>
 
                             <div className="text-center mt-3">
                                 <p className="text-[11px] font-normal text-slate-400 uppercase tracking-widest">
-                                    Don't Have An Account? <Link to="/user/auth/register" className="text-[#0f1d3a] font-bold underline decoration-sky-500/20 underline-offset-4 ml-1">Sign Up</Link>
+                                    Don't Have An Account? <Link to="/user/auth/register" className="text-[#0f1d3a] font-medium underline decoration-sky-500/20 underline-offset-4 ml-1">Sign Up</Link>
                                 </p>
                             </div>
                         </form>
@@ -204,7 +204,7 @@ const Login = () => {
                             <div className="space-y-1">
                                 <div className="flex justify-between items-center px-1">
                                     <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Verification</label>
-                                    <button type="button" onClick={() => setStep(1)} className="text-[10px] font-bold text-sky-600 uppercase">Change</button>
+                                    <button type="button" onClick={() => setStep(1)} className="text-[10px] font-medium text-sky-600 uppercase">Change</button>
                                 </div>
                                 <div className="relative group">
                                     <input
@@ -222,7 +222,7 @@ const Login = () => {
                                     <button 
                                         type="button" 
                                         onClick={handleResendOtp}
-                                        className="text-[11px] font-bold text-[#0f1d3a] hover:underline disabled:opacity-50"
+                                        className="text-[11px] font-medium text-[#0f1d3a] hover:underline disabled:opacity-50"
                                         disabled={loading || resendCooldown > 0}
                                     >
                                         {resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : 'Resend OTP'}
@@ -233,7 +233,7 @@ const Login = () => {
                             <button
                                 type="submit"
                                 disabled={otp.length !== 6 || loading}
-                                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-full font-bold text-[14px] transition-all shadow-xl shadow-emerald-50 active:scale-[0.98] flex items-center justify-center gap-2"
+                                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-full font-medium text-[14px] transition-all shadow-xl shadow-emerald-50 active:scale-[0.98] flex items-center justify-center gap-2"
                             >
                                 {loading ? <Loader2 size={18} className="animate-spin" /> : 'Verify Account'}
                             </button>

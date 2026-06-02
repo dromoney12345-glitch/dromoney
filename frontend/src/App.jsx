@@ -123,6 +123,12 @@ const RouteTracker = () => {
     if (location.pathname !== '/' && location.pathname !== '/user/auth/login') {
       sessionStorage.setItem('dromoney_last_route', location.pathname + location.search);
     }
+    
+    if (location.pathname.startsWith('/user')) {
+      document.body.classList.add('user-panel');
+    } else {
+      document.body.classList.remove('user-panel');
+    }
   }, [location]);
   return null;
 };

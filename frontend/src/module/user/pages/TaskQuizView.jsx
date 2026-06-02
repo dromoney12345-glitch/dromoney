@@ -89,7 +89,7 @@ const TaskQuizView = () => {
                     <button onClick={() => navigate(-1)} className="p-2 bg-slate-50 rounded-full">
                         <ChevronLeft size={24} className="text-slate-600" />
                     </button>
-                    <h1 className="text-xl font-black text-slate-800 tracking-tight uppercase">Simple Quiz Task</h1>
+                    <h1 className="text-xl font-medium text-slate-800 tracking-tight uppercase">Simple Quiz Task</h1>
                 </header>
 
                 <div className="flex-1 flex flex-col items-center justify-center text-center animate-in zoom-in-95 duration-700">
@@ -97,19 +97,19 @@ const TaskQuizView = () => {
                         <Sparkles size={48} className="text-indigo-500" />
                     </div>
                     
-                    <h2 className="text-3xl font-black text-slate-800 leading-tight mb-3">Ready for challenge?</h2>
-                    <p className="text-slate-500 font-bold max-w-xs mx-auto text-xs leading-relaxed uppercase tracking-tighter mb-8">
+                    <h2 className="text-3xl font-medium text-slate-800 leading-tight mb-3">Ready for challenge?</h2>
+                    <p className="text-slate-500 font-medium max-w-xs mx-auto text-xs leading-relaxed uppercase tracking-tighter mb-8">
                         Answer 10 simple questions correctly to win your coin reward instantly! 
                     </p>
 
                     <div className="grid grid-cols-2 gap-4 w-full max-w-xs mx-auto">
                         <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-sm">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Questions</p>
-                            <p className="text-lg font-black text-slate-800">10</p>
+                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none mb-2">Questions</p>
+                            <p className="text-lg font-medium text-slate-800">10</p>
                         </div>
                         <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-sm">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Time/Ques</p>
-                            <p className="text-lg font-black text-slate-800">10s</p>
+                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none mb-2">Time/Ques</p>
+                            <p className="text-lg font-medium text-slate-800">10s</p>
                         </div>
                     </div>
                 </div>
@@ -117,12 +117,12 @@ const TaskQuizView = () => {
                 {isEventClosed ? (
                     <div className="bg-amber-50 border border-amber-100 p-4 rounded-2xl flex items-center gap-3 mb-6">
                         <AlertCircle className="text-amber-500" size={20} />
-                        <p className="text-[11px] font-black text-amber-700 uppercase tracking-widest">You have already completed this quiz today!</p>
+                        <p className="text-[11px] font-medium text-amber-700 uppercase tracking-widest">You have already completed this quiz today!</p>
                     </div>
                 ) : (
                     <button 
                         onClick={() => setCurrentStep(1)}
-                        className="w-full bg-blue-600 text-white py-5 rounded-3xl font-black text-lg uppercase tracking-widest shadow-2xl shadow-blue-100 active:scale-95 transition-all mb-8"
+                        className="w-full bg-blue-600 text-white py-5 rounded-3xl font-medium text-lg uppercase tracking-widest shadow-2xl shadow-blue-100 active:scale-95 transition-all mb-8"
                     >
                         Start Now
                     </button>
@@ -138,12 +138,12 @@ const TaskQuizView = () => {
                 {/* Progress Header */}
                 <div className="bg-white px-6 py-8 rounded-b-[3rem] shadow-xl shadow-slate-200/50 z-10 border-b border-slate-100">
                     <div className="flex items-center justify-between mb-6">
-                        <span className="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-[12px] font-black uppercase tracking-widest border border-blue-100">
+                        <span className="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-[12px] font-medium uppercase tracking-widest border border-blue-100">
                             Question {currentQuestion + 1}/{totalQ}
                         </span>
                         <div className="flex items-center gap-2 bg-rose-50 px-4 py-1.5 rounded-full border border-rose-100">
                             <Timer size={16} className={`text-rose-500 ${timeLeft < 5 ? 'animate-pulse' : ''}`} />
-                            <span className={`text-[14px] font-black ${timeLeft < 5 ? 'text-rose-600' : 'text-slate-700'}`}>{timeLeft}s</span>
+                            <span className={`text-[14px] font-medium ${timeLeft < 5 ? 'text-rose-600' : 'text-slate-700'}`}>{timeLeft}s</span>
                         </div>
                     </div>
                     {/* Progress Bar */}
@@ -156,7 +156,7 @@ const TaskQuizView = () => {
                 </div>
 
                 <div className="flex-1 px-6 py-4 flex flex-col justify-start">
-                    <h2 className="text-2xl font-black text-slate-800 mb-6 leading-snug tracking-tight">
+                    <h2 className="text-2xl font-medium text-slate-800 mb-6 leading-snug tracking-tight">
                         {question.question}
                     </h2>
 
@@ -180,7 +180,7 @@ const TaskQuizView = () => {
                                     key={index}
                                     onClick={() => handleOptionSelect(index)}
                                     disabled={isAnswered}
-                                    className={`w-full p-5 rounded-3xl border-2 text-left font-black transition-all flex items-center justify-between group ${statusClasses}`}
+                                    className={`w-full p-5 rounded-3xl border-2 text-left font-medium transition-all flex items-center justify-between group ${statusClasses}`}
                                 >
                                     <span className="text-[15px] uppercase tracking-tight">{option}</span>
                                     {isAnswered && index === QUESTIONS[currentQuestion].answer && <CheckCircle2 size={24} className="text-emerald-500" />}
@@ -191,7 +191,7 @@ const TaskQuizView = () => {
                     </div>
                     
                     {/* Common Instruction Below Options */}
-                    <p className="mt-8 text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                    <p className="mt-8 text-center text-[10px] text-slate-400 font-medium uppercase tracking-widest">
                         Choose the most appropriate answer above.
                     </p>
                 </div>
@@ -210,8 +210,8 @@ const TaskQuizView = () => {
                             <Trophy size={64} className="text-emerald-500" />
                         </div>
                         <div className="space-y-2">
-                            <h2 className="text-3xl font-black text-slate-800 tracking-tight leading-none">Successfully <br/> You Won!</h2>
-                            <p className="text-slate-500 font-bold uppercase tracking-widest text-[11px]">Task Completed 10/10</p>
+                            <h2 className="text-3xl font-medium text-slate-800 tracking-tight leading-none">Successfully <br/> You Won!</h2>
+                            <p className="text-slate-500 font-medium uppercase tracking-widest text-[11px]">Task Completed 10/10</p>
                         </div>
                         
                         <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 w-full max-w-xs space-y-4">
@@ -220,8 +220,8 @@ const TaskQuizView = () => {
                                     <Coins size={20} className="text-amber-600 fill-amber-600" />
                                 </div>
                                 <div className="text-left">
-                                    <p className="text-[10px] font-black text-amber-600 uppercase leading-none mb-1">Task Reward</p>
-                                    <p className="text-xl font-black text-slate-800 tracking-tighter leading-none">+{reward} Coin</p>
+                                    <p className="text-[10px] font-medium text-amber-600 uppercase leading-none mb-1">Task Reward</p>
+                                    <p className="text-xl font-medium text-slate-800 tracking-tighter leading-none">+{reward} Coin</p>
                                 </div>
                             </div>
                         </div>
@@ -232,8 +232,8 @@ const TaskQuizView = () => {
                             <XCircle size={64} className="text-rose-500" />
                         </div>
                         <div className="space-y-4">
-                            <h2 className="text-3xl font-black text-slate-800 tracking-tight leading-none">You Lost</h2>
-                            <p className="text-slate-500 font-bold uppercase tracking-widest text-[11px] leading-relaxed">
+                            <h2 className="text-3xl font-medium text-slate-800 tracking-tight leading-none">You Lost</h2>
+                            <p className="text-slate-500 font-medium uppercase tracking-widest text-[11px] leading-relaxed">
                                 You scored {score}/10.<br/>
                                 Please next day try!
                             </p>
@@ -244,7 +244,7 @@ const TaskQuizView = () => {
 
             <button 
                 onClick={() => navigate('/user/earn')}
-                className="w-full bg-slate-900 text-white py-5 rounded-3xl font-black text-sm uppercase tracking-widest shadow-2xl active:scale-95 transition-all mb-4 flex items-center justify-center gap-3"
+                className="w-full bg-slate-900 text-white py-5 rounded-3xl font-medium text-sm uppercase tracking-widest shadow-2xl active:scale-95 transition-all mb-4 flex items-center justify-center gap-3"
             >
                 Continue <ArrowRight size={20} />
             </button>

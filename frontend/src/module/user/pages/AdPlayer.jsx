@@ -116,7 +116,7 @@ const AdPlayer = () => {
         }
     };
 
-    if (error) return <div className="p-10 text-center font-black text-rose-500">{error}</div>;
+    if (error) return <div className="p-10 text-center font-medium text-rose-500">{error}</div>;
     if (!ad) return null;
 
     return (
@@ -146,12 +146,12 @@ const AdPlayer = () => {
                     {/* User Coins Pill */}
                     <div className="bg-[#0F172A]/80 backdrop-blur-md border border-slate-800/80 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
                         <Coins size={13} className="text-amber-400 fill-amber-400" />
-                        <span className="text-[12px] font-black text-white leading-none">{userData?.coins?.total || userData?.coins?.balance || 0}</span>
+                        <span className="text-[12px] font-medium text-white leading-none">{userData?.coins?.total || userData?.coins?.balance || 0}</span>
                     </div>
                     {/* Ad Reward Pill */}
                     <div className="bg-amber-600/10 backdrop-blur-md border border-amber-600/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
                         <Coins size={13} className="text-amber-500 fill-amber-500" />
-                        <span className="text-[11px] font-black text-amber-500 uppercase tracking-wider leading-none">Reward: {ad.coinsReward} Coins</span>
+                        <span className="text-[11px] font-medium text-amber-500 uppercase tracking-wider leading-none">Reward: {ad.coinsReward} Coins</span>
                     </div>
                 </div>
             </header>
@@ -188,8 +188,8 @@ const AdPlayer = () => {
                 {!isCompleted && (
                     <div className="absolute top-20 right-4 bg-[#0F172A]/95 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-slate-800/80 shadow-lg">
                         <div className="flex flex-col items-center">
-                            <span className="text-[18px] font-black text-white leading-none">{timeLeft}</span>
-                            <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.15em] mt-0.5">Seconds</span>
+                            <span className="text-[18px] font-medium text-white leading-none">{timeLeft}</span>
+                            <span className="text-[7px] font-medium text-slate-400 uppercase tracking-[0.15em] mt-0.5">Seconds</span>
                         </div>
                     </div>
                 )}
@@ -206,13 +206,13 @@ const AdPlayer = () => {
                                     <MonitorPlay size={20} />
                                 </div>
                                 <div className="flex flex-col">
-                                    <h2 className="text-[15px] font-black text-slate-800 tracking-tight leading-none mb-1.5">{ad.title}</h2>
-                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">Sponsored Advertisement</p>
+                                    <h2 className="text-[15px] font-medium text-slate-800 tracking-tight leading-none mb-1.5">{ad.title}</h2>
+                                    <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest leading-none">Sponsored Advertisement</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-1.5 bg-indigo-50/50 border border-indigo-100/60 text-indigo-600 px-3 py-1.5 rounded-full shadow-sm">
                                 <Loader2 size={11} className="animate-spin text-indigo-500" />
-                                <span className="text-[9px] font-black uppercase tracking-widest">Watching</span>
+                                <span className="text-[9px] font-medium uppercase tracking-widest">Watching</span>
                             </div>
                         </div>
 
@@ -222,9 +222,9 @@ const AdPlayer = () => {
                                 <Coins size={18} className="text-amber-500 fill-amber-500 animate-bounce" />
                             </div>
                             <div>
-                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1.5">Total Earnings</p>
-                                <p className="text-[13px] font-bold text-slate-600 leading-none">
-                                    Earn <span className="text-indigo-600 font-extrabold">+{ad.coinsReward} coins</span> after {ad.duration}s
+                                <p className="text-[9px] font-medium text-slate-400 uppercase tracking-wider leading-none mb-1.5">Total Earnings</p>
+                                <p className="text-[13px] font-medium text-slate-600 leading-none">
+                                    Earn <span className="text-indigo-600 font-medium">+{ad.coinsReward} coins</span> after {ad.duration}s
                                 </p>
                             </div>
                         </div>
@@ -232,7 +232,7 @@ const AdPlayer = () => {
                         {/* Shield Security Alert Note - Sky blue */}
                         <div className="bg-sky-50 border border-sky-100 p-3.5 rounded-xl flex items-start gap-3">
                             <ShieldCheck size={16} className="text-sky-500 shrink-0 mt-0.5" />
-                            <p className="text-sky-800 font-bold text-[9px] leading-relaxed uppercase tracking-tight">
+                            <p className="text-sky-800 font-medium text-[9px] leading-relaxed uppercase tracking-tight">
                                 Do not close the app while watching. Reward will be added only after full timer completion for verification.
                             </p>
                         </div>
@@ -243,23 +243,23 @@ const AdPlayer = () => {
                             <CheckCircle2 size={40} className="text-emerald-500" />
                         </div>
                         <div className="space-y-1">
-                            <h2 className="text-2xl font-black text-slate-800 tracking-tight">Reward Claimed!</h2>
-                            <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">Coins successfully added to wallet</p>
+                            <h2 className="text-2xl font-medium text-slate-800 tracking-tight">Reward Claimed!</h2>
+                            <p className="text-slate-400 font-medium text-xs uppercase tracking-widest">Coins successfully added to wallet</p>
                         </div>
                         
                         <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex items-center justify-between max-w-xs mx-auto">
                             <div className="text-center w-full">
-                                <p className="text-[10px] font-black text-emerald-600 uppercase">Received</p>
-                                <p className="text-2xl font-black text-emerald-800 tracking-tighter">+{ad.coinsReward} <span className="text-sm">Coins</span></p>
+                                <p className="text-[10px] font-medium text-emerald-600 uppercase">Received</p>
+                                <p className="text-2xl font-medium text-emerald-800 tracking-tighter">+{ad.coinsReward} <span className="text-sm">Coins</span></p>
                             </div>
-                            <button onClick={() => navigate('/user/watch')} className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-emerald-200 transition-all active:scale-95">
+                            <button onClick={() => navigate('/user/watch')} className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-xl text-xs font-medium uppercase tracking-widest shadow-lg shadow-emerald-200 transition-all active:scale-95">
                                 Next Ad
                             </button>
                         </div>
 
                         <button 
                             onClick={() => navigate('/user/watch')}
-                            className="w-full text-slate-400 font-black text-[10px] uppercase tracking-widest pt-4 hover:text-indigo-600 transition-colors"
+                            className="w-full text-slate-400 font-medium text-[10px] uppercase tracking-widest pt-4 hover:text-indigo-600 transition-colors"
                         >
                             Return to list
                         </button>

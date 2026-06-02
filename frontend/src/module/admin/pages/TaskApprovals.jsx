@@ -82,7 +82,7 @@ const TaskApprovals = () => {
                         placeholder="Search by user or task name..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-11 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-[14px] font-bold text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
+                        className="w-full pl-11 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-[14px] font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
                     />
                 </div>
 
@@ -189,7 +189,7 @@ const TaskApprovals = () => {
                                 <div>
                                     <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-0.5">Submitted By</p>
                                     <p className="text-[13px] font-medium text-slate-800">{selectedSubmission.user?.name}</p>
-                                    <p className="text-[11px] font-bold text-slate-500">{selectedSubmission.user?.phone}</p>
+                                    <p className="text-[11px] font-medium text-slate-500">{selectedSubmission.user?.phone}</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-0.5">Reward</p>
@@ -233,9 +233,9 @@ const TaskApprovals = () => {
                                         {selectedSubmission.status === 'Approved' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
                                         <p className="text-[10px] font-medium uppercase tracking-normal">Record Processed</p>
                                     </div>
-                                    <p className="text-[12px] font-bold">This submission was <span className="underline decoration-2 underline-offset-4 uppercase">{selectedSubmission.status}</span></p>
+                                    <p className="text-[12px] font-medium">This submission was <span className="underline decoration-2 underline-offset-4 uppercase">{selectedSubmission.status}</span></p>
                                     {selectedSubmission.rejectionReason && (
-                                        <p className="text-[10px] mt-2 font-bold opacity-70">Reason: {selectedSubmission.rejectionReason}</p>
+                                        <p className="text-[10px] mt-2 font-medium opacity-70">Reason: {selectedSubmission.rejectionReason}</p>
                                     )}
                                 </div>
                             )}

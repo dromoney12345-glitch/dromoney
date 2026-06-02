@@ -38,7 +38,7 @@ const MarketingManager = () => {
             gradient: 'from-slate-500 to-slate-700',
             iconName: 'Sparkles',
             ctaText: 'View More',
-            path: '/user/home',
+            path: '/user/events',
             isActive: true
         };
         try {
@@ -292,7 +292,7 @@ const MarketingManager = () => {
                                         <div className="w-12 h-12 bg-sky-50 text-sky-500 rounded-2xl flex items-center justify-center"><FileText size={24} /></div>
                                         <div>
                                             <h3 className="text-lg font-medium text-slate-800 tracking-tight uppercase">Menu Content Editor</h3>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-normal">Editing: {selectedPage.replace('menu_', '').replace(/_/g, ' ')}</p>
+                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal">Editing: {selectedPage.replace('menu_', '').replace(/_/g, ' ')}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -302,13 +302,13 @@ const MarketingManager = () => {
                                         <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Page Title</label>
                                         <input value={infoPages[selectedPage].title} onChange={(e) => {
                                             const np = { ...infoPages }; np[selectedPage].title = e.target.value; setInfoPages(np);
-                                        }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-bold text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                        }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Page Subtitle</label>
                                         <input value={infoPages[selectedPage].subtitle} onChange={(e) => {
                                             const np = { ...infoPages }; np[selectedPage].subtitle = e.target.value; setInfoPages(np);
-                                        }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-bold text-slate-500 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                        }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-medium text-slate-500 focus:ring-2 focus:ring-sky-500 outline-none" />
                                     </div>
 
                                     <div className="space-y-4 pt-4 border-t border-slate-50">
@@ -323,7 +323,7 @@ const MarketingManager = () => {
                                                 }} className="w-[85%] bg-white border-b border-slate-100 px-3 py-2 text-[13px] font-medium text-slate-700 outline-none mb-2 rounded-t-xl" placeholder="Section Title" />
                                                 <textarea value={section.text} onChange={(e) => {
                                                     const np = { ...infoPages }; np[selectedPage].sections[i].text = e.target.value; setInfoPages(np);
-                                                }} className="w-full bg-white px-3 py-2 text-[12px] font-bold text-slate-500 h-16 outline-none resize-none rounded-b-xl" placeholder="Section Description..." />
+                                                }} className="w-full bg-white px-3 py-2 text-[12px] font-medium text-slate-500 h-16 outline-none resize-none rounded-b-xl" placeholder="Section Description..." />
                                             </div>
                                         ))}
                                         <button onClick={() => {
@@ -356,7 +356,7 @@ const MarketingManager = () => {
                                 <div className="flex-1 bg-white rounded-2xl overflow-hidden flex flex-col relative">
                                     <div className="p-6 bg-slate-900 text-white">
                                         <h1 className="text-2xl font-medium tracking-tight mt-6">{infoPages[selectedPage].title}</h1>
-                                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-normal mt-1">{infoPages[selectedPage].subtitle}</p>
+                                        <p className="text-[11px] font-medium text-slate-400 uppercase tracking-normal mt-1">{infoPages[selectedPage].subtitle}</p>
                                     </div>
                                     <div className="flex-1 bg-white p-4 overflow-y-auto space-y-6 rounded-t-3xl -mt-4 relative z-10 custom-scrollbar">
                                         {infoPages[selectedPage].sections?.map((section, idx) => (
@@ -364,7 +364,7 @@ const MarketingManager = () => {
                                                 <div className="mt-1"><CheckCircle2 size={20} className="text-sky-500" /></div>
                                                 <div>
                                                     <h3 className="text-sm font-medium text-slate-800 mb-1">{section.title}</h3>
-                                                    <p className="text-xs font-bold text-slate-500 leading-relaxed">{section.text}</p>
+                                                    <p className="text-xs font-medium text-slate-500 leading-relaxed">{section.text}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -386,7 +386,7 @@ const MarketingManager = () => {
                                         <div className="w-12 h-12 bg-sky-50 text-sky-500 rounded-2xl flex items-center justify-center"><Sparkles size={24} /></div>
                                         <div>
                                             <h3 className="text-lg font-medium text-slate-800 tracking-tight uppercase">Upcoming Features List</h3>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-normal">Add features seen in the DISCOVER page</p>
+                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal">Add features seen in the DISCOVER page</p>
                                         </div>
                                     </div>
                                     <button onClick={() => handleUpdateMarketingKey('menu_future_features', { title: futureFeaturesTitle, subtitle: futureFeaturesSubtitle, sections: futureFeatures }, 'Future and Option')} className="bg-slate-900 text-white px-4 py-3 rounded-xl text-[10px] font-medium uppercase tracking-normal shadow-xl flex items-center gap-2 hover:scale-105 transition-transform active:scale-95"><Save size={14} /> Global Sync</button>
@@ -395,11 +395,11 @@ const MarketingManager = () => {
                                 <div className="space-y-6">
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Page Title</label>
-                                        <input value={futureFeaturesTitle} onChange={(e) => setFutureFeaturesTitle(e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-bold text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                        <input value={futureFeaturesTitle} onChange={(e) => setFutureFeaturesTitle(e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                     </div>
                                     <div className="space-y-2 mb-6">
                                         <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Page Subtitle / Description</label>
-                                        <input value={futureFeaturesSubtitle} onChange={(e) => setFutureFeaturesSubtitle(e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-bold text-slate-500 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                        <input value={futureFeaturesSubtitle} onChange={(e) => setFutureFeaturesSubtitle(e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-medium text-slate-500 focus:ring-2 focus:ring-sky-500 outline-none" />
                                     </div>
 
                                     {futureFeatures.map((feat, i) => (
@@ -419,7 +419,7 @@ const MarketingManager = () => {
                                                     <label className="text-[9px] font-medium text-slate-400 uppercase tracking-normal ml-1">Description / Subtext</label>
                                                     <textarea value={feat.text} onChange={(e) => {
                                                         const nf = [...futureFeatures]; nf[i].text = e.target.value; setFutureFeatures(nf);
-                                                    }} className="w-full bg-white border border-slate-100 rounded-xl px-4 py-3 text-[12px] font-bold text-slate-500 h-20 outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
+                                                    }} className="w-full bg-white border border-slate-100 rounded-xl px-4 py-3 text-[12px] font-medium text-slate-500 h-20 outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
                                                 </div>
                                             </div>
                                         </div>
@@ -443,7 +443,7 @@ const MarketingManager = () => {
                                         </div>
                                         <div className="flex-1 flex flex-col justify-center mb-6">
                                             <h3 className="text-[16px] font-medium text-slate-800 leading-tight mb-2 uppercase tracking-tight">{futureFeaturesTitle}</h3>
-                                            <p className="text-[11px] font-bold text-slate-400 leading-tight uppercase tracking-[0.1em]">{futureFeaturesSubtitle}</p>
+                                            <p className="text-[11px] font-medium text-slate-400 leading-tight uppercase tracking-[0.1em]">{futureFeaturesSubtitle}</p>
                                         </div>
                                         <button className="w-full bg-slate-900 text-white text-[12px] font-medium py-4 rounded-2xl uppercase tracking-normal shadow-xl shadow-slate-200">
                                             Discover
@@ -476,13 +476,13 @@ const MarketingManager = () => {
                                                     </div>
                                                     <div>
                                                         <h3 className="text-[15px] font-medium text-slate-800 mb-1">{f.title}</h3>
-                                                        <p className="text-[12px] font-bold text-slate-400 leading-relaxed">{f.text}</p>
+                                                        <p className="text-[12px] font-medium text-slate-400 leading-relaxed">{f.text}</p>
                                                     </div>
                                                 </div>
                                             ))}
 
                                             <div className="mt-10 p-4 bg-slate-50 rounded-xl border border-slate-100 border-dashed text-center opacity-70">
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-normal leading-relaxed">
+                                                <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal leading-relaxed">
                                                     Need more help? Our experts are just a click away in the support section.
                                                 </p>
                                             </div>
@@ -513,13 +513,13 @@ const MarketingManager = () => {
                                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Banner Tag</label>
                                                 <input value={banner.tag} onChange={(e) => {
                                                     const newB = [...banners]; newB[idx].tag = e.target.value; setBanners(newB);
-                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-[14px] font-bold text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Gradient Theme</label>
                                                 <select value={banner.gradient} onChange={(e) => {
                                                     const newB = [...banners]; newB[idx].gradient = e.target.value; setBanners(newB);
-                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-[14px] font-bold text-slate-800 outline-none custom-scrollbar">
+                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-[14px] font-medium text-slate-800 outline-none custom-scrollbar">
                                                     <option value="from-sky-500 to-sky-700">Sky Premium (Blue)</option>
                                                     <option value="from-indigo-500 to-indigo-700">Indigo Royal (Dark Blue/Purple)</option>
                                                     <option value="from-emerald-500 to-teal-600">Emerald Growth (Green)</option>
@@ -543,20 +543,20 @@ const MarketingManager = () => {
                                             <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Subtitle / Description</label>
                                             <textarea value={banner.subtitle} onChange={(e) => {
                                                 const newB = [...banners]; newB[idx].subtitle = e.target.value; setBanners(newB);
-                                            }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-bold text-slate-500 h-24 outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
+                                            }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-medium text-slate-500 h-24 outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Button Text (CTA)</label>
                                                 <input value={banner.ctaText} onChange={(e) => {
                                                     const newB = [...banners]; newB[idx].ctaText = e.target.value; setBanners(newB);
-                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-[14px] font-bold text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" placeholder="e.g. Upgrade Now" />
+                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" placeholder="e.g. Upgrade Now" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Action Link (Path)</label>
                                                 <input value={banner.path} onChange={(e) => {
                                                     const newB = [...banners]; newB[idx].path = e.target.value; setBanners(newB);
-                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-[14px] font-bold text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" placeholder="e.g. /user/profile" />
+                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" placeholder="e.g. /user/profile" />
                                             </div>
                                         </div>
                                     </div>
@@ -566,7 +566,7 @@ const MarketingManager = () => {
                                     </button>
                                 </div>
                             ))}
-                            <button onClick={handleAddBanner} className="w-full py-6 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-extrabold text-[12px] uppercase tracking-normal hover:border-sky-500 hover:text-sky-500 transition-all flex flex-col items-center gap-2">
+                            <button onClick={handleAddBanner} className="w-full py-6 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-medium text-[12px] uppercase tracking-normal hover:border-sky-500 hover:text-sky-500 transition-all flex flex-col items-center gap-2">
                                 <Plus size={24} /> Add New Promotional Banner
                             </button>
                         </div>
@@ -584,7 +584,7 @@ const MarketingManager = () => {
                                         <div className="relative z-10 text-white">
                                             <span className="text-[9px] font-medium uppercase tracking-normal bg-white/20 px-3 py-1 rounded-full border border-white/10">{banner.tag}</span>
                                             <h2 className="text-2xl font-medium tracking-tight mt-3">{banner.title}</h2>
-                                            <p className="text-[11px] font-bold text-white/70 mt-1 max-w-[80%]">{banner.subtitle}</p>
+                                            <p className="text-[11px] font-medium text-white/70 mt-1 max-w-[80%]">{banner.subtitle}</p>
                                             <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-xl mt-5 text-[10px] font-medium uppercase tracking-normal">Upgrade Now <ChevronRight size={14} /></div>
                                         </div>
                                     </div>
@@ -606,7 +606,7 @@ const MarketingManager = () => {
                                         <div className={`w-9 h-9 ${type === 'support' ? 'bg-amber-100 text-amber-600' : 'bg-sky-100 text-sky-600'} rounded-xl flex items-center justify-center shrink-0`}><Zap size={18} /></div>
                                         <div>
                                             <h3 className="text-[13px] font-medium text-slate-800 tracking-tight leading-none">{b.title}</h3>
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-normal mt-0.5">Manage Dropdown Benefits</p>
+                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mt-0.5">Manage Dropdown Benefits</p>
                                         </div>
                                     </div>
 
@@ -669,7 +669,7 @@ const MarketingManager = () => {
                                                         const newBenefits = [...b.benefits];
                                                         newBenefits[idx] = e.target.value;
                                                         setBoosters({ ...boosters, [type]: { ...boosters[type], benefits: newBenefits } });
-                                                    }} className="flex-1 bg-white border border-slate-100 rounded-lg px-3 py-2 text-[12px] font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-sky-400 outline-none" />
+                                                    }} className="flex-1 bg-white border border-slate-100 rounded-lg px-3 py-2 text-[12px] font-medium text-slate-700 shadow-sm focus:ring-2 focus:ring-sky-400 outline-none" />
                                                     <button onClick={() => {
                                                         setBoosters({ ...boosters, [type]: { ...boosters[type], benefits: b.benefits.filter((_, i) => i !== idx) } });
                                                     }} className="w-8 h-8 bg-rose-50 text-rose-400 rounded-lg flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shrink-0"><Trash2 size={13} /></button>
@@ -698,7 +698,7 @@ const MarketingManager = () => {
                                 <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center"><Rocket size={32} /></div>
                                 <div>
                                     <h3 className="text-2xl font-medium text-slate-800 tracking-tight">Lifetime Access CMS</h3>
-                                    <p className="text-[12px] font-bold text-slate-400 uppercase tracking-normal mt-1">Manage the core platform offer</p>
+                                    <p className="text-[12px] font-medium text-slate-400 uppercase tracking-normal mt-1">Manage the core platform offer</p>
                                 </div>
                             </div>
 
@@ -713,7 +713,7 @@ const MarketingManager = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Subtitle Note (Hindi)</label>
-                                    <input value={lifetime.note} onChange={(e) => setLifetime({ ...lifetime, note: e.target.value })} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-bold text-slate-500 outline-none" />
+                                    <input value={lifetime.note} onChange={(e) => setLifetime({ ...lifetime, note: e.target.value })} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-medium text-slate-500 outline-none" />
                                 </div>
 
                                 <div className="space-y-3 pt-4">
@@ -722,7 +722,7 @@ const MarketingManager = () => {
                                         <div key={idx} className="flex gap-3">
                                             <input value={item} onChange={(e) => {
                                                 const nf = [...lifetime.features]; nf[idx] = e.target.value; setLifetime({ ...lifetime, features: nf });
-                                            }} className="flex-1 bg-white border border-slate-100 rounded-xl px-4 py-3.5 text-[13px] font-bold text-slate-800 shadow-sm outline-none" />
+                                            }} className="flex-1 bg-white border border-slate-100 rounded-xl px-4 py-3.5 text-[13px] font-medium text-slate-800 shadow-sm outline-none" />
                                             <button onClick={() => {
                                                 const nf = lifetime.features.filter((_, i) => i !== idx); setLifetime({ ...lifetime, features: nf });
                                             }} className="w-12 h-12 bg-rose-50 text-rose-400 rounded-xl flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"><Trash2 size={18} /></button>
@@ -752,7 +752,7 @@ const MarketingManager = () => {
                                         </div>
                                         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5">
                                             <p className="text-[15px] font-medium text-sky-400 leading-none">{lifetime.priceTag}</p>
-                                            <p className="text-[12px] font-bold text-white/70 mt-2 leading-tight">{lifetime.note}</p>
+                                            <p className="text-[12px] font-medium text-white/70 mt-2 leading-tight">{lifetime.note}</p>
                                         </div>
                                         <div className="space-y-4 pl-1">
                                             <p className="text-[10px] font-medium text-white/30 uppercase tracking-normal">Platform Access Benefits:</p>
@@ -781,7 +781,7 @@ const MarketingManager = () => {
                                     <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center"><Briefcase size={30} /></div>
                                     <div>
                                         <h3 className="text-2xl font-medium text-slate-800 tracking-tight">Project Card CMS</h3>
-                                        <p className="text-[12px] font-bold text-slate-400 uppercase tracking-normal mt-1">Manage the "Drowmoney Projects" info card</p>
+                                        <p className="text-[12px] font-medium text-slate-400 uppercase tracking-normal mt-1">Manage the "Drowmoney Projects" info card</p>
                                     </div>
                                 </div>
 
@@ -792,10 +792,10 @@ const MarketingManager = () => {
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Description Text</label>
-                                        <textarea value={projectsData.description} onChange={(e) => setProjectsData({ ...projectsData, description: e.target.value })} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-bold text-slate-500 h-32 outline-none focus:ring-2 focus:ring-emerald-500 transition-all resize-none shadow-inner" />
+                                        <textarea value={projectsData.description} onChange={(e) => setProjectsData({ ...projectsData, description: e.target.value })} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-medium text-slate-500 h-32 outline-none focus:ring-2 focus:ring-emerald-500 transition-all resize-none shadow-inner" />
                                     </div>
 
-                                    <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-[10px] text-emerald-700 font-bold">
+                                    <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-[10px] text-emerald-700 font-medium">
                                         Note: These changes will reflect immediately on the User "Income Center" page.
                                     </div>
                                 </div>
@@ -818,7 +818,7 @@ const MarketingManager = () => {
                                     </div>
                                     <div className="relative">
                                         <h4 className="text-[12px] font-medium text-slate-800 uppercase tracking-normal leading-none">{projectsData.title || 'Drowmoney Projects'}</h4>
-                                        <p className="text-[10px] font-bold text-slate-400 leading-tight mt-1.5 line-clamp-2">
+                                        <p className="text-[10px] font-medium text-slate-400 leading-tight mt-1.5 line-clamp-2">
                                             {projectsData.description || 'Access exclusive high-ticket affiliate projects and scale your monthly income...'}
                                         </p>
                                     </div>

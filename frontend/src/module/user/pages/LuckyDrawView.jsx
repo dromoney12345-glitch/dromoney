@@ -118,7 +118,7 @@ const LuckyDrawView = () => {
                     <button onClick={() => navigate('/user/events')} className="p-2 bg-white/10 rounded-full backdrop-blur active:scale-90 transition-transform">
                         <ChevronLeft size={24} className="text-white" />
                     </button>
-                    <h1 className="text-xl font-black tracking-tight uppercase">🎟️ Lucky Draw</h1>
+                    <h1 className="text-xl font-medium tracking-tight uppercase">🎟️ Lucky Draw</h1>
                 </header>
 
                 <div className="flex-1 flex flex-col items-center justify-center text-center space-y-10">
@@ -132,8 +132,8 @@ const LuckyDrawView = () => {
                     </div>
 
                     <div className="space-y-3">
-                        <h2 className="text-3xl font-black leading-tight">Try Your Luck!</h2>
-                        <p className="text-white/60 font-bold text-sm leading-relaxed max-w-xs">
+                        <h2 className="text-3xl font-medium leading-tight">Try Your Luck!</h2>
+                        <p className="text-white/60 font-medium text-sm leading-relaxed max-w-xs">
                             Pick a ticket and reveal your prize. Win cash up to ₹1000 or bonus coins!
                         </p>
                     </div>
@@ -157,8 +157,8 @@ const LuckyDrawView = () => {
 
                     {revealed && (
                         <div className="bg-white/10 backdrop-blur p-5 rounded-3xl border border-white/20 text-center animate-in zoom-in duration-500">
-                            <p className="text-[11px] font-black uppercase tracking-widest text-white/60 mb-2">Your Ticket Selected!</p>
-                            <p className="text-4xl font-black text-amber-400">🎟️ Ready!</p>
+                            <p className="text-[11px] font-medium uppercase tracking-widest text-white/60 mb-2">Your Ticket Selected!</p>
+                            <p className="text-4xl font-medium text-amber-400">🎟️ Ready!</p>
                         </div>
                     )}
                 </div>
@@ -166,7 +166,7 @@ const LuckyDrawView = () => {
                 <button
                     onClick={handleStartDraw}
                     disabled={!revealed}
-                    className={`w-full py-5 rounded-3xl font-black text-lg uppercase tracking-widest shadow-2xl transition-all mb-8 ${
+                    className={`w-full py-5 rounded-3xl font-medium text-lg uppercase tracking-widest shadow-2xl transition-all mb-8 ${
                         revealed
                             ? 'bg-amber-400 text-indigo-900 active:scale-95 shadow-amber-500/50'
                             : 'bg-white/10 text-white/30 cursor-not-allowed'
@@ -199,8 +199,8 @@ const LuckyDrawView = () => {
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <h2 className="text-2xl font-black animate-pulse">🎯 Drawing the Winner...</h2>
-                        <p className="text-white/60 font-bold text-sm">The wheel is spinning. Good luck!</p>
+                        <h2 className="text-2xl font-medium animate-pulse">🎯 Drawing the Winner...</h2>
+                        <p className="text-white/60 font-medium text-sm">The wheel is spinning. Good luck!</p>
                     </div>
                 </div>
             </div>
@@ -222,29 +222,29 @@ const LuckyDrawView = () => {
                 </div>
 
                 <div className="space-y-3">
-                    <p className="text-[11px] font-black uppercase tracking-[0.3em] text-white/50">Congratulations!</p>
-                    <h2 className="text-4xl font-black leading-tight">You Won!</h2>
+                    <p className="text-[11px] font-medium uppercase tracking-[0.3em] text-white/50">Congratulations!</p>
+                    <h2 className="text-4xl font-medium leading-tight">You Won!</h2>
                 </div>
 
                 <div className={`w-full max-w-xs p-8 rounded-[3rem] border-2 text-center bg-white/10 border-white/20 animate-in zoom-in duration-500`}>
-                    <p className="text-[10px] font-black uppercase tracking-widest mb-3 opacity-70">Your Prize</p>
-                    <p className="text-6xl font-black mb-4">{prize?.label}</p>
+                    <p className="text-[10px] font-medium uppercase tracking-widest mb-3 opacity-70">Your Prize</p>
+                    <p className="text-6xl font-medium mb-4">{prize?.label}</p>
                     {prize?.coins > 0 && (
                         <div className="flex items-center justify-center gap-2 bg-white/85 rounded-2xl p-3 shadow-md">
                             <Coins size={20} className="text-amber-500 fill-amber-500" />
-                            <span className="text-[13px] font-black text-slate-700">+{prize.coins} Coins added to wallet</span>
+                            <span className="text-[13px] font-medium text-slate-700">+{prize.coins} Coins added to wallet</span>
                         </div>
                     )}
                     {prize?.cash > 0 && (
                         <div className="flex items-center justify-center gap-2 bg-white/85 rounded-2xl p-3 shadow-md">
                             <Trophy size={20} className="text-emerald-500" />
-                            <span className="text-[13px] font-black text-slate-700">₹{prize.cash} prize confirmed!</span>
+                            <span className="text-[13px] font-medium text-slate-700">₹{prize.cash} prize confirmed!</span>
                         </div>
                     )}
                 </div>
 
                 <div className="bg-white/10 backdrop-blur p-5 rounded-3xl border border-white/20 text-center w-full max-w-xs">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-white/60">
+                    <p className="text-[10px] font-medium uppercase tracking-widest text-white/60">
                         🎉 Your result has been saved. Cash prizes will be credited within 24 hours.
                     </p>
                 </div>
@@ -252,7 +252,7 @@ const LuckyDrawView = () => {
 
             <button
                 onClick={() => navigate('/user/events')}
-                className="w-full bg-white text-indigo-900 py-5 rounded-3xl font-black text-sm uppercase tracking-widest shadow-2xl active:scale-95 transition-all mb-8 flex items-center justify-center gap-3"
+                className="w-full bg-white text-indigo-900 py-5 rounded-3xl font-medium text-sm uppercase tracking-widest shadow-2xl active:scale-95 transition-all mb-8 flex items-center justify-center gap-3"
             >
                 Back to Events <ArrowRight size={20} />
             </button>

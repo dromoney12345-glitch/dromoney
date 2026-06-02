@@ -11,8 +11,6 @@ import UnlockModal from '../components/UnlockModal';
 import KycModal from '../components/KycModal';
 import ReferralsModal from '../components/ReferralsModal';
 import FeedbackModal from '../components/FeedbackModal';
-import { openGallery } from '../../../../imageUploadUtils';
-
 const Profile = () => {
     const navigate = useNavigate();
     const galleryInputRef = React.useRef(null);
@@ -68,12 +66,7 @@ const Profile = () => {
     };
 
     const triggerGalleryUpload = () => {
-        openGallery({
-            onSelectFile: (file) => {
-                const e = { target: { files: [file] } };
-                handleImageChange(e);
-            }
-        });
+        if (galleryInputRef.current) galleryInputRef.current.click();
     };
 
     const triggerCameraUpload = () => {
@@ -104,10 +97,10 @@ const Profile = () => {
                     </button>
                     
                     <div className="flex flex-col">
-                        <p className="text-blue-400 text-[7px] font-black uppercase tracking-[0.2em] leading-none mb-1">
+                        <p className="text-blue-400 text-[7px] font-medium uppercase tracking-[0.2em] leading-none mb-1">
                             Account Settings
                         </p>
-                        <h1 className="text-base font-black text-white tracking-tight leading-none uppercase">
+                        <h1 className="text-base font-medium text-white tracking-tight leading-none uppercase">
                             Your Profile
                         </h1>
                     </div>
@@ -119,7 +112,7 @@ const Profile = () => {
                 <div className="flex flex-col items-center py-2">
                     <div className="relative mb-4">
 
-                        <div className="w-24 h-24 bg-[#0B1221] rounded-[1.75rem] flex items-center justify-center text-white text-3xl font-bold shadow-xl shadow-slate-200 overflow-hidden border-[3px] border-white relative group">
+                        <div className="w-24 h-24 bg-[#0B1221] rounded-[1.75rem] flex items-center justify-center text-white text-3xl font-medium shadow-xl shadow-slate-200 overflow-hidden border-[3px] border-white relative group">
                             <img src={profileImage || defaultRealImage} alt="Profile" className="w-full h-full object-cover" />
                             {isUploading && (
                                 <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
@@ -140,47 +133,54 @@ const Profile = () => {
                         >
                             <ImageIcon size={14} className="text-slate-600" />
                         </button>
+                        <input 
+                            type="file" 
+                            ref={galleryInputRef} 
+                            onChange={handleImageChange} 
+                            className="hidden" 
+                            accept="image/*"
+                        />
                     </div>
 
                     <div className="flex items-center justify-center mb-1.5">
                         <button 
                             onClick={triggerGalleryUpload}
-                            className="bg-[#0B1221] px-4 py-2 rounded-lg text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
+                            className="bg-[#0B1221] px-4 py-2 rounded-lg text-[10px] font-medium text-white uppercase tracking-widest flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
                         >
                             <ImageIcon size={14} className="text-blue-400" /> Upload Photo
                         </button>
                     </div>
-                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest opacity-60">Change Profile Photo</p>
+                    <p className="text-[8px] font-medium text-slate-400 uppercase tracking-widest opacity-60">Change Profile Photo</p>
                 </div>
 
                 {/* ── User Information Fields ── */}
                 <div className="space-y-3">
                     <div className="space-y-1">
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</p>
+                        <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest ml-1">Full Name</p>
                         <div className="bg-white border border-slate-100 rounded-xl px-4 py-3 flex items-center justify-between shadow-sm">
                             <div className="flex items-center gap-3">
                                 <User size={16} className="text-slate-300" />
-                                <span className="text-[13px] font-bold text-slate-800">{name}</span>
+                                <span className="text-[13px] font-medium text-slate-800">{name}</span>
                             </div>
                             <CheckCircle2 size={14} className="text-emerald-500" />
                         </div>
                     </div>
 
                     <div className="space-y-1">
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">User Identification</p>
+                        <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest ml-1">User Identification</p>
                         <div className="bg-white border border-slate-100 rounded-xl px-4 py-3 flex items-center justify-between shadow-sm">
                             <div className="flex items-center gap-3">
                                 <Award size={16} className="text-slate-300" />
-                                <span className="text-[13px] font-bold text-slate-800">{id}</span>
+                                <span className="text-[13px] font-medium text-slate-800">{id}</span>
                             </div>
-                            <div className="bg-slate-50 px-2 py-0.5 rounded text-[8px] font-bold text-slate-400 border border-slate-100 uppercase tracking-widest">Permanent</div>
+                            <div className="bg-slate-50 px-2 py-0.5 rounded text-[8px] font-medium text-slate-400 border border-slate-100 uppercase tracking-widest">Permanent</div>
                         </div>
                     </div>
                 </div>
 
                 {/* ── Status & Verification Sections ── */}
                 <div className="pt-1">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Verification Status</p>
+                    <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mb-2 ml-1">Verification Status</p>
                     <div className="grid grid-cols-2 gap-3">
                         <button 
                             onClick={() => handleAction('KYC Status')}
@@ -190,8 +190,8 @@ const Profile = () => {
                             <div className="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform border border-emerald-100">
                                 <ShieldCheck size={20} className="text-emerald-500" />
                             </div>
-                            <h4 className="text-[13px] font-bold text-slate-800 leading-tight">KYC Status</h4>
-                            <p className="text-[8px] font-black text-emerald-600 uppercase mt-1 tracking-wider">{kycStatus || 'SUBMITTED'}</p>
+                            <h4 className="text-[13px] font-medium text-slate-800 leading-tight">KYC Status</h4>
+                            <p className="text-[8px] font-medium text-emerald-600 uppercase mt-1 tracking-wider">{kycStatus || 'SUBMITTED'}</p>
                         </button>
 
                         <button 
@@ -202,8 +202,8 @@ const Profile = () => {
                             <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform border border-blue-100">
                                 <Users size={20} className="text-blue-500" />
                             </div>
-                            <h4 className="text-[13px] font-bold text-slate-800 leading-tight">My Referrals</h4>
-                            <p className="text-[8px] font-black text-blue-600 uppercase mt-1 tracking-wider">{referrals.count} ACTIVE</p>
+                            <h4 className="text-[13px] font-medium text-slate-800 leading-tight">My Referrals</h4>
+                            <p className="text-[8px] font-medium text-blue-600 uppercase mt-1 tracking-wider">{referrals.count} ACTIVE</p>
                         </button>
                     </div>
                 </div>
@@ -219,7 +219,7 @@ const Profile = () => {
                                 <Headset size={18} />
                             </div>
                             <div className="text-left">
-                                <h4 className="text-[13px] font-bold text-slate-800 leading-none">Help & Support</h4>
+                                <h4 className="text-[13px] font-medium text-slate-800 leading-none">Help & Support</h4>
                                 <p className="text-[9px] font-medium text-slate-400 mt-1">24/7 technical assistance</p>
                             </div>
                         </div>
@@ -235,7 +235,7 @@ const Profile = () => {
                                 <MessageSquare size={18} />
                             </div>
                             <div className="text-left">
-                                <h4 className="text-[13px] font-bold text-slate-800 leading-none">App Feedback</h4>
+                                <h4 className="text-[13px] font-medium text-slate-800 leading-none">App Feedback</h4>
                                 <p className="text-[9px] font-medium text-slate-400 mt-1">Tell us how to improve</p>
                             </div>
                         </div>
@@ -247,7 +247,7 @@ const Profile = () => {
                 <div className="pt-2">
                     <button 
                         onClick={logout}
-                        className="w-full bg-gradient-to-r from-slate-900 to-slate-800 text-white py-4 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-200 active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer"
+                        className="w-full bg-gradient-to-r from-slate-900 to-slate-800 text-white py-4 rounded-2xl text-[11px] font-medium uppercase tracking-[0.2em] shadow-xl shadow-slate-200 active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer"
                     >
                         <LogOut size={18} className="text-rose-500" /> Logout Account
                     </button>

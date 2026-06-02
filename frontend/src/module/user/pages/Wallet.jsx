@@ -263,7 +263,7 @@ const Wallet = () => {
                         </div>
                         <div>
                             <h4 className="text-[10px] text-emerald-900 uppercase tracking-tight leading-none mb-1">waiting for the admin confirmation..</h4>
-                            <p className="text-[9px] font-bold text-emerald-600/70">Your withdrawal request of ₹{pendingWithdrawal.amount} is pending review.</p>
+                            <p className="text-[9px] font-medium text-emerald-600/70">Your withdrawal request of ₹{pendingWithdrawal.amount} is pending review.</p>
                         </div>
                     </div>
                     <span className="bg-emerald-100 text-emerald-800 text-[8px] uppercase tracking-wider px-2 py-1 rounded-md shrink-0">
@@ -276,23 +276,23 @@ const Wallet = () => {
             <div className="flex bg-slate-200/50 p-1 rounded-lg border border-slate-200/50">
                 <button 
                     onClick={() => { setActiveTab('cash'); setFilter('All'); }}
-                    className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 transition-all ${activeTab === 'cash' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 font-bold'}`}
+                    className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 transition-all ${activeTab === 'cash' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 font-medium'}`}
                 >
                     <IndianRupee size={14} />
-                    <span className="text-[9px] uppercase font-bold tracking-wider">Cash</span>
+                    <span className="text-[9px] uppercase font-medium tracking-wider">Cash</span>
                 </button>
                 <button 
                     onClick={() => { setActiveTab('coins'); setFilter('All'); }}
-                    className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 transition-all ${activeTab === 'coins' ? 'bg-white text-amber-500 shadow-sm' : 'text-slate-500 font-bold'}`}
+                    className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 transition-all ${activeTab === 'coins' ? 'bg-white text-amber-500 shadow-sm' : 'text-slate-500 font-medium'}`}
                 >
                     <Coins size={14} />
-                    <span className="text-[9px] uppercase font-bold tracking-wider">Coins</span>
+                    <span className="text-[9px] uppercase font-medium tracking-wider">Coins</span>
                 </button>
             </div>
 
             {/* --- My Cards Heading --- */}
             <div className="flex items-center justify-between px-1 mt-0.5">
-                <h2 className="text-[15px] font-bold text-slate-800 tracking-tight">My Cards</h2>
+                <h2 className="text-[15px] font-medium text-slate-800 tracking-tight">My Cards</h2>
                 <div className="flex gap-1 opacity-30">
                     <div className="w-1 h-1 bg-slate-900 rounded-full"></div>
                     <div className="w-1 h-1 bg-slate-900 rounded-full"></div>
@@ -305,7 +305,7 @@ const Wallet = () => {
                 
                 <div className="relative z-10 flex flex-col justify-between h-[145px]">
                     <div className="flex justify-between items-start">
-                        <span className="text-[8px] font-bold text-white/40 uppercase tracking-[0.2em]">{activeTab === 'cash' ? 'Cash Account' : 'Coin Assets'}</span>
+                        <span className="text-[8px] font-medium text-white/40 uppercase tracking-[0.2em]">{activeTab === 'cash' ? 'Cash Account' : 'Coin Assets'}</span>
                         <div className="flex relative items-center">
                             <div className="w-5.5 h-5.5 bg-white/20 rounded-full"></div>
                             <div className="w-5.5 h-5.5 bg-white/40 rounded-full -ml-2.5"></div>
@@ -316,7 +316,7 @@ const Wallet = () => {
                         <div className="flex items-center gap-2.5 text-white/80 font-mono tracking-[0.1em] text-[13px]">
                              <span>••••</span> <span>••••</span> <span>••••</span> <span>5222</span>
                         </div>
-                        <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-1">
+                        <h2 className="text-2xl font-medium text-white tracking-tight flex items-center gap-1">
                             {activeTab === 'cash' ? <IndianRupee size={18} className="opacity-80" /> : <Coins size={18} className="opacity-80" />}
                             {activeTab === 'cash' ? Number(wallet.balance).toFixed(2) : coins.total.toLocaleString()}
                         </h2>
@@ -324,12 +324,12 @@ const Wallet = () => {
 
                     <div className="flex justify-between items-end">
                         <div className="flex flex-col">
-                            <p className="text-[6.5px] font-bold text-white/30 uppercase tracking-widest mb-0.5">Card Holder</p>
-                            <p className="text-[10px] font-bold text-white uppercase tracking-wider">{name || 'USER'}</p>
+                            <p className="text-[6.5px] font-medium text-white/30 uppercase tracking-widest mb-0.5">Card Holder</p>
+                            <p className="text-[10px] font-medium text-white uppercase tracking-wider">{name || 'USER'}</p>
                         </div>
                         <div className="flex flex-col items-end">
-                            <p className="text-[6.5px] font-bold text-white/30 uppercase tracking-widest mb-0.5">Expires</p>
-                            <p className="text-[10px] font-bold text-white uppercase tracking-wider">07/27</p>
+                            <p className="text-[6.5px] font-medium text-white/30 uppercase tracking-widest mb-0.5">Expires</p>
+                            <p className="text-[10px] font-medium text-white uppercase tracking-wider">07/27</p>
                         </div>
                     </div>
                 </div>
@@ -346,7 +346,7 @@ const Wallet = () => {
                     </div>
                     <div>
                         <h4 className="text-[12px] text-emerald-900 uppercase tracking-tight leading-none mb-1">Refer & Earn</h4>
-                        <p className="text-[9px] font-bold text-emerald-600/70">Get ₹200 for every friend!</p>
+                        <p className="text-[9px] font-medium text-emerald-600/70">Get ₹200 for every friend!</p>
                     </div>
                 </div>
                 <div className="bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-[9px] uppercase tracking-widest">
@@ -371,11 +371,11 @@ const Wallet = () => {
                     {/* Dynamic Fee & Deduction Previewer */}
                     {amount && !isNaN(parseFloat(amount)) && parseFloat(amount) > 0 && (
                         <div className="bg-slate-50 rounded-lg p-3 border border-slate-100 space-y-1.5 animate-in slide-in-from-top-1 duration-300">
-                            <div className="flex justify-between items-center text-[10px] font-bold text-slate-500">
+                            <div className="flex justify-between items-center text-[10px] font-medium text-slate-500">
                                 <span>Requested Amount:</span>
                                 <span className="text-slate-800">₹{parseFloat(amount).toFixed(2)}</span>
                             </div>
-                            <div className="flex justify-between items-center text-[10px] font-bold text-slate-500">
+                            <div className="flex justify-between items-center text-[10px] font-medium text-slate-500">
                                 <span>Transaction Fee:</span>
                                 <span className="text-amber-600">+ ₹5.00</span>
                             </div>
@@ -392,7 +392,7 @@ const Wallet = () => {
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                             placeholder={`Amount (Min. ₹${minWithdrawal})`}
-                            className="w-full bg-slate-50 border border-slate-100 rounded-lg py-2.5 px-3.5 text-[13px] font-bold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-blue-500 transition-all"
+                            className="w-full bg-slate-50 border border-slate-100 rounded-lg py-2.5 px-3.5 text-[13px] font-medium text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-blue-500 transition-all"
                         />
 
 
@@ -411,7 +411,7 @@ const Wallet = () => {
                                 <Info size={13} className="text-amber-500 shrink-0 mt-0.5" />
                             )}
                             <div className="flex-1">
-                                <p className={`text-[9px] font-bold leading-normal ${
+                                <p className={`text-[9px] font-medium leading-normal ${
                                     pendingWithdrawal ? 'text-amber-800' :
                                     cooldownRemaining > 0 ? 'text-rose-800' :
                                     'text-amber-800'
@@ -457,7 +457,7 @@ const Wallet = () => {
 
             {/* --- Wallet Actions --- */}
             <div className="px-1 mt-1">
-                <h3 className="text-[13px] font-bold text-slate-400 uppercase tracking-widest">Settings</h3>
+                <h3 className="text-[13px] font-medium text-slate-400 uppercase tracking-widest">Settings</h3>
             </div>
             
             <div className="flex flex-col gap-2">
@@ -502,7 +502,7 @@ const Wallet = () => {
             {/* --- Transactions --- */}
             <div className="mt-1">
                 <div className="flex items-center justify-between mb-2.5 px-1">
-                    <h3 className="text-[12px] font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                    <h3 className="text-[12px] font-medium text-slate-800 uppercase tracking-widest flex items-center gap-2">
                         <History size={14} className="text-blue-500" /> History
                     </h3>
                     <div className="flex bg-slate-200/50 p-0.5 rounded-md border border-slate-200/50">
@@ -510,7 +510,7 @@ const Wallet = () => {
                             <button
                                 key={tab}
                                 onClick={() => setFilter(['All', 'Earning', 'Payout'][idx])}
-                                className={`px-2.5 py-1 rounded-[4px] text-[8px] font-bold uppercase tracking-wider transition-all ${filter === ['All', 'Earning', 'Payout'][idx] ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-400'}`}
+                                className={`px-2.5 py-1 rounded-[4px] text-[8px] font-medium uppercase tracking-wider transition-all ${filter === ['All', 'Earning', 'Payout'][idx] ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-400'}`}
                             >
                                 {tab}
                             </button>
@@ -521,7 +521,7 @@ const Wallet = () => {
                 <div className="flex flex-col gap-2 pb-24">
                     {filteredTransactions.length === 0 ? (
                         <div className="text-center py-10 bg-white border border-slate-100 border-dashed rounded-lg">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No Records</p>
+                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">No Records</p>
                         </div>
                     ) : (
                         filteredTransactions.map((tx, index) => (
@@ -531,18 +531,18 @@ const Wallet = () => {
                                         {tx.type === 'credit' ? <ArrowDownLeft size={16} strokeWidth={3} /> : <ArrowUpRight size={16} strokeWidth={3} />}
                                     </div>
                                     <div>
-                                        <h4 className="text-[11.5px] font-bold text-slate-800 leading-tight">{tx.title || tx.source}</h4>
-                                        <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">
+                                        <h4 className="text-[11.5px] font-medium text-slate-800 leading-tight">{tx.title || tx.source}</h4>
+                                        <p className="text-[8px] font-medium text-slate-400 uppercase tracking-wider">
                                             {tx.date ? new Date(tx.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Just now'}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className={`text-[13px] font-bold tracking-tighter ${tx.type === 'credit' ? 'text-emerald-500' : 'text-slate-900'}`}>
+                                    <p className={`text-[13px] font-medium tracking-tighter ${tx.type === 'credit' ? 'text-emerald-500' : 'text-slate-900'}`}>
                                         {tx.type === 'credit' ? '+' : '-'}{activeTab === 'cash' ? '₹' : ''}{Number(tx.amount).toFixed(2)}
                                     </p>
                                     {activeTab === 'cash' && (
-                                        <span className={`text-[7px] font-bold px-1 py-0.5 rounded tracking-widest uppercase inline-block mt-1 ${tx.status === 'Success' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                                        <span className={`text-[7px] font-medium px-1 py-0.5 rounded tracking-widest uppercase inline-block mt-1 ${tx.status === 'Success' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
                                             {tx.status}
                                         </span>
                                     )}
@@ -702,7 +702,7 @@ const Wallet = () => {
                             </div>
 
                             <h3 className="text-[16px] text-slate-800 tracking-tight mb-1">Request Submitted! 🎉</h3>
-                            <p className="text-[13px] font-bold text-amber-600 mb-3 tracking-wide">Waiting for Admin Approval</p>
+                            <p className="text-[13px] font-medium text-amber-600 mb-3 tracking-wide">Waiting for Admin Approval</p>
 
                             <div className="bg-blue-50 border border-blue-100 rounded-xl p-3.5 text-left mb-3">
                                 <p className="text-[10.5px] font-semibold text-slate-600 leading-relaxed">
@@ -712,7 +712,7 @@ const Wallet = () => {
                             </div>
 
                             <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-left">
-                                <p className="text-[9.5px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">What happens next?</p>
+                                <p className="text-[9.5px] font-medium text-slate-400 uppercase tracking-widest mb-1.5">What happens next?</p>
                                 <div className="flex items-start gap-2 mb-1.5">
                                     <div className="w-4 h-4 bg-amber-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                                         <span className="text-[8px] text-amber-600">1</span>
@@ -736,7 +736,7 @@ const Wallet = () => {
 
                         <div className="bg-emerald-50 border-t border-emerald-100 px-4 py-2.5 flex items-center justify-center gap-1.5">
                             <CheckCircle2 size={12} className="text-emerald-500" />
-                            <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">You will be notified upon approval</span>
+                            <span className="text-[9px] font-medium text-emerald-600 uppercase tracking-widest">You will be notified upon approval</span>
                         </div>
 
                         <div className="p-4">
@@ -764,7 +764,7 @@ const Wallet = () => {
                         <p className="text-[11px] text-slate-800 uppercase tracking-wider">
                             {toast.type === 'success' ? 'Success' : toast.type === 'warning' ? 'Warning' : 'Error'}
                         </p>
-                        <p className="text-[10px] text-slate-500 font-bold mt-0.5 leading-snug">{toast.message}</p>
+                        <p className="text-[10px] text-slate-500 font-medium mt-0.5 leading-snug">{toast.message}</p>
                     </div>
                     <button onClick={() => setToast(null)} className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-lg hover:bg-slate-50">
                         <X size={14} />

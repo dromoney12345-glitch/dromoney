@@ -48,7 +48,7 @@ const InfoPageView = () => {
 
     if (loading) {
         return (
-            <div className="flex flex-col min-h-screen bg-[#F8FAFC] items-center justify-center font-sans">
+            <div className="flex flex-col min-h-screen bg-[#F8FAFC] items-center justify-center font-poppins">
                 <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-500 rounded-full animate-spin"></div>
                 <p className="mt-4 text-slate-400 font-medium animate-pulse uppercase tracking-widest text-[10px]">Synchronizing...</p>
             </div>
@@ -57,7 +57,7 @@ const InfoPageView = () => {
 
     if (loading) {
         return (
-            <div className="flex flex-col min-h-screen bg-white items-center justify-center font-sans">
+            <div className="flex flex-col min-h-screen bg-white items-center justify-center font-poppins">
                 <div className="w-10 h-10 border-4 border-slate-100 border-t-red-500 rounded-full animate-spin"></div>
                 <p className="mt-4 text-slate-400 font-medium text-[10px] uppercase tracking-[0.2em]">Loading Design...</p>
             </div>
@@ -67,7 +67,7 @@ const InfoPageView = () => {
     // Special Layout for "How It Works"
     if (pageId === 'how-it-works') {
         return (
-            <div className="flex flex-col min-h-screen bg-white font-sans pb-24 relative overflow-hidden">
+            <div className="flex flex-col min-h-screen bg-white font-poppins pb-24 relative overflow-hidden">
                 {/* Curved Hero Section */}
                 <div className="relative h-64 bg-gradient-to-br from-red-600 to-red-500 rounded-b-[4rem] shadow-2xl shadow-red-100 overflow-hidden">
                     {/* Decorative Background Icon */}
@@ -85,7 +85,7 @@ const InfoPageView = () => {
 
                     {/* Hero Text */}
                     <div className="absolute bottom-12 left-8 z-10">
-                        <h1 className="text-4xl font-bold text-white tracking-tight leading-none mb-2">
+                        <h1 className="text-4xl font-medium text-white tracking-tight leading-none mb-2">
                             How It Works
                         </h1>
                         <p className="text-white/80 text-[11px] font-medium uppercase tracking-[0.3em]">
@@ -109,8 +109,8 @@ const InfoPageView = () => {
                                     
                                     {/* Step Bubble Section */}
                                     <div className="flex flex-col items-center shrink-0 w-14 md:w-20">
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Step</p>
-                                        <div className="w-12 h-12 md:w-16 md:h-16 bg-white border-2 border-slate-100 shadow-xl rounded-full flex items-center justify-center text-slate-900 font-bold text-lg md:text-2xl relative">
+                                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-2">Step</p>
+                                        <div className="w-12 h-12 md:w-16 md:h-16 bg-white border-2 border-slate-100 shadow-xl rounded-full flex items-center justify-center text-slate-900 font-medium text-lg md:text-2xl relative">
                                             0{idx + 1}
                                             <div className="absolute -inset-1 border border-slate-50 rounded-full"></div>
                                         </div>
@@ -138,7 +138,7 @@ const InfoPageView = () => {
 
                                     {/* Text Content Side */}
                                     <div className={`flex flex-col gap-3 md:flex-1 ${isEven ? 'md:text-left' : 'md:text-right'}`}>
-                                        <h3 className="text-xl md:text-2xl font-bold text-red-500 tracking-tight">
+                                        <h3 className="text-xl md:text-2xl font-medium text-red-500 tracking-tight">
                                             {section.title}
                                         </h3>
                                         <p className="text-[13px] font-normal text-slate-500 leading-relaxed">
@@ -160,7 +160,7 @@ const InfoPageView = () => {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 blur-3xl"></div>
                         <h4 className="text-white font-medium text-lg mb-2">Ready to Start?</h4>
                         <p className="text-white/40 text-[11px] font-normal uppercase tracking-[0.2em] mb-6">Join the ecosystem of digital earners</p>
-                        <button className="w-full py-4 bg-red-500 hover:bg-red-600 text-white text-[11px] font-bold uppercase tracking-widest transition-all active:scale-95">
+                        <button className="w-full py-4 bg-red-500 hover:bg-red-600 text-white text-[11px] font-medium uppercase tracking-widest transition-all active:scale-95">
                             Get Started Now
                         </button>
                     </div>
@@ -171,7 +171,7 @@ const InfoPageView = () => {
 
     // Default Layout for other pages (Support, Benefits, About)
     return (
-        <div className="flex flex-col min-h-screen bg-[#F8FAFC] font-sans relative overflow-hidden">
+        <div className="flex flex-col min-h-screen bg-[#F8FAFC] font-poppins relative overflow-hidden">
             {/* Background Decorations */}
             <div className="absolute top-[-5%] left-[-5%] w-[40%] h-[30%] bg-blue-100/40 blur-[100px] rounded-full"></div>
             <div className="absolute top-[20%] right-[-5%] w-[40%] h-[30%] bg-emerald-100/40 blur-[100px] rounded-full"></div>

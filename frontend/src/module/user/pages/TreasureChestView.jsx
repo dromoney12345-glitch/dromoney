@@ -45,8 +45,8 @@ const TreasureChestView = () => {
                     <ChevronLeft size={24} />
                 </button>
                 <div>
-                    <h1 className="text-lg font-black tracking-tight">{task.title}</h1>
-                    <p className="text-[10px] font-bold text-amber-400 uppercase tracking-widest leading-none mt-1">Luck Challenge</p>
+                    <h1 className="text-lg font-medium tracking-tight">{task.title}</h1>
+                    <p className="text-[10px] font-medium text-amber-400 uppercase tracking-widest leading-none mt-1">Luck Challenge</p>
                 </div>
             </header>
 
@@ -54,10 +54,10 @@ const TreasureChestView = () => {
                 <div className="text-center space-y-3">
                     <div className="inline-flex items-center gap-2 bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-500/20 mb-2">
                         <Sparkles size={16} className="text-emerald-400" />
-                        <span className="text-xs font-black text-emerald-400">Guaranteed Prize Inside!</span>
+                        <span className="text-xs font-medium text-emerald-400">Guaranteed Prize Inside!</span>
                     </div>
-                    <h2 className="text-3xl font-black">{step === 0 ? 'Pick a Lucky Chest' : step === 1 ? 'Opening Chest...' : 'You Found a Reward!'}</h2>
-                    <p className="text-white/40 font-bold text-sm">Every chest has a unique reward inside. Choose wisely!</p>
+                    <h2 className="text-3xl font-medium">{step === 0 ? 'Pick a Lucky Chest' : step === 1 ? 'Opening Chest...' : 'You Found a Reward!'}</h2>
+                    <p className="text-white/40 font-medium text-sm">Every chest has a unique reward inside. Choose wisely!</p>
                 </div>
 
                 {/* Chests Grid */}
@@ -86,13 +86,13 @@ const TreasureChestView = () => {
                             
                             {step === 0 && (
                                 <div className="absolute -bottom-3 bg-slate-800 px-3 py-1 rounded-full border border-white/10 shadow-xl">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Box {i + 1}</span>
+                                    <span className="text-[10px] font-medium uppercase tracking-widest text-white/60">Box {i + 1}</span>
                                 </div>
                             )}
 
                             {step === 2 && selectedIdx === i && (
                                 <div className="absolute -bottom-4 bg-emerald-500 px-4 py-2 rounded-full shadow-2xl animate-in fade-in slide-in-from-top-2">
-                                    <span className="text-[11px] font-black text-white uppercase tracking-widest">+{task.reward} Coins</span>
+                                    <span className="text-[11px] font-medium text-white uppercase tracking-widest">+{task.reward} Coins</span>
                                 </div>
                             )}
                         </button>
@@ -106,13 +106,13 @@ const TreasureChestView = () => {
                         <div className="bg-white/5 p-6 rounded-3xl border border-white/10 text-center relative overflow-hidden group">
                            <div className="absolute -top-10 -right-10 w-24 h-24 bg-amber-400/10 rounded-full blur-2xl"></div>
                            <Trophy size={40} className="mx-auto mb-3 text-amber-400 animate-bounce" />
-                           <h3 className="text-xl font-black text-white">Reward Claimed!</h3>
-                           <p className="text-[11px] font-bold text-white/40 uppercase mt-1">Excellent choice, traveler!</p>
+                           <h3 className="text-xl font-medium text-white">Reward Claimed!</h3>
+                           <p className="text-[11px] font-medium text-white/40 uppercase mt-1">Excellent choice, traveler!</p>
                         </div>
                         
                         <button
                             onClick={() => navigate('/user/earn')}
-                            className="w-full bg-indigo-500 text-white py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all text-xs"
+                            className="w-full bg-indigo-500 text-white py-5 rounded-[2rem] font-medium uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all text-xs"
                         >
                             Return to Tasks
                         </button>

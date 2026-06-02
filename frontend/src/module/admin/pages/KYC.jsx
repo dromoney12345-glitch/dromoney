@@ -104,7 +104,7 @@ const KYC = () => {
                         placeholder="Search by name or mobile..."
                         value={search}
                         onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-                        className="w-full pl-11 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-[14px] font-bold text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
+                        className="w-full pl-11 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-[14px] font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
                     />
                 </div>
 
@@ -144,7 +144,7 @@ const KYC = () => {
                                             </div>
                                             <div>
                                                 <p className="font-medium text-slate-800 text-[13px] tracking-tight">{req.name}</p>
-                                                <p className="text-[10px] text-slate-400 font-bold tracking-tight">{req.mobile}</p>
+                                                <p className="text-[10px] text-slate-400 font-medium tracking-tight">{req.mobile}</p>
                                             </div>
                                         </div>
                                     </td>
@@ -287,7 +287,7 @@ const KYC = () => {
                             ) : (
                                 <div className={`p-5 rounded-[24px] text-center border-2 ${selectedKyc.status === 'Approved' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
                                     <p className="text-[10px] font-medium uppercase tracking-normal mb-1">Verification Record</p>
-                                    <p className="text-[12px] font-bold">This submission was verified as <span className="underline decoration-2 underline-offset-4">{selectedKyc.status}</span></p>
+                                    <p className="text-[12px] font-medium">This submission was verified as <span className="underline decoration-2 underline-offset-4">{selectedKyc.status}</span></p>
                                 </div>
                             )}
                         </div>

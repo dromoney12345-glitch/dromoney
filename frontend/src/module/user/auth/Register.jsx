@@ -152,8 +152,8 @@ const Register = () => {
         <div className="flex flex-col min-h-screen bg-white animate-in fade-in duration-700 overflow-y-auto pb-10">
             <style>
                 {`
-                    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
-                    body { font-family: 'Roboto', sans-serif; }
+                    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700;900&display=swap');
+                    body { font-family: 'Poppins', sans-serif !important; }
                 `}
             </style>
 
@@ -164,7 +164,7 @@ const Register = () => {
                 <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-2">
                         <img src={logoImg} alt="Dromoney" className="w-10 h-10 object-contain" />
-                        <span className="text-[20px] font-black tracking-[0.1em] uppercase">
+                        <span className="text-[20px] font-medium tracking-[0.1em] uppercase">
                             <span className="text-[#8B4513]">DRO</span>
                             <span className="text-white">MONEY</span>
                         </span>
@@ -234,10 +234,10 @@ const Register = () => {
                                         <Gift className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
                                     </div>
                                     {checkingReferral && (
-                                        <div className="text-[9px] text-slate-400 font-bold ml-3 mt-1 animate-pulse">Verifying referral code...</div>
+                                        <div className="text-[9px] text-slate-400 font-medium ml-3 mt-1 animate-pulse">Verifying referral code...</div>
                                     )}
                                     {referrerName && (
-                                        <div className="mt-1.5 px-4 py-1.5 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center gap-2 text-emerald-600 text-[10px] font-black uppercase tracking-wider animate-in fade-in zoom-in duration-300">
+                                        <div className="mt-1.5 px-4 py-1.5 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center gap-2 text-emerald-600 text-[10px] font-medium uppercase tracking-wider animate-in fade-in zoom-in duration-300">
                                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                                             <span>Referred By: {referrerName}</span>
                                         </div>
@@ -263,13 +263,13 @@ const Register = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full bg-[#0f1d3a] hover:bg-[#1a2c52] text-white py-3.5 rounded-full font-bold text-[14px] transition-all shadow-xl shadow-slate-200 active:scale-[0.98] flex items-center justify-center gap-2 mt-2"
+                                className="w-full bg-[#0f1d3a] hover:bg-[#1a2c52] text-white py-3.5 rounded-full font-medium text-[14px] transition-all shadow-xl shadow-slate-200 active:scale-[0.98] flex items-center justify-center gap-2 mt-2"
                             >
                                 {loading ? <Loader2 size={18} className="animate-spin" /> : 'Sign Up Now'}
                             </button>
                             <div className="text-center mt-3">
                                 <p className="text-[11px] font-normal text-slate-400 uppercase tracking-widest">
-                                    Already Have An Account? <Link to="/user/auth/login" className="text-[#0f1d3a] font-bold underline decoration-sky-500/20 underline-offset-4 ml-1">Sign In</Link>
+                                    Already Have An Account? <Link to="/user/auth/login" className="text-[#0f1d3a] font-medium underline decoration-sky-500/20 underline-offset-4 ml-1">Sign In</Link>
                                 </p>
                             </div>
                         </form>
@@ -279,7 +279,7 @@ const Register = () => {
                                 <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-2 border border-emerald-100 shadow-sm">
                                     <ShieldCheck size={28} className="text-emerald-500" />
                                 </div>
-                                <h3 className="text-lg font-bold text-[#0f1d3a]">Verify OTP</h3>
+                                <h3 className="text-lg font-medium text-[#0f1d3a]">Verify OTP</h3>
                             </div>
 
                             <div className="relative group max-w-[200px] mx-auto">
@@ -298,7 +298,7 @@ const Register = () => {
                                 <button 
                                     type="button" 
                                     onClick={handleResendOtp}
-                                    className="text-[11px] font-bold text-[#0f1d3a] hover:underline disabled:opacity-50"
+                                    className="text-[11px] font-medium text-[#0f1d3a] hover:underline disabled:opacity-50"
                                     disabled={loading || resendCooldown > 0}
                                 >
                                     {resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : 'Resend OTP'}
@@ -308,7 +308,7 @@ const Register = () => {
                             <button
                                 type="submit"
                                 disabled={loading || otp.length < 6}
-                                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-full font-bold text-[14px] transition-all shadow-xl shadow-emerald-50 active:scale-[0.98] flex items-center justify-center gap-2 mt-2"
+                                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-full font-medium text-[14px] transition-all shadow-xl shadow-emerald-50 active:scale-[0.98] flex items-center justify-center gap-2 mt-2"
                             >
                                 {loading ? <Loader2 size={18} className="animate-spin" /> : 'Confirm Register'}
                             </button>

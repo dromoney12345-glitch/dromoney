@@ -58,8 +58,8 @@ const FeedbackModal = ({ isOpen, onClose }) => {
                                     <MessageSquare size={18} />
                                 </div>
                                 <div>
-                                    <h3 className="font-black text-slate-800 text-md tracking-tight">App Feedback</h3>
-                                    <p className="text-[9px] uppercase tracking-widest text-slate-400 font-bold">Help us improve</p>
+                                    <h3 className="font-medium text-slate-800 text-md tracking-tight">App Feedback</h3>
+                                    <p className="text-[9px] uppercase tracking-widest text-slate-400 font-medium">Help us improve</p>
                                 </div>
                             </div>
                             <button onClick={onClose} className="p-1.5 bg-white rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 active:scale-95 transition-all shadow-sm border border-slate-100">
@@ -68,7 +68,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
                         </div>
 
                         <div className="p-3 text-center border-b border-slate-100 border-dashed">
-                            <h3 className="text-[11px] font-black text-slate-800 mb-2 uppercase tracking-wider">Rate your experience</h3>
+                            <h3 className="text-[11px] font-medium text-slate-800 mb-2 uppercase tracking-wider">Rate your experience</h3>
                             <div className="flex justify-center gap-1 sm:gap-1.5">
                                 {[1, 2, 3, 4, 5].map((star) => (
                                     <button
@@ -91,17 +91,17 @@ const FeedbackModal = ({ isOpen, onClose }) => {
                         </div>
 
                         <div className="p-3 sm:p-4">
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5 px-1">Any Suggestions?</p>
+                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-[0.2em] mb-1.5 px-1">Any Suggestions?</p>
                             <textarea
                                 value={feedback}
                                 onChange={(e) => setFeedback(e.target.value)}
                                 placeholder="I wish the app had..."
-                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[13px] font-black text-slate-700 placeholder:text-slate-400 resize-none h-16 sm:h-20 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-inner"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[13px] font-medium text-slate-700 placeholder:text-slate-400 resize-none h-16 sm:h-20 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-inner"
                             ></textarea>
 
                             <button
                                 onClick={handleSubmit}
-                                className={`w-full py-3 mt-2 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-xl active:scale-[0.98] transition-all shadow-md flex items-center justify-center gap-2 ${rating > 0 ? 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-200' : 'bg-slate-300 shadow-none hover:bg-slate-400'
+                                className={`w-full py-3 mt-2 text-white font-medium text-[10px] uppercase tracking-[0.2em] rounded-xl active:scale-[0.98] transition-all shadow-md flex items-center justify-center gap-2 ${rating > 0 ? 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-200' : 'bg-slate-300 shadow-none hover:bg-slate-400'
                                     }`}>
                                 Submit Feedback
                             </button>
@@ -112,7 +112,7 @@ const FeedbackModal = ({ isOpen, onClose }) => {
                 {status === 'submitting' && (
                     <div className="p-8 flex flex-col items-center justify-center text-center">
                         <Loader2 size={32} className="text-indigo-500 animate-spin mb-3" />
-                        <h3 className="text-md font-black text-slate-800 tracking-tight">Sending Feedback...</h3>
+                        <h3 className="text-md font-medium text-slate-800 tracking-tight">Sending Feedback...</h3>
                     </div>
                 )}
 

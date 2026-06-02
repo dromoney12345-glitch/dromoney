@@ -45,7 +45,7 @@ const Toast = ({ notification, onRemove }) => {
                 </div>
                 <div className="flex-1">
                     <h4 className="text-[13px] font-medium text-slate-800 uppercase tracking-tight">{notification.title}</h4>
-                    <p className="text-[11px] font-bold text-slate-400 mt-0.5 leading-tight">{notification.message}</p>
+                    <p className="text-[11px] font-medium text-slate-400 mt-0.5 leading-tight">{notification.message}</p>
                 </div>
                 <button onClick={() => onRemove(notification.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12" /></svg>
@@ -154,7 +154,7 @@ const AdminLayout = () => {
                                     <h4 className="text-[13px] font-medium text-slate-800 group-hover:text-sky-600 transition-colors uppercase tracking-tight">{notif.title}</h4>
                                     <span className="text-[9px] font-medium text-slate-400 bg-white px-2 py-1 rounded-lg border border-slate-100 shrink-0 ml-3">Just now</span>
                                 </div>
-                                <p className="text-[11px] font-bold text-slate-500 leading-relaxed">{notif.message}</p>
+                                <p className="text-[11px] font-medium text-slate-500 leading-relaxed">{notif.message}</p>
                             </div>
                         )) : (
                             <div className="text-center py-20">
@@ -222,7 +222,7 @@ const AdminLayout = () => {
                             <div className="w-7 h-7 bg-gradient-to-br from-sky-500 to-indigo-500 rounded-lg flex items-center justify-center text-white font-medium text-[11px]">A</div>
                             <div className="hidden sm:block">
                                 <p className="text-[12px] font-medium text-slate-800 leading-none">Admin</p>
-                                <p className="text-[9px] font-bold text-slate-400 leading-none mt-0.5 uppercase tracking-tighter">Super Admin</p>
+                                <p className="text-[9px] font-medium text-slate-400 leading-none mt-0.5 uppercase tracking-tighter">Super Admin</p>
                             </div>
                         </div>
                     </div>

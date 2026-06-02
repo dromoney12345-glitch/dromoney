@@ -65,7 +65,7 @@ const AdminLogin = () => {
                         
                         <div className="space-y-1">
                             <h1 className="text-5xl font-medium tracking-tight leading-none text-white animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">WELCOME</h1>
-                            <p className="text-base font-bold text-indigo-400 uppercase tracking-[0.3em] pl-1 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">Admin Gateway</p>
+                            <p className="text-base font-medium text-indigo-400 uppercase tracking-[0.3em] pl-1 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">Admin Gateway</p>
                         </div>
                         
                         <p className="text-[13px] text-slate-400 max-w-[280px] leading-relaxed font-medium animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
@@ -73,7 +73,7 @@ const AdminLogin = () => {
                         </p>
 
                         <div className="pt-6 animate-in fade-in duration-1000 delay-500">
-                             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 text-[10px] font-bold text-slate-300 uppercase tracking-normal">
+                             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 text-[10px] font-medium text-slate-300 uppercase tracking-normal">
                                 <CheckCircle2 size={12} className="text-emerald-500" /> System Status: Online
                              </div>
                         </div>
@@ -136,7 +136,7 @@ const AdminLogin = () => {
 
                             {/* Remember Me Only */}
                             <div className="flex items-center">
-                                <label className="flex items-center gap-2 text-[12px] font-bold text-slate-400 cursor-pointer group hover:text-slate-600 transition-colors">
+                                <label className="flex items-center gap-2 text-[12px] font-medium text-slate-400 cursor-pointer group hover:text-slate-600 transition-colors">
                                     <input type="checkbox" className="w-4 h-4 rounded border-slate-200 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 transition-all" />
                                     Keep me signed in
                                 </label>
@@ -147,7 +147,7 @@ const AdminLogin = () => {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full bg-[#0f172a] hover:bg-slate-800 text-white py-3.5 rounded-xl text-[14px] font-bold transition-all active:scale-[0.98] shadow-lg shadow-slate-200 flex items-center justify-center gap-2 group"
+                                    className="w-full bg-[#0f172a] hover:bg-slate-800 text-white py-3.5 rounded-xl text-[14px] font-medium transition-all active:scale-[0.98] shadow-lg shadow-slate-200 flex items-center justify-center gap-2 group"
                                 >
                                     {loading ? (
                                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -166,7 +166,7 @@ const AdminLogin = () => {
 
                                 <button
                                     type="button"
-                                    className="w-full bg-white border-2 border-slate-100 hover:border-slate-200 hover:bg-slate-50 text-slate-600 py-3.5 rounded-xl text-[13px] font-bold transition-all active:scale-[0.98]"
+                                    className="w-full bg-white border-2 border-slate-100 hover:border-slate-200 hover:bg-slate-50 text-slate-600 py-3.5 rounded-xl text-[13px] font-medium transition-all active:scale-[0.98]"
                                 >
                                     Institutional Login
                                 </button>
@@ -174,7 +174,7 @@ const AdminLogin = () => {
 
                             {error && (
                                 <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl animate-in fade-in slide-in-from-top-1">
-                                    <p className="text-center text-[12px] font-bold text-rose-500">{error}</p>
+                                    <p className="text-center text-[12px] font-medium text-rose-500">{error}</p>
                                 </div>
                             )}
                         </form>

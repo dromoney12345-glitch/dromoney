@@ -429,13 +429,28 @@ exports.unlockFutureFund = asyncHandler(async (req, res, next) => {
 // @route   GET /api/user/data/referrals
 // @access  Private
 exports.getReferrals = asyncHandler(async (req, res, next) => {
-    const referrals = await ReferralTransaction.find({ referrer: req.user.id })
-        .populate('referredUser', 'name phone createdAt')
+    // Fetch directly from User collection to ensure no missing referrals (even if transaction is missing)
+    const referredUsers = await User.find({ referredBy: req.user.id })
+        .select('name phone createdAt')
         .sort('-createdAt');
+
+    // Also fetch transactions to get the exact amounts if needed
+    const transactions = await ReferralTransaction.find({ referrer: req.user.id });
+
+    const referralsData = referredUsers.map(user => {
+        const tx = transactions.find(t => t.referredUser?.toString() === user._id.toString());
+        return {
+            _id: tx ? tx._id : user._id,
+            referredUser: user,
+            amount: tx ? tx.amount : 200, // default commission if tx missing
+            status: tx ? tx.status : 'Completed',
+            createdAt: user.createdAt
+        };
+    });
 
     res.status(200).json({
         success: true,
-        count: referrals.length,
-        data: referrals
+        count: referralsData.length,
+        data: referralsData
     });
 });

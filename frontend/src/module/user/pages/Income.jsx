@@ -456,7 +456,7 @@ const Income = () => {
         return (
             <div className="min-h-screen bg-[#0B1221] flex flex-col items-center justify-center gap-4 text-white">
                 <Loader2 className="animate-spin text-amber-500" size={32} />
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Verifying access...</p>
+                <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-400">Verifying access...</p>
             </div>
         );
     }
@@ -480,28 +480,28 @@ const Income = () => {
                         <div className="bg-gradient-to-br from-indigo-500 via-sky-500 to-emerald-400 p-6 text-center relative overflow-hidden">
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 blur-2xl"></div>
                             <CheckCircle2 size={40} className="text-white mx-auto mb-3 drop-shadow-lg" />
-                            <h2 className="text-white font-black text-xl tracking-tight">KYC Verified!</h2>
-                            <p className="text-white/80 text-[10px] font-black uppercase tracking-widest mt-1">Identity Confirmed</p>
+                            <h2 className="text-white font-medium text-xl tracking-tight">KYC Verified!</h2>
+                            <p className="text-white/80 text-[10px] font-medium uppercase tracking-widest mt-1">Identity Confirmed</p>
                         </div>
 
                         <div className="p-6 text-center">
-                            <p className="text-slate-400 text-[13px] font-bold mb-6 leading-relaxed">
+                            <p className="text-slate-400 text-[13px] font-medium mb-6 leading-relaxed">
                                 "Congratulations! Your account is verified. To unlock 6+ income methods, purchase our premium access course today."
                             </p>
 
                             <div className="bg-sky-50 rounded-2xl p-4 border border-sky-100 mb-6 flex items-center justify-between">
                                 <div className="text-left">
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Enrollment Fee</p>
-                                    <p className="text-2xl font-black text-sky-600 mt-1 leading-none">₹499</p>
+                                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none">Enrollment Fee</p>
+                                    <p className="text-2xl font-medium text-sky-600 mt-1 leading-none">₹499</p>
                                 </div>
                                 <div className="bg-white px-3 py-1 rounded-lg border border-sky-100">
-                                    <span className="text-[10px] font-black text-emerald-500 tracking-tighter">LIFE ACCESS</span>
+                                    <span className="text-[10px] font-medium text-emerald-500 tracking-tighter">LIFE ACCESS</span>
                                 </div>
                             </div>
 
                             <button
                                 onClick={() => setIsPaymentOpen(true)}
-                                className="w-full bg-slate-900 hover:bg-black active:scale-95 text-white font-black uppercase tracking-widest py-3.5 rounded-xl flex items-center justify-center gap-3 shadow-xl transition-all shadow-slate-100 text-xs"
+                                className="w-full bg-slate-900 hover:bg-black active:scale-95 text-white font-medium uppercase tracking-widest py-3.5 rounded-xl flex items-center justify-center gap-3 shadow-xl transition-all shadow-slate-100 text-xs"
                             >
                                 <Zap size={16} fill="currentColor" className="text-sky-400" />
                                 Buy Course & Unlock
@@ -574,8 +574,8 @@ const Income = () => {
                 {/* Header */}
                 <div className={`flex items-center justify-between shrink-0 px-1 border-b pb-4 ${borderClass}`}>
                     <div>
-                        <span className="text-[10px] font-black tracking-widest uppercase text-indigo-500">STEP {courseStep} OF 3</span>
-                        <h2 className="text-lg font-black tracking-tight text-slate-900">
+                        <span className="text-[10px] font-medium tracking-widest uppercase text-indigo-500">STEP {courseStep} OF 3</span>
+                        <h2 className="text-lg font-medium tracking-tight text-slate-900">
                             {isModal ? 'Guidelines & Templates 🎓' : 'Onboarding Guide 🎓'}
                         </h2>
                     </div>
@@ -587,7 +587,7 @@ const Income = () => {
                             ✕
                         </button>
                     ) : (
-                        <div className="bg-emerald-50 text-emerald-600 font-black text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-xl border border-emerald-100">
+                        <div className="bg-emerald-50 text-emerald-600 font-medium text-[10px] uppercase tracking-wider px-3 py-1.5 rounded-xl border border-emerald-100">
                             Course Active
                         </div>
                     )}
@@ -615,7 +615,7 @@ const Income = () => {
                             {courseStep === 1 && (
                                 <div className="space-y-6 select-none">
                                     <div>
-                                        <h3 className={`text-xl font-black leading-tight ${textTitleClass}`}>
+                                        <h3 className={`text-xl font-medium leading-tight ${textTitleClass}`}>
                                             {courseData.page1.title}
                                         </h3>
                                         <p className={`text-sm font-semibold leading-relaxed mt-2.5 ${textMutedClass}`}>
@@ -624,15 +624,15 @@ const Income = () => {
                                     </div>
 
                                     <div className="space-y-3.5">
-                                        <h4 className="text-xs font-black uppercase tracking-wider text-slate-400">{courseData.page1.methodsTitle}</h4>
+                                        <h4 className="text-xs font-medium uppercase tracking-wider text-slate-400">{courseData.page1.methodsTitle}</h4>
                                         
                                          {courseData.page1.methods?.map((m, idx) => {
                                             const pointsMerged = m.points?.join(' • ') || '';
                                             return (
                                                 <div key={idx} className="border border-slate-100 rounded-2xl p-4.5 flex flex-col gap-1.5 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-md hover:border-slate-200">
                                                     <div className="flex-1 min-w-0">
-                                                        <h5 className="text-[14px] font-black leading-tight text-slate-800">{m.title}</h5>
-                                                        <p className="text-[12px] font-semibold mt-1.5 leading-relaxed text-slate-500 font-sans">
+                                                        <h5 className="text-[14px] font-medium leading-tight text-slate-800">{m.title}</h5>
+                                                        <p className="text-[12px] font-semibold mt-1.5 leading-relaxed text-slate-500 font-poppins">
                                                             {pointsMerged}
                                                         </p>
                                                     </div>
@@ -646,7 +646,7 @@ const Income = () => {
                             {/* PAGE 2 CONTENT */}
                             {courseStep === 2 && (
                                 <div className="space-y-6">
-                                    <h3 className={`text-xl font-black leading-tight ${textTitleClass}`}>
+                                    <h3 className={`text-xl font-medium leading-tight ${textTitleClass}`}>
                                         {courseData.page2.title}
                                     </h3>
 
@@ -657,12 +657,12 @@ const Income = () => {
                                             alt="Dromoney Logo" 
                                             className="h-20 object-contain drop-shadow-sm select-none"
                                         />
-                                        <p className="text-xs font-bold leading-normal px-2 text-slate-500">
+                                        <p className="text-xs font-medium leading-normal px-2 text-slate-500">
                                             {courseData.page2.steps?.[0]?.details || 'सबसे पहले Dromoney logo डाउनलोड करें जो सीधा आपकी गैलरी में सेव हो जाएगा।'}
                                         </p>
                                         <button
                                             onClick={handleDownloadLogo}
-                                            className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 active:scale-95 text-white font-black uppercase text-[11px] tracking-widest py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all mt-1"
+                                            className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 active:scale-95 text-white font-medium uppercase text-[11px] tracking-widest py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all mt-1"
                                         >
                                             <Download size={14} /> Download Logo to Gallery
                                         </button>
@@ -673,10 +673,10 @@ const Income = () => {
                                         {courseData.page2.steps?.slice(1).map((step, idx) => (
                                             <div key={idx} className="rounded-2xl p-4 border border-slate-100 bg-white flex flex-col gap-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.01)] transition-all duration-300 hover:border-slate-200">
                                                 <div className="flex items-center gap-2.5">
-                                                    <span className="text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider text-indigo-600 bg-indigo-50 border border-indigo-100">{step.stepNum}</span>
-                                                    <h4 className="text-xs font-black leading-none text-slate-800">{step.title}</h4>
+                                                    <span className="text-[9px] font-medium px-2 py-0.5 rounded-md uppercase tracking-wider text-indigo-600 bg-indigo-50 border border-indigo-100">{step.stepNum}</span>
+                                                    <h4 className="text-xs font-medium leading-none text-slate-800">{step.title}</h4>
                                                 </div>
-                                                <p className="text-[12px] font-semibold leading-relaxed text-slate-500 font-sans">{step.details}</p>
+                                                <p className="text-[12px] font-semibold leading-relaxed text-slate-500 font-poppins">{step.details}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -684,14 +684,14 @@ const Income = () => {
                                     {/* Calling Script script link */}
                                     {courseData.page2.step5Title && (
                                         <div className="rounded-2xl border border-amber-100 bg-amber-50/50 p-4.5 flex flex-col gap-1.5">
-                                            <h4 className="text-xs font-black flex items-center gap-1.5 text-amber-800">
+                                            <h4 className="text-xs font-medium flex items-center gap-1.5 text-amber-800">
                                                 <AlertTriangle size={14} /> {courseData.page2.step5Title}
                                             </h4>
-                                            <p className="text-[12px] font-semibold leading-relaxed text-slate-600 font-sans">{courseData.page2.step5Details}</p>
+                                            <p className="text-[12px] font-semibold leading-relaxed text-slate-600 font-poppins">{courseData.page2.step5Details}</p>
                                             {courseData.page2.callScriptLink && (
                                                 <button
                                                     onClick={handleDownloadCallingScript}
-                                                    className="w-full mt-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black uppercase text-[10px] tracking-widest py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-md transition-all text-center"
+                                                    className="w-full mt-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-medium uppercase text-[10px] tracking-widest py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-md transition-all text-center"
                                                 >
                                                     <Download size={14} /> View Calling Scripts (PDF)
                                                 </button>
@@ -701,18 +701,18 @@ const Income = () => {
 
                                     {/* Ready Templates */}
                                     <div className="space-y-3.5 pt-1">
-                                        <h4 className="text-xs font-black uppercase tracking-wider text-slate-400">{courseData.page2.templatesTitle}</h4>
+                                        <h4 className="text-xs font-medium uppercase tracking-wider text-slate-400">{courseData.page2.templatesTitle}</h4>
                                         <div className="space-y-3">
                                             {courseData.page2.templates?.map((tmpl, idx) => {
                                                 const isCopied = copiedIndex === idx;
                                                 return (
                                                     <div key={idx} className="rounded-3xl p-4.5 border border-slate-100 bg-slate-50/80 relative flex flex-col gap-4">
-                                                        <p className="text-[12px] font-semibold leading-relaxed whitespace-pre-wrap select-all pr-1 text-slate-600 font-sans">
+                                                        <p className="text-[12px] font-semibold leading-relaxed whitespace-pre-wrap select-all pr-1 text-slate-600 font-poppins">
                                                             {tmpl}
                                                         </p>
                                                         <button
                                                             onClick={() => handleCopyText(tmpl, idx)}
-                                                            className={`w-full border py-3.5 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-wider shadow-md transition-all active:scale-95 ${
+                                                            className={`w-full border py-3.5 rounded-xl flex items-center justify-center gap-2 text-[10px] font-medium uppercase tracking-wider shadow-md transition-all active:scale-95 ${
                                                                 isCopied 
                                                                     ? 'bg-emerald-500 border-emerald-500 text-white shadow-emerald-500/10' 
                                                                     : 'bg-white hover:bg-slate-100 border-slate-200 text-indigo-600'
@@ -740,18 +740,18 @@ const Income = () => {
                             {/* PAGE 3 CONTENT */}
                             {courseStep === 3 && (
                                 <div className="space-y-6">
-                                    <h3 className={`text-xl font-black leading-tight ${textTitleClass}`}>
+                                    <h3 className={`text-xl font-medium leading-tight ${textTitleClass}`}>
                                         {courseData.page3.title}
                                     </h3>
 
                                              {/* Examples */}
                                     <div className="rounded-3xl p-5 border border-indigo-100 bg-gradient-to-br from-indigo-50/40 to-blue-50/40 space-y-3.5 relative overflow-hidden shadow-sm">
-                                        <h4 className="text-xs font-black text-indigo-600 uppercase tracking-wider flex items-center gap-1.5">
+                                        <h4 className="text-xs font-medium text-indigo-600 uppercase tracking-wider flex items-center gap-1.5">
                                             <TrendingUp size={14} /> {courseData.page3.exampleTitle}
                                         </h4>
                                         <div className="space-y-2">
                                             {courseData.page3.examples?.map((ex, idx) => (
-                                                <p key={idx} className="text-[13px] font-black leading-relaxed text-slate-700 font-sans">
+                                                <p key={idx} className="text-[13px] font-medium leading-relaxed text-slate-700 font-poppins">
                                                     {ex}
                                                 </p>
                                             ))}
@@ -760,7 +760,7 @@ const Income = () => {
 
                                     {/* Security and Safety Rules */}
                                     <div className="rounded-3xl border border-rose-100 bg-rose-50/50 p-4.5 space-y-3.5">
-                                        <h4 className="text-xs font-black uppercase tracking-wider flex items-center gap-1.5 text-rose-800">
+                                        <h4 className="text-xs font-medium uppercase tracking-wider flex items-center gap-1.5 text-rose-800">
                                             <AlertCircle size={14} /> {courseData.page3.rulesTitle}
                                         </h4>
                                         <div className="space-y-2.5">
@@ -769,7 +769,7 @@ const Income = () => {
                                                     <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 bg-rose-50 text-rose-600">
                                                         <AlertCircle size={12} />
                                                     </div>
-                                                    <p className="text-[12px] font-semibold leading-normal text-slate-600 font-sans">{rule}</p>
+                                                    <p className="text-[12px] font-semibold leading-normal text-slate-600 font-poppins">{rule}</p>
                                                 </div>
                                             ))}
                                         </div>
@@ -785,7 +785,7 @@ const Income = () => {
                     {courseStep > 1 ? (
                         <button
                             onClick={handlePrev}
-                            className={`flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-black uppercase tracking-widest rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95 border border-slate-200/50 ${isModal ? 'text-[10px] py-3' : 'text-[11px] py-4 shadow-sm'}`}
+                            className={`flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium uppercase tracking-widest rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95 border border-slate-200/50 ${isModal ? 'text-[10px] py-3' : 'text-[11px] py-4 shadow-sm'}`}
                         >
                             <ChevronLeft size={14} /> Prev
                         </button>
@@ -796,7 +796,7 @@ const Income = () => {
                     {courseStep < 3 ? (
                         <button
                             onClick={handleNext}
-                            className={`flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-black uppercase tracking-widest rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-md shadow-indigo-500/10 ${isModal ? 'text-[10px] py-3' : 'text-[11px] py-4'}`}
+                            className={`flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-medium uppercase tracking-widest rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-md shadow-indigo-500/10 ${isModal ? 'text-[10px] py-3' : 'text-[11px] py-4'}`}
                         >
                             Next <ChevronRight size={14} />
                         </button>
@@ -804,7 +804,7 @@ const Income = () => {
                         isModal ? (
                             <button
                                 onClick={() => setIsCourseModalOpen(false)}
-                                className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-black uppercase text-[10px] tracking-widest py-3 rounded-xl flex items-center justify-center gap-1 transition-all active:scale-95 shadow-lg shadow-emerald-500/10"
+                                className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-medium uppercase text-[10px] tracking-widest py-3 rounded-xl flex items-center justify-center gap-1 transition-all active:scale-95 shadow-lg shadow-emerald-500/10"
                             >
                                 Close Guide
                             </button>
@@ -812,7 +812,7 @@ const Income = () => {
                             <button
                                 onClick={handleFinishCourse}
                                 disabled={loading}
-                                className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-black uppercase text-[11px] tracking-widest py-4 rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-lg shadow-emerald-500/15 disabled:opacity-50"
+                                className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-medium uppercase text-[11px] tracking-widest py-4 rounded-xl flex items-center justify-center gap-1.5 transition-all active:scale-95 shadow-lg shadow-emerald-500/15 disabled:opacity-50"
                             >
                                 {loading ? 'Completing...' : 'Finish & Earn'}
                             </button>
@@ -839,11 +839,11 @@ const Income = () => {
     return (
         <div className="flex flex-col gap-5 p-5 bg-[#F8FAFC] animate-in fade-in duration-700">
             {/* Minimal Sub-Header */}
-            <div className="flex items-center justify-between px-1">
-                <div>
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Income Center</h2>
-                    <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em]">Verified Earning Systems</p>
+            <div className="flex items-start justify-between px-1 mb-3">
+                <div className="flex flex-col gap-1.5">
+                    <h2 className="text-2xl font-medium text-slate-900 tracking-tight leading-none mt-1">Income Center</h2>
+                    <div className="flex flex-wrap items-center gap-2.5 mt-0.5">
+                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.15em] leading-none">Verified Earning Systems</p>
                         
                         {/* Course Reopen link (कोर्स & टेंपलेट्स) */}
                         <button
@@ -851,14 +851,14 @@ const Income = () => {
                                 setCourseStep(1);
                                 setIsCourseModalOpen(true);
                             }}
-                            className="text-[9px] font-black text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 px-2 py-0.5 rounded-full uppercase tracking-tighter transition-all flex items-center gap-0.5 active:scale-95 shadow-sm"
+                            className="text-[9px] font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 px-2.5 py-1 rounded-full uppercase tracking-tighter transition-all flex items-center gap-1 active:scale-95 whitespace-nowrap"
                         >
-                            <BookOpen size={8} /> कोर्स & टेंपलेट्स
+                            <BookOpen size={10} /> कोर्स & टेंपलेट्स
                         </button>
                     </div>
                 </div>
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100">
-                    <TrendingUp size={20} className="text-blue-500" />
+                <div className="pt-1.5 pr-1 shrink-0">
+                    <TrendingUp size={24} strokeWidth={2.5} className="text-blue-500" />
                 </div>
             </div>
 
@@ -888,7 +888,7 @@ const Income = () => {
                     {/* Top Row: Brand & Wireless */}
                     <div className="flex justify-between items-start relative z-10">
                         <div className="flex flex-col">
-                            <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em] mb-0.5">Dromoney Card</span>
+                            <span className="text-[9px] font-medium text-white/40 uppercase tracking-[0.3em] mb-0.5">Dromoney Card</span>
                             <div className="flex items-center gap-2">
                                 <div className="w-7 h-5 bg-gradient-to-br from-amber-200 via-yellow-400 to-amber-500 rounded-sm shadow-inner relative overflow-hidden">
                                     <div className="absolute inset-0 opacity-20 border-t border-b border-black/20 grid grid-cols-3">
@@ -906,10 +906,10 @@ const Income = () => {
 
                     {/* Middle Row: Numbers / Title */}
                     <div className="relative z-10 py-1">
-                        <h3 className="text-lg font-black text-white tracking-[0.05em] leading-tight drop-shadow-lg">
+                        <h3 className="text-lg font-medium text-white tracking-[0.05em] leading-tight drop-shadow-lg">
                             {INCOME_OPTIONS[0].title.replace('Earn ', '')}
                         </h3>
-                        <p className="text-[9px] font-bold text-indigo-300 uppercase tracking-widest mt-0.5">
+                        <p className="text-[9px] font-medium text-indigo-300 uppercase tracking-widest mt-0.5">
                             {INCOME_OPTIONS[0].subtitle}
                         </p>
                     </div>
@@ -917,8 +917,8 @@ const Income = () => {
                     {/* Bottom Row: Name & Mastercard Logo Design */}
                     <div className="flex justify-between items-end relative z-10">
                         <div className="flex flex-col">
-                            <span className="text-[6px] font-bold text-white/30 uppercase tracking-widest mb-0.5">Card Holder</span>
-                            <span className="text-[12px] font-black text-white uppercase tracking-wider">{userData.name || 'REFERRAL PARTNER'}</span>
+                            <span className="text-[6px] font-medium text-white/30 uppercase tracking-widest mb-0.5">Card Holder</span>
+                            <span className="text-[12px] font-medium text-white uppercase tracking-wider">{userData.name || 'REFERRAL PARTNER'}</span>
                         </div>
                         <div className="flex items-center">
                             <div className="relative flex">
@@ -965,10 +965,10 @@ const Income = () => {
 
                             {/* Content - High Density */}
                             <div className="relative z-10 flex-1">
-                                <h3 className="text-[12px] font-black text-slate-800 tracking-tight leading-none mb-1">
+                                <h3 className="text-[12px] font-medium text-slate-800 tracking-tight leading-none mb-1">
                                     {opt.id === 6 ? futureFeaturesConfig.title : opt.title}
                                 </h3>
-                                <p className="text-[8.5px] font-bold text-slate-500 leading-tight tracking-tight line-clamp-2">
+                                <p className="text-[8.5px] font-medium text-slate-500 leading-tight tracking-tight line-clamp-2">
                                     {opt.id === 6 ? futureFeaturesConfig.subtitle : opt.subtitle}
                                 </p>
                             </div>
@@ -976,7 +976,7 @@ const Income = () => {
                             {/* Bottom Row - Integrated Action */}
                             <div className="flex items-center justify-between mt-2.5 relative z-10">
                                 <div className={`${theme.pill} px-1.5 py-0.5 rounded-full border border-white/20`}>
-                                    <span className="text-[6.5px] font-black uppercase tracking-wider">{opt.locked ? 'Coming Soon' : 'Active'}</span>
+                                    <span className="text-[6.5px] font-medium uppercase tracking-wider">{opt.locked ? 'Coming Soon' : 'Active'}</span>
                                 </div>
                                 <div className="w-5 h-5 bg-slate-900 rounded-full flex items-center justify-center text-white active:scale-90 transition-transform">
                                     <ChevronRight size={10} strokeWidth={3} />
@@ -993,8 +993,8 @@ const Income = () => {
                     <Briefcase size={20} className="text-sky-500" />
                 </div>
                 <div>
-                    <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest leading-none">{projectsData.title}</h4>
-                    <p className="text-[9px] font-bold text-slate-400 leading-tight mt-1">
+                    <h4 className="text-[11px] font-medium text-slate-800 uppercase tracking-widest leading-none">{projectsData.title}</h4>
+                    <p className="text-[9px] font-medium text-slate-400 leading-tight mt-1">
                         {projectsData.description}
                     </p>
                 </div>

@@ -49,23 +49,23 @@ const UnlockModal = ({ isOpen, onClose }) => {
                         <Lock className="text-white group-hover:scale-110 transition-transform" size={40} />
                     </div>
 
-                    <h2 className="text-2xl font-black text-slate-900 mb-2 leading-tight">
+                    <h2 className="text-2xl font-medium text-slate-900 mb-2 leading-tight">
                         Platform <span className="text-sky-500">Locked!</span>
                     </h2>
-                    <p className="text-sm font-bold text-slate-400 mb-8 leading-relaxed px-4">
+                    <p className="text-sm font-medium text-slate-400 mb-8 leading-relaxed px-4">
                         "Unlock platform access today for just ₹499 and start earning big returns from every sale."
                     </p>
 
                     <div className="space-y-3 w-full">
                         <button 
                             onClick={handleUnlockClick}
-                            className="w-full bg-sky-600 hover:bg-sky-700 active:scale-95 text-white py-5 rounded-2xl text-xs font-black shadow-lg shadow-sky-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest"
+                            className="w-full bg-sky-600 hover:bg-sky-700 active:scale-95 text-white py-5 rounded-2xl text-xs font-medium shadow-lg shadow-sky-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest"
                         >
                             Pay ₹499 to Unlock <ChevronRight size={18} />
                         </button>
                         <button 
                             onClick={onClose}
-                            className="w-full text-slate-400 font-bold text-[10px] uppercase py-2 hover:text-slate-800 transition-colors tracking-widest"
+                            className="w-full text-slate-400 font-medium text-[10px] uppercase py-2 hover:text-slate-800 transition-colors tracking-widest"
                         >
                             Maybe Later
                         </button>
@@ -73,7 +73,7 @@ const UnlockModal = ({ isOpen, onClose }) => {
 
                     <div className="mt-8 flex items-center gap-2 opacity-30 group cursor-default">
                         <Sparkles size={14} className="text-sky-500 group-hover:animate-spin" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Powered by AffiliateEarn</span>
+                        <span className="text-[10px] font-medium uppercase tracking-widest">Powered by AffiliateEarn</span>
                     </div>
 
                     <button 

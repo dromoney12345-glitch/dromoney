@@ -352,7 +352,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
                                     <input
                                         value={q.question}
                                         onChange={e => updateQuestion(qIdx, 'question', e.target.value)}
-                                        className="flex-1 text-sm font-bold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-blue-400"
+                                        className="flex-1 text-sm font-medium text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-blue-400"
                                         placeholder="Question text..."
                                     />
                                     <button onClick={() => deleteQuestion(qIdx)} className="p-1.5 text-rose-400 hover:bg-rose-50 rounded-lg transition-all">
@@ -369,7 +369,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
                                             <input
                                                 value={opt}
                                                 onChange={e => updateOption(qIdx, oIdx, e.target.value)}
-                                                className="text-[11px] font-bold text-slate-700 bg-transparent outline-none flex-1 min-w-0"
+                                                className="text-[11px] font-medium text-slate-700 bg-transparent outline-none flex-1 min-w-0"
                                             />
                                         </div>
                                     ))}
@@ -399,14 +399,14 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
                         {prizes.map((p, idx) => (
                             <div key={p.id || idx} className="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-xl p-3 animate-in fade-in duration-350">
                                 <Gift size={16} className="text-purple-500 shrink-0" />
-                                <input value={p.label} onChange={e => updatePrize(idx, 'label', e.target.value)} className="flex-1 text-sm font-bold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 outline-none" placeholder="Label (e.g. ₹500)" />
+                                <input value={p.label} onChange={e => updatePrize(idx, 'label', e.target.value)} className="flex-1 text-sm font-medium text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 outline-none" placeholder="Label (e.g. ₹500)" />
                                 <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-2 py-1.5">
-                                    <span className="text-[10px] text-slate-400 font-bold">Cash ₹</span>
-                                    <input type="number" min="0" value={p.cash} onChange={e => updatePrize(idx, 'cash', Math.max(0, +e.target.value))} className="w-14 text-sm font-bold text-slate-800 outline-none text-center" />
+                                    <span className="text-[10px] text-slate-400 font-medium">Cash ₹</span>
+                                    <input type="number" min="0" value={p.cash} onChange={e => updatePrize(idx, 'cash', Math.max(0, +e.target.value))} className="w-14 text-sm font-medium text-slate-800 outline-none text-center" />
                                 </div>
                                 <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-2 py-1.5">
                                     <Coins size={12} className="text-amber-500" />
-                                    <input type="number" min="0" value={p.coins} onChange={e => updatePrize(idx, 'coins', Math.max(0, +e.target.value))} className="w-14 text-sm font-bold text-slate-800 outline-none text-center" />
+                                    <input type="number" min="0" value={p.coins} onChange={e => updatePrize(idx, 'coins', Math.max(0, +e.target.value))} className="w-14 text-sm font-medium text-slate-800 outline-none text-center" />
                                 </div>
                                 <button onClick={() => deletePrize(idx)} className="p-1.5 text-rose-400 hover:bg-rose-50 rounded-lg transition-all">
                                     <Trash2 size={14} />
@@ -446,12 +446,12 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
                                 </div>
                                 <div className="flex-1 space-y-2">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-bold text-slate-400 w-16">Icon Name:</span>
-                                        <input value={c.icon} onChange={e => updateCard(idx, 'icon', e.target.value)} className="flex-1 text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-lg px-2 py-1 outline-none" />
+                                        <span className="text-[10px] font-medium text-slate-400 w-16">Icon Name:</span>
+                                        <input value={c.icon} onChange={e => updateCard(idx, 'icon', e.target.value)} className="flex-1 text-[11px] font-medium text-slate-700 bg-white border border-slate-200 rounded-lg px-2 py-1 outline-none" />
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-bold text-slate-400 w-16">Color Class:</span>
-                                        <input value={c.color} onChange={e => updateCard(idx, 'color', e.target.value)} className="flex-1 text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-lg px-2 py-1 outline-none" />
+                                        <span className="text-[10px] font-medium text-slate-400 w-16">Color Class:</span>
+                                        <input value={c.color} onChange={e => updateCard(idx, 'color', e.target.value)} className="flex-1 text-[11px] font-medium text-slate-700 bg-white border border-slate-200 rounded-lg px-2 py-1 outline-none" />
                                     </div>
                                 </div>
                             </div>
@@ -460,7 +460,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
 
                     <div className="mt-6 p-4 bg-indigo-50 rounded-2xl border border-indigo-100 flex items-center gap-3">
                         <AlertCircle size={18} className="text-indigo-500" />
-                        <p className="text-[11px] font-bold text-indigo-700">Memory Master requires 6 pairs. Icons must be valid Lucide icon names.</p>
+                        <p className="text-[11px] font-medium text-indigo-700">Memory Master requires 6 pairs. Icons must be valid Lucide icon names.</p>
                     </div>
                 </div>
             )}
@@ -632,7 +632,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
 
                     <button
                         onClick={() => setStatusFilter(statusFilter === 'all' ? 'winner' : 'all')}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[11px] font-medium uppercase tracking-normal border transition-all ${statusFilter === 'winner' ? 'bg-amber-100 border-amber-300 text-amber-700 font-bold ml-2' : 'bg-slate-50 border-slate-200 text-slate-500 ml-2'}`}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[11px] font-medium uppercase tracking-normal border transition-all ${statusFilter === 'winner' ? 'bg-amber-100 border-amber-300 text-amber-700 font-medium ml-2' : 'bg-slate-50 border-slate-200 text-slate-500 ml-2'}`}
                     >
                         <Award size={14} className={statusFilter === 'winner' ? 'fill-amber-500' : ''} />
                         {statusFilter === 'winner' ? 'Showing Winners' : 'Filter Winners'}
@@ -646,7 +646,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                         placeholder="Search by name..."
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 outline-none focus:border-sky-400 transition-all"
+                        className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-medium text-slate-700 outline-none focus:border-sky-400 transition-all"
                     />
                 </div>
             </div>
@@ -689,7 +689,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                 👑 Record Holder (Minimum Completion Time)
                             </span>
                             <h4 className="text-lg font-medium tracking-tight mt-1">{fastestParticipant.name || 'Anonymous User'}</h4>
-                            <p className="text-[11px] font-bold text-amber-50 mt-0.5">
+                            <p className="text-[11px] font-medium text-amber-50 mt-0.5">
                                 Finished with {fastestParticipant.result || 'perfect matching'} in a record-breaking <strong className="text-white text-xs font-medium bg-white/20 px-2 py-0.5 rounded-md">{fastestParticipant.timeTaken} seconds</strong>!
                             </p>
                         </div>
@@ -707,7 +707,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                 🎁 Approve & Give Prize
                             </button>
                         ) : (
-                            <span className="bg-emerald-500/30 border border-emerald-400 px-3 py-1.5 rounded-xl text-[9px] font-medium uppercase tracking-normal flex items-center gap-1.5 text-white font-extrabold">
+                            <span className="bg-emerald-500/30 border border-emerald-400 px-3 py-1.5 rounded-xl text-[9px] font-medium uppercase tracking-normal flex items-center gap-1.5 text-white font-medium">
                                 <CheckCircle size={12} /> Approved Winner
                             </span>
                         )}
@@ -741,7 +741,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                             <Users size={48} strokeWidth={1} />
                         </div>
                         <p className="text-[11px] font-medium uppercase tracking-normal mb-1">No matching participants</p>
-                        <p className="text-[9px] font-bold text-slate-400">Try changing your filters or searching</p>
+                        <p className="text-[9px] font-medium text-slate-400">Try changing your filters or searching</p>
                     </div>
                 ) : (
                     <div className="divide-y divide-slate-50">
@@ -772,7 +772,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                             <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                                                 <div className="flex items-center gap-1 bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">
                                                     <Zap size={10} className="text-slate-500" />
-                                                    <span className="text-[10px] font-bold">{p.result || '—'}</span>
+                                                    <span className="text-[10px] font-medium">{p.result || '—'}</span>
                                                 </div>
                                                 {p.timeTaken !== undefined && p.timeTaken !== null && (
                                                     <div className="flex items-center gap-1 bg-sky-50 text-sky-700 px-2 py-0.5 rounded-md border border-sky-100">
@@ -783,7 +783,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                                 <span className="text-[10px] text-slate-300 hidden sm:inline">|</span>
                                                 <div className="flex items-center gap-1.5">
                                                     <Clock size={10} className="text-slate-400" />
-                                                    <span className="text-[10px] font-bold text-slate-500">{p.joinedAt}</span>
+                                                    <span className="text-[10px] font-medium text-slate-500">{p.joinedAt}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -825,7 +825,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                                     value={awardNote}
                                                     onChange={e => setAwardNote(e.target.value)}
                                                     placeholder="Add a congratulation note or transaction ID..."
-                                                    className="flex-1 text-[12px] font-bold text-slate-700 bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400"
+                                                    className="flex-1 text-[12px] font-medium text-slate-700 bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400"
                                                 />
                                                 <button
                                                     onClick={() => handleAward(p)}
@@ -858,7 +858,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                 </div>
                                 <div>
                                     <h2 className="text-2xl font-medium text-slate-800 tracking-tight">{viewingParticipant.name}</h2>
-                                    <p className="text-slate-400 font-bold text-sm">Joined {viewingParticipant.joinedAt}</p>
+                                    <p className="text-slate-400 font-medium text-sm">Joined {viewingParticipant.joinedAt}</p>
                                     {viewingParticipant.prizeStatus === 'Awarded' && (
                                         <span className="inline-block mt-2 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-normal border border-amber-200">Event Winner</span>
                                     )}
@@ -886,15 +886,15 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                 <h4 className="text-[11px] font-medium text-slate-400 uppercase tracking-normal">Contact Details</h4>
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl">
-                                        <span className="text-[11px] font-bold text-slate-400">Email Address</span>
+                                        <span className="text-[11px] font-medium text-slate-400">Email Address</span>
                                         <span className="text-[11px] font-medium text-slate-700">{viewingParticipant.email}</span>
                                     </div>
                                     <div className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl">
-                                        <span className="text-[11px] font-bold text-slate-400">Mobile Number</span>
+                                        <span className="text-[11px] font-medium text-slate-400">Mobile Number</span>
                                         <span className="text-[11px] font-medium text-slate-700">{viewingParticipant.phone}</span>
                                     </div>
                                     <div className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl">
-                                        <span className="text-[11px] font-bold text-slate-400">Registration Date</span>
+                                        <span className="text-[11px] font-medium text-slate-400">Registration Date</span>
                                         <span className="text-[11px] font-medium text-slate-700">{viewingParticipant.joinedAt}</span>
                                     </div>
                                 </div>
@@ -912,7 +912,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                     <CheckCircle className="text-emerald-500" size={20} />
                                     <div>
                                         <p className="text-[11px] font-medium text-emerald-800 uppercase">Prize Awarded</p>
-                                        <p className="text-[10px] font-bold text-emerald-600">{viewingParticipant.prizeNote || 'Awarded by Administrator'}</p>
+                                        <p className="text-[10px] font-medium text-emerald-600">{viewingParticipant.prizeNote || 'Awarded by Administrator'}</p>
                                     </div>
                                 </div>
                             )}
@@ -1104,7 +1104,7 @@ const EventsAdmin = () => {
 
                             <div>
                                 <h2 className="text-2xl font-medium text-slate-800 tracking-tight font-['Poppins']">Create New Event</h2>
-                                <p className="text-slate-400 font-bold text-xs mt-1 font-['Poppins']">Configure event metadata and default parameters</p>
+                                <p className="text-slate-400 font-medium text-xs mt-1 font-['Poppins']">Configure event metadata and default parameters</p>
                             </div>
 
                             <div className="space-y-4 font-['Poppins']">
@@ -1115,7 +1115,7 @@ const EventsAdmin = () => {
                                         value={newEventData.title}
                                         onChange={e => setNewEventData(p => ({ ...p, title: e.target.value }))}
                                         placeholder="e.g. Daily Brain Quiz"
-                                        className="w-full text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white transition-all font-['Poppins']"
+                                        className="w-full text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white transition-all font-['Poppins']"
                                     />
                                 </div>
 
@@ -1125,7 +1125,7 @@ const EventsAdmin = () => {
                                         <select
                                             value={newEventData.tag}
                                             onChange={e => setNewEventData(p => ({ ...p, tag: e.target.value }))}
-                                            className="w-full text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white font-['Poppins']"
+                                            className="w-full text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white font-['Poppins']"
                                         >
                                             <option value="Quiz">Quiz Game</option>
                                             <option value="Draw">Lucky Draw</option>
@@ -1141,7 +1141,7 @@ const EventsAdmin = () => {
                                             required
                                             value={newEventData.fee}
                                             onChange={e => setNewEventData(p => ({ ...p, fee: Math.max(0, +e.target.value) }))}
-                                            className="w-full text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white font-['Poppins']"
+                                            className="w-full text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white font-['Poppins']"
                                         />
                                     </div>
                                 </div>
@@ -1154,7 +1154,7 @@ const EventsAdmin = () => {
                                             value={newEventData.prize}
                                             onChange={e => setNewEventData(p => ({ ...p, prize: e.target.value }))}
                                             placeholder="e.g. ₹500 Pool"
-                                            className="w-full text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white font-['Poppins']"
+                                            className="w-full text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white font-['Poppins']"
                                         />
                                     </div>
 
@@ -1164,7 +1164,7 @@ const EventsAdmin = () => {
                                             required
                                             value={newEventData.startTime}
                                             onChange={e => setNewEventData(p => ({ ...p, startTime: e.target.value }))}
-                                            className="w-full text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white font-['Poppins']"
+                                            className="w-full text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white font-['Poppins']"
                                         />
                                     </div>
                                 </div>
@@ -1174,7 +1174,7 @@ const EventsAdmin = () => {
                                     <select
                                         value={newEventData.status}
                                         onChange={e => setNewEventData(p => ({ ...p, status: e.target.value }))}
-                                        className="w-full text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white font-['Poppins']"
+                                        className="w-full text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white font-['Poppins']"
                                     >
                                         <option value="Active">Active</option>
                                         <option value="Inactive">Inactive</option>

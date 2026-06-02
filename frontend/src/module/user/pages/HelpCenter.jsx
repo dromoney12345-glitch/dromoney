@@ -72,10 +72,10 @@ const HelpCenter = () => {
                     </button>
                     
                     <div className="flex flex-col">
-                        <p className="text-blue-400 text-[8px] font-black uppercase tracking-[0.2em] leading-none mb-1">
+                        <p className="text-blue-400 text-[8px] font-medium uppercase tracking-[0.2em] leading-none mb-1">
                             Support System
                         </p>
-                        <h1 className="text-lg font-black text-white tracking-tight leading-none uppercase">
+                        <h1 className="text-lg font-medium text-white tracking-tight leading-none uppercase">
                             Help Center
                         </h1>
                     </div>
@@ -91,13 +91,13 @@ const HelpCenter = () => {
                             <MessageCircle size={24} className="text-emerald-500" />
                         </div>
                         <div>
-                            <h3 className="text-sm font-black text-slate-800 leading-tight">WhatsApp Support</h3>
-                            <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-tight leading-tight">Instant Chat with Team</p>
+                            <h3 className="text-sm font-medium text-slate-800 leading-tight">WhatsApp Support</h3>
+                            <p className="text-xs font-medium text-slate-400 mt-1 uppercase tracking-tight leading-tight">Instant Chat with Team</p>
                         </div>
                     </div>
                     <button 
                         onClick={handleWhatsApp}
-                        className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs py-3.5 rounded-2xl uppercase tracking-[0.15em] shadow-lg shadow-emerald-100 flex items-center justify-center gap-2 active:scale-95 transition-all"
+                        className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-xs py-3.5 rounded-2xl uppercase tracking-[0.15em] shadow-lg shadow-emerald-100 flex items-center justify-center gap-2 active:scale-95 transition-all"
                     >
                         <MessageCircle size={16} fill="currentColor" /> Open WhatsApp
                     </button>
@@ -110,8 +110,8 @@ const HelpCenter = () => {
                             <BookOpen size={24} className="text-sky-500" />
                         </div>
                         <div>
-                            <h3 className="text-sm font-black text-slate-800 leading-tight">Help Guide</h3>
-                            <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-tight leading-tight">Basic platform usage</p>
+                            <h3 className="text-sm font-medium text-slate-800 leading-tight">Help Guide</h3>
+                            <p className="text-xs font-medium text-slate-400 mt-1 uppercase tracking-tight leading-tight">Basic platform usage</p>
                         </div>
                     </div>
                     
@@ -123,11 +123,11 @@ const HelpCenter = () => {
                                     onClick={() => setActiveGuide(activeGuide === i ? null : i)}
                                     className="w-full flex items-center justify-between text-left group py-1"
                                 >
-                                    <span className={`text-[12px] font-black transition-colors ${activeGuide === i ? 'text-sky-500' : 'text-slate-600'}`}>{guide.q}</span>
+                                    <span className={`text-[12px] font-medium transition-colors ${activeGuide === i ? 'text-sky-500' : 'text-slate-600'}`}>{guide.q}</span>
                                     <ChevronDown size={14} className={`text-slate-300 transition-transform duration-300 ${activeGuide === i ? 'rotate-180 text-sky-500' : ''}`} />
                                 </button>
                                 <div className={`overflow-hidden transition-all duration-500 ease-in-out ${activeGuide === i ? 'max-h-60 mt-2 opacity-100' : 'max-h-0 opacity-0'}`}>
-                                    <p className="text-[11px] font-bold text-slate-400 leading-relaxed pl-1 pb-1">{guide.a}</p>
+                                    <p className="text-[11px] font-medium text-slate-400 leading-relaxed pl-1 pb-1">{guide.a}</p>
                                 </div>
                             </div>
                         ))}
@@ -141,8 +141,8 @@ const HelpCenter = () => {
                             <AlertCircle size={24} className="text-rose-500" />
                         </div>
                         <div>
-                            <h3 className="text-sm font-black text-slate-800 leading-tight">Report Problem</h3>
-                            <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-tight leading-tight">Technical issues & bugs</p>
+                            <h3 className="text-sm font-medium text-slate-800 leading-tight">Report Problem</h3>
+                            <p className="text-xs font-medium text-slate-400 mt-1 uppercase tracking-tight leading-tight">Technical issues & bugs</p>
                         </div>
                     </div>
 
@@ -151,12 +151,12 @@ const HelpCenter = () => {
                             value={problem}
                             onChange={(e) => setProblem(e.target.value)}
                             placeholder="Describe your issue here..."
-                            className="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl p-4 text-xs font-bold text-slate-700 focus:bg-white focus:border-rose-400 focus:ring-0 transition-all placeholder:text-slate-400 resize-none h-28"
+                            className="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl p-4 text-xs font-medium text-slate-700 focus:bg-white focus:border-rose-400 focus:ring-0 transition-all placeholder:text-slate-400 resize-none h-28"
                         />
                         <button 
                             onClick={handleSendReport}
                             disabled={!problem.trim() || isSending}
-                            className={`w-full py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 active:scale-95
+                            className={`w-full py-3.5 rounded-2xl text-[11px] font-medium uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 active:scale-95
                                 ${!problem.trim() || isSending ? 'bg-slate-100 text-slate-300' : 'bg-slate-900 text-white shadow-xl shadow-slate-200'}`}
                         >
                             {isSending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}

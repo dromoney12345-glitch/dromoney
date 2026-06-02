@@ -150,7 +150,7 @@ const Reports = () => {
                                         ))}
                                     </div>
                                     <p className="text-[11px] font-medium text-slate-400 uppercase tracking-normal mb-1 leading-none">Dynamic App Rate</p>
-                                    <p className="text-[10px] font-bold text-indigo-500 bg-indigo-50 border border-indigo-100/30 px-3 py-1 rounded-full mt-3 uppercase tracking-tight">{totalFeedbacks} Total Reviews</p>
+                                    <p className="text-[10px] font-medium text-indigo-500 bg-indigo-50 border border-indigo-100/30 px-3 py-1 rounded-full mt-3 uppercase tracking-tight">{totalFeedbacks} Total Reviews</p>
                                 </div>
 
                                 {/* Star Breakdown Progress Bars */}
@@ -203,7 +203,7 @@ const Reports = () => {
                                                         </div>
                                                         <div className="min-w-0">
                                                             <h4 className="text-[13px] font-medium text-slate-800 tracking-tight leading-none uppercase truncate max-w-[120px]">{f.user?.name || 'Anonymous'}</h4>
-                                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-normal mt-1 opacity-70">{formatTime(f.createdAt)}</p>
+                                                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mt-1 opacity-70">{formatTime(f.createdAt)}</p>
                                                         </div>
                                                     </div>
 
@@ -227,7 +227,7 @@ const Reports = () => {
 
                                             {/* Message Body */}
                                             <div className="mt-4 bg-slate-50/50 rounded-2xl p-4 border border-slate-50 relative z-10">
-                                                <p className="text-[12px] font-bold text-slate-600 leading-relaxed line-clamp-4 group-hover:line-clamp-none transition-all">
+                                                <p className="text-[12px] font-medium text-slate-600 leading-relaxed line-clamp-4 group-hover:line-clamp-none transition-all">
                                                     "{f.message}"
                                                 </p>
                                             </div>
@@ -278,7 +278,7 @@ const Reports = () => {
                                 </div>
                                 <div className="flex-1 space-y-4 pt-2">
                                     <h5 className="text-[11px] font-medium text-slate-400 uppercase tracking-normal ml-1">Issue Description</h5>
-                                    <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-[14px] font-bold text-slate-600 leading-relaxed shadow-inner">
+                                    <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-[14px] font-medium text-slate-600 leading-relaxed shadow-inner">
                                         {pr.message}
                                     </div>
                                     {pr.status === 'Pending' && (
@@ -293,7 +293,7 @@ const Reports = () => {
                         {reports.length === 0 && !loading && (
                              <div className="col-span-full py-20 text-center">
                                 <ShieldAlert size={48} className="text-slate-200 mx-auto mb-4" />
-                                <p className="text-slate-400 font-bold uppercase tracking-normal text-xs">No active problem reports.</p>
+                                <p className="text-slate-400 font-medium uppercase tracking-normal text-xs">No active problem reports.</p>
                             </div>
                         )}
                     </div>
@@ -322,7 +322,7 @@ const Reports = () => {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Answer / Instruction Body</label>
-                                            <textarea value={guide.a} onChange={(e) => updateGuide(i, 'a', e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-bold text-slate-500 h-28 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-400 transition-all shadow-sm resize-none" />
+                                            <textarea value={guide.a} onChange={(e) => updateGuide(i, 'a', e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-medium text-slate-500 h-28 outline-none focus:bg-white focus:ring-2 focus:ring-indigo-400 transition-all shadow-sm resize-none" />
                                         </div>
                                     </div>
                                     <button 
@@ -333,7 +333,7 @@ const Reports = () => {
                                     </button>
                                 </div>
                             ))}
-                            <button onClick={addGuide} className="w-full py-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-extrabold text-[12px] uppercase tracking-normal hover:border-indigo-400 hover:text-indigo-500 transition-all flex flex-col items-center gap-3">
+                            <button onClick={addGuide} className="w-full py-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-medium text-[12px] uppercase tracking-normal hover:border-indigo-400 hover:text-indigo-500 transition-all flex flex-col items-center gap-3">
                                 <Plus size={24} /> Add New FAQ Guide Item
                             </button>
                         </div>
@@ -351,7 +351,7 @@ const Reports = () => {
                                         </div>
                                         <div>
                                             <h3 className="text-2xl font-medium text-white tracking-tight uppercase">Help Guide</h3>
-                                            <p className="text-[12px] font-bold text-white/30 uppercase tracking-normal mt-1">Basic Platform Usage</p>
+                                            <p className="text-[12px] font-medium text-white/30 uppercase tracking-normal mt-1">Basic Platform Usage</p>
                                         </div>
                                     </div>
 
@@ -362,7 +362,7 @@ const Reports = () => {
                                                     <span className="text-[13px] font-medium text-white/90 leading-tight group-hover/p:text-indigo-400 transition-colors">{g.q}</span>
                                                     <ChevronDown size={18} className="text-white/20 group-hover/p:text-white transition-all duration-300" />
                                                 </div>
-                                                <p className="text-[11px] font-bold text-white/40 mt-3 leading-relaxed border-t border-white/5 pt-3 group-hover/p:text-white/60">{g.a}</p>
+                                                <p className="text-[11px] font-medium text-white/40 mt-3 leading-relaxed border-t border-white/5 pt-3 group-hover/p:text-white/60">{g.a}</p>
                                             </div>
                                         ))}
                                     </div>

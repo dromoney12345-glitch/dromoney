@@ -168,10 +168,10 @@ const BusinessIdeas = () => {
                     <div className="text-center space-y-1 relative z-10">
                         <div className="flex items-center justify-center gap-1.5 mb-0.5">
                             <Star size={12} className="text-[#FFE03D]" fill="#FFE03D" />
-                            <p className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em]">महीने की कमाई</p>
+                            <p className="text-[10px] font-medium text-white/70 uppercase tracking-[0.2em]">महीने की कमाई</p>
                             <Star size={12} className="text-[#FFE03D]" fill="#FFE03D" />
                         </div>
-                        <p className="text-[28px] font-black text-white leading-none drop-shadow-md">
+                        <p className="text-[28px] font-medium text-white leading-none drop-shadow-md">
                             ₹50k - <span className="text-[#FFE03D]">₹{selectedIdea?.potentialEarnings || '1 Lakh'}</span>
                         </p>
                     </div>
@@ -189,15 +189,15 @@ const BusinessIdeas = () => {
 
                     <div className="text-center space-y-1.5 relative z-10">
                         <div className="bg-white/10 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-xl inline-block">
-                            <p className="text-[11px] font-black text-[#00FF94] leading-tight uppercase tracking-wider">बहुत कम इन्वेस्टमेंट से</p>
+                            <p className="text-[11px] font-medium text-[#00FF94] leading-tight uppercase tracking-wider">बहुत कम इन्वेस्टमेंट से</p>
                         </div>
-                        <p className="text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mt-1">Start Your Own Brand Today</p>
+                        <p className="text-[9px] font-medium text-white/60 uppercase tracking-[0.2em] mt-1">Start Your Own Brand Today</p>
                     </div>
                 </div>
 
                 <button 
                     onClick={() => navigate('/user/business-ideas/all')}
-                    className="w-full max-w-[320px] bg-[#5D38F0] hover:bg-[#4C2CD9] text-white font-black text-[14px] py-4 rounded-[2rem] shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 transition-all active:scale-95 uppercase tracking-widest border-b-4 border-indigo-800 shrink-0"
+                    className="w-full max-w-[320px] bg-[#5D38F0] hover:bg-[#4C2CD9] text-white font-medium text-[14px] py-4 rounded-[2rem] shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 transition-all active:scale-95 uppercase tracking-widest border-b-4 border-indigo-800 shrink-0"
                 >
                     LET'S START <ArrowRight size={18} />
                 </button>
@@ -214,8 +214,8 @@ const BusinessIdeas = () => {
                         <ChevronLeft size={22} />
                     </button>
                     <div>
-                        <h1 className="text-xl font-black text-slate-900 tracking-tight">Business Hub</h1>
-                        <p className="text-[10px] font-bold text-[#5D38F0] uppercase tracking-widest">Explore Opportunities</p>
+                        <h1 className="text-xl font-medium text-slate-900 tracking-tight">Business Hub</h1>
+                        <p className="text-[10px] font-medium text-[#5D38F0] uppercase tracking-widest">Explore Opportunities</p>
                     </div>
                 </div>
             </div>
@@ -224,7 +224,7 @@ const BusinessIdeas = () => {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-3">
                         <div className="w-12 h-12 border-4 border-[#5D38F0] border-t-transparent rounded-full animate-spin" />
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Searching Best Ideas...</p>
+                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Searching Best Ideas...</p>
                     </div>
                 ) : (
                     ideas.map((idea) => (
@@ -244,18 +244,18 @@ const BusinessIdeas = () => {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex flex-wrap gap-1 mb-0.5">
                                         {(idea.badges && idea.badges.length > 0 ? idea.badges : ['Trending']).map((badge, idx) => (
-                                            <span key={idx} className={`text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase ${idx % 2 === 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-indigo-50 text-[#5D38F0]'}`}>
+                                            <span key={idx} className={`text-[7px] font-medium px-1.5 py-0.5 rounded-full uppercase ${idx % 2 === 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-indigo-50 text-[#5D38F0]'}`}>
                                                 {badge}
                                             </span>
                                         ))}
                                     </div>
-                                    <h3 className="text-[15px] font-black text-slate-900 leading-tight truncate uppercase tracking-tight">{idea.title}</h3>
-                                    <p className="text-[10px] text-[#5D38F0] font-black mt-0.5 line-clamp-1 uppercase tracking-tight">₹{idea.potentialEarnings || "50,000"}+ Monthly</p>
+                                    <h3 className="text-[15px] font-medium text-slate-900 leading-tight truncate uppercase tracking-tight">{idea.title}</h3>
+                                    <p className="text-[10px] text-[#5D38F0] font-medium mt-0.5 line-clamp-1 uppercase tracking-tight">₹{idea.potentialEarnings || "50,000"}+ Monthly</p>
                                 </div>
                             </div>
                             
                             <div className="flex items-center justify-between border-t border-slate-50 pt-3 mt-1 relative z-10">
-                                <p className="text-[9px] font-bold text-slate-400 leading-relaxed max-w-[75%] line-clamp-2">
+                                <p className="text-[9px] font-medium text-slate-400 leading-relaxed max-w-[75%] line-clamp-2">
                                     {idea.desc || "विशेषज्ञ मार्गदर्शन के साथ अपनी व्यावसायिक यात्रा शुरू करें..."}
                                 </p>
                                 <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 group-hover:bg-[#5D38F0] group-hover:text-white transition-all">
@@ -276,9 +276,9 @@ const BusinessIdeas = () => {
                 <button onClick={() => navigate('/user/business-ideas/all')} className="w-9 h-9 flex items-center justify-center text-slate-900 bg-slate-50 rounded-xl active:scale-90 transition-all border border-slate-100">
                     <ChevronLeft size={20} />
                 </button>
-                <h1 className="text-base font-black text-slate-900 uppercase tracking-tight">Start Journey</h1>
+                <h1 className="text-base font-medium text-slate-900 uppercase tracking-tight">Start Journey</h1>
                 <button className="w-9 h-9 flex items-center justify-center text-slate-400 border border-slate-100 rounded-xl">
-                    <span className="font-bold text-xs">?</span>
+                    <span className="font-medium text-xs">?</span>
                 </button>
             </div>
             <div className="px-6 py-4 flex items-center justify-center">
@@ -290,10 +290,10 @@ const BusinessIdeas = () => {
                         { num: 3, label: 'Ecosystem', active: false }
                     ].map((s, idx) => (
                         <div key={idx} className="flex flex-col items-center gap-1.5 relative z-10 flex-1">
-                            <div className={`w-7 h-7 rounded-full flex items-center justify-center font-black text-[10px] transition-all duration-300 ${s.active ? 'bg-[#5D38F0] text-white shadow-md' : 'bg-white border border-slate-100 text-slate-300'}`}>
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center font-medium text-[10px] transition-all duration-300 ${s.active ? 'bg-[#5D38F0] text-white shadow-md' : 'bg-white border border-slate-100 text-slate-300'}`}>
                                 {s.active ? s.num : <LockIcon size={10} className="opacity-60" />}
                             </div>
-                            <span className={`text-[7px] font-black uppercase tracking-widest ${s.active ? 'text-[#5D38F0]' : 'text-slate-300'}`}>{s.label}</span>
+                            <span className={`text-[7px] font-medium uppercase tracking-widest ${s.active ? 'text-[#5D38F0]' : 'text-slate-300'}`}>{s.label}</span>
                         </div>
                     ))}
                 </div>
@@ -304,44 +304,44 @@ const BusinessIdeas = () => {
                         {selectedIdea?.bannerImage ? <img src={selectedIdea.bannerImage} className="w-full h-full object-cover" alt="icon" /> : <Rocket size={28} className="text-[#5D38F0]" />}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h2 className="text-[19px] font-black text-[#1E293B] leading-tight truncate uppercase">{selectedIdea?.hindiTitle || "बिजनेस आइडिया"}</h2>
-                        <p className="text-[13px] font-bold text-slate-400 truncate uppercase mt-0.5">{selectedIdea?.title}</p>
-                        <p className="text-[9px] font-black text-indigo-500 mt-1 leading-snug uppercase tracking-tight">₹{selectedIdea?.potentialEarnings || "50,000"} Monthly Potential</p>
+                        <h2 className="text-[19px] font-medium text-[#1E293B] leading-tight truncate uppercase">{selectedIdea?.hindiTitle || "बिजनेस आइडिया"}</h2>
+                        <p className="text-[13px] font-medium text-slate-400 truncate uppercase mt-0.5">{selectedIdea?.title}</p>
+                        <p className="text-[9px] font-medium text-indigo-500 mt-1 leading-snug uppercase tracking-tight">₹{selectedIdea?.potentialEarnings || "50,000"} Monthly Potential</p>
                     </div>
                 </div>
             </div>
             <div className="px-6 mt-8 space-y-4">
-                <h3 className="text-base font-black text-slate-900 uppercase tracking-tight">बिजनेस डिटेल्स</h3>
+                <h3 className="text-base font-medium text-slate-900 uppercase tracking-tight">बिजनेस डिटेल्स</h3>
                 <div className="grid grid-cols-3 gap-2">
                     <div 
                         onClick={() => navigate(`/user/business-ideas/${ideaId}/info/howItWorks`)}
                         className="bg-white border border-slate-100 rounded-2xl p-3 flex flex-col items-center text-center shadow-sm cursor-pointer active:scale-95 transition-all"
                     >
                         <div className="w-10 h-10 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center mb-2"><Sparkles size={18} /></div>
-                        <h4 className="text-[9px] font-black text-slate-900 leading-tight">कैसे करें</h4>
-                        <p className="text-[7px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">प्रोसेस समझें</p>
+                        <h4 className="text-[9px] font-medium text-slate-900 leading-tight">कैसे करें</h4>
+                        <p className="text-[7px] font-medium text-slate-400 mt-1 uppercase tracking-tighter">प्रोसेस समझें</p>
                     </div>
                     <div 
                         onClick={() => navigate(`/user/business-ideas/${ideaId}/info/investmentDetails`)}
                         className="bg-white border border-slate-100 rounded-2xl p-3 flex flex-col items-center text-center shadow-sm cursor-pointer active:scale-95 transition-all"
                     >
                         <div className="w-10 h-10 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center mb-2"><Briefcase size={18} /></div>
-                        <h4 className="text-[9px] font-black text-slate-900 leading-tight">इन्वेस्टमेंट</h4>
-                        <p className="text-[7px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">कुल खर्च</p>
+                        <h4 className="text-[9px] font-medium text-slate-900 leading-tight">इन्वेस्टमेंट</h4>
+                        <p className="text-[7px] font-medium text-slate-400 mt-1 uppercase tracking-tighter">कुल खर्च</p>
                     </div>
                     <div 
                         onClick={() => navigate(`/user/business-ideas/${ideaId}/info/profitDetails`)}
                         className="bg-white border border-slate-100 rounded-2xl p-3 flex flex-col items-center text-center shadow-sm cursor-pointer active:scale-95 transition-all"
                     >
                         <div className="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center mb-2"><TrendingUp size={18} /></div>
-                        <h4 className="text-[9px] font-black text-slate-900 leading-tight">प्रॉफिट</h4>
-                        <p className="text-[7px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">कमाई जानें</p>
+                        <h4 className="text-[9px] font-medium text-slate-900 leading-tight">प्रॉफिट</h4>
+                        <p className="text-[7px] font-medium text-slate-400 mt-1 uppercase tracking-tighter">कमाई जानें</p>
                     </div>
                 </div>
             </div>
             
             <div className="px-6 mt-8 space-y-3">
-                <h3 className="text-base font-black text-slate-900 uppercase tracking-tight">सपोर्ट वीडियो</h3>
+                <h3 className="text-base font-medium text-slate-900 uppercase tracking-tight">सपोर्ट वीडियो</h3>
                 <div className="relative aspect-video bg-slate-900 rounded-[1.5rem] overflow-hidden shadow-lg border border-slate-100" onClick={() => setIsPlaying(!isPlaying)}>
                     {selectedIdea?.videoUrl ? (
                         <UniversalVideoPlayer 
@@ -354,7 +354,7 @@ const BusinessIdeas = () => {
                     ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-slate-800">
                             <Video size={32} className="text-white/20" />
-                            <p className="text-white/40 text-[9px] font-black uppercase tracking-widest">Video Not Available</p>
+                            <p className="text-white/40 text-[9px] font-medium uppercase tracking-widest">Video Not Available</p>
                         </div>
                     )}
                 </div>
@@ -362,13 +362,13 @@ const BusinessIdeas = () => {
 
             <div className="mx-6 mt-6 bg-[#EEF2FF] rounded-2xl p-4 flex items-center gap-4 shadow-sm shadow-indigo-100">
                 <Sparkles size={20} className="text-[#5D38F0]" fill="currentColor" />
-                <p className="text-[11px] font-black text-[#5D38F0]">यह एक लो इन्वेस्टमेंट हाई प्रॉफिट बिजनेस आइडिया है।</p>
+                <p className="text-[11px] font-medium text-[#5D38F0]">यह एक लो इन्वेस्टमेंट हाई प्रॉफिट बिजनेस आइडिया है।</p>
             </div>
 
             <div className="fixed bottom-24 left-6 right-6 z-50 max-w-sm mx-auto">
                 <button 
                     onClick={() => navigate(`/user/business-ideas/${ideaId}/subscription`)} 
-                    className="w-full bg-[#5D38F0] hover:bg-[#4C2CD9] text-white font-black py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 uppercase tracking-widest border border-white/20"
+                    className="w-full bg-[#5D38F0] hover:bg-[#4C2CD9] text-white font-medium py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 uppercase tracking-widest border border-white/20"
                 >
                     Next <ArrowRight size={20} />
                 </button>
@@ -381,7 +381,7 @@ const BusinessIdeas = () => {
         <div className="min-h-screen bg-[#F8FAFF] pb-40">
             <div className="px-6 pt-4 pb-4 flex items-center justify-between sticky top-[64px] z-40 bg-[#F8FAFF]/80 backdrop-blur-md">
                 <button onClick={() => navigate(`/user/business-ideas/${ideaId}`)} className="w-10 h-10 flex items-center justify-center text-slate-900 bg-white rounded-xl shadow-sm"><ChevronLeft size={24} /></button>
-                <h1 className="text-lg font-black text-slate-900">Unlock Premium</h1>
+                <h1 className="text-lg font-medium text-slate-900">Unlock Premium</h1>
                 <div className="w-10" />
             </div>
 
@@ -391,7 +391,7 @@ const BusinessIdeas = () => {
                         <button
                             key={idx}
                             onClick={() => setSelectedPlanIdx(idx)}
-                            className={`shrink-0 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${selectedPlanIdx === idx ? 'bg-[#5D38F0] text-white shadow-lg shadow-indigo-100' : 'bg-white text-slate-400 border border-slate-100'}`}
+                            className={`shrink-0 px-6 py-3 rounded-2xl font-medium text-xs uppercase tracking-widest transition-all ${selectedPlanIdx === idx ? 'bg-[#5D38F0] text-white shadow-lg shadow-indigo-100' : 'bg-white text-slate-400 border border-slate-100'}`}
                         >
                             {plan.title.split(' ')[0]} {plan.durationInDays ? `${plan.durationInDays} Days` : plan.duration.replace('/ ', '')}
                         </button>
@@ -403,33 +403,33 @@ const BusinessIdeas = () => {
                 {settings.businessPlans.length > 0 ? (
                     <div className="bg-gradient-to-br from-[#5D38F0] to-[#8643FF] rounded-[3rem] p-8 text-white relative overflow-hidden shadow-2xl">
                         <Crown size={32} className="text-[#FFE03D] mb-6" fill="#FFE03D" fillOpacity={0.4} />
-                        <h2 className="text-3xl font-black mb-2">{settings.businessPlans[selectedPlanIdx]?.title}</h2>
-                        <p className="text-white/80 font-bold text-sm">{settings.businessPlans[selectedPlanIdx]?.subtitle}</p>
+                        <h2 className="text-3xl font-medium mb-2">{settings.businessPlans[selectedPlanIdx]?.title}</h2>
+                        <p className="text-white/80 font-medium text-sm">{settings.businessPlans[selectedPlanIdx]?.subtitle}</p>
                         <div className="mt-8 flex items-baseline gap-2">
-                            <span className="text-4xl font-black">₹{settings.businessPlans[selectedPlanIdx]?.price}</span>
-                            <span className="text-white/60 font-bold text-sm">
+                            <span className="text-4xl font-medium">₹{settings.businessPlans[selectedPlanIdx]?.price}</span>
+                            <span className="text-white/60 font-medium text-sm">
                                 {settings.businessPlans[selectedPlanIdx]?.durationInDays ? `(${settings.businessPlans[selectedPlanIdx].durationInDays} Days)` : settings.businessPlans[selectedPlanIdx]?.duration}
                             </span>
                         </div>
 
                         {isSubscribed && timeRem && (
                             <div className="mt-6 bg-white/20 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-white/70 mb-1">Plan Active Until</p>
-                                <p className="text-lg font-black text-white">
-                                    {timeRem.days} Days {timeRem.hours} Hours <span className="text-[10px] font-bold text-white/50 lowercase ml-1">remaining</span>
+                                <p className="text-[10px] font-medium uppercase tracking-widest text-white/70 mb-1">Plan Active Until</p>
+                                <p className="text-lg font-medium text-white">
+                                    {timeRem.days} Days {timeRem.hours} Hours <span className="text-[10px] font-medium text-white/50 lowercase ml-1">remaining</span>
                                 </p>
                             </div>
                         )}
                     </div>
                 ) : (
                     <div className="bg-indigo-50 rounded-[3rem] p-12 text-center">
-                        <p className="text-indigo-400 font-black text-xs uppercase tracking-widest">Loading Premium Plans...</p>
+                        <p className="text-indigo-400 font-medium text-xs uppercase tracking-widest">Loading Premium Plans...</p>
                     </div>
                 )}
             </div>
 
             <div className="px-6 mt-10 space-y-4">
-                <h3 className="text-lg font-black text-slate-900 ml-2">Premium Benefits</h3>
+                <h3 className="text-lg font-medium text-slate-900 ml-2">Premium Benefits</h3>
                 {settings.businessPlans.length > 0 && (settings.businessPlans[selectedPlanIdx]?.benefits?.length > 0 ? settings.businessPlans[selectedPlanIdx].benefits : [
                     { title: '24/7 Expert Support', subtitle: 'Premium Benefit unlocked', iconType: 'support', colorType: 'emerald' },
                     { title: 'Weekly Live Meetings', subtitle: 'Premium Benefit unlocked', iconType: 'meeting', colorType: 'indigo' },
@@ -448,8 +448,8 @@ const BusinessIdeas = () => {
                                 <Icon size={22} />
                             </div>
                             <div>
-                                <h4 className="text-[14px] font-black text-slate-900 leading-tight">{benefit.title}</h4>
-                                <p className="text-[10px] font-bold text-slate-400 mt-1">{benefit.subtitle}</p>
+                                <h4 className="text-[14px] font-medium text-slate-900 leading-tight">{benefit.title}</h4>
+                                <p className="text-[10px] font-medium text-slate-400 mt-1">{benefit.subtitle}</p>
                             </div>
                             <ShieldCheck size={18} className="ml-auto text-emerald-500" />
                         </div>
@@ -465,7 +465,7 @@ const BusinessIdeas = () => {
                             setShowPaymentModal(true);
                         }
                     }} 
-                    className="w-full bg-[#5D38F0] hover:bg-[#4C2CD9] text-white font-black py-4 rounded-2xl shadow-xl flex items-center justify-center gap-3 uppercase tracking-widest border border-white/20"
+                    className="w-full bg-[#5D38F0] hover:bg-[#4C2CD9] text-white font-medium py-4 rounded-2xl shadow-xl flex items-center justify-center gap-3 uppercase tracking-widest border border-white/20"
                 >
                     {isSubscribed ? 'Continue to Ecosystem' : 'Unlock Journey'} <ArrowRight size={20} />
                 </button>
@@ -494,7 +494,7 @@ const BusinessIdeas = () => {
             return (
                 <div className="min-h-screen flex flex-col items-center justify-center p-6 gap-4">
                     <Loader2 size={40} className="text-[#5D38F0] animate-spin" />
-                    <p className="text-slate-400 font-black text-xs uppercase tracking-widest text-center">Loading Ecosystem Content...</p>
+                    <p className="text-slate-400 font-medium text-xs uppercase tracking-widest text-center">Loading Ecosystem Content...</p>
                 </div>
             );
         }
@@ -512,7 +512,7 @@ const BusinessIdeas = () => {
                 `}</style>
                 <div className="px-6 pt-4 pb-4 flex items-center justify-between bg-[#F8FAFF]/90 backdrop-blur-md sticky top-[64px] z-40">
                     <button onClick={() => navigate(`/user/business-ideas/${ideaId}/subscription`)} className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-900 shadow-sm border border-slate-100 active:scale-90 transition-all"><ChevronLeft size={24} /></button>
-                    <h1 className="text-lg font-black text-slate-900 tracking-tight">Premium Hub</h1>
+                    <h1 className="text-lg font-medium text-slate-900 tracking-tight">Premium Hub</h1>
                     <div className="w-10" />
                 </div>
 
@@ -527,10 +527,10 @@ const BusinessIdeas = () => {
                             { num: 3, label: 'Ecosystem', active: true }
                         ].map((s, idx) => (
                             <div key={idx} className="flex flex-col items-center gap-2 relative z-10 flex-1">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-300 ${s.active ? 'bg-[#5D38F0] text-white shadow-lg ring-4 ring-indigo-100' : 'bg-white border-2 border-slate-100 text-slate-300'}`}>
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-medium text-xs transition-all duration-300 ${s.active ? 'bg-[#5D38F0] text-white shadow-lg ring-4 ring-indigo-100' : 'bg-white border-2 border-slate-100 text-slate-300'}`}>
                                     {s.active ? s.num : <LockIcon size={12} />}
                                 </div>
-                                <span className={`text-[8px] font-black uppercase tracking-widest ${s.active ? 'text-[#5D38F0]' : 'text-slate-300'}`}>{s.label}</span>
+                                <span className={`text-[8px] font-medium uppercase tracking-widest ${s.active ? 'text-[#5D38F0]' : 'text-slate-300'}`}>{s.label}</span>
                             </div>
                         ))}
                     </div>
@@ -539,9 +539,9 @@ const BusinessIdeas = () => {
                 <div className="px-6 mt-8">
                     <div className="flex items-center gap-3 mb-1">
                         <Sparkles size={18} className="text-[#5D38F0]" />
-                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">Strategy Ecosystem</h2>
+                        <h2 className="text-2xl font-medium text-slate-900 tracking-tight">Strategy Ecosystem</h2>
                     </div>
-                    <p className="text-[12px] font-bold text-slate-400">Unlock your business potential with these steps</p>
+                    <p className="text-[12px] font-medium text-slate-400">Unlock your business potential with these steps</p>
                 </div>
 
                 <div className="px-6 mt-6 grid grid-cols-2 gap-4">
@@ -568,17 +568,17 @@ const BusinessIdeas = () => {
                                         <div className={`w-9 h-9 ${c.bg} rounded-xl flex items-center justify-center`}>
                                             <span className={`${c.color}`}>{getIcon(i)}</span>
                                         </div>
-                                        <span className={`text-[9px] font-black text-slate-200 uppercase`}>0{i+1}</span>
+                                        <span className={`text-[9px] font-medium text-slate-200 uppercase`}>0{i+1}</span>
                                     </div>
                                     
                                     <div className="flex-1">
-                                        <h4 className="text-[12px] font-black text-slate-800 leading-tight mb-2 group-hover:text-[#5D38F0] transition-colors line-clamp-2 uppercase">
+                                        <h4 className="text-[12px] font-medium text-slate-800 leading-tight mb-2 group-hover:text-[#5D38F0] transition-colors line-clamp-2 uppercase">
                                             {card.title}
                                         </h4>
                                     </div>
 
                                     <div className="flex justify-between items-center mt-2 pt-2 border-t border-slate-50">
-                                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Details</span>
+                                        <span className="text-[8px] font-medium text-slate-400 uppercase tracking-tighter">Details</span>
                                         <div className={`w-6 h-6 rounded-lg ${c.bg} flex items-center justify-center ${c.color} group-hover:bg-[#5D38F0] group-hover:text-white transition-all`}>
                                             <ArrowRight size={12} />
                                         </div>
@@ -589,9 +589,9 @@ const BusinessIdeas = () => {
                     })}
                 </div>
                 <div className="mx-6 mt-8 bg-white border border-slate-100 rounded-[2rem] p-6 shadow-sm">
-                    <h4 className="text-sm font-black text-slate-900 mb-2">मीटिंग जॉइन करें</h4>
+                    <h4 className="text-sm font-medium text-slate-900 mb-2">मीटिंग जॉइन करें</h4>
                     <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 flex items-center justify-between mb-4">
-                        <p className="text-[10px] font-bold text-slate-500 truncate">{selectedIdea?.meetingLink || "Link not set"}</p>
+                        <p className="text-[10px] font-medium text-slate-500 truncate">{selectedIdea?.meetingLink || "Link not set"}</p>
                         <button 
                             onClick={() => {
                                 const link = selectedIdea?.meetingLink;
@@ -627,15 +627,15 @@ const BusinessIdeas = () => {
                                 alert('Meeting link not available yet.');
                             }
                         }}
-                        className="w-full bg-[#5D38F0] text-white py-4 rounded-xl font-black text-sm flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
+                        className="w-full bg-[#5D38F0] text-white py-4 rounded-xl font-medium text-sm flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all"
                     >
                         <Play size={16} fill="currentColor" /> जॉइन मीटिंग
                     </button>
                 </div>
                 <div className="mx-6 mt-6 bg-white border border-slate-100 rounded-[2rem] p-6 shadow-sm relative overflow-hidden">
-                    <h4 className="text-sm font-black text-slate-900 mb-2">सपोर्ट चैट</h4>
-                    <p className="text-[10px] font-bold text-slate-400 mb-4">किसी भी समस्या के लिए हमसे चैट करें।</p>
-                    <button onClick={() => navigate('/user/chat-support')} className="bg-white border border-indigo-100 text-[#5D38F0] px-6 py-2 rounded-xl font-black text-[11px] flex items-center gap-2 hover:bg-indigo-50 transition-all"><MessageSquare size={14} /> चैट शुरू करें</button>
+                    <h4 className="text-sm font-medium text-slate-900 mb-2">सपोर्ट चैट</h4>
+                    <p className="text-[10px] font-medium text-slate-400 mb-4">किसी भी समस्या के लिए हमसे चैट करें।</p>
+                    <button onClick={() => navigate('/user/chat-support')} className="bg-white border border-indigo-100 text-[#5D38F0] px-6 py-2 rounded-xl font-medium text-[11px] flex items-center gap-2 hover:bg-indigo-50 transition-all"><MessageSquare size={14} /> चैट शुरू करें</button>
                 </div>
             </div>
         );
@@ -650,7 +650,7 @@ const BusinessIdeas = () => {
             return (
                 <div className="min-h-screen bg-[#F8FAFF] flex flex-col items-center justify-center p-6 gap-4">
                     <Loader2 size={40} className="text-[#5D38F0] animate-spin" />
-                    <p className="text-slate-400 font-black text-xs uppercase tracking-widest text-center">Loading Strategy Details...</p>
+                    <p className="text-slate-400 font-medium text-xs uppercase tracking-widest text-center">Loading Strategy Details...</p>
                 </div>
             );
         }
@@ -674,16 +674,16 @@ const BusinessIdeas = () => {
                             <ChevronLeft size={24} />
                         </button>
                         <div className="flex flex-col items-end">
-                            <p className="text-[9px] font-black text-white/60 uppercase tracking-widest">Premium Strategy</p>
-                            <span className="text-white font-black text-xs">Phase 0{cardIdx + 1}</span>
+                            <p className="text-[9px] font-medium text-white/60 uppercase tracking-widest">Premium Strategy</p>
+                            <span className="text-white font-medium text-xs">Phase 0{cardIdx + 1}</span>
                         </div>
                     </div>
 
                     <div className="absolute bottom-10 left-8 right-8 z-20">
-                        <h1 className="text-3xl font-black text-white leading-tight mb-2">{card?.title}</h1>
+                        <h1 className="text-3xl font-medium text-white leading-tight mb-2">{card?.title}</h1>
                         <div className="flex items-center gap-2">
                             <div className="w-6 h-1 bg-white/40 rounded-full"></div>
-                            <p className="text-[10px] font-bold text-white/80 uppercase tracking-widest">Premium Strategy</p>
+                            <p className="text-[10px] font-medium text-white/80 uppercase tracking-widest">Premium Strategy</p>
                         </div>
                     </div>
 
@@ -698,7 +698,7 @@ const BusinessIdeas = () => {
                             <div className={`w-10 h-10 ${c.bg} ${c.color} rounded-xl flex items-center justify-center shadow-inner`}>
                                 <Sparkles size={18} />
                             </div>
-                            <h3 className="text-sm font-black text-slate-800">विस्तृत जानकारी</h3>
+                            <h3 className="text-sm font-medium text-slate-800">विस्तृत जानकारी</h3>
                         </div>
 
                         {card?.description ? (
@@ -714,7 +714,7 @@ const BusinessIdeas = () => {
                                 <div className={`w-16 h-16 ${c.bg} rounded-full flex items-center justify-center`}>
                                     <MessageSquare size={30} className={c.color} />
                                 </div>
-                                <p className="font-black text-slate-300 text-xs uppercase tracking-widest">Update In Progress</p>
+                                <p className="font-medium text-slate-300 text-xs uppercase tracking-widest">Update In Progress</p>
                                 <p className="text-slate-400 text-[11px] max-w-[200px]">Admin team is refining this section. Please check back shortly.</p>
                             </div>
                         )}
@@ -730,7 +730,7 @@ const BusinessIdeas = () => {
                                 window.scrollTo(0, 0);
                             }
                         }}
-                        className="w-full bg-[#1E293B] hover:bg-slate-800 text-white py-5 rounded-[2rem] font-black text-sm flex items-center justify-center gap-3 shadow-[0_15px_40px_rgba(0,0,0,0.3)] active:scale-95 transition-all border border-slate-700"
+                        className="w-full bg-[#1E293B] hover:bg-slate-800 text-white py-5 rounded-[2rem] font-medium text-sm flex items-center justify-center gap-3 shadow-[0_15px_40px_rgba(0,0,0,0.3)] active:scale-95 transition-all border border-slate-700"
                     >
                         Next Strategy <ArrowRight size={18} />
                     </button>
@@ -775,9 +775,9 @@ const BusinessIdeas = () => {
                             <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white">
                                 {c.icon}
                             </div>
-                            <span className="text-white/60 font-black text-xs uppercase tracking-widest">Business Detail</span>
+                            <span className="text-white/60 font-medium text-xs uppercase tracking-widest">Business Detail</span>
                         </div>
-                        <h1 className="text-3xl font-black text-white leading-tight">{c.title}</h1>
+                        <h1 className="text-3xl font-medium text-white leading-tight">{c.title}</h1>
                     </div>
                     
                     {/* Decorative Elements */}
@@ -790,7 +790,7 @@ const BusinessIdeas = () => {
                             <div className={`w-10 h-10 ${c.bg} ${c.color} rounded-xl flex items-center justify-center shadow-inner`}>
                                 <Rocket size={18} />
                             </div>
-                            <h3 className="text-sm font-black text-slate-800">विस्तृत जानकारी</h3>
+                            <h3 className="text-sm font-medium text-slate-800">विस्तृत जानकारी</h3>
                         </div>
 
                         {content ? (
@@ -806,7 +806,7 @@ const BusinessIdeas = () => {
                                 <div className={`w-16 h-16 ${c.bg} rounded-full flex items-center justify-center`}>
                                     <MessageSquare size={30} className={c.color} />
                                 </div>
-                                <p className="font-black text-slate-300 text-xs uppercase tracking-widest">Update In Progress</p>
+                                <p className="font-medium text-slate-300 text-xs uppercase tracking-widest">Update In Progress</p>
                                 <p className="text-slate-400 text-[11px] max-w-[200px]">Admin team is refining this section. Please check back shortly.</p>
                             </div>
                         )}
@@ -818,7 +818,7 @@ const BusinessIdeas = () => {
                 <div className="sticky bottom-0 p-6 z-50 bg-white/80 backdrop-blur-md border-t border-slate-50">
                     <button 
                         onClick={() => navigate(`/user/business-ideas/${ideaId}`)}
-                        className="w-full bg-[#1E293B] hover:bg-slate-800 text-white py-5 rounded-[2rem] font-black text-sm shadow-xl active:scale-95 transition-all"
+                        className="w-full bg-[#1E293B] hover:bg-slate-800 text-white py-5 rounded-[2rem] font-medium text-sm shadow-xl active:scale-95 transition-all"
                     >
                         Got it! Back to Journey
                     </button>
@@ -828,7 +828,7 @@ const BusinessIdeas = () => {
     };
 
     return (
-        <div className="max-w-md mx-auto bg-white min-h-screen font-sans shadow-xl relative overflow-x-clip">
+        <div className="max-w-md mx-auto bg-white min-h-screen font-poppins shadow-xl relative overflow-x-clip">
             {step === -1 && <IntroScreen />}
             {step === 0 && <ListingScreen />}
             {step === 1 && <DetailsScreen />}
