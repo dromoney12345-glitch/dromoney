@@ -820,13 +820,13 @@ const Income = () => {
 
     // ── LAYER 4: Final Income Cards (Modern Mobile UI Redesign) ─────────────
     return (
-        <div className="flex flex-col gap-3 p-4 bg-[#F8FAFC] animate-in fade-in duration-700">
+        <div className="flex flex-col gap-2 p-3 bg-[#F8FAFC] animate-in fade-in duration-700">
             {/* Minimal Sub-Header */}
-            <div className="flex items-start justify-between px-1 mb-1">
-                <div className="flex flex-col gap-1.5">
-                    <h2 className="text-2xl font-medium text-slate-900 tracking-tight leading-none mt-1">Income Center</h2>
-                    <div className="flex flex-wrap items-center gap-2.5 mt-0.5">
-                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.15em] leading-none">Verified Earning Systems</p>
+            <div className="flex items-start justify-between px-1 mb-0.5">
+                <div className="flex flex-col gap-1">
+                    <h2 className="text-[18px] font-semibold text-slate-900 tracking-tight leading-none">Income Center</h2>
+                    <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                        <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest leading-none">Verified Earning Systems</p>
                         
                         {/* Course Reopen link (कोर्स & टेंपलेट्स) */}
                         <button
@@ -840,8 +840,8 @@ const Income = () => {
                         </button>
                     </div>
                 </div>
-                <div className="pt-1.5 pr-1 shrink-0">
-                    <TrendingUp size={24} strokeWidth={2.5} className="text-blue-500" />
+                <div className="shrink-0 pt-0.5">
+                    <TrendingUp size={20} strokeWidth={2.5} className="text-blue-500" />
                 </div>
             </div>
 

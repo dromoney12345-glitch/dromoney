@@ -64,13 +64,13 @@ const UserLayout = () => {
     return (
         <div className="h-screen bg-slate-50 text-slate-900 font-poppins overflow-hidden flex flex-col max-w-md mx-auto relative">
             {/* --- New Dromoney Fixed Top Header --- */}
-            <header className="shrink-0 z-50 bg-slate-900/95 backdrop-blur-md px-4 py-1.5 flex items-center justify-between border-b border-slate-800 shadow-xl min-h-[57px]">
+            <header className="shrink-0 z-50 bg-slate-900/95 backdrop-blur-md px-4 py-1 flex items-center justify-between border-b border-slate-800 shadow-xl min-h-[48px] max-h-[48px]">
                 {/* 1. Brand & Logo (Left Side) */}
-                <div className="flex items-center gap-1 active:scale-95 transition-transform cursor-pointer" onClick={() => navigate('/user/home')}>
-                    <div className="w-14 h-14 flex items-center justify-center">
+                <div className="flex items-center gap-1 active:scale-95 transition-transform cursor-pointer -ml-1" onClick={() => navigate('/user/home')}>
+                    <div className="w-10 h-10 flex items-center justify-center">
                         <img src={LogoImg} alt="Logo" className="w-full h-full object-contain brightness-110 drop-shadow-xl" />
                     </div>
-                    <span className="text-[18px] font-semibold tracking-[0.1em] uppercase font-poppins truncate">
+                    <span className="text-[15px] font-semibold tracking-wider uppercase font-poppins truncate">
                         <span className="text-[#8B4513]">DRO</span>
                         <span className="text-white">MONEY</span>
                     </span>
