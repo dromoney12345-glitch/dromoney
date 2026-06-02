@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { 
     ChevronLeft, Camera, User, Award, CheckCircle2, 
     ShieldCheck, Users, Headset, MessageSquare, 
-    ChevronRight, LogOut, Image as ImageIcon, Loader2 
+    ChevronRight, LogOut, Image as ImageIcon, Loader2,
+    Mail, Smartphone
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import api from '../../shared/services/api'; 
