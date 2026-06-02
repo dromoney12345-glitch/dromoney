@@ -159,7 +159,7 @@ const BusinessIdeas = () => {
                 </button>
             </div>
 
-            <div className="flex-1 flex flex-col items-center justify-center p-5 overflow-hidden gap-5">
+            <div className="flex-1 flex flex-col items-center justify-start pt-12 p-5 overflow-hidden gap-6">
                 <div className="w-full max-w-[320px] bg-gradient-to-br from-[#5D38F0] to-[#8643FF] rounded-[2rem] p-5 text-white shadow-xl relative overflow-hidden flex flex-col items-center justify-center min-h-0 mb-2">
                     {/* Decorative Elements */}
                     <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-8 -mt-8 blur-2xl" />
