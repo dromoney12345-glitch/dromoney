@@ -149,17 +149,10 @@ const KycModal = ({ isOpen, onClose }) => {
 
                             <div className="space-y-1">
                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Front Photo</label>
-                                <div 
-                                    onClick={() => fileInputRef.current?.click()}
+                                <label 
+                                    htmlFor="kyc-modal-upload"
                                     className="w-full aspect-[16/9] bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition-all overflow-hidden relative"
                                 >
-                                    <input 
-                                        type="file" 
-                                        ref={fileInputRef} 
-                                        onChange={handleFileChange} 
-                                        className="hidden" 
-                                        accept="image/*"
-                                    />
                                     {previewUrl ? (
                                         <img src={previewUrl} className="w-full h-full object-cover" alt="Preview" />
                                     ) : (
@@ -168,7 +161,14 @@ const KycModal = ({ isOpen, onClose }) => {
                                             <span className="text-[10px] font-medium text-slate-400 uppercase">Click to Upload</span>
                                         </>
                                     )}
-                                </div>
+                                </label>
+                                <input 
+                                    id="kyc-modal-upload"
+                                    type="file" 
+                                    onChange={handleFileChange} 
+                                    className="hidden" 
+                                    accept="image/*"
+                                />
                             </div>
                         </div>
                     ) : (

@@ -65,13 +65,7 @@ const Profile = () => {
         }
     };
 
-    const triggerGalleryUpload = () => {
-        if (galleryInputRef.current) galleryInputRef.current.click();
-    };
-
-    const triggerCameraUpload = () => {
-        if (cameraInputRef.current) cameraInputRef.current.click();
-    };
+    // Removed triggerGalleryUpload and triggerCameraUpload in favor of label
 
     return (
         <div className="flex flex-col min-h-screen bg-[#F1F9F3] pb-24 relative overflow-hidden">
@@ -119,23 +113,23 @@ const Profile = () => {
                                     <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                 </div>
                             )}
-                            <div 
-                                onClick={triggerGalleryUpload}
+                            <label 
+                                htmlFor="profile-upload"
                                 className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
                             >
                                 <ImageIcon size={20} className="text-white" />
-                            </div>
+                            </label>
                         </div>
                         
-                        <button 
-                            onClick={triggerGalleryUpload}
+                        <label 
+                            htmlFor="profile-upload"
                             className="absolute -bottom-0.5 -right-0.5 w-8 h-8 bg-white rounded-full shadow-lg border border-slate-100 flex items-center justify-center cursor-pointer active:scale-90 transition-all z-20"
                         >
                             <ImageIcon size={14} className="text-slate-600" />
-                        </button>
+                        </label>
                         <input 
+                            id="profile-upload"
                             type="file" 
-                            ref={galleryInputRef} 
                             onChange={handleImageChange} 
                             className="hidden" 
                             accept="image/*"
@@ -143,12 +137,12 @@ const Profile = () => {
                     </div>
 
                     <div className="flex items-center justify-center mb-1.5">
-                        <button 
-                            onClick={triggerGalleryUpload}
+                        <label 
+                            htmlFor="profile-upload"
                             className="bg-[#0B1221] px-4 py-2 rounded-lg text-[10px] font-medium text-white uppercase tracking-widest flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
                         >
                             <ImageIcon size={14} className="text-blue-400" /> Upload Photo
-                        </button>
+                        </label>
                     </div>
                     <p className="text-[8px] font-medium text-slate-400 uppercase tracking-widest opacity-60">Change Profile Photo</p>
                 </div>

@@ -43,9 +43,7 @@ const KycSetup = () => {
         </div>
     );
 
-    const triggerFileSelect = () => {
-        fileInputRef.current?.click();
-    };
+    // triggerFileSelect removed in favor of label
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -209,9 +207,9 @@ const KycSetup = () => {
                         {/* Upload area (More compact) */}
                         <div className="space-y-2">
                             <label className="text-[9px] uppercase font-medium tracking-widest text-slate-400 px-1">Photo Upload</label>
-                            <div 
-                                onClick={triggerFileSelect}
-                                className="relative group cursor-pointer border-2 border-dashed border-slate-100 hover:border-amber-500/30 rounded-2xl p-1 bg-slate-50/30 transition-all overflow-hidden"
+                            <label 
+                                htmlFor="kyc-upload"
+                                className="relative group cursor-pointer border-2 border-dashed border-slate-100 hover:border-amber-500/30 rounded-2xl p-1 bg-slate-50/30 transition-all overflow-hidden block"
                             >
                                 {!aadhaarFile ? (
                                     <div className="py-8 flex flex-col items-center justify-center gap-2">
@@ -238,7 +236,14 @@ const KycSetup = () => {
                                         </div>
                                     </div>
                                 )}
-                            </div>
+                            </label>
+                            <input 
+                                id="kyc-upload"
+                                type="file" 
+                                onChange={handleFileChange} 
+                                className="hidden" 
+                                accept="image/*"
+                            />
                         </div>
                     </div>
 
@@ -271,13 +276,7 @@ const KycSetup = () => {
                 </div>
             </div>
 
-            <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileChange} 
-                className="hidden" 
-                accept="image/*"
-            />
+
         </div>
     );
 };

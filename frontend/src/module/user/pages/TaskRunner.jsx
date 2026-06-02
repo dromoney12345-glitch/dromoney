@@ -394,11 +394,10 @@ const TaskRunner = () => {
                                    {step2Text}
                                </p>
                                
-                               <div 
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="relative border-2 border-dashed border-slate-700/50 hover:border-amber-500/60 rounded-2xl p-6 flex flex-col items-center justify-center bg-slate-950/50 transition-colors cursor-pointer group h-32 z-10"
+                                <label 
+                                    htmlFor="task-proof-upload"
+                                    className="relative border-2 border-dashed border-slate-700/50 hover:border-amber-500/60 rounded-2xl p-6 flex flex-col items-center justify-center bg-slate-950/50 transition-colors cursor-pointer group h-32 z-10 block"
                                 >
-                                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => { if(e.target.files[0]) setScreenshotFile(e.target.files[0]); }} />
                                     {!screenshotFile ? (
                                         <>
                                             <UploadCloud size={24} className="text-slate-500 group-hover:text-amber-500 mb-2 transition-colors relative z-0" />
@@ -413,7 +412,14 @@ const TaskRunner = () => {
                                             </div>
                                         </div>
                                     )}
-                                </div>
+                                </label>
+                                <input 
+                                    id="task-proof-upload"
+                                    type="file" 
+                                    className="hidden" 
+                                    accept="image/*" 
+                                    onChange={(e) => { if(e.target.files[0]) setScreenshotFile(e.target.files[0]); }} 
+                                />
                            </div>
                        )}
                     </div>
