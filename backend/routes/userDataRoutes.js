@@ -8,7 +8,8 @@ const {
     updateProfilePhoto,
     updateFutureFundProgress,
     unlockFutureFund,
-    getReferrals
+    getReferrals,
+    updateProfile
 } = require('../controllers/userController');
 const { submitTask } = require('../controllers/taskSubmissionController');
 const { unlockIdea } = require('../controllers/businessIdeaController');
@@ -32,6 +33,7 @@ router.post('/complete-course', completeCourse);
 router.post('/promotions', submitPromotion);
 router.get('/promotions', getMyPromotions);
 router.get('/referrals', getReferrals);
+router.patch('/profile', updateProfile);
 router.patch('/photo', upload.single('photo'), updateProfilePhoto);
 router.post('/future-fund/progress', updateFutureFundProgress);
 router.post('/future-fund/unlock', unlockFutureFund);

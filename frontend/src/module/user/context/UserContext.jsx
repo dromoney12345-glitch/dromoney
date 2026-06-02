@@ -295,6 +295,25 @@ export const UserProvider = ({ children }) => {
         setUserData(prev => ({ ...prev, profileImage: newUrl }));
     };
 
+    const updateProfileData = async (data) => {
+        try {
+            const res = await api.patch('/user/data/profile', data);
+            if (res.success) {
+                setUserData(prev => ({ 
+                    ...prev, 
+                    ...(data.name && { name: data.name }),
+                    ...(data.email && { email: data.email }),
+                    ...(data.phone && { phone: data.phone })
+                }));
+                return { success: true };
+            }
+            return { success: false, error: res.message || 'Failed to update' };
+        } catch (error) {
+            console.error('Update Profile error:', error);
+            return { success: false, error: error.response?.data?.message || 'Server error' };
+        }
+    };
+
     const addNotification = (title, message, type) => {
         setNotifications(prev => [{ id: Date.now(), title, message, time: "Just now", type, isRead: false }, ...prev]);
     };
@@ -317,6 +336,7 @@ export const UserProvider = ({ children }) => {
         addNotification,
         refreshUserProfile,
         updateProfileImage,
+        updateProfileData,
         markAsRead,
         clearNotifications
     }), [userData, notifications, loading, isAuthenticated]);

@@ -11,17 +11,20 @@ import UnlockModal from '../components/UnlockModal';
 import KycModal from '../components/KycModal';
 import ReferralsModal from '../components/ReferralsModal';
 import FeedbackModal from '../components/FeedbackModal';
+import EditProfileModal from '../components/EditProfileModal';
+
 const Profile = () => {
     const navigate = useNavigate();
     const galleryInputRef = React.useRef(null);
     const cameraInputRef = React.useRef(null);
-    const { userData, addNotification, updateProfileImage, logout } = useUser();
-    const { name, id, referrals, isPaid, profileImage, kycStatus } = userData;
+    const { userData, addNotification, updateProfileImage, updateProfileData, logout } = useUser();
+    const { name, id, email, phone, referrals, isPaid, profileImage, kycStatus } = userData;
     const [isUploading, setIsUploading] = useState(false);
     const [isUnlockOpen, setIsUnlockOpen] = useState(false);
     const [isKycOpen, setIsKycOpen] = useState(false);
     const [isReferralsOpen, setIsReferralsOpen] = useState(false);
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+    const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
     const defaultRealImage = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&q=80&fit=crop";
 
@@ -73,6 +76,7 @@ const Profile = () => {
             <KycModal isOpen={isKycOpen} onClose={() => setIsKycOpen(false)} />
             <ReferralsModal isOpen={isReferralsOpen} onClose={() => setIsReferralsOpen(false)} referralCount={referrals.count} />
             <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
+            <EditProfileModal isOpen={isEditProfileOpen} onClose={() => setIsEditProfileOpen(false)} userData={userData} updateProfileData={updateProfileData} addNotification={addNotification} />
 
             {/* Ultra-Compact Header Row - Navy Blue Theme */}
             <div className="relative h-16 bg-gradient-to-br from-[#0B1221] to-[#1E293B] rounded-b-3xl shadow-lg overflow-hidden mb-4 flex items-center px-5">
@@ -149,14 +153,32 @@ const Profile = () => {
 
                 {/* ── User Information Fields ── */}
                 <div className="space-y-3">
+                    <div className="flex items-center justify-between ml-1 mb-2">
+                        <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">Personal Details</p>
+                        <button onClick={() => setIsEditProfileOpen(true)} className="text-[10px] text-blue-500 font-medium hover:underline flex items-center gap-1 active:scale-95 transition-all">
+                            Edit Profile
+                        </button>
+                    </div>
+
                     <div className="space-y-1">
-                        <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest ml-1">Full Name</p>
-                        <div className="bg-white border border-slate-100 rounded-xl px-4 py-3 flex items-center justify-between shadow-sm">
-                            <div className="flex items-center gap-3">
-                                <User size={16} className="text-slate-300" />
-                                <span className="text-[13px] font-medium text-slate-800">{name}</span>
+                        <div className="bg-white border border-slate-100 rounded-xl px-4 py-3 flex flex-col gap-3 shadow-sm">
+                            <div className="flex items-center justify-between border-b border-slate-50 pb-2">
+                                <div className="flex items-center gap-3">
+                                    <User size={16} className="text-slate-300" />
+                                    <span className="text-[13px] font-medium text-slate-800">{name}</span>
+                                </div>
+                                <CheckCircle2 size={14} className="text-emerald-500" />
                             </div>
-                            <CheckCircle2 size={14} className="text-emerald-500" />
+                            
+                            <div className="flex items-center gap-3 border-b border-slate-50 pb-2">
+                                <Mail size={16} className="text-slate-300" />
+                                <span className="text-[12px] font-medium text-slate-600">{email}</span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <Smartphone size={16} className="text-slate-300" />
+                                <span className="text-[12px] font-medium text-slate-600">{phone}</span>
+                            </div>
                         </div>
                     </div>
 

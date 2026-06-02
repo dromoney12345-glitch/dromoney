@@ -454,3 +454,40 @@ exports.getReferrals = asyncHandler(async (req, res, next) => {
         data: referralsData
     });
 });
+
+// @desc    Update User Profile (name, email, phone)
+// @route   PATCH /api/user/data/profile
+// @access  Private
+exports.updateProfile = asyncHandler(async (req, res, next) => {
+    const { name, email, phone } = req.body;
+    
+    // Check if email or phone already exists
+    if (email) {
+        const emailExists = await User.findOne({ email, _id: { $ne: req.user.id } });
+        if (emailExists) {
+            return next(new ErrorResponse('Email already registered by another account', 400));
+        }
+    }
+    
+    if (phone) {
+        const phoneExists = await User.findOne({ phone, _id: { $ne: req.user.id } });
+        if (phoneExists) {
+            return next(new ErrorResponse('Phone already registered by another account', 400));
+        }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+        req.user.id,
+        { 
+            ...(name && { name }),
+            ...(email && { email }),
+            ...(phone && { phone })
+        },
+        { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+        success: true,
+        data: updatedUser
+    });
+});

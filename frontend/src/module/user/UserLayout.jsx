@@ -240,6 +240,7 @@ const UserLayout = () => {
 
                             {/* Options with reduced padding */}
                             {[
+                                { icon: User, label: 'Settings', path: '/user/profile' },
                                 { icon: HelpCircle, label: 'How It Works', path: '/user/info/how-it-works' },
                                 { icon: Sparkles, label: 'Benefits', path: '/user/info/benefits' },
                                 { icon: Share2, label: 'Refer & Earn', path: '/user/marketing' },
