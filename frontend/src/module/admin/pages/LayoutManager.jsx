@@ -64,6 +64,10 @@ const LayoutManager = () => {
             id: 5, label: 'No Refund Policy', path: '/user/info/refund-policy', dbKey: 'menu_refund_policy',
             content: "", icon: AlertCircle, color: 'text-rose-500'
         },
+        {
+            id: 6, label: 'Future and Option', path: '/user/info/future-features', dbKey: 'menu_future_features',
+            content: "", icon: Sparkles, color: 'text-indigo-500'
+        },
     ]);
 
 

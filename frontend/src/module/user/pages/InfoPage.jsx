@@ -102,6 +102,15 @@ const LOCAL_FALLBACKS = {
             { title: 'The Platform', text: 'Dromoney is India\'s fastest growing affiliate and task-based earning ecosystem. We connect brands with genuine users.' },
             { title: 'Transparency', text: 'We believe in fairness. Every payout and task is tracked with 100% precision. Our verified system ensures security.' }
         ]
+    },
+    'future-features': {
+        title: 'Future and Option',
+        subtitle: 'Upcoming earning opportunities',
+        sections: [
+            { title: '1. What is Future Fund?', text: 'Dromoney brings a revolutionary earning model for consistent performers. By completing your daily tasks and meeting specific sales targets, you unlock a recurring income stream similar to a creator fund.' },
+            { title: '2. Eligibility Criteria', text: 'To qualify for the Future Fund, you need to:\n• Successfully generate 10 affiliate sales.\n• Maintain 15 minutes of daily active participation for 10 consecutive days.\n• Follow all community guidelines strictly.' },
+            { title: '3. Performance Rewards', text: 'Once eligible, your earnings are scaled based on your platform activity. The more actively you participate and refer, the higher your tiered rewards.' }
+        ]
     }
 };
 
@@ -199,7 +208,13 @@ const InfoPage = () => {
                 {/* Compact Row: Back + Title */}
                 <div className="flex items-center gap-3 relative z-20 w-full">
                     <button 
-                        onClick={() => navigate('/user/home')} 
+                        onClick={() => {
+                            if (type === 'future-features') {
+                                navigate('/user/income');
+                            } else {
+                                navigate(-1);
+                            }
+                        }} 
                         className="w-8 h-8 flex items-center justify-center bg-white/5 backdrop-blur-md rounded-lg text-white active:scale-90 transition-all border border-white/10"
                     >
                         <ChevronLeft size={18} />
