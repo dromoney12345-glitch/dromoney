@@ -140,7 +140,7 @@ const MarketingManager = () => {
     const fetchAllMarketingData = async () => {
         const keys = [
             'menu_how_it_works', 'menu_benefits', 'menu_support', 'menu_about',
-            'menu_boosters', 'menu_future_features', 'income_projects'
+            'menu_boosters', 'menu_future_features'
         ];
         try {
             const res = await api.get(`/public/content/bulk?keys=${keys.join(',')}`);
@@ -181,11 +181,6 @@ const MarketingManager = () => {
                         setFutureFeaturesTitle(fData.title || "Future and Option");
                         setFutureFeaturesSubtitle(fData.subtitle || "Upcoming earning opportunities");
                     }
-                }
-
-                // 4. Process Income Projects
-                if (data['income_projects'] && data['income_projects'].data) {
-                    setProjectsData(data['income_projects'].data);
                 }
             }
         } catch (err) {
@@ -238,9 +233,6 @@ const MarketingManager = () => {
     const [futureFeaturesTitle, setFutureFeaturesTitle] = useState("Future and Option");
     const [futureFeaturesSubtitle, setFutureFeaturesSubtitle] = useState("Upcoming earning opportunities");
 
-    // -- Projects Card Data --
-    const [projectsData, setProjectsData] = useState({ title: '', description: '' });
-
     // Old Storage effects removed
 
     return (
@@ -254,7 +246,6 @@ const MarketingManager = () => {
                     { id: 'banners', label: 'Ad Banners', icon: Layout },
                     { id: 'boosters', label: 'Booster Packs', icon: Zap },
                     { id: 'lifetime', label: 'Lifetime Promo', icon: Rocket },
-                    { id: 'projects', label: 'Income Projects', icon: Briefcase },
                     { id: 'future', label: 'Future and Option', icon: Sparkles },
                 ].map(tab => (
                     <button
@@ -763,64 +754,6 @@ const MarketingManager = () => {
                                                 </div>
                                             ))}
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* ── NEW: INCOME PROJECTS CARD CMS ── */}
-                {activeTab === 'projects' && (
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
-                        {/* Editor Side */}
-                        <div className="space-y-6">
-                            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-8 relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 opacity-40 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform"></div>
-                                <div className="flex items-center gap-4 relative">
-                                    <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center"><Briefcase size={30} /></div>
-                                    <div>
-                                        <h3 className="text-2xl font-medium text-slate-800 tracking-tight">Project Card CMS</h3>
-                                        <p className="text-[12px] font-medium text-slate-400 uppercase tracking-normal mt-1">Manage the "Drowmoney Projects" info card</p>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-6 pt-4 relative">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Card Title</label>
-                                        <input value={projectsData.title} onChange={(e) => setProjectsData({ ...projectsData, title: e.target.value })} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[15px] font-medium text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 transition-all" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Description Text</label>
-                                        <textarea value={projectsData.description} onChange={(e) => setProjectsData({ ...projectsData, description: e.target.value })} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-medium text-slate-500 h-32 outline-none focus:ring-2 focus:ring-emerald-500 transition-all resize-none shadow-inner" />
-                                    </div>
-
-                                    <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-[10px] text-emerald-700 font-medium">
-                                        Note: These changes will reflect immediately on the User "Income Center" page.
-                                    </div>
-                                </div>
-
-                                <button onClick={() => handleUpdateMarketingKey('income_projects', projectsData, 'Projects Card Info')} className="w-full relative mt-4 bg-[#0F172A] text-white py-3 rounded-[24px] font-medium text-[12px] uppercase tracking-normal shadow-2xl flex items-center justify-center gap-3 active:scale-95 transition-all">
-                                    <Save size={20} /> Update Project Card
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Preview Side */}
-                        <div className="flex flex-col justify-center">
-                            <div className="bg-slate-50 p-6 rounded-[60px] border border-slate-200 shadow-inner flex flex-col items-center">
-                                <p className="text-[10px] font-medium text-slate-300 uppercase tracking-[0.3em] mb-10 text-center">User Panel Live View</p>
-
-                                <div className="w-[320px] bg-white border border-slate-100 rounded-xl p-5 flex items-center gap-4 shadow-xl ring-8 ring-white relative overflow-hidden group">
-                                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
-                                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0 border border-emerald-100">
-                                        <Briefcase size={22} className="text-emerald-500" />
-                                    </div>
-                                    <div className="relative">
-                                        <h4 className="text-[12px] font-medium text-slate-800 uppercase tracking-normal leading-none">{projectsData.title || 'Drowmoney Projects'}</h4>
-                                        <p className="text-[10px] font-medium text-slate-400 leading-tight mt-1.5 line-clamp-2">
-                                            {projectsData.description || 'Access exclusive high-ticket affiliate projects and scale your monthly income...'}
-                                        </p>
                                     </div>
                                 </div>
                             </div>

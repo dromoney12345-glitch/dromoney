@@ -122,7 +122,6 @@ const Income = () => {
     const [rawFile, setRawFile] = useState(null);
     const [isPaymentOpen, setIsPaymentOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [projectsData, setProjectsData] = useState({ title: 'Dromoney Projects', description: 'Loading latest projects...' });
     const [futureFeaturesConfig, setFutureFeaturesConfig] = useState({
         title: 'Future and Option',
         subtitle: 'Upcoming earning opportunities'
@@ -186,26 +185,10 @@ const Income = () => {
     });
 
     useEffect(() => {
-        fetchProjects();
         fetchFutureFeatures();
         fetchOnboardingCourse();
         setKycStatus(userKycStatus);
     }, [userKycStatus]);
-
-    const fetchProjects = async () => {
-        try {
-            const res = await api.get('/public/content/income_projects');
-            if (res.success) {
-                if (res.data.data) {
-                    setProjectsData(res.data.data);
-                } else {
-                    setProjectsData(res.data);
-                }
-            }
-        } catch (err) {
-            console.error("Content fetch failed:", err);
-        }
-    };
 
     const fetchFutureFeatures = async () => {
         try {
@@ -984,17 +967,6 @@ const Income = () => {
                 })}
             </div>
 
-            <div className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm relative overflow-hidden group mb-4">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-sky-500/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
-                <div className="w-10 h-10 bg-sky-50 rounded-xl flex items-center justify-center shrink-0 border border-sky-100">
-                    <Briefcase size={20} className="text-sky-500" />
-                </div>
-                <div>
-                    <h4 className="text-[11px] font-medium text-slate-800 uppercase tracking-widest leading-none">{projectsData.title}</h4>
-                    <p className="text-[9px] font-medium text-slate-400 leading-tight mt-1">
-                        {projectsData.description}
-                    </p>
-                </div>
             </div>
         </div>
     );
