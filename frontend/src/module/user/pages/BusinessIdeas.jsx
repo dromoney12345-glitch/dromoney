@@ -825,7 +825,7 @@ const BusinessIdeas = () => {
     };
 
     return (
-        <div className="w-full bg-[#F8FAFF] min-h-screen flex flex-col font-poppins relative overflow-x-clip">
+        <div className="w-full bg-[#F8FAFF] flex-1 flex flex-col font-poppins relative overflow-x-clip">
             {step === -1 && <IntroScreen />}
             {step === 0 && <ListingScreen />}
             {step === 1 && <DetailsScreen />}
