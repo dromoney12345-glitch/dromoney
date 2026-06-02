@@ -131,7 +131,7 @@ const BusinessIdeas = () => {
 
     // --- SCREEN -1: INTRO (Premium Rocket Welcome) ---
     const IntroScreen = () => (
-        <div className="h-[calc(100vh-122px)] flex flex-col bg-[#F8FAFF] overflow-hidden select-none">
+        <div className="flex-1 flex flex-col bg-[#F8FAFF] overflow-hidden select-none pb-20">
             <style>
                 {`
                 @keyframes boost {
@@ -828,7 +828,7 @@ const BusinessIdeas = () => {
     };
 
     return (
-        <div className="max-w-md mx-auto bg-white min-h-screen font-poppins shadow-xl relative overflow-x-clip">
+        <div className="max-w-md mx-auto bg-[#F8FAFF] min-h-screen flex flex-col font-poppins relative overflow-x-clip">
             {step === -1 && <IntroScreen />}
             {step === 0 && <ListingScreen />}
             {step === 1 && <DetailsScreen />}
