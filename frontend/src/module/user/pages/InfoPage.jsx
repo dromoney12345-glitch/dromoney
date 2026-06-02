@@ -212,7 +212,7 @@ const InfoPage = () => {
                             if (type === 'future-features') {
                                 navigate('/user/income');
                             } else {
-                                navigate(-1);
+                                navigate('/user/home');
                             }
                         }} 
                         className="w-8 h-8 flex items-center justify-center bg-white/5 backdrop-blur-md rounded-lg text-white active:scale-90 transition-all border border-white/10"
