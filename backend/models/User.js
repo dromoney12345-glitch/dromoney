@@ -168,6 +168,13 @@ const UserSchema = new mongoose.Schema({
             type: Date,
             default: Date.now
         }
+    }],
+    notifications: [{
+        title: String,
+        message: String,
+        type: { type: String, default: 'info' },
+        isRead: { type: Boolean, default: false },
+        createdAt: { type: Date, default: Date.now }
     }]
 
 }, {

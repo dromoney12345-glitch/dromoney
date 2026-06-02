@@ -26,7 +26,8 @@ const INITIAL_USER_STATE = {
     activeBusinessPlan: 'Free',
     businessPlanStatus: 'none',
     completedTasks: [],
-    hasCompletedCourse: false
+    hasCompletedCourse: false,
+    userNotifications: []
 };
 
 export const UserProvider = ({ children }) => {
@@ -176,7 +177,8 @@ export const UserProvider = ({ children }) => {
             businessHubFirstAccessedAt: dbUser.businessHubFirstAccessedAt,
             completedTasks: dbUser.completedTasks || [],
             dailyTaskCompletions: dbUser.dailyTaskCompletions || [],
-            hasCompletedCourse: dbUser.hasCompletedCourse || false
+            hasCompletedCourse: dbUser.hasCompletedCourse || false,
+            userNotifications: dbUser.notifications || []
         });
     };
 

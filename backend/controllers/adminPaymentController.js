@@ -62,6 +62,14 @@ exports.updatePaymentStatus = async (req, res) => {
                     }
                     user.isBoosterActive = true;
                     user.boosterExpiry = expiryDate;
+                    
+                    user.notifications = user.notifications || [];
+                    user.notifications.push({
+                        title: 'Booster Activated! ⚡',
+                        message: `Your ${isSupport ? 'Support Booster' : 'Task Booster'} is now active! Enjoy 3X coin earnings for 30 days.`,
+                        type: 'success',
+                        isRead: false
+                    });
                     await user.save();
 
                     // Create standard Transaction for user history
@@ -112,6 +120,15 @@ exports.updatePaymentStatus = async (req, res) => {
 
                     // Default: Platform unlock
                     user.isPaid = true;
+
+                    user.notifications = user.notifications || [];
+                    user.notifications.push({
+                        title: 'Platform Access Unlocked! 🚀',
+                        message: `Your payment for ${payment.plan || 'Lifetime Access'} is confirmed. Welcome to DroMoney Premium!`,
+                        type: 'success',
+                        isRead: false
+                    });
+
                     await user.save();
 
                     // Create standard Transaction for user history
@@ -167,6 +184,14 @@ exports.updatePaymentStatus = async (req, res) => {
                                         'wallet.lifetimeEarnings': settings.referralCommission,
                                         'wallet.referralEarnings': settings.referralCommission,
                                         'referralCount': 1
+                                    },
+                                    $push: {
+                                        notifications: {
+                                            title: 'Commission Received! 💰',
+                                            message: `You have earned a direct referral commission of ₹${settings.referralCommission} from ${user.name}'s purchase!`,
+                                            type: 'success',
+                                            isRead: false
+                                        }
                                     }
                                 });
 

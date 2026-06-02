@@ -18,6 +18,32 @@ const UserLayout = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { userData, notifications, clearNotifications, markAsRead, logout } = useUser();
 
+    // Combine global and personal notifications
+    const allNotifications = React.useMemo(() => {
+        const readIds = JSON.parse(localStorage.getItem('dromoney_read_notifs') || '[]');
+        
+        const personalNotifs = (userData?.userNotifications || []).map(n => {
+            const idStr = n._id || n.id || Math.random().toString();
+            return {
+                id: idStr,
+                title: n.title,
+                message: n.message,
+                time: n.createdAt ? new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now',
+                timestamp: n.createdAt ? new Date(n.createdAt).getTime() : Date.now(),
+                type: n.type || 'info',
+                isRead: n.isRead || readIds.includes(idStr)
+            };
+        });
+        
+        const globalNotifs = notifications.map(n => ({
+            ...n,
+            timestamp: n.id // Global ones use timestamp for id in some places, or we can just assume recent
+        }));
+
+        return [...globalNotifs, ...personalNotifs].sort((a, b) => b.timestamp - a.timestamp);
+    }, [notifications, userData?.userNotifications]);
+
+
     const navItems = [
         { path: '/user/home', label: 'Home', icon: HomeIcon },
         { path: '/user/income', label: 'Income', icon: TrendingUp },
@@ -60,7 +86,7 @@ const UserLayout = () => {
                         className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-sky-400 relative active:scale-90 transition-all"
                     >
                         <Bell size={17} strokeWidth={2} />
-                        {notifications.length > 0 && (
+                        {allNotifications.filter(n => !n.isRead).length > 0 && (
                             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-sky-500 rounded-full border border-slate-900"></span>
                         )}
                     </button>
@@ -116,8 +142,8 @@ const UserLayout = () => {
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                        {notifications.length > 0 ? (
-                            notifications.map((notif) => (
+                        {allNotifications.length > 0 ? (
+                            allNotifications.map((notif) => (
                                 <div 
                                     key={notif.id} 
                                     onClick={() => markAsRead(notif.id)}

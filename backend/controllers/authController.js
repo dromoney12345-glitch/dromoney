@@ -94,6 +94,16 @@ exports.register = async (req, res, next) => {
                 status: 'Success'
             });
 
+            // Add in-app notification
+            referrer.notifications = referrer.notifications || [];
+            referrer.notifications.push({
+                title: 'New Team Member! 👥',
+                message: `Congratulations! ${user.name} just registered using your referral link.`,
+                type: 'success',
+                isRead: false
+            });
+            await referrer.save({ validateBeforeSave: false });
+
             // Send Push Notification to Referrer
             try {
                 const { sendNotificationToUser } = require('./fcmController');
