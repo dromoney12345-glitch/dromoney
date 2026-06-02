@@ -9,6 +9,7 @@ import {
 import { motion } from "framer-motion";
 import { useUser } from './context/UserContext';
 import LogoImg from '../../assets/WhatsApp_Image_2026-04-28_at_10.52.49_PM-removebg-preview.png';
+import PullToRefreshWrapper from './components/PullToRefreshWrapper';
 
 const UserLayout = () => {
     const location = useLocation();
@@ -253,9 +254,9 @@ const UserLayout = () => {
             </div>
 
             {/* --- Dynamic Content Rendering Area (Pages) --- */}
-            <main className="flex-1 overflow-y-auto overflow-x-hidden">
+            <PullToRefreshWrapper>
                 <Outlet />
-            </main>
+            </PullToRefreshWrapper>
 
             {/* --- Premium White Elevated Bottom Navigation Bar --- */}
             <div className="shrink-0 z-50">
