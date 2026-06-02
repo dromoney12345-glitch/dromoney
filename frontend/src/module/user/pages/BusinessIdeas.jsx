@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
-    Rocket, ChevronLeft, ArrowRight, 
-    Sparkles, Briefcase, MessageSquare,
+    Rocket, ChevronLeft, ArrowRight, ChevronRight,
+    Sparkles, Briefcase, MessageSquare, Clock,
     Play, TrendingUp, Copy, Users,
     Crown, ShieldCheck, Zap, Star, Video,
     Lock as LockIcon, Loader2
@@ -208,15 +208,13 @@ const BusinessIdeas = () => {
     // --- SCREEN 0: PREMIUM CARDS LISTING ---
     const ListingScreen = () => (
         <div className="min-h-screen bg-[#F8FAFF] pb-32">
-            <div className="bg-white px-6 pt-4 pb-4 flex items-center justify-between sticky top-[64px] z-30 shadow-sm shadow-indigo-50/50 rounded-b-[2.5rem]">
-                <div className="flex items-center gap-4">
-                    <button onClick={() => navigate('/user/business-ideas')} className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 active:scale-90 transition-all border border-slate-100">
-                        <ChevronLeft size={22} />
-                    </button>
-                    <div>
-                        <h1 className="text-xl font-medium text-slate-900 tracking-tight">Business Hub</h1>
-                        <p className="text-[10px] font-medium text-[#5D38F0] uppercase tracking-widest">Explore Opportunities</p>
-                    </div>
+            <div className="bg-white px-5 py-4 flex items-center gap-4 sticky top-0 z-30 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] w-full">
+                <button onClick={() => navigate('/user/business-ideas')} className="w-9 h-9 bg-slate-50 rounded-xl flex items-center justify-center text-slate-600 active:scale-95 transition-all border border-slate-100 shrink-0">
+                    <ChevronLeft size={20} />
+                </button>
+                <div className="flex-1">
+                    <h1 className="text-[17px] font-semibold text-slate-800 tracking-tight leading-none">Business Hub</h1>
+                    <p className="text-[10px] font-medium text-[#5D38F0] uppercase tracking-widest mt-1">Explore Opportunities</p>
                 </div>
             </div>
 
@@ -231,36 +229,35 @@ const BusinessIdeas = () => {
                         <div 
                             key={idea._id}
                             onClick={() => handleIdeaSelect(idea)}
-                            className="bg-white rounded-[1.25rem] p-3 flex flex-col gap-2.5 shadow-sm border border-slate-100 group hover:shadow-md transition-all cursor-pointer active:scale-[0.98] relative overflow-hidden"
+                            className="bg-white rounded-2xl p-2.5 flex items-center gap-3.5 shadow-sm border border-slate-100 group hover:shadow-md transition-all cursor-pointer active:scale-[0.98] relative overflow-hidden"
                         >
-                            <div className="flex items-center gap-3 relative z-10">
-                                <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden border border-slate-50">
-                                    {idea.bannerImage ? (
-                                        <img src={idea.bannerImage} className="w-full h-full object-cover relative z-10" alt="" />
-                                    ) : (
-                                        <Rocket size={28} className="text-[#5D38F0]/40 -rotate-45 relative z-10" />
-                                    )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex flex-wrap gap-1 mb-0.5">
-                                        {(idea.badges && idea.badges.length > 0 ? idea.badges : ['Trending']).map((badge, idx) => (
-                                            <span key={idx} className={`text-[7px] font-medium px-1.5 py-0.5 rounded-full uppercase ${idx % 2 === 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-indigo-50 text-[#5D38F0]'}`}>
-                                                {badge}
-                                            </span>
-                                        ))}
-                                    </div>
-                                    <h3 className="text-[15px] font-medium text-slate-900 leading-tight truncate uppercase tracking-tight">{idea.title}</h3>
-                                    <p className="text-[10px] text-[#5D38F0] font-medium mt-0.5 line-clamp-1 uppercase tracking-tight">₹{idea.potentialEarnings || "50,000"}+ Monthly</p>
+                            <div className="w-[72px] h-[72px] bg-indigo-50 rounded-[14px] flex items-center justify-center shrink-0 relative overflow-hidden">
+                                {idea.bannerImage ? (
+                                    <img src={idea.bannerImage} className="w-full h-full object-cover relative z-10" alt="" />
+                                ) : (
+                                    <Rocket size={24} className="text-[#5D38F0]/40 -rotate-45 relative z-10" />
+                                )}
+                                <div className="absolute bottom-1 left-1 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded text-[8px] font-medium text-white flex items-center gap-1 z-20">
+                                    <div className="w-1 h-1 bg-white rounded-full"></div> New
                                 </div>
                             </div>
-                            
-                            <div className="flex items-center justify-between border-t border-slate-50 pt-2.5 mt-0.5 relative z-10">
-                                <p className="text-[9px] font-medium text-slate-400 leading-relaxed max-w-[80%] line-clamp-1">
-                                    {idea.desc || "विशेषज्ञ मार्गदर्शन के साथ अपनी व्यावसायिक यात्रा शुरू करें..."}
-                                </p>
-                                <div className="w-7 h-7 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 group-hover:bg-[#5D38F0] group-hover:text-white transition-all">
-                                    <ArrowRight size={12} />
+                            <div className="flex-1 min-w-0 py-0.5">
+                                <div className="text-[8px] font-semibold text-[#5D38F0] uppercase tracking-widest mb-0.5">
+                                    {(idea.badges && idea.badges.length > 0) ? idea.badges[0] : 'Trending Idea'}
                                 </div>
+                                <h3 className="text-[14px] font-medium text-slate-800 leading-tight truncate mb-1.5">{idea.title}</h3>
+                                
+                                <div className="flex items-center gap-2.5">
+                                    <div className="flex items-center gap-1 bg-amber-50 border border-amber-100/50 px-1.5 py-0.5 rounded text-[9px] font-medium text-amber-600">
+                                        <Star size={9} fill="currentColor" /> ₹{idea.potentialEarnings || "50k"}+
+                                    </div>
+                                    <div className="flex items-center gap-1 text-[9px] font-medium text-slate-400">
+                                        <Clock size={9} /> {idea.duration || "1mo"}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="shrink-0 text-slate-300 pr-1">
+                                <ChevronRight size={16} />
                             </div>
                         </div>
                     ))
