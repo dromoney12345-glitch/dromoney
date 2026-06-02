@@ -220,11 +220,11 @@ const Earn = () => {
                                 </div>
 
                                 {/* Text Content */}
-                                <div className="flex-1 min-w-0">
-                                    <h4 className={`text-[14px] font-medium tracking-tight leading-snug ${isCompleted ? 'text-slate-400 line-through' : 'text-slate-800'}`}>
+                                <div className="flex-1 min-w-0 pr-3">
+                                    <h4 className={`text-[14px] font-medium tracking-tight leading-snug truncate ${isCompleted ? 'text-slate-400 line-through' : 'text-slate-800'}`}>
                                         {task.title}
                                     </h4>
-                                    <p className="text-[11px] font-medium text-slate-400 mt-1 leading-snug">
+                                    <p className="text-[11px] font-medium text-slate-400 mt-1 leading-snug line-clamp-2 break-words">
                                         {isCompleted ? 'Completed' : task.description}
                                     </p>
                                 </div>
