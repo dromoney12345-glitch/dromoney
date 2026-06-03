@@ -134,7 +134,7 @@ const RouteTracker = () => {
 };
 
 function App() {
-  const [showSplash, setShowSplash] = React.useState(true);
+  const [showSplash, setShowSplash] = React.useState(!localStorage.getItem('dromoney_token'));
 
   return (
     <AdminProvider>

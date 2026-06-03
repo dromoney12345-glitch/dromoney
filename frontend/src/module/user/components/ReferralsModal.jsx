@@ -34,10 +34,8 @@ const ReferralsModal = ({ isOpen, onClose, referralCount = 0 }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center sm:p-4">
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose}></div>
-            
-            <div className="relative bg-white w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-300 max-h-[85vh] flex flex-col">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-white">
+            <div className="relative bg-white w-full h-full sm:max-w-sm overflow-hidden animate-in slide-in-from-bottom sm:zoom-in-95 duration-300 flex flex-col">
                 
                 <div className="p-5 bg-white border-b border-slate-100 flex justify-between items-center z-10 sticky top-0 shadow-sm">
                     <div className="flex items-center gap-3">

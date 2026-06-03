@@ -76,7 +76,7 @@ const UniversalVideoPlayer = ({ url, className, onEnded, autoPlay = true, contro
             autoPlay={autoPlay}
             playsInline
             onEnded={onEnded}
-            style={{ width: '100%', aspectRatio: '16/9', backgroundColor: '#000' }}
+            style={{ width: '100%', height: '100%', objectFit: 'contain', backgroundColor: '#000' }}
         />
     );
 };
