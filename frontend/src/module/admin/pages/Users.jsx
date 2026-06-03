@@ -213,7 +213,7 @@ const Users = () => {
                             <tr className="border-b border-slate-50 bg-slate-50/50">
                                 <th className="text-left px-5 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">User</th>
                                 <th className="text-left px-5 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Mobile</th>
-                                <th className="text-left px-5 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">KYC Status</th>
+                                <th className="text-center px-5 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">KYC Status</th>
                                 <th className="text-left px-5 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Earnings</th>
                                 <th className="text-left px-5 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Wallet</th>
                                 <th className="text-left px-5 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Status</th>
@@ -236,10 +236,10 @@ const Users = () => {
                                     </td>
                                     <td className="px-5 py-4 text-[13px] font-medium text-slate-600 tabular-nums font-['Poppins']">{user.mobile}</td>
                                     <td className="px-5 py-4">
-                                        <div className="flex flex-col gap-0.5">
+                                        <div className="flex flex-col items-center gap-0.5">
                                             <StatusBadge status={user.kyc.status} />
                                             {(user.kyc.status === 'Pending' || user.kyc.status === 'pending') && (
-                                                <span className="text-[8px] font-semibold text-amber-500 uppercase tracking-tighter ml-1 font-['Poppins']">Requires Review</span>
+                                                <span className="text-[8px] font-semibold text-amber-500 uppercase tracking-tighter font-['Poppins']">Requires Review</span>
                                             )}
                                         </div>
                                     </td>

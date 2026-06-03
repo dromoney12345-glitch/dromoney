@@ -154,7 +154,7 @@ const BusinessIdeas = () => {
 
             {/* Sticky Header Row */}
             <div className="bg-white/80 backdrop-blur-md px-6 py-3 flex items-center justify-between border-b border-slate-100/50 shrink-0">
-                <button onClick={() => navigate(-1)} className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 active:scale-90 transition-all border border-slate-100">
+                <button onClick={() => navigate('/user/income')} className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 active:scale-90 transition-all border border-slate-100">
                     <ChevronLeft size={22} />
                 </button>
             </div>

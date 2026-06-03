@@ -10,10 +10,12 @@ const StatusBadge = ({ status }) => {
         rejected: 'bg-rose-50 text-rose-600',
         failed: 'bg-rose-50 text-rose-600',
         inactive: 'bg-slate-100 text-slate-400',
+        'not started': 'bg-slate-100 text-slate-500'
     };
     const cls = styles[status?.toLowerCase()] || 'bg-slate-100 text-slate-500';
+    
     return (
-        <span className={`text-[9px] font-medium uppercase tracking-normal px-2.5 py-1 rounded-lg ${cls}`}>
+        <span className={`inline-flex items-center justify-center text-[10px] font-semibold uppercase tracking-wide px-3 py-1.5 rounded-lg min-w-[85px] text-center ${cls}`}>
             {status}
         </span>
     );
