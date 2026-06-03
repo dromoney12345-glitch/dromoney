@@ -166,6 +166,16 @@
 }
 
 /* Override left padding for inputs that have a leading absolute icon */
+.admin-compact-container input.pl-9 {
+    padding-left: 2.25rem !important;
+}
+.admin-compact-container input.pl-10 {
+    padding-left: 2.5rem !important;
+}
+.admin-compact-container input.pl-11 {
+    padding-left: 2.75rem !important;
+}
+.admin-compact-container input.pl-12,
 .admin-compact-container input.pl-12-override {
     padding-left: 3rem !important;
 }

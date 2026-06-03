@@ -89,7 +89,7 @@ const IncomeInfo = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#F0FDF4] animate-in fade-in duration-700 pb-20">
+        <div className="flex flex-col min-h-screen bg-[#F0FDF4] animate-in fade-in duration-700 pb-6">
             <style>
                 {`
                     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700;900&display=swap');
@@ -252,7 +252,7 @@ const IncomeInfo = () => {
                 </section>
 
                 {/* Footer Insight */}
-                <div className="text-center py-6">
+                <div className="text-center pt-2 pb-2">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-slate-100 mb-4">
                         <Info size={14} className="text-emerald-500" />
                         <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">Knowledge is Wealth</span>

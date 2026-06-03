@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Lock, X, ChevronRight, Sparkles } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import PaymentModal from './PaymentModal';
@@ -6,6 +6,15 @@ import PaymentModal from './PaymentModal';
 const UnlockModal = ({ isOpen, onClose }) => {
     const { refreshUserProfile } = useUser();
     const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+        return () => { document.body.style.overflow = 'auto'; };
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
@@ -36,7 +45,7 @@ const UnlockModal = ({ isOpen, onClose }) => {
             {/* --- Backdrop --- */}
             <div 
                 onClick={onClose}
-                className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-500"
+                className="absolute inset-0 bg-slate-900 animate-in fade-in duration-500"
             ></div>
 
             {/* --- Modal Content --- */}

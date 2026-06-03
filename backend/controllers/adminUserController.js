@@ -208,10 +208,34 @@ exports.deleteUser = async (req, res, next) => {
 
         console.log(`Starting cascade deletion for user: ${user.name} (${user._id})`);
 
-        // Clean up all related collections to ensure zero orphaned data and 100% database consistency
+        // Revert referral reward if this user was referred by someone
+        const referralTx = await ReferralTransaction.findOne({ referredUser: user._id, status: 'Completed' });
+        if (referralTx && referralTx.referrer) {
+            const referrer = await User.findById(referralTx.referrer);
+            if (referrer) {
+                console.log(`Reverting referral reward of ${referralTx.amount} from referrer: ${referrer.name}`);
+                
+                // Deduct from referrer's wallet and referral count
+                referrer.wallet.balance = Math.max(0, referrer.wallet.balance - referralTx.amount);
+                referrer.wallet.referralEarnings = Math.max(0, referrer.wallet.referralEarnings - referralTx.amount);
+                referrer.referralCount = Math.max(0, referrer.referralCount - 1);
+                await referrer.save();
+
+                // Delete the specific transaction record from referrer's history
+                await Transaction.findOneAndDelete({
+                    user: referrer._id,
+                    type: 'credit',
+                    currency: 'INR',
+                    amount: referralTx.amount,
+                    source: `Referral Reward: ${user.name}`
+                });
+            }
+        }
+
+        // Payment records are intentionally preserved for financial audit trail.
+        // We only delete non-financial user data.
         await Promise.all([
             Transaction.deleteMany({ user: user._id }),
-            Payment.deleteMany({ user: user._id }),
             Withdrawal.deleteMany({ user: user._id }),
             TaskSubmission.deleteMany({ user: user._id }),
             EventParticipant.deleteMany({ user: user._id }),

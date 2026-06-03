@@ -4,8 +4,12 @@ const PaymentSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.ObjectId,
         ref: 'User',
-        required: true,
+        required: false, // Allow null when user is deleted (orphaned payment)
     },
+    // Snapshot of user info at time of payment — preserved even if user is deleted
+    userName: { type: String, default: '' },
+    userEmail: { type: String, default: '' },
+    userPhone: { type: String, default: '' },
     plan: {
         type: String,
         default: 'Lifetime Access',

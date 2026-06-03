@@ -40,17 +40,20 @@ exports.getAffiliateStats = async (req, res) => {
                     activeReferrersCount: topReferrers.length,
                     currentCommission: settings?.referralCommission || 200
                 },
-                logs: logs.map(log => ({
-                    id: log._id,
-                    referrer: log.referrer?.name || 'Deleted User',
-                    referredTo: log.referredUser?.name || 'Deleted User',
-                    date: new Date(log.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
-                    joinTime: new Date(log.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-                    reward: `₹${log.amount}`,
-                    status: log.status,
-                    txnId: log._id.toString().substring(0, 8).toUpperCase(),
-                    ip: 'Verified' // IP tracking not implemented in transaction model
-                }))
+                logs: logs.map(log => {
+                    const regDate = log.referredUser?.createdAt || log.createdAt;
+                    return {
+                        id: log._id,
+                        referrer: log.referrer?.name || 'Deleted User',
+                        referredTo: log.referredUser?.name || 'Deleted User',
+                        date: new Date(regDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+                        joinTime: new Date(regDate).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+                        reward: `₹${log.amount}`,
+                        status: log.status === 'Completed' ? 'Credited' : log.status,
+                        txnId: log._id.toString().substring(0, 8).toUpperCase(),
+                        ip: 'Verified' // IP tracking not implemented in transaction model
+                    };
+                })
             }
         });
     } catch (err) {

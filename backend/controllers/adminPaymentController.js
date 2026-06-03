@@ -10,9 +10,24 @@ exports.getPayments = async (req, res) => {
             .populate('user', 'name email phone')
             .sort({ createdAt: -1 });
 
+        // Normalize: if user was deleted, fall back to the stored snapshot fields
+        const normalized = payments.map(p => {
+            const obj = p.toObject();
+            if (!obj.user) {
+                obj.user = {
+                    _id: null,
+                    name: obj.userName || 'Deleted User',
+                    email: obj.userEmail || '—',
+                    phone: obj.userPhone || '—',
+                    isDeleted: true
+                };
+            }
+            return obj;
+        });
+
         res.json({
             success: true,
-            data: payments
+            data: normalized
         });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });

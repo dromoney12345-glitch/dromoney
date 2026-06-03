@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     MessageSquare, AlertCircle, BookOpen, Star, 
     Trash2, Plus, Save, User, Clock, 
@@ -6,7 +6,13 @@ import {
     MessageCircle, ExternalLink, ShieldAlert
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
-import api from '../../shared/services/api';
+import api, { BASE_URL } from '../../shared/services/api';
+
+const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith('http')) return imagePath;
+    return `${BASE_URL}/uploads/${imagePath}`;
+};
 
 const Reports = () => {
     const [activeTab, setActiveTab] = useState('problems');
@@ -193,7 +199,7 @@ const Reports = () => {
                                                         <div className="w-10 h-10 bg-slate-900 border border-slate-800 text-white rounded-xl flex items-center justify-center font-medium shadow-lg overflow-hidden shrink-0">
                                                             {f.user?.profileImage ? (
                                                                 <img 
-                                                                    src={`http://localhost:5000/uploads/${f.user.profileImage}`} 
+                                                                    src={getImageUrl(f.user.profileImage)} 
                                                                     className="w-full h-full object-cover" 
                                                                     alt="User"
                                                                     onError={(e) => { e.target.onerror = null; e.target.src = ''; e.target.classList.add('hidden'); }} 
@@ -255,7 +261,7 @@ const Reports = () => {
                                     <div className="flex items-center gap-3 mb-2">
                                         <div className="w-12 h-12 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center shadow-inner overflow-hidden shrink-0">
                                             {pr.user?.profileImage ? (
-                                                <img src={`http://localhost:5000/uploads/${pr.user.profileImage}`} className="w-full h-full object-cover" alt="" />
+                                                <img src={getImageUrl(pr.user.profileImage)} className="w-full h-full object-cover" alt="" />
                                             ) : (
                                                 <AlertCircle size={24} />
                                             )}

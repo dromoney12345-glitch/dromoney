@@ -190,6 +190,16 @@ const Income = () => {
         setKycStatus(userKycStatus);
     }, [userKycStatus]);
 
+    // Prevent body scroll when course modal is open
+    useEffect(() => {
+        if (isCourseModalOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => { document.body.style.overflow = ''; };
+    }, [isCourseModalOpen]);
+
     const fetchFutureFeatures = async () => {
         try {
             const res = await api.get('/public/content/menu_future_features');
@@ -521,20 +531,20 @@ const Income = () => {
         };
 
         const containerClass = isModal
-            ? "w-full max-w-md bg-white rounded-[2rem] border border-slate-100 shadow-2xl overflow-hidden relative flex flex-col p-5 space-y-4"
+            ? "w-full bg-white rounded-[2rem] border border-slate-100 shadow-2xl overflow-hidden relative flex flex-col"
             : "w-full flex-1 flex flex-col space-y-6 md:space-y-8 bg-slate-50";
 
         const progressTrackClass = "bg-slate-100";
         const borderClass = "border-slate-100";
         const textMutedClass = "text-slate-500";
         const textTitleClass = "text-slate-800";
-        const footerBgClass = isModal ? "bg-white border-t border-slate-100 pt-3 flex gap-3 shrink-0" : "border-t border-slate-100 pt-4 pb-4 flex gap-4 shrink-0 bg-white sticky bottom-0 z-10 shadow-[0_-8px_30px_rgba(0,0,0,0.03)]";
+        const footerBgClass = isModal ? "bg-white border-t border-slate-100 pt-3 px-5 pb-4 flex gap-3 shrink-0" : "border-t border-slate-100 pt-4 pb-4 flex gap-4 shrink-0 bg-white sticky bottom-0 z-10 shadow-[0_-8px_30px_rgba(0,0,0,0.03)]";
 
         return (
             <div className={containerClass}>
                 
                 {/* Thin stories-style progress bar */}
-                <div className="flex gap-1.5 py-1 shrink-0">
+                <div className={`flex gap-1.5 py-1 shrink-0 ${isModal ? 'px-5 pt-4' : ''}`}>
                     {[1, 2, 3].map((step) => (
                         <button
                             key={step}
@@ -555,7 +565,7 @@ const Income = () => {
                 </div>
 
                 {/* Header */}
-                <div className={`flex items-center justify-between shrink-0 px-1 border-b pb-4 ${borderClass}`}>
+                <div className={`flex items-center justify-between shrink-0 border-b pb-4 ${borderClass} ${isModal ? 'px-5' : 'px-1'}`}>
                     <div>
                         <span className="text-[10px] font-medium tracking-widest uppercase text-indigo-500">STEP {courseStep} OF 3</span>
                         <h2 className="text-lg font-medium tracking-tight text-slate-900">
@@ -577,7 +587,7 @@ const Income = () => {
                 </div>
 
                 {/* Smooth Carousel Frame */}
-                <div className={isModal ? "relative flex-1 overflow-hidden min-h-[460px] flex flex-col justify-between" : "relative flex-1 flex flex-col justify-between"}>
+                <div className={isModal ? "relative flex-1 min-h-[320px] overflow-hidden flex flex-col justify-between" : "relative flex-1 flex flex-col justify-between"}>
                     <AnimatePresence custom={courseDirection} mode="wait">
                         <motion.div
                             key={courseStep}
@@ -591,7 +601,7 @@ const Income = () => {
                             dragElastic={0.4}
                             onDragEnd={isModal ? handleDragEnd : undefined}
                             className={isModal 
-                                ? "w-full absolute inset-0 overflow-y-auto space-y-4 pr-1 scrollbar-thin cursor-grab active:cursor-grabbing pb-4" 
+                                ? "w-full absolute inset-0 overflow-y-auto space-y-4 scrollbar-thin cursor-grab active:cursor-grabbing pb-4 px-5" 
                                 : "w-full space-y-6 pb-6"}
                         >
                             {/* PAGE 1 CONTENT */}
@@ -848,10 +858,15 @@ const Income = () => {
             {/* Optional Course Modal Viewer with Click-Outside closing */}
             {isCourseModalOpen && (
                 <div 
-                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4"
+                    className="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-[999] flex items-end justify-center sm:items-center p-4"
                     onClick={() => setIsCourseModalOpen(false)}
+                    style={{ overflowY: 'hidden' }}
                 >
-                    <div onClick={(e) => e.stopPropagation()}>
+                    <div 
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-full max-w-sm flex flex-col"
+                        style={{ maxHeight: 'calc(100vh - 32px)' }}
+                    >
                         {renderOnboardingCourseContent(true)}
                     </div>
                 </div>

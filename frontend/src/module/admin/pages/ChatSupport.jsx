@@ -86,7 +86,7 @@ const AdminChatSupport = () => {
                 <div className="p-4 border-b border-slate-100 bg-slate-50/50">
                     <h2 className="text-sm font-medium uppercase tracking-normal text-slate-800 mb-4">Support Inbox</h2>
                     <div className="relative">
-                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none" />
                         <input 
                             type="text" 
                             placeholder="Search users..."

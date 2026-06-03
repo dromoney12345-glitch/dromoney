@@ -726,7 +726,23 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                     </div>
                     <div className="flex items-center gap-4">
                         <button 
-                            onClick={() => onShowToast('Excel report generated and downloading...', 'success')}
+                            onClick={() => {
+                                onShowToast('Exporting data...', 'success');
+                                const headers = ['Name', 'Email', 'Phone', 'Joined At', 'Time Taken', 'Score', 'Status'];
+                                const csvContent = [
+                                    headers.join(','),
+                                    ...sortedParticipants.map(p => 
+                                        `"${p.name || ''}","${p.email || ''}","${p.phone || ''}","${p.joinedAt || ''}","${p.timeTaken || ''}","${p.score || ''}","${p.prizeStatus || ''}"`
+                                    )
+                                ].join('\\n');
+                                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                                const link = document.createElement('a');
+                                link.href = URL.createObjectURL(blob);
+                                link.setAttribute('download', `events_participants_${new Date().toISOString().split('T')[0]}.csv`);
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                            }}
                             className="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-xl text-[10px] font-medium uppercase tracking-normal border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-2"
                         >
                             <ClipboardList size={12} /> Export Excel

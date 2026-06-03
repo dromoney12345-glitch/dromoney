@@ -37,6 +37,7 @@ const Payments = () => {
                     user: p.user?.name || 'Deleted User',
                     email: p.user?.email || 'N/A',
                     phone: p.user?.phone || 'N/A',
+                    isDeleted: p.user?.isDeleted || !p.user?._id,
                     plan: p.plan || 'Lifetime Access',
                     amount: `₹${parseFloat(p.amount).toFixed(2)}`,
                     method: p.method || 'Razorpay',
@@ -125,13 +126,13 @@ const Payments = () => {
             {/* Toolbar */}
             <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
                 <div className="relative flex-1 w-full">
-                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none" />
                     <input
                         type="text"
                         placeholder="Search by name, ID or UTR number..."
                         value={search}
                         onChange={handleSearch}
-                        className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-[14px] font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm transition-all font-['Poppins']"
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-[14px] font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm transition-all font-['Poppins']"
                     />
                 </div>
 
@@ -166,11 +167,16 @@ const Payments = () => {
                                     <td className="px-5 py-4 font-medium text-sky-600 text-[12px] tabular-nums tracking-tight font-['Poppins']">#{p.id}</td>
                                     <td className="px-5 py-4">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-sky-400 font-semibold text-[11px] font-['Poppins']">
+                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-semibold font-['Poppins'] ${p.isDeleted ? 'bg-rose-100 text-rose-400' : 'bg-slate-900 text-sky-400'}`}>
                                                 {p.user.charAt(0)}
                                             </div>
                                             <div>
-                                                <p className="font-semibold text-slate-800 text-[13px] leading-none tracking-tight font-['Poppins']">{p.user}</p>
+                                                <div className="flex items-center gap-1.5">
+                                                    <p className="font-semibold text-slate-800 text-[13px] leading-none tracking-tight font-['Poppins']">{p.user}</p>
+                                                    {p.isDeleted && (
+                                                        <span className="text-[8px] font-semibold uppercase tracking-wide bg-rose-50 text-rose-400 border border-rose-100 px-1.5 py-0.5 rounded-md">Deleted</span>
+                                                    )}
+                                                </div>
                                                 <p className="text-[10px] text-slate-400 mt-1 font-medium font-['Poppins']">{p.email}</p>
                                             </div>
                                         </div>
@@ -257,11 +263,16 @@ const Payments = () => {
                             {/* User & Amount Info */}
                             <div className="flex items-center justify-between bg-slate-50 p-5 rounded-[24px] border border-slate-100 shadow-inner">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-sky-400 font-semibold font-['Poppins']">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-semibold font-['Poppins'] ${selectedPayment.isDeleted ? 'bg-rose-100 text-rose-400' : 'bg-slate-900 text-sky-400'}`}>
                                         {selectedPayment.user.charAt(0)}
                                     </div>
                                     <div>
-                                        <p className="text-[13px] font-semibold text-slate-800 leading-none font-['Poppins']">{selectedPayment.user}</p>
+                                        <div className="flex items-center gap-1.5">
+                                            <p className="text-[13px] font-semibold text-slate-800 leading-none font-['Poppins']">{selectedPayment.user}</p>
+                                            {selectedPayment.isDeleted && (
+                                                <span className="text-[8px] font-semibold uppercase tracking-wide bg-rose-50 text-rose-400 border border-rose-100 px-1.5 py-0.5 rounded-md">Account Deleted</span>
+                                            )}
+                                        </div>
                                         <p className="text-[10px] text-slate-400 mt-1 font-medium font-['Poppins']">{selectedPayment.method}</p>
                                     </div>
                                 </div>

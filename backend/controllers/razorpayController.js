@@ -83,9 +83,12 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
         },
     });
 
-    // Save a pending payment record in DB
+    // Save a pending payment record in DB — snapshot user info for permanent audit trail
     await Payment.create({
         user: req.user.id,
+        userName: user.name || '',
+        userEmail: user.email || '',
+        userPhone: user.phone || '',
         plan: planName,
         paymentType: pType,
         planDuration: reqPlanDuration || 'Monthly',

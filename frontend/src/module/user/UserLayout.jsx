@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
     Menu, Bell, Wallet as WalletIcon, Home as HomeIcon, LayoutGrid, User, History, 
@@ -16,7 +16,25 @@ const UserLayout = () => {
     const navigate = useNavigate();
     const [isNotifOpen, setIsNotifOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
     const { userData, notifications, clearNotifications, markAsRead, logout } = useUser();
+
+    useEffect(() => {
+        const handleResize = () => {
+            // If window height shrinks by more than 20% (keyboard opened)
+            if (window.visualViewport) {
+                setIsKeyboardOpen(window.visualViewport.height < window.innerHeight * 0.8);
+            } else {
+                setIsKeyboardOpen(window.innerHeight < 500);
+            }
+        };
+        window.visualViewport?.addEventListener('resize', handleResize);
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.visualViewport?.removeEventListener('resize', handleResize);
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
     // Combine global and personal notifications
     const allNotifications = React.useMemo(() => {
@@ -62,7 +80,7 @@ const UserLayout = () => {
     };
 
     return (
-        <div className="h-screen bg-slate-50 text-slate-900 font-poppins overflow-hidden flex flex-col max-w-md mx-auto relative">
+        <div className="bg-slate-50 text-slate-900 font-poppins overflow-hidden flex flex-col max-w-md mx-auto relative" style={{ height: '100vh' }}>
             {/* --- New Dromoney Fixed Top Header --- */}
             <header className="shrink-0 z-50 bg-slate-900/95 backdrop-blur-md px-4 py-1 flex items-center justify-between border-b border-slate-800 shadow-xl min-h-[48px] max-h-[48px]">
                 {/* 1. Brand & Logo (Left Side) */}
@@ -280,12 +298,18 @@ const UserLayout = () => {
             </div>
 
             {/* --- Dynamic Content Rendering Area (Pages) --- */}
-            <PullToRefreshWrapper>
-                <Outlet />
-            </PullToRefreshWrapper>
+            <div className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth" style={{ paddingBottom: '80px' }}>
+                <PullToRefreshWrapper>
+                    <Outlet />
+                </PullToRefreshWrapper>
+            </div>
 
-            {/* --- Premium White Elevated Bottom Navigation Bar --- */}
-            <div className="shrink-0 z-50">
+            {/* --- Premium White Elevated Bottom Navigation Bar --- FIXED: stays at bottom even when keyboard is open */}
+            {!isKeyboardOpen && (
+            <div
+                className="absolute bottom-0 left-0 right-0 z-50 w-full"
+                style={{ transform: 'translateZ(0)' }}
+            >
                 {/* The Ultra-Light Mustard Bar Container */}
                 <div className="relative bg-[#FFFEF7] border-t border-black/5 h-20 flex items-center px-4 shadow-[0_-10px_30px_rgba(0,0,0,0.06)]">
                     
@@ -350,6 +374,7 @@ const UserLayout = () => {
                     })}
                 </div>
             </div>
+            )}
         </div>
     );
 };

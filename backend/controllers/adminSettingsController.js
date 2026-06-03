@@ -1,4 +1,5 @@
 const Settings = require('../models/Settings');
+const Admin = require('../models/Admin');
 const asyncHandler = require('../middleware/async');
 
 // @desc    Get system settings
@@ -12,9 +13,16 @@ exports.getSettings = asyncHandler(async (req, res) => {
         settings = await Settings.create({});
     }
 
+    const admin = await Admin.findOne();
+    const settingsObj = settings.toObject();
+    
+    if (admin) {
+        settingsObj.adminEmail = admin.email;
+    }
+
     res.status(200).json({
         success: true,
-        data: settings
+        data: settingsObj
     });
 });
 
@@ -46,6 +54,16 @@ exports.updateSettings = asyncHandler(async (req, res) => {
             new: true,
             runValidators: true
         });
+    }
+
+    // Update Admin email/password if provided
+    if (req.body.adminEmail || req.body.adminPassword) {
+        const admin = await Admin.findOne();
+        if (admin) {
+            if (req.body.adminEmail) admin.email = req.body.adminEmail;
+            if (req.body.adminPassword) admin.password = req.body.adminPassword;
+            await admin.save();
+        }
     }
 
     res.status(200).json({

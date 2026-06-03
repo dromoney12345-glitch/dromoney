@@ -27,7 +27,11 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
         if (isOpen) {
             setStatus('idle');
             setErrorMsg('');
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
         }
+        return () => { document.body.style.overflow = 'auto'; };
     }, [isOpen]);
 
     if (!isOpen) return null;
@@ -116,20 +120,20 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
     };
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-5 font-poppins">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+                className="absolute inset-0 bg-slate-100"
                 onClick={status === 'idle' ? onClose : undefined}
             />
 
             {/* Modal Box */}
-            <div className="relative bg-white w-full max-w-[300px] rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="relative bg-white w-full max-w-[340px] mx-auto rounded-2xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-slate-200 animate-in zoom-in-95 duration-200">
 
                 {/* ── IDLE: Show Pay Button ── */}
                 {(status === 'idle' || status === 'error') && (
                     <>
-                        <div className="p-5 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                        <div className="px-5 pt-4 pb-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
                             <div>
                                 <h3 className="font-medium text-slate-800 text-lg uppercase tracking-tight">Checkout</h3>
                                 <p className="text-[10px] uppercase tracking-widest text-slate-400 font-medium max-w-[150px] truncate">{plan}</p>

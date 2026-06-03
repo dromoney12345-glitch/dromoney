@@ -41,8 +41,8 @@ const Users = () => {
                     email: u.email,
                     mobile: u.phone || 'N/A',
                     referrals: u.referralCount || 0,
-                    earnings: `₹${u.wallet?.lifetimeEarnings || 0}`,
-                    wallet: `₹${u.wallet?.balance || 0}`,
+                    earnings: `₹${parseFloat(u.wallet?.lifetimeEarnings || 0).toFixed(2)}`,
+                    wallet: `₹${parseFloat(u.wallet?.balance || 0).toFixed(2)}`,
                     status: u.isBlocked ? 'Blocked' : 'Active',
                     joined: new Date(u.createdAt).toLocaleDateString(),
                     kyc: u.kyc || { status: 'Not Started' },
@@ -112,8 +112,27 @@ const Users = () => {
         }
     };
 
+    const [editError, setEditError] = useState('');
+
     const handleSaveEdit = (e) => {
         e.preventDefault();
+        setEditError('');
+
+        // Strict email validation
+        const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+        const emailParts = (editingUser?.email || '').split('@');
+        const localPart = emailParts[0]?.toLowerCase();
+        const domainWithoutTld = emailParts[1]?.split('.')[0]?.toLowerCase();
+
+        if (!emailRegex.test(editingUser?.email || '')) {
+            setEditError('Please enter a valid email address (e.g. name@gmail.com)');
+            return;
+        }
+        if (localPart && domainWithoutTld && localPart === domainWithoutTld) {
+            setEditError('Please use a real email address (e.g. name@gmail.com)');
+            return;
+        }
+
         // Implement backend edit if needed
         setIsEditModalOpen(false);
     };
@@ -159,13 +178,13 @@ const Users = () => {
             {/* Toolbar */}
             <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
                 <div className="relative flex-1 w-full">
-                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none" />
                     <input
                         type="text"
                         placeholder="Search by name or mobile..."
                         value={search}
                         onChange={handleSearch}
-                        className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-[14px] font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm font-['Poppins']"
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-[14px] font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm font-['Poppins']"
                     />
                 </div>
                 
@@ -263,6 +282,40 @@ const Users = () => {
                             )}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Pagination Footer */}
+                <div className="px-5 py-4 bg-slate-50/50 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4 font-['Poppins']">
+                    <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-normal order-2 sm:order-1">
+                        Showing {filtered.length > 0 ? indexOfFirstItem + 1 : 0} to {Math.min(indexOfLastItem, filtered.length)} of {filtered.length} entries
+                    </div>
+                    <div className="flex items-center gap-2 order-1 sm:order-2">
+                        <button
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(prev => prev - 1)}
+                            className="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-[10px] font-semibold uppercase text-slate-500 hover:bg-slate-50 disabled:opacity-50 shadow-sm transition-all"
+                        >
+                            Prev
+                        </button>
+                        <div className="flex items-center gap-1.5">
+                            {[...Array(totalPages)].map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setCurrentPage(i + 1)}
+                                    className={`w-8 h-8 rounded-xl text-[10px] font-semibold flex items-center justify-center transition-all shadow-sm ${currentPage === i + 1 ? 'bg-sky-500 text-white border-sky-400' : 'bg-white text-slate-400 border-slate-200 hover:bg-slate-50'}`}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+                        </div>
+                        <button
+                            disabled={currentPage === totalPages || totalPages === 0}
+                            onClick={() => setCurrentPage(prev => prev + 1)}
+                            className="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-[10px] font-semibold uppercase text-slate-500 hover:bg-slate-50 disabled:opacity-50 shadow-sm transition-all"
+                        >
+                            Next
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -403,6 +456,12 @@ const Users = () => {
                             </button>
                         </div>
                         <div className="p-8 space-y-6">
+                            {editError && (
+                                <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-start gap-2">
+                                    <AlertCircle size={14} className="text-rose-500 mt-0.5 shrink-0" />
+                                    <p className="text-rose-600 text-[11px] font-medium font-['Poppins']">{editError}</p>
+                                </div>
+                            )}
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-[10px] font-medium uppercase tracking-normal text-slate-400 mb-2 font-['Poppins']">Full Name</label>
@@ -410,7 +469,14 @@ const Users = () => {
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-medium uppercase tracking-normal text-slate-400 mb-2 font-['Poppins']">Email</label>
-                                    <input type="email" value={editingUser.email} onChange={(e) => setEditingUser({...editingUser, email: e.target.value})} className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-[13px] font-medium text-slate-700 font-['Poppins']" />
+                                    <input
+                                        type="email"
+                                        value={editingUser.email}
+                                        onChange={(e) => { setEditingUser({...editingUser, email: e.target.value}); setEditError(''); }}
+                                        className={`w-full px-4 py-3 bg-slate-50 border rounded-xl text-[13px] font-medium text-slate-700 font-['Poppins'] transition-colors ${editError ? 'border-rose-300 bg-rose-50/30' : 'border-slate-100'}`}
+                                        placeholder="name@gmail.com"
+                                    />
+                                    <p className="text-[9px] text-slate-400 font-medium mt-1.5 ml-1 font-['Poppins']">Use a real email provider (gmail.com, yahoo.com, etc.)</p>
                                 </div>
                             </div>
                             <button type="submit" className="w-full bg-sky-500 hover:bg-sky-600 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-xl shadow-sky-500/25 transition-all font-['Poppins']">Save Changes</button>

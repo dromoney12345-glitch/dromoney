@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
     Settings as SettingsIcon, Shield, CreditCard, 
     Layout, Coins, Bell, Save, CheckCircle2,
-    Lock, Mail, Globe, AlertTriangle
+    Lock, Mail, Globe, AlertTriangle, Eye, EyeOff
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { SettingsDataService } from '../../../services/SettingsDataService';
@@ -12,6 +12,7 @@ const Settings = () => {
     const [config, setConfig] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
     const [showToast, setShowToast] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         const fetchSettings = async () => {
@@ -268,17 +269,27 @@ const Settings = () => {
                                                 className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:border-rose-500 transition-all mb-4" 
                                             />
                                         </div>
-                                        <div className="space-y-2">
+                                        <div className="space-y-2 relative">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <Lock size={14} className="text-slate-400" />
                                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal">Admin Dashboard Password</label>
                                             </div>
-                                            <input 
-                                                type="password" 
-                                                value={config.adminPassword}
-                                                onChange={(e) => handleChange('adminPassword', e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:border-rose-500 transition-all" 
-                                            />
+                                            <div className="relative">
+                                                <input 
+                                                    type={showPassword ? "text" : "password"} 
+                                                    value={config.adminPassword || ''}
+                                                    onChange={(e) => handleChange('adminPassword', e.target.value)}
+                                                    placeholder="Enter new password to update"
+                                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:border-rose-500 transition-all pr-12" 
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                                                >
+                                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

@@ -293,11 +293,6 @@ const Wallet = () => {
             {/* --- My Cards Heading --- */}
             <div className="flex items-center justify-between px-1 mt-0.5">
                 <h2 className="text-[15px] font-medium text-slate-800 tracking-tight">My Cards</h2>
-                <div className="flex gap-1 opacity-30">
-                    <div className="w-1 h-1 bg-slate-900 rounded-full"></div>
-                    <div className="w-1 h-1 bg-slate-900 rounded-full"></div>
-                    <div className="w-1 h-1 bg-slate-900 rounded-full"></div>
-                </div>
             </div>
 
             <div className="relative rounded-xl p-4.5 shadow-lg overflow-hidden group bg-gradient-to-br from-[#0f1d3a] via-[#1a2c52] to-[#0f1d3a] transition-all duration-500">

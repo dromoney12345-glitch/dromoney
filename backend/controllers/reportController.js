@@ -1,4 +1,5 @@
 const Report = require('../models/Report');
+const Notification = require('../models/Notification');
 const asyncHandler = require('../middleware/async');
 
 // @desc    Submit new problem report
@@ -60,6 +61,33 @@ exports.updateReportStatus = asyncHandler(async (req, res, next) => {
 
     if (!report) {
         return res.status(404).json({ success: false, error: 'Report not found' });
+    }
+
+    // Create Notification for the user
+    if (status === 'Resolved' || status === 'Rejected') {
+        const title = status === 'Resolved' ? 'Report Resolved' : 'Report Rejected';
+        const message = status === 'Resolved' 
+            ? `Your reported problem "${report.message.substring(0, 30)}..." has been resolved by our team.` 
+            : `Your reported problem has been rejected.`;
+            
+        const notification = await Notification.create({
+            user: report.user,
+            title,
+            message,
+            type: status === 'Resolved' ? 'success' : 'warning'
+        });
+
+        // Emit real-time socket event if possible
+        if (global.io) {
+            global.io.to(report.user.toString()).emit('new_notification', {
+                id: notification._id,
+                title: notification.title,
+                message: notification.message,
+                type: notification.type,
+                isRead: false,
+                createdAt: notification.createdAt
+            });
+        }
     }
 
     res.status(200).json({

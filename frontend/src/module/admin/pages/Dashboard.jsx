@@ -26,6 +26,7 @@ const Dashboard = () => {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [alerts, setAlerts] = useState([]);
     const [queue, setQueue] = useState([]);
+    const [recentNotifs, setRecentNotifs] = useState([]);
 
     // Engagement Matrix state
     const [engagementPeriod, setEngagementPeriod] = useState('daily');
@@ -83,7 +84,12 @@ const Dashboard = () => {
     const fetchAlerts = async () => {
         try {
             const response = await api.get('/admin/dashboard/alerts');
-            if (response.success) setAlerts(response.data);
+            if (response.success) {
+                setAlerts(response.data);
+                if (response.recentNotifications) {
+                    setRecentNotifs(response.recentNotifications);
+                }
+            }
             
             const userRes = await api.get('/admin/users');
             if (userRes.success) {
@@ -125,10 +131,10 @@ const Dashboard = () => {
     ];
 
     const conversionFunnel = liveStats?.conversionFunnel || [
-        { label: 'Website Visitors', value: '1,240', percent: '100%', color: 'bg-slate-200' },
-        { label: 'Registrations', value: '0', percent: '0%', color: 'bg-indigo-400' },
-        { label: 'Paid Members', value: '0', percent: '0%', color: 'bg-sky-500' },
-        { label: 'Active Earners', value: '0', percent: '0%', color: 'bg-emerald-500' },
+        { label: 'Total Visits', value: '...', percent: '0%', color: 'bg-slate-200' },
+        { label: 'Registrations', value: '...', percent: '0%', color: 'bg-indigo-400' },
+        { label: 'Paid Members', value: '...', percent: '0%', color: 'bg-sky-500' },
+        { label: 'Active Earners', value: '...', percent: '0%', color: 'bg-emerald-500' },
     ];
 
     const fraudAlerts = alerts.length > 0 ? alerts : [
@@ -306,19 +312,34 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Fraud & Safety Guard */}
-                <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 flex flex-col group">
+                {/* Notifications & Alerts */}
+                <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 flex flex-col group h-[300px] overflow-hidden">
                     <div className="flex items-center justify-between mb-5">
                         <div>
-                            <h2 className="text-[14px] font-medium text-slate-900 tracking-tight uppercase flex items-center gap-2"><ShieldAlert size={14} className="text-rose-500" /> Safety Guard</h2>
-                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mt-0.5">Anomaly Detection System</p>
+                            <h2 className="text-[14px] font-medium text-slate-900 tracking-tight uppercase flex items-center gap-2"><Bell size={14} className="text-amber-500" /> Notifications & Alerts</h2>
+                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mt-0.5">Recent User Broadcasts & Alerts</p>
                         </div>
-                        <div className="w-8 h-8 bg-rose-50 text-rose-500 rounded-lg flex items-center justify-center border border-rose-100"><ShieldQuestion size={16} /></div>
+                        <div className="w-8 h-8 bg-amber-50 text-amber-500 rounded-lg flex items-center justify-center border border-amber-100"><ShieldAlert size={16} /></div>
                     </div>
 
-                    <div className="space-y-2 flex-1">
+                    <div className="space-y-2 flex-1 overflow-y-auto custom-scrollbar pr-2">
+                        {recentNotifs.length > 0 ? (
+                            recentNotifs.map((n, i) => (
+                                <div key={`notif-${i}`} className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col gap-1 hover:bg-white hover:shadow-lg hover:shadow-slate-100 transition-all cursor-pointer group/alert">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <div className={`w-2 h-2 rounded-full ${n.type === 'broadcast' ? 'bg-sky-500' : 'bg-emerald-500'}`}></div>
+                                            <p className="text-[11px] font-medium text-slate-800 tracking-tight leading-none uppercase">{n.title}</p>
+                                        </div>
+                                        <span className="text-[8px] font-medium text-slate-300 uppercase tracking-normal">{n.time}</span>
+                                    </div>
+                                    <p className="text-[10px] font-medium text-slate-500 leading-snug pl-4">{n.message}</p>
+                                </div>
+                            ))
+                        ) : null}
+                        
                         {fraudAlerts.map((a, i) => (
-                            <div key={i} className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between hover:bg-white hover:shadow-lg hover:shadow-slate-100 transition-all cursor-pointer group/alert">
+                            <div key={`alert-${i}`} className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between hover:bg-white hover:shadow-lg hover:shadow-slate-100 transition-all cursor-pointer group/alert">
                                 <div className="flex items-center gap-3">
                                      <div className={`w-2 h-2 rounded-full ${a.severity === 'high' ? 'bg-rose-500 animate-pulse' : a.severity === 'medium' ? 'bg-amber-500' : 'bg-sky-500'}`}></div>
                                      <div>

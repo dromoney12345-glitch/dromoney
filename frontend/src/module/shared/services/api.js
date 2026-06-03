@@ -23,13 +23,15 @@ api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('dromoney_token');
         const adminToken = localStorage.getItem('dromoney_admin_token');
-        
-        // Use admin token if the request path starts with /admin or if currently on an admin page
-        if ((config.url.includes('/admin') || window.location.pathname.startsWith('/admin')) && adminToken) {
+        // Determine if request is for admin routes
+        const isAdminRequest = config.url?.includes('/admin') || window.location.pathname.startsWith('/admin');
+        if (isAdminRequest && adminToken) {
             config.headers.Authorization = `Bearer ${adminToken}`;
         } else if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+        // Debug log to verify which token is used
+        console.debug('API request', config.method?.toUpperCase(), config.url, 'Authorization set:', !!config.headers.Authorization);
         return config;
     },
     (error) => {

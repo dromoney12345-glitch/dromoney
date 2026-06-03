@@ -131,8 +131,8 @@ const Affiliates = () => {
 
                 <div className="flex flex-col sm:flex-row items-center gap-3 flex-1 max-w-2xl">
                     <div className="relative flex-1 w-full">
-                        <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                        <input type="text" value={search} onChange={handleSearch} placeholder="Search referrers..." className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 py-2.5 text-[11px] font-medium text-slate-700 outline-none focus:ring-2 focus:ring-sky-500 transition-all shadow-inner" />
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none" />
+                        <input type="text" value={search} onChange={handleSearch} placeholder="Search referrers..." className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-9 pr-4 py-2.5 text-[11px] font-medium text-slate-700 outline-none focus:ring-2 focus:ring-sky-500 transition-all shadow-inner" />
                     </div>
                     <div className="flex gap-1.5 bg-slate-50 p-1 rounded-xl border border-slate-100 shadow-inner">
                         {['All', 'Credited', 'Pending'].map(t => (

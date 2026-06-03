@@ -36,6 +36,22 @@ exports.register = async (req, res, next) => {
             return next(new ErrorResponse('This phone number is already registered.', 400));
         }
 
+        // Strict email validation — reject fake/invalid email formats
+        if (trimmedEmail) {
+            const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+            const emailParts = trimmedEmail.split('@');
+            const localPart = emailParts[0];
+            const domainWithoutTld = emailParts[1]?.split('.')[0];
+
+            if (!emailRegex.test(trimmedEmail)) {
+                return next(new ErrorResponse('Please enter a valid email address (e.g. name@gmail.com)', 400));
+            }
+            // Block fake emails where username == domain name (e.g. suhani@suhani.com)
+            if (localPart && domainWithoutTld && localPart === domainWithoutTld) {
+                return next(new ErrorResponse('Please use a real email address (e.g. name@gmail.com)', 400));
+            }
+        }
+
         const userWithEmail = (trimmedEmail && trimmedEmail !== '') ? await User.findOne({ email: trimmedEmail }) : null;
         if (userWithEmail) {
             return next(new ErrorResponse('This email address is already registered.', 400));

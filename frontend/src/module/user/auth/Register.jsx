@@ -92,9 +92,21 @@ const Register = () => {
             return;
         }
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        // Strict email validation — must have real-looking domain and TLD
+        // Rejects: suhani@suhani.com, test@test.com, user@user.in etc.
+        const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+        const emailParts = formData.email.split('@');
+        const localPart = emailParts[0]?.toLowerCase();
+        const domainPart = emailParts[1]?.toLowerCase();
+        const domainWithoutTld = domainPart?.split('.')[0];
+
         if (!emailRegex.test(formData.email)) {
-            setError('Please enter a valid email address');
+            setError('Please enter a valid email address (e.g. name@gmail.com)');
+            return;
+        }
+        // Block fake emails where username == domain name (e.g. suhani@suhani.com)
+        if (localPart && domainWithoutTld && localPart === domainWithoutTld) {
+            setError('Please use a real email address (e.g. name@gmail.com)');
             return;
         }
 

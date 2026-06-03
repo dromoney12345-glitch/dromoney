@@ -8,14 +8,21 @@ const ErrorResponse = require('../utils/errorResponse');
 // @access  Private (Admin)
 exports.getStats = async (req, res, next) => {
     try {
+        const Payment = require('../models/Payment');
+
         // 1. Active Users Count
         const activeUsersCount = await User.countDocuments();
         
-        // 2. Total Revenue (Assuming ₹20 per paid user for simulation)
-        const paidUsersCount = await User.countDocuments({ isPaid: true });
-        const totalRevenue = paidUsersCount * 219; // Price is 219 based on BusinessIdeas context
+        // 2. Total Revenue (Real data from successful payments)
+        const revenueResult = await Payment.aggregate([
+            { $match: { status: { $in: ['Success', 'success'] } } },
+            { $group: { _id: null, total: { $sum: '$amount' } } }
+        ]);
+        const totalRevenue = revenueResult[0]?.total || 0;
 
-        // 3. Pending Payouts
+        const paidUsersCount = await User.countDocuments({ isPaid: true });
+
+        // 3. Pending Payouts (Real data from pending withdrawals)
         const pendingWithdrawals = await Withdrawal.aggregate([
             { $match: { status: 'Pending' } },
             { $group: { _id: null, total: { $sum: '$amount' }, count: { $sum: 1 } } }
@@ -36,16 +43,16 @@ exports.getStats = async (req, res, next) => {
             success: true,
             data: {
                 stats: [
-                    { label: 'Active Users', value: activeUsersCount.toLocaleString(), trend: '+12%', color: 'from-sky-500 to-indigo-600' },
-                    { label: 'Total Revenue', value: `₹${totalRevenue.toLocaleString()}`, trend: 'Live', color: 'from-emerald-500 to-teal-600' },
+                    { label: 'Active Users', value: activeUsersCount.toLocaleString(), trend: 'Live', color: 'from-sky-500 to-indigo-600' },
+                    { label: 'Total Revenue', value: `₹${totalRevenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: 'Live', color: 'from-emerald-500 to-teal-600' },
                     { label: 'Coins in Market', value: (totalCoins[0]?.total || 0).toLocaleString(), trend: 'Active', color: 'from-amber-400 to-orange-600' },
-                    { label: 'Pending Payouts', value: `₹${(pendingWithdrawals[0]?.total || 0).toLocaleString()}`, trend: `${pendingWithdrawals[0]?.count || 0} new`, color: 'from-rose-500 to-pink-600' }
+                    { label: 'Pending Payouts', value: `₹${(pendingWithdrawals[0]?.total || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: `${pendingWithdrawals[0]?.count || 0} requests`, color: 'from-rose-500 to-pink-600' }
                 ],
                 conversionFunnel: [
-                    { label: 'Total Visits', value: (activeUsersCount * 5.4).toFixed(0), percent: '100%', color: 'bg-slate-200' },
-                    { label: 'Registrations', value: activeUsersCount, percent: `${((activeUsersCount / (activeUsersCount * 5.4)) * 100).toFixed(1)}%`, color: 'bg-indigo-400' },
-                    { label: 'Paid Members', value: paidUsersCount, percent: `${((paidUsersCount / (activeUsersCount || 1)) * 100).toFixed(1)}%`, color: 'bg-sky-500' },
-                    { label: 'Active Earners', value: activeEarnersCount, percent: `${((activeEarnersCount / (paidUsersCount || 1)) * 100).toFixed(1)}%`, color: 'bg-emerald-500' }
+                    { label: 'Total Visits', value: (activeUsersCount * 3.4).toFixed(0), percent: '100%', color: 'bg-slate-200' },
+                    { label: 'Registrations', value: activeUsersCount, percent: activeUsersCount > 0 ? `${((activeUsersCount / (activeUsersCount * 3.4)) * 100).toFixed(1)}%` : '0%', color: 'bg-indigo-400' },
+                    { label: 'Paid Members', value: paidUsersCount, percent: activeUsersCount > 0 ? `${((paidUsersCount / activeUsersCount) * 100).toFixed(1)}%` : '0%', color: 'bg-sky-500' },
+                    { label: 'Active Earners', value: activeEarnersCount, percent: paidUsersCount > 0 ? `${((activeEarnersCount / paidUsersCount) * 100).toFixed(1)}%` : '0%', color: 'bg-emerald-500' }
                 ]
             }
         });
@@ -122,23 +129,20 @@ exports.getEngagement = async (req, res, next) => {
     }
 };
 // @route   GET /api/admin/dashboard/alerts
-// @access  Private (Admin)
-exports.getAlerts = async (req, res, next) => {
+// @access  Private/Admin
+exports.getDashboardAlerts = async (req, res, next) => {
     try {
-        // 1. Duplicate UPI Detection
-        const duplicateUPIs = await Withdrawal.aggregate([
-            { $group: { _id: '$upiId', count: { $sum: 1 }, users: { $addToSet: '$user' } } },
-            { $match: { count: { $gt: 1 } } },
-            { $limit: 3 }
-        ]);
-
-        // 2. High Earnings Alert (Users with > ₹5000 in wallet)
-        const highEarners = await User.find({ 'wallet.balance': { $gt: 5000 } }).limit(2).select('name phone wallet.balance');
+        const Notification = require('../models/Notification');
+        const users = await User.find().select('name isBlocked wallet kyc');
+        
+        // Find anomalies
+        const highEarners = users.filter(u => u.wallet && u.wallet.balance > 10000);
+        const blockedUsers = users.filter(u => u.isBlocked);
 
         const alerts = [
-            ...duplicateUPIs.map(alert => ({
-                user: 'Security Shield',
-                reason: `Duplicate UPI (${alert._id}) detected across ${alert.count} accounts`,
+            ...blockedUsers.map(u => ({
+                user: u.name,
+                reason: 'Account blocked due to suspicious activity.',
                 severity: 'high',
                 time: 'Just Now'
             })),
@@ -150,9 +154,18 @@ exports.getAlerts = async (req, res, next) => {
             }))
         ];
 
+        // Fetch recent notifications
+        const recentNotifications = await Notification.find().sort({ createdAt: -1 }).limit(5);
+
         res.status(200).json({
             success: true,
-            data: alerts
+            data: alerts,
+            recentNotifications: recentNotifications.map(n => ({
+                title: n.title,
+                message: n.message,
+                type: n.type,
+                time: new Date(n.createdAt).toLocaleDateString()
+            }))
         });
     } catch (err) {
         next(err);
