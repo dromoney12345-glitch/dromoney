@@ -119,7 +119,9 @@ const RootRedirect = () => {
 
 const RouteTracker = () => {
   const location = useLocation();
+  
   React.useEffect(() => {
+    // 1. Existing App Logic
     if (location.pathname !== '/' && location.pathname !== '/user/auth/login') {
       sessionStorage.setItem('dromoney_last_route', location.pathname + location.search);
     }
@@ -129,7 +131,40 @@ const RouteTracker = () => {
     } else {
       document.body.classList.remove('user-panel');
     }
+
+    // 2. Flutter Route Tracking Integration
+    try {
+      // Normalize route to ensure consistent format
+      const normalizedRoute = location.pathname.startsWith('/') 
+        ? location.pathname 
+        : `/${location.pathname}`;
+      
+      // Development logging only - Always visible in dev tools for testing
+      if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV) {
+        console.log(`[Flutter Route Sync] Detected route: ${normalizedRoute}`);
+      }
+
+      // Safe check for Flutter InAppWebView injected object
+      if (window.flutter_inappwebview && typeof window.flutter_inappwebview.callHandler === 'function') {
+        // Send route to Flutter
+        window.flutter_inappwebview.callHandler("routeChanged", normalizedRoute);
+        
+        if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV) {
+          console.log(`[Flutter Route Sync] Sent ${normalizedRoute} to Flutter`);
+        }
+      } else {
+        if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV) {
+          console.log(`[Flutter Route Sync] flutter_inappwebview not found. Running in standard browser.`);
+        }
+      }
+    } catch (error) {
+      // Catch any potential errors to prevent breaking browser usage
+      if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV) {
+        console.error('[Flutter Route Sync Error]', error);
+      }
+    }
   }, [location]);
+  
   return null;
 };
 
