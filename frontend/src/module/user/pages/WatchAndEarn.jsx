@@ -1,21 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlayCircle, Clock, Coins, ChevronRight, MonitorPlay, Sparkles, TrendingUp, CheckCircle2, AlertTriangle, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
-
+import { Clock, Coins, MonitorPlay, Sparkles, TrendingUp, RefreshCw, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
 
 const WatchAndEarn = () => {
-    const navigate = useNavigate();
-    const { userData } = useUser();
-    const [viewAds, setViewAds] = useState([]);
+    const { userData, fetchUserData } = useUser();
+    const [status, setStatus] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    const [dailyAdCount, setDailyAdCount] = useState(0);
-    const [nextAdAvailableAt, setNextAdAvailableAt] = useState(null);
-    const [maxDailyLimit, setMaxDailyLimit] = useState(10);
-    const [cooldownRemaining, setCooldownRemaining] = useState(0);
-
     const [toast, setToast] = useState(null);
 
     const showToast = (message, type = 'success') => {
@@ -23,53 +15,88 @@ const WatchAndEarn = () => {
         setTimeout(() => setToast(null), 4000);
     };
 
-    useEffect(() => {
-        fetchAds();
-    }, []);
-
-    const fetchAds = async () => {
+    const fetchStatus = async () => {
         setLoading(true);
         try {
-            const res = await api.get('/public/ads');
+            const res = await api.get('/reward/status');
             if (res.success) {
-                setViewAds(res.data);
-                setDailyAdCount(res.dailyAdCount ?? 0);
-                setNextAdAvailableAt(res.nextAdAvailableAt || null);
-                // Use limit from DB, fallback to 10
-                setMaxDailyLimit(res.maxDailyLimit ?? 10);
+                setStatus(res);
             }
         } catch (err) {
-            console.error('Error fetching ads:', err);
+            console.error('Error fetching reward status:', err);
         } finally {
             setLoading(false);
         }
     };
 
-    // Cooldown countdown
     useEffect(() => {
-        if (!nextAdAvailableAt) { setCooldownRemaining(0); return; }
-        const update = () => {
-            const ms = new Date(nextAdAvailableAt) - Date.now();
-            setCooldownRemaining(ms <= 0 ? 0 : Math.ceil(ms / 1000));
-        };
-        update();
-        const t = setInterval(update, 1000);
-        return () => clearInterval(t);
-    }, [nextAdAvailableAt]);
+        fetchStatus();
 
-    const handleAdClick = (adId, isWatched) => {
-        if (isWatched) { showToast("Reward already claimed for this ad.", "error"); return; }
-        if (dailyAdCount >= maxDailyLimit) { showToast(`Daily limit reached! You can only watch ${maxDailyLimit} videos per day.`, "error"); return; }
-        if (cooldownRemaining > 0) { showToast(`Wait ${cooldownRemaining}s before next video.`, "error"); return; }
-        navigate(`/user/ad-player/${adId}`);
+        // Expose a function to flutter so it can tell React to refresh after ad is completed
+        window.refreshRewardStatus = async () => {
+            showToast("Reward earned! Updating balance...");
+            await fetchStatus();
+            if (fetchUserData) await fetchUserData(); // Assuming this context method exists to refresh user
+        };
+
+        return () => {
+            delete window.refreshRewardStatus;
+        };
+    }, []);
+
+    // Cooldown countdown logic
+    const [cooldownRemaining, setCooldownRemaining] = useState(0);
+
+    useEffect(() => {
+        if (!status || status.nextAdIn <= 0) {
+            setCooldownRemaining(0);
+            return;
+        }
+        setCooldownRemaining(status.nextAdIn);
+        
+        const t = setInterval(() => {
+            setCooldownRemaining(prev => {
+                if (prev <= 1) {
+                    clearInterval(t);
+                    fetchStatus(); // re-fetch when cooldown ends
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+        return () => clearInterval(t);
+    }, [status?.nextAdIn]);
+
+    const handleWatchAd = () => {
+        if (!status?.available) {
+            showToast("Ad is not available right now.", "error");
+            return;
+        }
+
+        // Call flutter handler
+        if (window.flutter_inappwebview) {
+            window.flutter_inappwebview.callHandler('showRewardAd', 'reward_ad_1').catch(e => {
+                console.error("Flutter handler error", e);
+                showToast("Failed to launch Ad.", "error");
+            });
+        } else {
+            showToast("This feature is only available in the mobile app.", "error");
+            // For testing only on web, we could mock the claim
+            // api.post('/reward/claim').then(() => { window.refreshRewardStatus(); });
+        }
     };
 
-    const slotsLeft = Math.max(0, maxDailyLimit - dailyAdCount);
+    const formatTime = (seconds) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}m ${s}s`;
+    };
+
+    const maxDailyLimit = 10;
+    const dailyAdCount = status ? (maxDailyLimit - status.remainingAds) : 0;
 
     return (
-        <div className="pb-24 bg-[#F8FAFC] font-['Poppins']">
-
-            {/* Toast */}
+        <div className="pb-24 bg-[#F8FAFC] font-['Poppins'] min-h-screen">
             {toast && (
                 <div className={`fixed top-5 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-2.5 px-4 py-3 rounded-xl border shadow-xl animate-in fade-in slide-in-from-top-4 duration-300 w-[88%] max-w-sm ${
                     toast.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-rose-50 border-rose-100 text-rose-800'
@@ -95,7 +122,7 @@ const WatchAndEarn = () => {
                     <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1 bg-white/15 px-2.5 py-1 rounded-full border border-white/15">
                             <Coins size={11} className="text-yellow-300 fill-yellow-300" />
-                            <span className="text-[11px] text-white">{userData.coins.total}</span>
+                            <span className="text-[11px] text-white">{userData?.coins?.balance || 0}</span>
                         </div>
                         <div className="w-9 h-9 bg-white/15 border border-white/20 rounded-xl flex items-center justify-center">
                             <MonitorPlay size={18} className="text-white" />
@@ -114,7 +141,7 @@ const WatchAndEarn = () => {
                             <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
                                 <div
                                     className="h-full bg-indigo-400 rounded-full transition-all duration-500"
-                                    style={{ width: maxDailyLimit > 0 ? `${Math.min((dailyAdCount / maxDailyLimit) * 100, 100)}%` : '0%' }}
+                                    style={{ width: `${(dailyAdCount / maxDailyLimit) * 100}%` }}
                                 ></div>
                             </div>
                             <span className="text-[10px] text-white shrink-0">{dailyAdCount}/{maxDailyLimit}</span>
@@ -123,101 +150,66 @@ const WatchAndEarn = () => {
                 </div>
             </div>
 
-            {/* Status banners */}
-            {dailyAdCount >= maxDailyLimit ? (
-                <div className="bg-rose-50 border border-rose-100 rounded-xl p-3 flex items-center gap-2.5 mx-3 mt-3 shadow-sm">
-                    <AlertTriangle className="text-rose-500 w-4 h-4 shrink-0" />
-                    <div>
-                        <p className="text-rose-800 text-[11px] uppercase tracking-tight">Daily Limit Reached</p>
-                        <p className="text-rose-500 text-[9px]">Come back tomorrow for more!</p>
-                    </div>
-                </div>
-            ) : cooldownRemaining > 0 ? (
-                <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex items-center justify-between mx-3 mt-3 shadow-sm">
-                    <div className="flex items-center gap-2.5">
-                        <RefreshCw size={14} className="text-amber-500 animate-spin shrink-0" />
-                        <div>
-                            <p className="text-amber-800 text-[11px] uppercase tracking-tight">Cooldown Active</p>
-                            <p className="text-amber-500 text-[9px]">Wait for validation gap to finish.</p>
-                        </div>
-                    </div>
-                    <div className="bg-amber-500 text-white px-2.5 py-1 rounded-lg text-[11px]">
-                        {cooldownRemaining}s
-                    </div>
-                </div>
-            ) : null}
-
-            {/* Ad list */}
-            <div className="px-3 mt-3 space-y-2">
-                <div className="flex items-center justify-between px-0.5 mb-1">
-                    <h2 className="text-[10px] text-slate-400 uppercase tracking-[0.2em]">Available Ad Slots</h2>
-                    <span className="text-[9px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-1 border border-emerald-100">
-                        <span className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse inline-block"></span>
-                        {slotsLeft} Left Today
-                    </span>
-                </div>
-
-                {loading ? (
-                    <div className="py-12 text-center text-slate-300 text-[11px] uppercase tracking-widest">Loading...</div>
-                ) : viewAds.length === 0 ? (
-                    <div className="py-12 text-center text-slate-300 text-[11px] uppercase tracking-widest">No ads available</div>
-                ) : viewAds.map((ad) => {
-                    const isWatched = ad.isWatched;
-                    const isBlocked = dailyAdCount >= maxDailyLimit || cooldownRemaining > 0;
-
-                    return (
-                        <button
-                            key={ad._id}
-                            disabled={isWatched}
-                            onClick={() => handleAdClick(ad._id, isWatched)}
-                            className={`w-full text-left bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden flex transition-all active:scale-[0.98] group ${
-                                isWatched ? 'opacity-60 grayscale-[0.3]' : isBlocked ? 'opacity-85' : 'hover:shadow-md'
-                            }`}
-                        >
-                            {/* Thumbnail */}
-                            <div className="w-[72px] h-[72px] relative shrink-0">
-                                <img src={ad.thumbnailUrl} alt={ad.title} className="w-full h-full object-cover" />
-                                <div className="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-black/60 to-transparent"></div>
-                                <div className="absolute bottom-1 left-1.5 flex items-center gap-0.5 text-white">
-                                    <PlayCircle size={7} className="fill-white" />
-                                    <span className="text-[7px]">{ad.duration}s</span>
-                                </div>
-                                {isWatched && (
-                                    <div className="absolute inset-0 bg-indigo-600/50 flex items-center justify-center">
-                                        <CheckCircle2 size={20} className="text-white" />
-                                    </div>
-                                )}
+            {/* Content */}
+            <div className="px-3 mt-4 space-y-3">
+                {loading && !status ? (
+                     <div className="py-12 text-center text-slate-400 text-[11px] uppercase tracking-widest">Loading...</div>
+                ) : (
+                    <>
+                        {/* Ads Display */}
+                        {status && status.remainingAds <= 0 ? (
+                            <div className="bg-rose-50 border border-rose-100 rounded-xl p-4 text-center shadow-sm">
+                                <AlertTriangle className="text-rose-500 w-8 h-8 mx-auto mb-2" />
+                                <h3 className="text-rose-800 text-[14px] font-medium">Daily Limit Reached</h3>
+                                <p className="text-rose-500 text-[11px] mt-1">You have watched all {maxDailyLimit} ads for today. Come back tomorrow!</p>
                             </div>
-
-                            {/* Content */}
-                            <div className="flex-1 px-3 py-2 flex flex-col justify-between">
-                                <div>
-                                    <p className="text-[7px] text-indigo-500 uppercase tracking-widest leading-none mb-0.5">Sponsored Content</p>
-                                    <h3 className="text-[12px] text-slate-800 leading-snug line-clamp-2 group-hover:text-indigo-600 transition-colors">
-                                        {ad.title}
-                                    </h3>
-                                </div>
-                                <div className="flex items-center justify-between pt-1.5 border-t border-slate-50 mt-1">
-                                    <div className="flex items-center gap-1.5">
-                                        <div className="flex items-center gap-0.5 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100">
-                                            <Coins size={9} className="text-amber-500 fill-amber-500" />
-                                            <span className="text-[9px] text-amber-600">+{ad.coinsReward}</span>
-                                        </div>
-                                        <div className="flex items-center gap-0.5 text-slate-400">
-                                            <Clock size={8} />
-                                            <span className="text-[8px]">{ad.duration}s</span>
-                                        </div>
+                        ) : cooldownRemaining > 0 ? (
+                            <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm relative overflow-hidden">
+                                <div className="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h3 className="text-slate-800 text-[14px] font-medium">Reward Ad</h3>
+                                        <p className="text-slate-500 text-[11px]">Reward: {status?.rewardAmount || 5} Coins</p>
                                     </div>
-                                    {isWatched ? (
-                                        <span className="text-[8px] text-emerald-500 uppercase">Claimed</span>
-                                    ) : (
-                                        <ChevronRight size={13} className="text-slate-300 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" />
-                                    )}
+                                    <div className="bg-amber-50 text-amber-600 px-2.5 py-1 rounded-lg border border-amber-100 flex items-center gap-1.5">
+                                        <RefreshCw size={12} className="animate-spin" />
+                                        <span className="text-[11px] font-medium">Cooldown</span>
+                                    </div>
+                                </div>
+                                <div className="bg-slate-50 rounded-lg p-3 text-center border border-slate-100">
+                                    <Clock className="w-5 h-5 text-slate-400 mx-auto mb-1.5" />
+                                    <p className="text-slate-600 text-[12px]">Available In:</p>
+                                    <p className="text-indigo-600 text-[16px] font-semibold">{formatTime(cooldownRemaining)}</p>
                                 </div>
                             </div>
-                        </button>
-                    );
-                })}
+                        ) : (
+                            <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm relative overflow-hidden group hover:border-indigo-200 transition-colors">
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-indigo-50 rounded-bl-full -z-0"></div>
+                                <div className="relative z-10">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h3 className="text-slate-800 text-[15px] font-medium">Reward Ad</h3>
+                                            <div className="flex items-center gap-1 mt-1">
+                                                <Coins size={12} className="text-amber-500 fill-amber-500" />
+                                                <p className="text-amber-600 text-[12px] font-medium">Reward: {status?.rewardAmount || 5} Coins</p>
+                                            </div>
+                                        </div>
+                                        <div className="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1.5">
+                                            <CheckCircle size={12} />
+                                            <span className="text-[11px] font-medium uppercase tracking-wider">Available</span>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={handleWatchAd}
+                                        className="w-full bg-indigo-600 text-white py-3 rounded-xl text-[13px] font-medium flex items-center justify-center gap-2 hover:bg-indigo-700 active:scale-[0.98] transition-all"
+                                    >
+                                        <MonitorPlay size={16} />
+                                        Watch Ad Now
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
         </div>
     );

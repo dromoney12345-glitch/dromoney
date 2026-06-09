@@ -134,6 +134,13 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    lastRewardAt: {
+        type: Date
+    },
+    todayRewardCount: {
+        type: Number,
+        default: 0
+    },
     businessHubFirstAccessedAt: {
         type: Date
     },
