@@ -43,7 +43,8 @@ const WatchAndEarn = () => {
                 }
             } catch (err) {
                 console.error("Claim error:", err);
-                showToast("Failed to verify reward.", "error");
+                const errMsg = err.response?.data?.message || err.message || "Failed to verify reward.";
+                showToast(errMsg, "error");
             }
             await fetchStatus();
             if (fetchUserData) await fetchUserData(); // Refresh user balance

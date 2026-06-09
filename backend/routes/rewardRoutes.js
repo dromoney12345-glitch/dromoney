@@ -98,6 +98,10 @@ router.post('/claim', async (req, res) => {
         }
 
         // Apply reward
+        if (!user.coins) {
+            user.coins = { balance: 0, lifetimeCoins: 0 };
+        }
+        
         user.coins.balance = (user.coins.balance || 0) + REWARD_AMOUNT;
         user.coins.lifetimeCoins = (user.coins.lifetimeCoins || 0) + REWARD_AMOUNT;
         
