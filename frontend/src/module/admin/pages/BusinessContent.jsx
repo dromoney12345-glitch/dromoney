@@ -270,8 +270,8 @@ const BusinessContent = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] p-4 sm:p-8 font-poppins">
-            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div className="min-h-screen bg-[#F8FAFC] p-4 sm:p-4 font-poppins">
+            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
                 <div>
                     <h1 className="text-2xl font-medium text-slate-900 tracking-tight">Business Hub Manager</h1>
                     <p className="text-sm font-medium text-slate-400 uppercase tracking-normal mt-1">Manage Strategies & Plan Control</p>
@@ -279,20 +279,20 @@ const BusinessContent = () => {
                 <div className="flex gap-3">
                     <button 
                         onClick={() => setShowSettingsModal(true)}
-                        className="bg-white text-slate-600 border border-slate-200 px-4 py-3 rounded-2xl font-medium text-sm flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
+                        className="bg-white text-slate-600 border border-slate-200 px-4 py-3 rounded-lg font-medium text-sm flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
                     >
                         <Layout size={20} /> PLAN SETTINGS
                     </button>
                     <button 
                         onClick={() => { resetForm(); setShowModal(true); }}
-                        className="bg-[#5D38F0] text-white px-4 py-3 rounded-2xl font-medium text-sm flex items-center gap-2 shadow-lg shadow-indigo-100 hover:bg-[#4C2CD9] transition-all active:scale-95"
+                        className="bg-[#5D38F0] text-white px-4 py-3 rounded-lg font-medium text-sm flex items-center gap-2 shadow-lg shadow-indigo-100 hover:bg-[#4C2CD9] transition-all active:scale-95"
                     >
                         <Plus size={20} /> CREATE NEW CARD
                     </button>
                 </div>
             </div>
 
-            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {loading ? (
                     <div className="col-span-full flex flex-col items-center justify-center py-20 gap-4">
                         <Loader2 size={40} className="text-[#5D38F0] animate-spin" />
@@ -300,9 +300,9 @@ const BusinessContent = () => {
                     </div>
                 ) : (
                     ideas.map((idea) => (
-                        <div key={idea._id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 group hover:shadow-xl transition-all">
+                        <div key={idea._id} className="bg-white rounded-lg p-4 shadow-sm border border-slate-100 group hover:shadow-xl transition-all">
                             <div className="flex items-center gap-4 mb-4">
-                                <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shrink-0">
+                                <div className="w-14 h-14 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center shrink-0">
                                     {idea.bannerImage ? <img src={idea.bannerImage} className="w-full h-full object-cover" alt="" /> : <ImageIcon className="text-slate-200" />}
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -330,7 +330,7 @@ const BusinessContent = () => {
             {/* Ecosystem Content Modal */}
             {showEcoModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-                    <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                    <div className="bg-white w-full max-w-2xl rounded-lg shadow-2xl overflow-hidden animate-in zoom-in duration-200">
                         <div className="px-8 pt-8 pb-4 flex items-center justify-between border-b border-slate-50">
                             <div>
                                 <h2 className="text-xl font-medium text-slate-900 uppercase tracking-tight">Ecosystem Content</h2>
@@ -338,7 +338,7 @@ const BusinessContent = () => {
                             </div>
                             <button onClick={() => setShowEcoModal(false)} className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400"><X size={20} /></button>
                         </div>
-                        <div className="p-8 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
+                        <div className="p-4 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
                             {ecoData.cards.map((card, idx) => (
                                 <div key={card.id} className="space-y-3">
                                     <div className="flex items-center gap-3">
@@ -364,11 +364,11 @@ const BusinessContent = () => {
                                         }}
                                         rows={5}
                                         placeholder={`Full description for '${card.title}'...`}
-                                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-medium text-slate-600 outline-none resize-none focus:ring-2 focus:ring-indigo-500/20 leading-relaxed"
+                                        className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-4 text-sm font-medium text-slate-600 outline-none resize-none focus:ring-2 focus:ring-indigo-500/20 leading-relaxed"
                                     />
                                 </div>
                             ))}
-                            <button onClick={handleSaveEco} disabled={submitting} className="w-full bg-slate-900 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
+                            <button onClick={handleSaveEco} disabled={submitting} className="w-full bg-slate-900 text-white py-4 rounded-lg font-medium text-[12px] uppercase tracking-normal shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
                                 {submitting ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />} SAVE ECOSYSTEM CONTENT
                             </button>
                         </div>
@@ -379,7 +379,7 @@ const BusinessContent = () => {
             {/* Subscription Settings Modal */}
             {showSettingsModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-                    <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in duration-200 flex h-[85vh]">
+                    <div className="bg-white w-full max-w-4xl rounded-lg shadow-2xl overflow-hidden animate-in zoom-in duration-200 flex h-[85vh]">
                         {/* Sidebar: Plan List */}
                         <div className="w-64 bg-slate-50 border-r border-slate-100 p-4 flex flex-col gap-4 overflow-y-auto">
                             <div className="mb-2">
@@ -389,7 +389,7 @@ const BusinessContent = () => {
                                 <button 
                                     key={idx} 
                                     onClick={() => setActivePlanIdx(idx)}
-                                    className={`w-full text-left p-4 rounded-2xl transition-all flex items-center justify-between group ${activePlanIdx === idx ? 'bg-white shadow-md border border-slate-100 ring-2 ring-indigo-500/20' : 'hover:bg-slate-100'}`}
+                                    className={`w-full text-left p-4 rounded-lg transition-all flex items-center justify-between group ${activePlanIdx === idx ? 'bg-white shadow-md border border-slate-100 ring-2 ring-indigo-500/20' : 'hover:bg-slate-100'}`}
                                 >
                                     <div className="min-w-0">
                                         <p className={`font-medium text-xs truncate ${activePlanIdx === idx ? 'text-indigo-600' : 'text-slate-600'}`}>{plan.title || 'Untitled'}</p>
@@ -400,7 +400,7 @@ const BusinessContent = () => {
                             ))}
                             <button 
                                 onClick={addNewPlan}
-                                className="w-full mt-2 bg-indigo-50 text-indigo-600 p-4 rounded-2xl font-medium text-[10px] uppercase flex items-center justify-center gap-2 border border-indigo-100 border-dashed hover:bg-indigo-100 transition-all"
+                                className="w-full mt-2 bg-indigo-50 text-indigo-600 p-4 rounded-lg font-medium text-[10px] uppercase flex items-center justify-center gap-2 border border-indigo-100 border-dashed hover:bg-indigo-100 transition-all"
                             >
                                 <Plus size={16} /> ADD NEW PLAN
                             </button>
@@ -417,7 +417,7 @@ const BusinessContent = () => {
                             </div>
 
                             {settingsData.businessPlans.length > 0 ? (
-                                <div className="flex-1 overflow-y-auto p-5 space-y-8 custom-scrollbar">
+                                <div className="flex-1 overflow-y-auto p-4 space-y-8 custom-scrollbar">
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-medium text-slate-400 uppercase ml-1">Plan Title</label>
@@ -448,7 +448,7 @@ const BusinessContent = () => {
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             {settingsData.businessPlans[activePlanIdx].benefits.map((benefit, bIdx) => (
-                                                <div key={bIdx} className="bg-slate-50/50 border border-slate-100 p-5 rounded-xl space-y-3 relative group hover:bg-white hover:shadow-lg transition-all border-dashed">
+                                                <div key={bIdx} className="bg-slate-50/50 border border-slate-100 p-4 rounded-xl space-y-3 relative group hover:bg-white hover:shadow-lg transition-all border-dashed">
                                                     <button onClick={() => {
                                                         const newBenefits = settingsData.businessPlans[activePlanIdx].benefits.filter((_, i) => i !== bIdx);
                                                         const newPlans = [...settingsData.businessPlans];
@@ -489,8 +489,8 @@ const BusinessContent = () => {
                                         </div>
                                     </div>
                                     <div className="pt-4 flex justify-between gap-4">
-                                        <button onClick={() => removePlan(activePlanIdx)} className="bg-rose-50 text-rose-500 px-4 py-4 rounded-2xl font-medium text-[10px] uppercase tracking-normal hover:bg-rose-100 transition-all flex items-center gap-2"><Trash2 size={16} /> DELETE PLAN</button>
-                                        <button onClick={handleSaveSettings} disabled={submitting} className="flex-1 bg-slate-900 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
+                                        <button onClick={() => removePlan(activePlanIdx)} className="bg-rose-50 text-rose-500 px-4 py-4 rounded-lg font-medium text-[10px] uppercase tracking-normal hover:bg-rose-100 transition-all flex items-center gap-2"><Trash2 size={16} /> DELETE PLAN</button>
+                                        <button onClick={handleSaveSettings} disabled={submitting} className="flex-1 bg-slate-900 text-white py-4 rounded-lg font-medium text-[12px] uppercase tracking-normal shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
                                             {submitting ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />} SAVE ALL CHANGES
                                         </button>
                                     </div>
@@ -509,7 +509,7 @@ const BusinessContent = () => {
 
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-                    <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
+                    <div className="bg-white w-full max-w-2xl rounded-lg shadow-2xl overflow-hidden animate-in zoom-in duration-200">
                         <div className="px-8 pt-8 pb-4 flex items-center justify-between border-b border-slate-50">
                             <div>
                                 <h2 className="text-xl font-medium text-slate-900 uppercase tracking-tight">{editingId ? 'Update Strategy' : 'Create Strategy'}</h2>
@@ -517,8 +517,8 @@ const BusinessContent = () => {
                             </div>
                             <button onClick={() => setShowModal(false)} className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400"><X size={20} /></button>
                         </div>
-                        <form onSubmit={handleSaveIdea} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <form onSubmit={handleSaveIdea} className="p-4 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Card Banner</label>
                                     <div className="flex gap-4">
@@ -580,25 +580,25 @@ const BusinessContent = () => {
                                         className="w-full bg-indigo-50/30 border border-indigo-100 rounded-xl px-4 py-3 text-sm font-medium outline-none text-indigo-600 placeholder:text-slate-300 focus:ring-2 focus:ring-indigo-500/20"
                                     />
                                 </div>
-                                <div className="md:col-span-2 p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-6">
+                                <div className="md:col-span-2 p-4 bg-slate-50 rounded-lg border border-slate-100 space-y-6">
                                     <h3 className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-2">Business Card Details</h3>
                                     <div className="space-y-4">
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-medium text-emerald-500 uppercase ml-1">How it Works (कैसे करें)</label>
-                                            <textarea value={formData.howItWorks} onChange={(e) => setFormData({...formData, howItWorks: e.target.value})} rows="4" className="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-xs font-medium outline-none focus:ring-2 focus:ring-emerald-500/10 resize-none" placeholder="Explain the process step-by-step..." />
+                                            <textarea value={formData.howItWorks} onChange={(e) => setFormData({...formData, howItWorks: e.target.value})} rows="4" className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-xs font-medium outline-none focus:ring-2 focus:ring-emerald-500/10 resize-none" placeholder="Explain the process step-by-step..." />
                                         </div>
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-medium text-amber-500 uppercase ml-1">Investment Details (इन्वेस्टमेंट)</label>
-                                            <textarea value={formData.investmentDetails} onChange={(e) => setFormData({...formData, investmentDetails: e.target.value})} rows="4" className="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-xs font-medium outline-none focus:ring-2 focus:ring-amber-500/10 resize-none" placeholder="Break down the costs..." />
+                                            <textarea value={formData.investmentDetails} onChange={(e) => setFormData({...formData, investmentDetails: e.target.value})} rows="4" className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-xs font-medium outline-none focus:ring-2 focus:ring-amber-500/10 resize-none" placeholder="Break down the costs..." />
                                         </div>
                                         <div className="space-y-1">
                                             <label className="text-[9px] font-medium text-indigo-500 uppercase ml-1">Profit Details (प्रॉफ़िट)</label>
-                                            <textarea value={formData.profitDetails} onChange={(e) => setFormData({...formData, profitDetails: e.target.value})} rows="4" className="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-500/10 resize-none" placeholder="Explain the potential earnings..." />
+                                            <textarea value={formData.profitDetails} onChange={(e) => setFormData({...formData, profitDetails: e.target.value})} rows="4" className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-xs font-medium outline-none focus:ring-2 focus:ring-indigo-500/10 resize-none" placeholder="Explain the potential earnings..." />
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" disabled={submitting || isUploading} className="w-full bg-slate-900 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
+                            <button type="submit" disabled={submitting || isUploading} className="w-full bg-slate-900 text-white py-4 rounded-lg font-medium text-[12px] uppercase tracking-normal shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all">
                                 {submitting ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />} SAVE STRATEGY
                             </button>
                         </form>

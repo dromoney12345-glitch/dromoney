@@ -164,7 +164,7 @@ const AdminChatSupport = () => {
                             {messages.map((m, i) => (
                                 <div key={i} className={`flex ${m.sender === 'admin' ? 'justify-end' : 'justify-start'}`}>
                                     <div className="flex flex-col max-w-[70%]">
-                                        <div className={`p-4 rounded-2xl text-[13px] font-medium shadow-sm leading-relaxed
+                                        <div className={`p-4 rounded-lg text-[13px] font-medium shadow-sm leading-relaxed
                                             ${m.sender === 'admin' 
                                                 ? 'bg-slate-900 text-white rounded-tr-none' 
                                                 : 'bg-white text-slate-800 rounded-tl-none border border-slate-100'}`}>
@@ -197,7 +197,7 @@ const AdminChatSupport = () => {
                         </form>
                     </>
                 ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                    <div className="flex-1 flex flex-col items-center justify-center text-center p-4">
                         <div className="w-20 h-20 bg-indigo-50 text-indigo-200 rounded-full flex items-center justify-center mb-6">
                             <MessageSquare size={40} />
                         </div>

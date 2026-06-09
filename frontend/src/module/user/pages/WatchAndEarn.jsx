@@ -34,9 +34,19 @@ const WatchAndEarn = () => {
 
         // Expose a function to flutter so it can tell React to refresh after ad is completed
         window.refreshRewardStatus = async () => {
-            showToast("Reward earned! Updating balance...");
+            try {
+                const claimRes = await api.post('/reward/claim');
+                if(claimRes.success) {
+                    showToast("Reward earned! Coins added successfully.");
+                } else {
+                    showToast(claimRes.message || "Could not claim reward.", "error");
+                }
+            } catch (err) {
+                console.error("Claim error:", err);
+                showToast("Failed to verify reward.", "error");
+            }
             await fetchStatus();
-            if (fetchUserData) await fetchUserData(); // Assuming this context method exists to refresh user
+            if (fetchUserData) await fetchUserData(); // Refresh user balance
         };
 
         return () => {

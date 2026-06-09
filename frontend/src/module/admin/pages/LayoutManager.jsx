@@ -189,9 +189,9 @@ const LayoutManager = () => {
     };
 
     return (
-        <div className="p-4 lg:p-8 max-w-7xl mx-auto min-h-screen bg-slate-50/50">
+        <div className="p-4 lg:p-4 max-w-7xl mx-auto min-h-screen bg-slate-50/50">
             {/* Header Area */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-12">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-12">
                 <div className="space-y-1">
                     <h1 className="text-4xl font-medium text-slate-900 tracking-tight uppercase">Layout Manager</h1>
                     <p className="text-[12px] font-medium text-slate-400 uppercase tracking-normal flex items-center gap-2">
@@ -199,15 +199,15 @@ const LayoutManager = () => {
                     </p>
                 </div>
 
-                <div className="bg-white p-1.5 rounded-[22px] border border-slate-100 shadow-sm flex flex-wrap gap-1">
+                <div className="bg-white p-1.5 rounded-lg border border-slate-100 shadow-sm flex flex-wrap gap-1">
                     <button 
                         onClick={() => setActiveTab('navbar')}
-                        className={`px-6 py-3 rounded-[18px] text-[10px] font-medium uppercase tracking-normal transition-all ${activeTab === 'navbar' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>
+                        className={`px-6 py-3 rounded-lg text-[10px] font-medium uppercase tracking-normal transition-all ${activeTab === 'navbar' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>
                         Section Content
                     </button>
                     <button 
                         onClick={() => setActiveTab('footer')}
-                        className={`px-6 py-3 rounded-[18px] text-[10px] font-medium uppercase tracking-normal transition-all ${activeTab === 'footer' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>
+                        className={`px-6 py-3 rounded-lg text-[10px] font-medium uppercase tracking-normal transition-all ${activeTab === 'footer' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>
                         Footer & Policies
                     </button>
                 </div>
@@ -217,10 +217,10 @@ const LayoutManager = () => {
             {activeTab === 'navbar' && (
                 <div className="space-y-12 pb-24 animate-in slide-in-from-bottom-4 duration-500">
                     {navbarSections.map((section, sIdx) => (
-                        <div key={section.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 group overflow-hidden">
-                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10 pb-8 border-b border-slate-50">
+                        <div key={section.id} className="bg-white rounded-lg border border-slate-100 shadow-sm p-4 group overflow-hidden">
+                            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 pb-8 border-b border-slate-50">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-14 h-14 bg-slate-900 text-sky-400 rounded-2xl flex items-center justify-center font-medium text-xl shadow-xl">{section.id}</div>
+                                    <div className="w-14 h-14 bg-slate-900 text-sky-400 rounded-lg flex items-center justify-center font-medium text-xl shadow-xl">{section.id}</div>
                                     <div className="space-y-1">
                                         <input type="text" value={section.label} onChange={(e) => {
                                             const ns = [...navbarSections]; ns[sIdx].label = e.target.value; setNavbarSections(ns);
@@ -232,15 +232,15 @@ const LayoutManager = () => {
                                 </div>
                                 <button 
                                     onClick={() => handleUpdateSection(section)}
-                                    className="flex items-center gap-2 bg-[#0F172A] text-white px-8 py-4 rounded-2xl font-medium text-[11px] uppercase tracking-normal shadow-xl hover:bg-black transition-all"
+                                    className="flex items-center gap-2 bg-[#0F172A] text-white px-8 py-4 rounded-lg font-medium text-[11px] uppercase tracking-normal shadow-xl hover:bg-black transition-all"
                                 >
                                     <Save size={16} /> Update Section
                                 </button>
                             </div>
 
-                            <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide snap-x">
+                            <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x">
                                 {section.steps.map((step, stepIdx) => (
-                                    <div key={stepIdx} className="min-w-[340px] bg-slate-50/50 border border-slate-100 rounded-[36px] p-7 snap-center group/card transition-all hover:bg-white hover:shadow-2xl hover:shadow-slate-100 relative">
+                                    <div key={stepIdx} className="min-w-[340px] bg-slate-50/50 border border-slate-100 rounded-lg p-7 snap-center group/card transition-all hover:bg-white hover:shadow-2xl hover:shadow-slate-100 relative">
                                         <button onClick={() => deleteStep(sIdx, stepIdx)} className="absolute top-6 right-6 w-9 h-9 bg-white text-rose-500 rounded-xl flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-all shadow-sm border border-slate-100">
                                             <Trash2 size={14} />
                                         </button>
@@ -249,19 +249,19 @@ const LayoutManager = () => {
                                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Step {stepIdx + 1} Title</label>
                                                 <input value={step.title} onChange={(e) => {
                                                     const ns = [...navbarSections]; ns[sIdx].steps[stepIdx].title = e.target.value; setNavbarSections(ns);
-                                                }} className="w-full bg-white border border-slate-100 rounded-2xl px-5 py-4 text-[12px] font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-500 shadow-sm" />
+                                                }} className="w-full bg-white border border-slate-100 rounded-lg px-5 py-4 text-[12px] font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-500 shadow-sm" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Instructions (Hindi)</label>
                                                 <textarea value={step.desc} onChange={(e) => {
                                                     const ns = [...navbarSections]; ns[sIdx].steps[stepIdx].desc = e.target.value; setNavbarSections(ns);
-                                                }} className="w-full bg-white border border-slate-100 rounded-2xl px-5 py-4 text-[12px] font-medium text-slate-500 h-28 outline-none focus:ring-2 focus:ring-sky-500 resize-none shadow-sm" />
+                                                }} className="w-full bg-white border border-slate-100 rounded-lg px-5 py-4 text-[12px] font-medium text-slate-500 h-28 outline-none focus:ring-2 focus:ring-sky-500 resize-none shadow-sm" />
                                             </div>
                                         </div>
                                     </div>
                                 ))}
-                                <button onClick={() => addStep(sIdx)} className="min-w-[200px] bg-slate-50/30 border-2 border-dashed border-slate-200 rounded-[36px] flex flex-col items-center justify-center gap-3 hover:border-sky-500 hover:bg-sky-50/50 transition-all text-slate-300 hover:text-sky-500 group/plus">
-                                    <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-lg group-hover/plus:scale-110 transition-transform"><Plus size={24} /></div>
+                                <button onClick={() => addStep(sIdx)} className="min-w-[200px] bg-slate-50/30 border-2 border-dashed border-slate-200 rounded-lg flex flex-col items-center justify-center gap-3 hover:border-sky-500 hover:bg-sky-50/50 transition-all text-slate-300 hover:text-sky-500 group/plus">
+                                    <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center shadow-lg group-hover/plus:scale-110 transition-transform"><Plus size={24} /></div>
                                     <span className="text-[11px] font-medium uppercase tracking-normal">Add New Step</span>
                                 </button>
                             </div>
@@ -273,19 +273,19 @@ const LayoutManager = () => {
             {/* TAB: FOOTER & POLICIES (MERGED) */}
             {activeTab === 'footer' && (
                 <div className="space-y-6 pb-24 animate-in slide-in-from-bottom-4 duration-500">
-                    <div className="grid grid-cols-1 gap-6">
+                    <div className="grid grid-cols-1 gap-4">
                         {footerPolicies.map((item, idx) => (
-                            <div key={item.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden p-5 group">
-                                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-10">
+                            <div key={item.id} className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden p-4 group">
+                                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                                     <div className="flex-1 space-y-6">
                                         <div className="flex items-center gap-4">
-                                            <div className={`p-4 rounded-2xl bg-slate-50 ${item.color}`}><item.icon size={28} /></div>
+                                            <div className={`p-4 rounded-lg bg-slate-50 ${item.color}`}><item.icon size={28} /></div>
                                             <div>
                                                 <h3 className="text-lg font-medium text-slate-800 uppercase tracking-tight">{item.label}</h3>
                                                 <p className="text-[10px] text-slate-400 font-medium uppercase tracking-normal mt-0.5">Edit path and page content</p>
                                             </div>
                                         </div>
-                                        <div className="p-6 bg-slate-50/50 rounded-[28px] border border-slate-50 space-y-4">
+                                        <div className="p-4 bg-slate-50/50 rounded-lg border border-slate-50 space-y-4">
                                             <div>
                                                 <label className="text-[9px] font-medium text-slate-400 uppercase tracking-normal ml-1 mb-2 block">Link Display Label</label>
                                                 <input value={item.label} onChange={(e) => {
@@ -295,7 +295,7 @@ const LayoutManager = () => {
                                         </div>
                                         <button 
                                             onClick={() => handleUpdatePolicy(item)}
-                                            className="lg:flex items-center gap-3 bg-[#0F172A] text-white px-8 py-4 rounded-2xl font-medium text-[11px] uppercase tracking-normal shadow-xl hover:bg-[#1E293B] transition-all w-full justify-center"
+                                            className="lg:flex items-center gap-3 bg-[#0F172A] text-white px-8 py-4 rounded-lg font-medium text-[11px] uppercase tracking-normal shadow-xl hover:bg-[#1E293B] transition-all w-full justify-center"
                                         >
                                             <Save size={16} /> Update {item.label} Data
                                         </button>
@@ -311,7 +311,7 @@ const LayoutManager = () => {
                                             onChange={(e) => {
                                                 const nf = [...footerPolicies]; nf[idx].content = e.target.value; setFooterPolicies(nf);
                                             }}
-                                            className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-5 text-[13px] font-medium text-slate-700 h-[220px] outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all resize-none shadow-inner"
+                                            className="w-full bg-slate-50 border border-slate-100 rounded-lg p-4 text-[13px] font-medium text-slate-700 h-[220px] outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all resize-none shadow-inner"
                                             placeholder={`Write full text for ${item.label}...`}
                                         />
                                     </div>

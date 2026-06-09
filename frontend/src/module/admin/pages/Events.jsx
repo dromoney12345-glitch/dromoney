@@ -39,7 +39,7 @@ const TabBtn = ({ active, onClick, icon: Icon, label }) => (
 );
 
 const Toast = ({ msg, type }) => (
-    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl shadow-xl text-white text-[12px] font-medium uppercase tracking-normal animate-in slide-in-from-bottom-4 duration-300 font-['Poppins'] ${type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`}>
+    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-lg shadow-xl text-white text-[12px] font-medium uppercase tracking-normal animate-in slide-in-from-bottom-4 duration-300 font-['Poppins'] ${type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`}>
         {type === 'success' ? <Check size={16} /> : <AlertCircle size={16} />}
         {msg}
     </div>
@@ -84,7 +84,7 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast }) => {
                 const isEditing = editingId === event.id;
 
                 return (
-                    <div key={event.id} className="bg-white rounded-[1.5rem] border border-slate-100 shadow-sm p-5 hover:shadow-md transition-shadow relative group font-['Poppins']">
+                    <div key={event.id} className="bg-white rounded-lg border border-slate-100 shadow-sm p-4 hover:shadow-md transition-shadow relative group font-['Poppins']">
                         {/* Delete Button on Hover */}
                         <button
                             onClick={() => {
@@ -332,7 +332,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
 
             {/* Quiz Content */}
             {sel.tag === 'Quiz' && (
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 animate-in fade-in font-['Poppins']">
+                <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-4 animate-in fade-in font-['Poppins']">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-[15px] font-medium text-slate-800 font-['Poppins']">Quiz Questions ({questions.length})</h3>
                         <div className="flex gap-2">
@@ -346,7 +346,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
                     </div>
                     <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
                         {questions.map((q, qIdx) => (
-                            <div key={q.id || qIdx} className="bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-3 animate-in fade-in duration-300">
+                            <div key={q.id || qIdx} className="bg-slate-50 border border-slate-100 rounded-lg p-4 space-y-3 animate-in fade-in duration-300">
                                 <div className="flex items-start gap-3">
                                     <span className="w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-[10px] font-medium shrink-0 mt-0.5">{qIdx + 1}</span>
                                     <input
@@ -383,7 +383,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
 
             {/* Lucky Draw Content */}
             {sel.tag === 'Draw' && (
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 animate-in fade-in font-['Poppins']">
+                <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-4 animate-in fade-in font-['Poppins']">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-[15px] font-medium text-slate-800 font-['Poppins']">Draw Prizes ({prizes.length})</h3>
                         <div className="flex gap-2">
@@ -420,7 +420,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
 
             {/* Memory Master Content */}
             {sel.tag === 'Brain' && (
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 animate-in fade-in font-['Poppins']">
+                <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-4 animate-in fade-in font-['Poppins']">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-[15px] font-medium text-slate-800 font-['Poppins']">Card Symbols ({cards.length})</h3>
                         <div className="flex items-center gap-3">
@@ -440,7 +440,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-1">
                         {cards.map((c, idx) => (
-                            <div key={c.id || idx} className="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-2xl p-4 animate-in fade-in duration-350">
+                            <div key={c.id || idx} className="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-lg p-4 animate-in fade-in duration-350">
                                 <div className={`w-12 h-12 bg-white rounded-xl border border-slate-200 flex items-center justify-center ${c.color} shadow-sm`}>
                                     <Sparkles size={20} />
                                 </div>
@@ -458,7 +458,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
                         ))}
                     </div>
 
-                    <div className="mt-6 p-4 bg-indigo-50 rounded-2xl border border-indigo-100 flex items-center gap-3">
+                    <div className="mt-6 p-4 bg-indigo-50 rounded-lg border border-indigo-100 flex items-center gap-3">
                         <AlertCircle size={18} className="text-indigo-500" />
                         <p className="text-[11px] font-medium text-indigo-700">Memory Master requires 6 pairs. Icons must be valid Lucide icon names.</p>
                     </div>
@@ -604,7 +604,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
             </div>
 
             {/* Filter Controls */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-100 flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
+            <div className="bg-white p-4 rounded-lg border border-slate-100 flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
                 <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mr-2 ml-1">Filter:</span>
                     <select
@@ -664,7 +664,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                         icon: Trophy 
                     },
                 ].map(s => (
-                    <div key={s.label} className={`${s.bg} rounded-2xl p-4 flex items-center justify-between border border-white shadow-sm`}>
+                    <div key={s.label} className={`${s.bg} rounded-lg p-4 flex items-center justify-between border border-white shadow-sm`}>
                          <div className="p-3 rounded-xl bg-white/50">
                             <s.icon size={20} className={s.color} />
                         </div>
@@ -678,10 +678,10 @@ const ParticipantsTab = ({ events, onShowToast }) => {
 
             {/* Winner Spotlight Card */}
             {fastestParticipant && (
-                <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 rounded-xl p-5 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 border border-orange-400 relative overflow-hidden">
+                <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 rounded-xl p-4 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 border border-orange-400 relative overflow-hidden">
                     <div className="absolute right-0 top-0 translate-x-1/4 -translate-y-1/4 opacity-10 text-[120px] select-none pointer-events-none">🏆</div>
                     <div className="flex items-center gap-4 relative z-10">
-                        <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white text-xl font-medium shrink-0 shadow-inner">
+                        <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-lg flex items-center justify-center text-white text-xl font-medium shrink-0 shadow-inner">
                             🏅
                         </div>
                         <div className="text-left">
@@ -716,7 +716,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
             )}
 
             {/* Participants Table */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
+            <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
                 <div className="p-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
                     <div className="flex items-center gap-2">
                         <Users size={16} className="text-slate-400" />
@@ -753,7 +753,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
 
                 {sortedParticipants.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24 text-slate-300">
-                        <div className="p-6 bg-slate-50 rounded-full mb-4">
+                        <div className="p-4 bg-slate-50 rounded-full mb-4">
                             <Users size={48} strokeWidth={1} />
                         </div>
                         <p className="text-[11px] font-medium uppercase tracking-normal mb-1">No matching participants</p>
@@ -770,7 +770,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                         className={`flex items-center p-4 hover:bg-slate-50 cursor-pointer transition-colors ${p.prizeStatus === 'Awarded' ? 'bg-emerald-50/10' : ''}`}
                                     >
                                         {/* Avatar */}
-                                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white font-medium text-sm mr-4 shrink-0 shadow-sm ${p.prizeStatus === 'Awarded' ? 'bg-gradient-to-br from-amber-400 to-orange-500' : isFastest ? 'bg-gradient-to-br from-rose-500 to-amber-500 animate-pulse' : 'bg-gradient-to-br from-slate-400 to-slate-600'}`}>
+                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white font-medium text-sm mr-4 shrink-0 shadow-sm ${p.prizeStatus === 'Awarded' ? 'bg-gradient-to-br from-amber-400 to-orange-500' : isFastest ? 'bg-gradient-to-br from-rose-500 to-amber-500 animate-pulse' : 'bg-gradient-to-br from-slate-400 to-slate-600'}`}>
                                             {p.prizeStatus === 'Awarded' ? <Award size={18} /> : isFastest ? <Trophy size={18} className="text-white fill-white" /> : (p.name || 'U')[0].toUpperCase()}
                                         </div>
                                         
@@ -805,7 +805,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                         </div>
 
                                         {/* Prize & Status */}
-                                        <div className="flex items-center gap-6 pr-2">
+                                        <div className="flex items-center gap-4 pr-2">
                                             <div className="text-right hidden sm:block">
                                                 <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mb-0.5">Prize Won</p>
                                                 <p className="text-[13px] font-medium text-amber-600">{p.prize || 'No Prize'}</p>
@@ -829,7 +829,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
 
                                     {/* Award Awarding UI */}
                                     {awardingId === p.id && (
-                                        <div className="mx-4 mb-4 bg-slate-50 border border-sky-200 rounded-2xl p-4 flex flex-col gap-3 animate-in slide-in-from-top-2 duration-300">
+                                        <div className="mx-4 mb-4 bg-slate-50 border border-sky-200 rounded-lg p-4 flex flex-col gap-3 animate-in slide-in-from-top-2 duration-300">
                                             <div className="flex items-center justify-between">
                                                 <p className="text-[10px] font-medium text-sky-600 uppercase tracking-normal">Award Prize to {p.name}</p>
                                                 <button onClick={() => setAwardingId(null)}>
@@ -862,13 +862,13 @@ const ParticipantsTab = ({ events, onShowToast }) => {
             {/* Participant Detail Modal */}
             {viewingParticipant && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
-                        <div className="p-8 relative">
+                    <div className="bg-white w-full max-w-lg rounded-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+                        <div className="p-4 relative">
                             <button onClick={() => setViewingParticipant(null)} className="absolute top-6 right-6 p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors">
                                 <X size={20} />
                             </button>
 
-                            <div className="flex items-center gap-6 mb-8">
+                            <div className="flex items-center gap-4 mb-5">
                                 <div className="w-20 h-20 bg-gradient-to-br from-sky-400 to-blue-600 rounded-xl flex items-center justify-center text-white text-3xl font-medium shadow-xl shadow-sky-100">
                                     {(viewingParticipant.name || 'U')[0].toUpperCase()}
                                 </div>
@@ -881,18 +881,18 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-3 mb-8">
-                                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex flex-col justify-center">
+                            <div className="grid grid-cols-3 gap-3 mb-5">
+                                <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex flex-col justify-center">
                                     <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mb-1 text-center">Performance</p>
                                     <p className="text-sm font-medium text-slate-800 text-center">{viewingParticipant.result || 'No Result'}</p>
                                 </div>
-                                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex flex-col justify-center">
+                                <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex flex-col justify-center">
                                     <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mb-1 text-center">Completion Time</p>
                                     <p className="text-sm font-medium text-slate-800 text-center">
                                         {viewingParticipant.timeTaken !== undefined && viewingParticipant.timeTaken !== null ? `${viewingParticipant.timeTaken}s` : 'N/A'}
                                     </p>
                                 </div>
-                                <div className="bg-amber-50 p-3 rounded-2xl border border-amber-100 flex flex-col justify-center">
+                                <div className="bg-amber-50 p-3 rounded-lg border border-amber-100 flex flex-col justify-center">
                                     <p className="text-[9px] font-medium text-amber-500 uppercase tracking-normal mb-1 text-center">Reward Status</p>
                                     <p className="text-sm font-medium text-amber-700 text-center">{viewingParticipant.prize || 'Claimable'}</p>
                                 </div>
@@ -919,12 +919,12 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                             {viewingParticipant.prizeStatus !== 'Awarded' ? (
                                 <button
                                     onClick={() => { setAwardingId(viewingParticipant.id); setViewingParticipant(null); }}
-                                    className="w-full mt-8 bg-sky-500 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-xl shadow-sky-200 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                    className="w-full mt-5 bg-sky-500 text-white py-4 rounded-lg font-medium text-[12px] uppercase tracking-normal shadow-xl shadow-sky-200 active:scale-95 transition-all flex items-center justify-center gap-2"
                                 >
                                     <Award size={18} /> Award Prize Now
                                 </button>
                             ) : (
-                                <div className="mt-8 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3">
+                                <div className="mt-5 p-4 bg-emerald-50 border border-emerald-100 rounded-lg flex items-center gap-3">
                                     <CheckCircle className="text-emerald-500" size={20} />
                                     <div>
                                         <p className="text-[11px] font-medium text-emerald-800 uppercase">Prize Awarded</p>
@@ -1071,21 +1071,21 @@ const EventsAdmin = () => {
     };
 
     return (
-        <div className="p-6 animate-in fade-in duration-500 font-['Poppins']">
+        <div className="p-4 animate-in fade-in duration-500 font-['Poppins']">
             {toast && <Toast msg={toast.msg} type={toast.type} />}
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <PageHeader title="Events & Contests" subtitle="Manage live events, content, and participants" />
                 <button
                     onClick={() => setIsAddModalOpen(true)}
-                    className="flex items-center gap-2 px-5 py-3 bg-sky-500 text-white rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-lg shadow-sky-200 hover:bg-sky-600 active:scale-95 transition-all font-['Poppins']"
+                    className="flex items-center gap-2 px-5 py-3 bg-sky-500 text-white rounded-lg font-medium text-[12px] uppercase tracking-normal shadow-lg shadow-sky-200 hover:bg-sky-600 active:scale-95 transition-all font-['Poppins']"
                 >
                     <Plus size={16} /> Add Event
                 </button>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-8 mt-2 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm w-fit">
+            <div className="flex gap-2 mb-5 mt-2 bg-white p-2 rounded-lg border border-slate-100 shadow-sm w-fit">
                 <TabBtn active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} icon={Trophy} label="Events" />
                 <TabBtn active={activeTab === 'content'} onClick={() => setActiveTab('content')} icon={Edit3} label="Content Editor" />
                 <TabBtn active={activeTab === 'participants'} onClick={() => setActiveTab('participants')} icon={Users} label="Participants" />
@@ -1112,8 +1112,8 @@ const EventsAdmin = () => {
             {/* Add Event Modal */}
             {isAddModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-md rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 font-['Poppins']">
-                        <form onSubmit={handleAddEvent} className="p-8 relative space-y-6 font-['Poppins']">
+                    <div className="bg-white w-full max-w-md rounded-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 font-['Poppins']">
+                        <form onSubmit={handleAddEvent} className="p-4 relative space-y-6 font-['Poppins']">
                             <button type="button" onClick={() => setIsAddModalOpen(false)} className="absolute top-6 right-6 p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors">
                                 <X size={20} />
                             </button>
@@ -1203,7 +1203,7 @@ const EventsAdmin = () => {
                             <button
                                 type="submit"
                                 disabled={createLoading}
-                                className="w-full bg-sky-500 disabled:bg-sky-300 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-xl shadow-sky-200 hover:bg-sky-600 active:scale-95 transition-all flex items-center justify-center gap-2 font-['Poppins']"
+                                className="w-full bg-sky-500 disabled:bg-sky-300 text-white py-4 rounded-lg font-medium text-[12px] uppercase tracking-normal shadow-xl shadow-sky-200 hover:bg-sky-600 active:scale-95 transition-all flex items-center justify-center gap-2 font-['Poppins']"
                             >
                                 {createLoading ? (
                                     <>

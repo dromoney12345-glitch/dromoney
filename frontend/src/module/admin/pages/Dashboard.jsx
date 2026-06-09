@@ -187,7 +187,7 @@ const Dashboard = () => {
         <div className="p-4 space-y-5 animate-in fade-in duration-700 bg-[#f9f6f1] min-h-screen pb-20 overflow-x-hidden">
             
             {/* ── HEADER & LIVE STATUS ── */}
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                     <div className="bg-slate-900 p-3 rounded-xl shadow-xl text-white transform -rotate-3 hover:rotate-0 transition-transform duration-500">
                         <BarChart3 size={24} strokeWidth={2.5} />
@@ -281,10 +281,10 @@ const Dashboard = () => {
             </div>
 
             {/* ── SECOND LAYER: FUNNEL & FRAUD ── */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
                 
                 {/* Conversion Funnel */}
-                <div className="bg-white rounded-xl p-5 shadow-sm relative overflow-hidden border border-slate-100 group">
+                <div className="bg-white rounded-xl p-4 shadow-sm relative overflow-hidden border border-slate-100 group">
                     <div className="flex items-center justify-between mb-5">
                         <div>
                             <h2 className="text-[14px] font-medium uppercase tracking-tight flex items-center gap-2 text-slate-900"><Filter size={14} className="text-indigo-500" /> Conversion Funnel</h2>
@@ -313,7 +313,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Notifications & Alerts */}
-                <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 flex flex-col group h-[300px] overflow-hidden">
+                <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4 flex flex-col group h-[300px] overflow-hidden">
                     <div className="flex items-center justify-between mb-5">
                         <div>
                             <h2 className="text-[14px] font-medium text-slate-900 tracking-tight uppercase flex items-center gap-2"><Bell size={14} className="text-amber-500" /> Notifications & Alerts</h2>
@@ -355,10 +355,10 @@ const Dashboard = () => {
             </div>
 
             {/* ── THIRD LAYER: ENGAGEMENT & HEALTH ── */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
                 
                 {/* Engagement Graph */}
-                <div className="xl:col-span-2 bg-white rounded-xl border border-slate-100 shadow-sm p-5 group relative overflow-hidden">
+                <div className="xl:col-span-2 bg-white rounded-xl border border-slate-100 shadow-sm p-4 group relative overflow-hidden">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 mb-6 relative z-10">
                         <div>
                             <h2 className="text-[14px] font-medium text-slate-900 tracking-tight uppercase flex items-center gap-2"><BarChart3 size={16} className="text-indigo-500" /> Engagement Matrix</h2>
@@ -472,7 +472,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Broadcast Center */}
-                <div className="bg-white rounded-xl p-5 shadow-sm flex flex-col h-full relative overflow-hidden group border border-slate-100">
+                <div className="bg-white rounded-xl p-4 shadow-sm flex flex-col h-full relative overflow-hidden group border border-slate-100">
                      <div className="flex items-center gap-3 mb-5">
                         <div className="w-9 h-9 bg-[#FDF2D0] rounded-lg flex items-center justify-center text-[#856404] shadow-sm border border-[#F9E9B8] group-hover:scale-110 transition-transform"><Send size={16} /></div>
                         <div>
@@ -513,7 +513,7 @@ const Dashboard = () => {
             </div>
 
             {/* ── FOURTH LAYER: VERIFICATION ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                 
                 {/* Verification Queue Redesign */}
                 <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden flex flex-col group">

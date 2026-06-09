@@ -114,9 +114,9 @@ const DocumentsCMS = () => {
     }
 
     return (
-        <div className="p-4 lg:p-8 max-w-7xl mx-auto min-h-screen bg-slate-50/50">
+        <div className="p-4 lg:p-4 max-w-7xl mx-auto min-h-screen bg-slate-50/50">
             {/* Header Area */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-12">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-12">
                 <div className="space-y-1">
                     <h1 className="text-4xl font-medium text-slate-900 tracking-tight uppercase">Guidelines & Docs</h1>
                     <p className="text-[12px] font-medium text-slate-400 uppercase tracking-normal flex items-center gap-2">
@@ -125,11 +125,11 @@ const DocumentsCMS = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 pb-24">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 pb-24">
                 {/* Course Editor Panel */}
                 <div className="space-y-6">
                     {/* Course Pages Sub-Tabs */}
-                    <div className="flex gap-2 mb-4 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm w-fit">
+                    <div className="flex gap-2 mb-4 bg-white p-2 rounded-lg border border-slate-100 shadow-sm w-fit">
                         {[1, 2, 3].map((pNum) => (
                             <button
                                 key={pNum}
@@ -142,10 +142,10 @@ const DocumentsCMS = () => {
                     </div>
 
                     {/* Editor Block */}
-                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-                        <div className="flex items-center justify-between mb-8 border-b border-slate-50 pb-6">
+                    <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-4">
+                        <div className="flex items-center justify-between mb-5 border-b border-slate-50 pb-6">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-sky-50 text-sky-500 rounded-2xl flex items-center justify-center"><Award size={24} /></div>
+                                <div className="w-12 h-12 bg-sky-50 text-sky-500 rounded-lg flex items-center justify-center"><Award size={24} /></div>
                                 <div>
                                     <h3 className="text-lg font-medium text-slate-800 tracking-tight uppercase">Onboarding Course Editor</h3>
                                     <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal">Page {activeCoursePage} Content</p>
@@ -161,26 +161,26 @@ const DocumentsCMS = () => {
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Page Title (Hindi)</label>
                                     <input value={courseData.page1.title || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page1.title = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-4 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Introductory Text (Hindi)</label>
                                     <textarea value={courseData.page1.intro || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page1.intro = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-medium text-slate-500 h-28 outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
+                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-4 text-[13px] font-medium text-slate-500 h-28 outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Methods Section Heading (Hindi)</label>
                                     <input value={courseData.page1.methodsTitle || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page1.methodsTitle = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-4 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                 </div>
 
                                 {/* Earning Methods List */}
                                 <div className="space-y-4 pt-4 border-t border-slate-50">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Earning Methods</label>
                                     {courseData.page1.methods?.map((method, mIdx) => (
-                                        <div key={mIdx} className="bg-slate-50 rounded-xl p-5 border border-slate-100 relative space-y-3">
+                                        <div key={mIdx} className="bg-slate-50 rounded-xl p-4 border border-slate-100 relative space-y-3">
                                             <button onClick={() => {
                                                 const nd = JSON.parse(JSON.stringify(courseData)); nd.page1.methods.splice(mIdx, 1); setCourseData(nd);
                                             }} className="absolute top-4 right-4 text-rose-400 hover:text-rose-600"><Trash2 size={16} /></button>
@@ -216,7 +216,7 @@ const DocumentsCMS = () => {
                                         if (!nd.page1.methods) nd.page1.methods = [];
                                         nd.page1.methods.push({ title: 'New Method Title', points: ['Point 1 details...'] });
                                         setCourseData(nd);
-                                    }} className="w-full py-3.5 border-2 border-dashed border-slate-200 rounded-2xl text-[11px] font-medium uppercase tracking-normal text-slate-400 hover:text-sky-500 hover:border-sky-300 transition-all">+ Add Earning Method</button>
+                                    }} className="w-full py-3.5 border-2 border-dashed border-slate-200 rounded-lg text-[11px] font-medium uppercase tracking-normal text-slate-400 hover:text-sky-500 hover:border-sky-300 transition-all">+ Add Earning Method</button>
                                 </div>
                             </div>
                         )}
@@ -228,11 +228,11 @@ const DocumentsCMS = () => {
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Page Title (Hindi)</label>
                                     <input value={courseData.page2.title || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page2.title = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-4 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                 </div>
 
                                 {/* Download Assets Config */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-sky-50/40 rounded-xl border border-sky-100/60 shadow-sm">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-sky-50/40 rounded-xl border border-sky-100/60 shadow-sm">
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between">
                                             <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Brand Logo URL</label>
@@ -288,7 +288,7 @@ const DocumentsCMS = () => {
                                 <div className="space-y-4 pt-4 border-t border-slate-50">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Steps list (Timeline)</label>
                                     {courseData.page2.steps?.map((step, sIdx) => (
-                                        <div key={sIdx} className="bg-slate-50 rounded-xl p-5 border border-slate-100 relative space-y-3">
+                                        <div key={sIdx} className="bg-slate-50 rounded-xl p-4 border border-slate-100 relative space-y-3">
                                             <button onClick={() => {
                                                 const nd = JSON.parse(JSON.stringify(courseData)); nd.page2.steps.splice(sIdx, 1); setCourseData(nd);
                                             }} className="absolute top-4 right-4 text-rose-400 hover:text-rose-600"><Trash2 size={16} /></button>
@@ -311,14 +311,14 @@ const DocumentsCMS = () => {
                                         if (!nd.page2.steps) nd.page2.steps = [];
                                         nd.page2.steps.push({ stepNum: `🔥 stap ${nd.page2.steps.length + 1}`, title: 'New Promotion Setup Step', details: 'Details...' });
                                         setCourseData(nd);
-                                    }} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-2xl text-[10px] font-medium uppercase tracking-normal text-slate-400 hover:text-sky-500 hover:border-sky-300 transition-all">+ Add Setup Step</button>
+                                    }} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-lg text-[10px] font-medium uppercase tracking-normal text-slate-400 hover:text-sky-500 hover:border-sky-300 transition-all">+ Add Setup Step</button>
                                 </div>
 
                                 {/* Ready templates list */}
                                 <div className="space-y-4 pt-4 border-t border-slate-50">
                                     <input value={courseData.page2.templatesTitle || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page2.templatesTitle = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-500" />
+                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-4 text-[13px] font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-500" />
                                     
                                     {courseData.page2.templates?.map((template, tIdx) => (
                                         <div key={tIdx} className="flex gap-2">
@@ -335,18 +335,18 @@ const DocumentsCMS = () => {
                                         if (!nd.page2.templates) nd.page2.templates = [];
                                         nd.page2.templates.push('🔥 New Template Description here...\n\nLink: [Your Link]');
                                         setCourseData(nd);
-                                    }} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-2xl text-[10px] font-medium uppercase tracking-normal text-slate-400 hover:text-sky-500 hover:border-sky-300 transition-all">+ Add Ready Template</button>
+                                    }} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-lg text-[10px] font-medium uppercase tracking-normal text-slate-400 hover:text-sky-500 hover:border-sky-300 transition-all">+ Add Ready Template</button>
                                 </div>
 
                                 {/* Calling Step 5 */}
-                                <div className="space-y-4 pt-4 border-t border-slate-50 p-5 bg-orange-50/20 rounded-xl border border-orange-100/50">
+                                <div className="space-y-4 pt-4 border-t border-slate-50 p-4 bg-orange-50/20 rounded-xl border border-orange-100/50">
                                     <label className="text-[10px] font-medium text-orange-600 uppercase tracking-normal ml-1">Step 5: Calling Script block</label>
                                     <input value={courseData.page2.step5Title || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page2.step5Title = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-[13px] font-medium text-slate-800 outline-none" />
+                                    }} className="w-full bg-white border border-slate-200 rounded-lg px-5 py-4 text-[13px] font-medium text-slate-800 outline-none" />
                                     <textarea value={courseData.page2.step5Details || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page2.step5Details = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-[12px] font-medium text-slate-500 h-20 outline-none resize-none" />
+                                    }} className="w-full bg-white border border-slate-200 rounded-lg px-5 py-4 text-[12px] font-medium text-slate-500 h-20 outline-none resize-none" />
                                 </div>
                             </div>
                         )}
@@ -358,14 +358,14 @@ const DocumentsCMS = () => {
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Page Title (Hindi)</label>
                                     <input value={courseData.page3.title || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page3.title = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-4 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                 </div>
 
                                 {/* Daily Plan List */}
                                 <div className="space-y-4 pt-4 border-t border-slate-50">
                                     <input value={courseData.page3.dailyPlanTitle || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page3.dailyPlanTitle = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-500" />
+                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-4 text-[13px] font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-500" />
                                     
                                     {courseData.page3.dailyPlans?.map((plan, idx) => (
                                         <div key={idx} className="flex gap-2">
@@ -382,14 +382,14 @@ const DocumentsCMS = () => {
                                         if (!nd.page3.dailyPlans) nd.page3.dailyPlans = [];
                                         nd.page3.dailyPlans.push('New daily task point...');
                                         setCourseData(nd);
-                                    }} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-2xl text-[10px] font-medium uppercase tracking-normal text-slate-400 hover:text-sky-500 hover:border-sky-300 transition-all">+ Add Daily Task Point</button>
+                                    }} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-lg text-[10px] font-medium uppercase tracking-normal text-slate-400 hover:text-sky-500 hover:border-sky-300 transition-all">+ Add Daily Task Point</button>
                                 </div>
 
                                 {/* Examples Block */}
                                 <div className="space-y-4 pt-4 border-t border-slate-50">
                                     <input value={courseData.page3.exampleTitle || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page3.exampleTitle = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-medium text-slate-800 outline-none" />
+                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-4 text-[13px] font-medium text-slate-800 outline-none" />
                                     
                                     {courseData.page3.examples?.map((ex, idx) => (
                                         <div key={idx} className="flex gap-2">
@@ -406,14 +406,14 @@ const DocumentsCMS = () => {
                                         if (!nd.page3.examples) nd.page3.examples = [];
                                         nd.page3.examples.push('➡️New Example equation...');
                                         setCourseData(nd);
-                                    }} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-2xl text-[10px] font-medium uppercase tracking-normal text-slate-400 hover:text-sky-500 hover:border-sky-300 transition-all">+ Add Example Equation</button>
+                                    }} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-lg text-[10px] font-medium uppercase tracking-normal text-slate-400 hover:text-sky-500 hover:border-sky-300 transition-all">+ Add Example Equation</button>
                                 </div>
 
                                 {/* Important Rules */}
                                 <div className="space-y-4 pt-4 border-t border-slate-50">
                                     <input value={courseData.page3.rulesTitle || ''} onChange={(e) => {
                                         const nd = JSON.parse(JSON.stringify(courseData)); nd.page3.rulesTitle = e.target.value; setCourseData(nd);
-                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-medium text-slate-800 outline-none" />
+                                    }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-4 text-[13px] font-medium text-slate-800 outline-none" />
                                     
                                     {courseData.page3.rules?.map((rule, idx) => (
                                         <div key={idx} className="flex gap-2">
@@ -430,7 +430,7 @@ const DocumentsCMS = () => {
                                         if (!nd.page3.rules) nd.page3.rules = [];
                                         nd.page3.rules.push('Rule description in Hindi...');
                                         setCourseData(nd);
-                                    }} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-2xl text-[10px] font-medium uppercase tracking-normal text-slate-400 hover:text-sky-500 hover:border-sky-300 transition-all">+ Add Rule</button>
+                                    }} className="w-full py-3 border-2 border-dashed border-slate-200 rounded-lg text-[10px] font-medium uppercase tracking-normal text-slate-400 hover:text-sky-500 hover:border-sky-300 transition-all">+ Add Rule</button>
                                 </div>
                             </div>
                         )}
@@ -441,13 +441,13 @@ const DocumentsCMS = () => {
                 <div className="space-y-4">
                     <h4 className="text-[11px] font-medium text-slate-400 uppercase tracking-normal ml-4 flex items-center gap-2">User Course View Preview <ChevronRight size={12} /></h4>
                     
-                    <div className="bg-slate-100 rounded-2xl p-4 border-8 border-slate-200 shadow-2xl relative h-[720px] overflow-hidden flex flex-col scale-95 origin-top">
+                    <div className="bg-slate-100 rounded-lg p-4 border-8 border-slate-200 shadow-2xl relative h-[720px] overflow-hidden flex flex-col scale-95 origin-top">
                         {/* Emulated Notch */}
                         <div className="absolute top-4 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-3xl z-50"></div>
                         
-                        <div className="flex-1 bg-white rounded-2xl overflow-hidden flex flex-col relative shadow-inner">
+                        <div className="flex-1 bg-white rounded-lg overflow-hidden flex flex-col relative shadow-inner">
                             {/* Header */}
-                            <div className="p-5 bg-slate-900 text-white flex justify-between items-center shrink-0 pt-7">
+                            <div className="p-4 bg-slate-900 text-white flex justify-between items-center shrink-0 pt-7">
                                 <div>
                                     <span className="text-[8px] font-medium text-sky-400 uppercase tracking-normal">Dromoney Onboarding</span>
                                     <h1 className="text-md font-medium tracking-tight leading-none mt-1">Earning Guide (Page {activeCoursePage}/3)</h1>
@@ -458,13 +458,13 @@ const DocumentsCMS = () => {
                             </div>
 
                             {/* Body Content */}
-                            <div className="flex-1 p-5 overflow-y-auto space-y-5 bg-slate-50 custom-scrollbar pb-16">
+                            <div className="flex-1 p-4 overflow-y-auto space-y-5 bg-slate-50 custom-scrollbar pb-16">
                                 {activeCoursePage === 1 && (
                                     <div className="space-y-4">
                                         <h2 className="text-md font-medium text-slate-800 leading-snug">{courseData.page1.title}</h2>
                                         <p className="text-[11px] font-medium text-slate-500 leading-relaxed whitespace-pre-wrap">{courseData.page1.intro}</p>
                                         
-                                        <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm space-y-4">
+                                        <div className="bg-white rounded-lg border border-slate-100 p-4 shadow-sm space-y-4">
                                             <h3 className="text-[11px] font-medium text-slate-700 uppercase tracking-tight">{courseData.page1.methodsTitle}</h3>
                                             {courseData.page1.methods?.map((m, idx) => (
                                                 <div key={idx} className="space-y-1 pb-2 border-b border-slate-50 last:border-none">
@@ -485,7 +485,7 @@ const DocumentsCMS = () => {
                                         {/* Steps list */}
                                         <div className="space-y-3">
                                             {courseData.page2.steps?.map((step, idx) => (
-                                                <div key={idx} className="bg-white rounded-2xl border border-slate-100 p-3.5 shadow-sm space-y-1">
+                                                <div key={idx} className="bg-white rounded-lg border border-slate-100 p-3.5 shadow-sm space-y-1">
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-[10px] font-medium text-orange-500 uppercase tracking-normal">{step.stepNum}</span>
                                                         <h3 className="text-[11px] font-medium text-slate-800">{step.title}</h3>
@@ -502,7 +502,7 @@ const DocumentsCMS = () => {
                                         </div>
 
                                         {/* Step 5 */}
-                                        <div className="bg-amber-50 rounded-2xl border border-amber-100 p-4 space-y-2">
+                                        <div className="bg-amber-50 rounded-lg border border-amber-100 p-4 space-y-2">
                                             <h3 className="text-[11px] font-medium text-amber-800 flex items-center gap-1"><AlertTriangle size={12} /> {courseData.page2.step5Title}</h3>
                                             <p className="text-[10px] font-medium text-slate-600 leading-relaxed">{courseData.page2.step5Details}</p>
                                             <button className="w-full py-2 bg-amber-600 text-white rounded-lg font-medium text-[9px] uppercase tracking-normal flex items-center justify-center gap-1">
@@ -528,7 +528,7 @@ const DocumentsCMS = () => {
                                         <h2 className="text-md font-medium text-slate-800 leading-snug">{courseData.page3.title}</h2>
                                         
                                         {/* Daily Plan */}
-                                        <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm space-y-2">
+                                        <div className="bg-white rounded-lg border border-slate-100 p-4 shadow-sm space-y-2">
                                             <h3 className="text-[11px] font-medium text-slate-700 uppercase tracking-tight">{courseData.page3.dailyPlanTitle}</h3>
                                             {courseData.page3.dailyPlans?.map((p, idx) => (
                                                 <div key={idx} className="flex items-center gap-2">
@@ -539,7 +539,7 @@ const DocumentsCMS = () => {
                                         </div>
 
                                         {/* Example */}
-                                        <div className="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-2xl p-4 shadow-md text-white space-y-2 relative overflow-hidden">
+                                        <div className="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-lg p-4 shadow-md text-white space-y-2 relative overflow-hidden">
                                             <div className="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-lg"></div>
                                             <h3 className="text-[11px] font-medium text-sky-400 uppercase tracking-tight">{courseData.page3.exampleTitle}</h3>
                                             {courseData.page3.examples?.map((ex, idx) => (
@@ -548,7 +548,7 @@ const DocumentsCMS = () => {
                                         </div>
 
                                         {/* Rules */}
-                                        <div className="bg-rose-50/50 rounded-2xl border border-rose-100 p-4 space-y-2">
+                                        <div className="bg-rose-50/50 rounded-lg border border-rose-100 p-4 space-y-2">
                                             <h3 className="text-[11px] font-medium text-rose-800 flex items-center gap-1 uppercase tracking-tight"><AlertCircle size={12} /> {courseData.page3.rulesTitle}</h3>
                                             {courseData.page3.rules?.map((rule, idx) => (
                                                 <p key={idx} className="text-[10px] font-medium text-slate-600 leading-tight">🛑 {rule}</p>

@@ -94,7 +94,7 @@ const Notifications = () => {
     };
 
     return (
-        <div className="p-6 animate-in fade-in duration-500 relative">
+        <div className="p-4 animate-in fade-in duration-500 relative">
             {toast && (
                 <div className={`fixed top-5 right-5 z-[9999] flex items-center gap-3 px-5 py-3.5 rounded-xl border shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300 ${
                     toast.type === 'success' 
@@ -111,9 +111,9 @@ const Notifications = () => {
             )}
             <PageHeader title="Notifications" subtitle="Broadcast messages to all platform users" />
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 {/* Compose */}
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+                <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-4">
                     <h2 className="text-sm font-medium text-slate-800 uppercase tracking-normal mb-5 flex items-center gap-2">
                         <Bell size={16} className="text-sky-500" /> Compose Message
                     </h2>
@@ -145,7 +145,7 @@ const Notifications = () => {
                 </div>
 
                 {/* History */}
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+                <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden flex flex-col">
                     <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/20">
                         <h2 className="text-sm font-medium text-slate-800 uppercase tracking-normal flex items-center gap-2">
                             <HistoryIcon size={16} className="text-slate-400" /> Broadcast History
@@ -162,7 +162,7 @@ const Notifications = () => {
                     </div>
                     <div className="divide-y divide-slate-50 max-h-[600px] overflow-y-auto custom-scrollbar">
                         {history.length > 0 ? history.map((n) => (
-                            <div key={n._id} className="p-8 hover:bg-slate-50/60 transition-all group/item border-l-4 border-l-sky-200 hover:border-l-sky-400">
+                            <div key={n._id} className="p-4 hover:bg-slate-50/60 transition-all group/item border-l-4 border-l-sky-200 hover:border-l-sky-400">
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex-1">
                                         <h3 className="font-medium text-slate-800 text-[20px] leading-tight mb-3">{n.title}</h3>

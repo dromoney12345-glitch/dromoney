@@ -70,7 +70,7 @@ const TaskApprovals = () => {
     };
 
     return (
-        <div className="p-6 animate-in fade-in duration-500">
+        <div className="p-4 animate-in fade-in duration-500">
             <PageHeader title="Task Approvals" subtitle="Verify and approve manual task proofs from users" />
 
             {/* Toolbar */}
@@ -82,11 +82,11 @@ const TaskApprovals = () => {
                         placeholder="Search by user or task name..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-[14px] font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-100 rounded-lg text-[14px] font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
                     />
                 </div>
 
-                <div className="flex items-center gap-1 bg-white p-1 rounded-2xl border border-slate-100 shadow-sm">
+                <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-100 shadow-sm">
                     {['All', 'Pending', 'Approved', 'Rejected'].map(status => (
                         <button
                             key={status}
@@ -101,7 +101,7 @@ const TaskApprovals = () => {
             </div>
 
             {/* Submissions Table */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+            <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden mb-6">
                 <div className="overflow-x-auto scrollbar-hide">
                     <table className="w-full text-sm">
                         <thead>
@@ -171,7 +171,7 @@ const TaskApprovals = () => {
             {isModalOpen && selectedSubmission && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-[#0F172A]/80 backdrop-blur-sm"></div>
-                    <div className="relative bg-white w-full max-w-[440px] rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
+                    <div className="relative bg-white w-full max-w-[440px] rounded-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
                         <div className="bg-[#0F172A] p-7 text-white relative">
                             <div className="flex justify-between items-start">
                                 <div>
@@ -184,8 +184,8 @@ const TaskApprovals = () => {
                             </div>
                         </div>
 
-                        <div className="p-8 space-y-7">
-                            <div className="flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <div className="p-4 space-y-7">
+                            <div className="flex items-center justify-between bg-slate-50 p-4 rounded-lg border border-slate-100">
                                 <div>
                                     <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-0.5">Submitted By</p>
                                     <p className="text-[13px] font-medium text-slate-800">{selectedSubmission.user?.name}</p>
@@ -199,15 +199,15 @@ const TaskApprovals = () => {
 
                             <div className="space-y-3">
                                 <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal px-1">Proof Image</p>
-                                <div className="aspect-[4/3] bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
+                                <div className="aspect-[4/3] bg-slate-50 rounded-lg border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
                                     <img 
                                         src={selectedSubmission.proofImage} 
                                         alt="Proof" 
                                         className="w-full h-full object-contain p-2"
                                     />
                                     <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-4 backdrop-blur-[2px]">
-                                        <a href={selectedSubmission.proofImage} target="_blank" rel="noreferrer" className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><Download size={20} /></a>
-                                        <a href={selectedSubmission.proofImage} target="_blank" rel="noreferrer" className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><ExternalLink size={20} /></a>
+                                        <a href={selectedSubmission.proofImage} target="_blank" rel="noreferrer" className="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><Download size={20} /></a>
+                                        <a href={selectedSubmission.proofImage} target="_blank" rel="noreferrer" className="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><ExternalLink size={20} /></a>
                                     </div>
                                 </div>
                             </div>
@@ -216,19 +216,19 @@ const TaskApprovals = () => {
                                 <div className="flex gap-4">
                                     <button
                                         onClick={() => handleAction(selectedSubmission._id, 'reject')}
-                                        className="flex-1 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-4.5 rounded-[20px] font-medium text-[11px] uppercase tracking-normal transition-all active:scale-95 border border-rose-100"
+                                        className="flex-1 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-4.5 rounded-lg font-medium text-[11px] uppercase tracking-normal transition-all active:scale-95 border border-rose-100"
                                     >
                                         Reject
                                     </button>
                                     <button
                                         onClick={() => handleAction(selectedSubmission._id, 'approve')}
-                                        className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-4.5 rounded-[20px] font-medium text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-xl shadow-sky-200"
+                                        className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-4.5 rounded-lg font-medium text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-xl shadow-sky-200"
                                     >
                                         Approve
                                     </button>
                                 </div>
                             ) : (
-                                <div className={`p-5 rounded-[24px] text-center border-2 ${selectedSubmission.status === 'Approved' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
+                                <div className={`p-4 rounded-lg text-center border-2 ${selectedSubmission.status === 'Approved' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
                                     <div className="flex items-center justify-center gap-2 mb-1">
                                         {selectedSubmission.status === 'Approved' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
                                         <p className="text-[10px] font-medium uppercase tracking-normal">Record Processed</p>

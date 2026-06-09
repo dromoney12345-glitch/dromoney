@@ -97,7 +97,7 @@ const Affiliates = () => {
             </div>
 
             {/* Toolbar with Edit Rate */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex flex-col md:flex-row md:items-center justify-between gap-5">
+            <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-4 flex flex-col md:flex-row md:items-center justify-between gap-5">
                 <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-sky-50 rounded-lg text-sky-600 shadow-inner flex items-center justify-center"><Share2 size={18} /></div>
                     <div>
@@ -143,7 +143,7 @@ const Affiliates = () => {
             </div>
 
             {/* Simple Table */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+            <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden mb-6">
                 <div className="overflow-x-auto scrollbar-hide">
                     <table className="w-full text-sm">
                         <thead>
@@ -169,7 +169,7 @@ const Affiliates = () => {
                                     <td className="px-8 py-3"><StatusBadge status={r.status} /></td>
                                     <td className="px-8 py-3">
                                         <div className="flex justify-center">
-                                            <button onClick={() => openAudit(r)} className="w-10 h-10 bg-slate-50 hover:bg-[#0F172A] hover:text-white text-slate-400 rounded-2xl flex items-center justify-center transition-all shadow-sm border border-slate-100"><ShieldCheck size={18} /></button>
+                                            <button onClick={() => openAudit(r)} className="w-10 h-10 bg-slate-50 hover:bg-[#0F172A] hover:text-white text-slate-400 rounded-lg flex items-center justify-center transition-all shadow-sm border border-slate-100"><ShieldCheck size={18} /></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -219,7 +219,7 @@ const Affiliates = () => {
             {isAuditOpen && selectedAudit && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
                     <div onClick={() => setIsAuditOpen(false)} className="absolute inset-0 bg-[#0F172A]/80 backdrop-blur-sm"></div>
-                    <div className="relative bg-white w-full max-w-[420px] rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
+                    <div className="relative bg-white w-full max-w-[420px] rounded-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
                         <div className="bg-[#0F172A] p-7 text-white flex justify-between items-center">
                             <div>
                                 <h3 className="text-xl tracking-tight">Referral Audit</h3>
@@ -228,18 +228,18 @@ const Affiliates = () => {
                             <button onClick={() => setIsAuditOpen(false)} className="text-white/40 hover:text-white transition-colors"><XCircle size={28} /></button>
                         </div>
 
-                        <div className="p-8 space-y-8">
+                        <div className="p-4 space-y-8">
                             {/* Simplified Timeline */}
                             <div className="space-y-6 relative border-l-2 border-slate-100 ml-4 pl-8">
                                 <div className="relative">
-                                    <div className="absolute -left-[50px] top-0 w-[42px] h-[42px] bg-slate-900 rounded-2xl flex items-center justify-center text-sky-400 text-[14px] shadow-lg">1</div>
+                                    <div className="absolute -left-[50px] top-0 w-[42px] h-[42px] bg-slate-900 rounded-lg flex items-center justify-center text-sky-400 text-[14px] shadow-lg">1</div>
                                     <p className="text-[11px] text-slate-400 uppercase tracking-normal mb-1">Registration</p>
                                     <p className="text-[14px] text-slate-800">{selectedAudit.date} at {selectedAudit.joinTime}</p>
                                     <p className="text-[10px] font-medium text-slate-400 mt-1">IP Address: {selectedAudit.ip}</p>
                                 </div>
 
                                 <div className="relative">
-                                    <div className="absolute -left-[50px] top-0 w-[42px] h-[42px] bg-sky-500 rounded-2xl flex items-center justify-center text-white text-[14px] shadow-lg">2</div>
+                                    <div className="absolute -left-[50px] top-0 w-[42px] h-[42px] bg-sky-500 rounded-lg flex items-center justify-center text-white text-[14px] shadow-lg">2</div>
                                     <p className="text-[11px] text-slate-400 uppercase tracking-normal mb-1">Platform Fee Paid</p>
                                     <p className="text-[14px] text-slate-800 flex items-center gap-2">
                                         ₹499.00 <span className="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-md">VERIFIED</span>
@@ -248,13 +248,13 @@ const Affiliates = () => {
                                 </div>
 
                                 <div className="relative">
-                                    <div className="absolute -left-[50px] top-0 w-[42px] h-[42px] bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-[14px] shadow-lg">3</div>
+                                    <div className="absolute -left-[50px] top-0 w-[42px] h-[42px] bg-emerald-500 rounded-lg flex items-center justify-center text-white text-[14px] shadow-lg">3</div>
                                     <p className="text-[11px] text-slate-400 uppercase tracking-normal mb-1">Commission Credit</p>
                                     <p className="text-[16px] text-emerald-600">₹200.00 <span className="text-[10px] text-slate-400 font-medium ml-1">Paid to {selectedAudit.referrer}</span></p>
                                 </div>
                             </div>
 
-                            <button onClick={() => setIsAuditOpen(false)} className="w-full bg-[#0F172A] text-white py-4 rounded-[22px] text-[12px] uppercase tracking-normal shadow-xl shadow-slate-200 active:scale-95 transition-all">Close Report</button>
+                            <button onClick={() => setIsAuditOpen(false)} className="w-full bg-[#0F172A] text-white py-4 rounded-lg text-[12px] uppercase tracking-normal shadow-xl shadow-slate-200 active:scale-95 transition-all">Close Report</button>
                         </div>
                     </div>
                 </div>

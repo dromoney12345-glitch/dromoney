@@ -40,7 +40,7 @@ const Settings = () => {
         }
     };
 
-    if (!config) return <div className="p-10 text-center font-medium animate-pulse">Loading Platform Config...</div>;
+    if (!config) return <div className="p-4 text-center font-medium animate-pulse">Loading Platform Config...</div>;
 
     const tabs = [
         { id: 'general', label: 'General', icon: Layout, color: 'text-sky-500', bg: 'bg-sky-50' },
@@ -50,13 +50,13 @@ const Settings = () => {
     ];
 
     return (
-        <div className="p-6 animate-in fade-in duration-500 pb-20 relative">
+        <div className="p-4 animate-in fade-in duration-500 pb-20 relative">
             <PageHeader title="System Settings" subtitle="Global configuration for branding, payments, and commission logic" />
 
             {/* Success Toast */}
             {showToast && (
                 <div className="fixed top-24 right-8 z-50 animate-in slide-in-from-right duration-300">
-                    <div className="bg-emerald-500 text-white px-4 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
+                    <div className="bg-emerald-500 text-white px-4 py-4 rounded-lg shadow-2xl flex items-center gap-3">
                         <CheckCircle2 size={24} />
                         <div>
                             <p className="text-xs font-medium uppercase tracking-normal">Settings Saved</p>
@@ -66,7 +66,7 @@ const Settings = () => {
                 </div>
             )}
 
-            <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex flex-col lg:flex-row gap-5">
                 {/* Sidebar Navigation */}
                 <div className="w-full lg:w-72 space-y-3">
                     <div className="bg-white p-2 rounded-xl border border-slate-100 shadow-sm space-y-1">
@@ -74,7 +74,7 @@ const Settings = () => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl transition-all duration-300 group
+                                className={`w-full flex items-center justify-between px-5 py-4 rounded-lg transition-all duration-300 group
                                     ${activeTab === tab.id ? 'bg-[#1A1C30] text-white shadow-xl shadow-slate-200' : 'text-slate-500 hover:bg-slate-50'}`}
                             >
                                 <div className="flex items-center gap-3">
@@ -88,7 +88,7 @@ const Settings = () => {
                         ))}
                     </div>
 
-                    <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100 mt-6 relative overflow-hidden">
+                    <div className="bg-amber-50 rounded-lg p-4 border border-amber-100 mt-6 relative overflow-hidden">
                         <div className="absolute -top-4 -right-4 text-amber-100 rotate-12">
                             <AlertTriangle size={80} />
                         </div>
@@ -103,9 +103,9 @@ const Settings = () => {
 
                 {/* Content Area */}
                 <div className="flex-1">
-                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 min-h-[500px] flex flex-col">
+                    <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-4 min-h-[500px] flex flex-col">
                         {/* Tab Content Header */}
-                        <div className="mb-10">
+                        <div className="mb-6">
                             <div className="flex items-center gap-3 mb-2">
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${tabs.find(t => t.id === activeTab).bg} ${tabs.find(t => t.id === activeTab).color}`}>
                                     {React.createElement(tabs.find(t => t.id === activeTab).icon, { size: 20 })}
@@ -120,7 +120,7 @@ const Settings = () => {
                         <div className="flex-1">
                             {activeTab === 'general' && (
                                 <div className="space-y-8 animate-in fade-in duration-300">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <Globe size={14} className="text-slate-400" />
@@ -130,7 +130,7 @@ const Settings = () => {
                                                 type="text" 
                                                 value={config.appName}
                                                 onChange={(e) => handleChange('appName', e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all" 
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -142,7 +142,7 @@ const Settings = () => {
                                                 type="email" 
                                                 value={config.contactEmail}
                                                 onChange={(e) => handleChange('contactEmail', e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all" 
                                             />
                                         </div>
                                         <div className="lg:col-span-2 p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
@@ -163,7 +163,7 @@ const Settings = () => {
 
                             {activeTab === 'payments' && (
                                 <div className="space-y-8 animate-in fade-in duration-300">
-                                    <div className="p-6 bg-indigo-50/50 rounded-xl border border-indigo-100 flex items-start gap-4">
+                                    <div className="p-4 bg-indigo-50/50 rounded-xl border border-indigo-100 flex items-start gap-4">
                                         <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-indigo-500 shadow-sm shrink-0">
                                             <CreditCard size={24} />
                                         </div>
@@ -180,7 +180,7 @@ const Settings = () => {
                                                 value={config.adminUpiId}
                                                 onChange={(e) => handleChange('adminUpiId', e.target.value)}
                                                 placeholder="yourname@upi" 
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" 
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -190,7 +190,7 @@ const Settings = () => {
                                                 value={config.bankDetails}
                                                 onChange={(e) => handleChange('bankDetails', e.target.value)}
                                                 placeholder="Account Number, IFSC, Branch Name..." 
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all resize-none" 
                                             />
                                         </div>
                                     </div>
@@ -199,11 +199,13 @@ const Settings = () => {
 
                             {activeTab === 'earnings' && (
                                 <div className="space-y-10 animate-in fade-in duration-300">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {[
                                             { label: 'Referral Commission', field: 'referralCommission', unit: '₹', icon: '🎁', info: 'Direct sale bonus' },
                                             { label: 'Coin Value', field: 'coinRate', unit: '₹', icon: '🪙', info: '1 Coin = ₹ Value', step: 0.01 },
-                                            { label: 'Minimum Payout', field: 'minWithdrawal', unit: '₹', icon: '🏧', info: 'Withdrawal limit' }
+                                            { label: 'Minimum Payout', field: 'minWithdrawal', unit: '₹', icon: '🏧', info: 'Withdrawal limit' },
+                                            { label: 'Ad Cooldown', field: 'adCooldownSeconds', unit: 's', icon: '⏱️', info: 'Wait time between ads', step: 1 },
+                                            { label: 'Max Daily Ads', field: 'adMaxDailyLimit', unit: 'ads', icon: '🎬', info: 'Limit per user', step: 1 }
                                         ].map((item, idx) => (
                                             <div key={idx} className="bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-emerald-200 transition-all group">
                                                 <div className="flex items-center justify-between mb-4">
@@ -212,22 +214,37 @@ const Settings = () => {
                                                 </div>
                                                 <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal ml-1">{item.label}</label>
                                                 <div className="relative mt-2">
-                                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 font-medium text-slate-400">{item.unit}</span>
-                                                    <input 
-                                                        type="number" 
-                                                        step={item.step || 1}
-                                                        value={config[item.field]}
-                                                        onChange={(e) => handleChange(item.field, parseFloat(e.target.value))}
-                                                        className="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-5 py-4 text-lg font-medium text-emerald-600 focus:outline-none focus:border-emerald-500 transition-all" 
-                                                    />
+                                                    {item.unit === '₹' ? (
+                                                        <>
+                                                            <span className="absolute left-5 top-1/2 -translate-y-1/2 font-medium text-slate-400">{item.unit}</span>
+                                                            <input 
+                                                                type="number" 
+                                                                step={item.step || 1}
+                                                                value={config[item.field]}
+                                                                onChange={(e) => handleChange(item.field, parseFloat(e.target.value))}
+                                                                className="w-full bg-white border border-slate-200 rounded-lg pl-10 pr-5 py-4 text-lg font-medium text-emerald-600 focus:outline-none focus:border-emerald-500 transition-all" 
+                                                            />
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <input 
+                                                                type="number" 
+                                                                step={item.step || 1}
+                                                                value={config[item.field]}
+                                                                onChange={(e) => handleChange(item.field, parseFloat(e.target.value))}
+                                                                className={`w-full bg-white border border-slate-200 rounded-lg pl-5 ${item.unit.length > 2 ? 'pr-16' : 'pr-10'} py-4 text-lg font-medium text-emerald-600 focus:outline-none focus:border-emerald-500 transition-all`} 
+                                                            />
+                                                            <span className="absolute right-5 top-1/2 -translate-y-1/2 font-medium text-slate-400">{item.unit}</span>
+                                                        </>
+                                                    )}
                                                 </div>
                                                 <p className="text-[10px] font-medium text-slate-400 mt-3 ml-1 uppercase tracking-tight opacity-60">{item.info}</p>
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="p-6 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-between gap-4">
+                                    <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-between gap-4">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm">
+                                            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-emerald-500 shadow-sm">
                                                 <TrendingUpIcon size={24} />
                                             </div>
                                             <div>
@@ -248,7 +265,7 @@ const Settings = () => {
                             {activeTab === 'security' && (
                                 <div className="space-y-8 animate-in fade-in duration-300">
                                     <div className="max-w-md space-y-6">
-                                        <div className="p-6 bg-rose-50/50 rounded-xl border border-rose-100 flex items-center gap-4 mb-2">
+                                        <div className="p-4 bg-rose-50/50 rounded-xl border border-rose-100 flex items-center gap-4 mb-2">
                                             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-rose-500 shadow-sm">
                                                 <Shield size={24} />
                                             </div>
@@ -266,7 +283,7 @@ const Settings = () => {
                                                 type="email" 
                                                 value={config.adminEmail}
                                                 onChange={(e) => handleChange('adminEmail', e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:border-rose-500 transition-all mb-4" 
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:border-rose-500 transition-all mb-4" 
                                             />
                                         </div>
                                         <div className="space-y-2 relative">
@@ -280,7 +297,7 @@ const Settings = () => {
                                                     value={config.adminPassword || ''}
                                                     onChange={(e) => handleChange('adminPassword', e.target.value)}
                                                     placeholder="Enter new password to update"
-                                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:border-rose-500 transition-all pr-12" 
+                                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:border-rose-500 transition-all pr-12" 
                                                 />
                                                 <button
                                                     type="button"

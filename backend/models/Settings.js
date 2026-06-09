@@ -49,6 +49,14 @@ const SettingsSchema = new mongoose.Schema({
     }],
     
     // Earnings
+    adCooldownSeconds: {
+        type: Number,
+        default: 30
+    },
+    adMaxDailyLimit: {
+        type: Number,
+        default: 10
+    },
     referralSystemEnabled: {
         type: Boolean,
         default: true

@@ -92,7 +92,7 @@ const KYC = () => {
     };
 
     return (
-        <div className="p-6 animate-in fade-in duration-500">
+        <div className="p-4 animate-in fade-in duration-500">
             <PageHeader title="KYC Verification" subtitle="Manage and verify user identity documents" />
 
             {/* Toolbar */}
@@ -104,11 +104,11 @@ const KYC = () => {
                         placeholder="Search by name or mobile..."
                         value={search}
                         onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-[14px] font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-100 rounded-lg text-[14px] font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm"
                     />
                 </div>
 
-                <div className="flex items-center gap-1 bg-white p-1 rounded-2xl border border-slate-100 shadow-sm">
+                <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-100 shadow-sm">
                     {['All', 'Pending', 'Approved', 'Rejected'].map(status => (
                         <button
                             key={status}
@@ -123,7 +123,7 @@ const KYC = () => {
             </div>
 
             {/* Simplified Table */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+            <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden mb-6">
                 <div className="overflow-x-auto scrollbar-hide">
                     <table className="w-full text-sm">
                         <thead>
@@ -222,7 +222,7 @@ const KYC = () => {
             {isModalOpen && selectedKyc && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-[#0F172A]/80 backdrop-blur-sm"></div>
-                    <div className="relative bg-white w-full max-w-[440px] rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
+                    <div className="relative bg-white w-full max-w-[440px] rounded-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
                         {/* Modal Header */}
                         <div className="bg-[#0F172A] p-7 text-white relative">
                             <div className="flex justify-between items-start">
@@ -236,7 +236,7 @@ const KYC = () => {
                             </div>
                         </div>
 
-                        <div className="p-8 space-y-7">
+                        <div className="p-4 space-y-7">
                             {/* Aadhar Content Only */}
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between px-1">
@@ -248,7 +248,7 @@ const KYC = () => {
                                 </div>
 
                                 {/* Premium Photo Preview */}
-                                <div className="aspect-[1.5/1] bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
+                                <div className="aspect-[1.5/1] bg-slate-50 rounded-lg border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
                                     {selectedKyc.aadharImage ? (
                                         <img 
                                             src={selectedKyc.aadharImage} 
@@ -262,8 +262,8 @@ const KYC = () => {
                                         </div>
                                     )}
                                     <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-4 backdrop-blur-[2px]">
-                                        <a href={selectedKyc.aadharImage} download target="_blank" rel="noreferrer" className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><Download size={20} /></a>
-                                        <a href={selectedKyc.aadharImage} target="_blank" rel="noreferrer" className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><ExternalLink size={20} /></a>
+                                        <a href={selectedKyc.aadharImage} download target="_blank" rel="noreferrer" className="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><Download size={20} /></a>
+                                        <a href={selectedKyc.aadharImage} target="_blank" rel="noreferrer" className="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><ExternalLink size={20} /></a>
                                     </div>
                                 </div>
                             </div>
@@ -273,19 +273,19 @@ const KYC = () => {
                                 <div className="flex gap-4 pt-2">
                                     <button
                                         onClick={() => handleAction(selectedKyc.id, 'Rejected')}
-                                        className="flex-1 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-4.5 rounded-[20px] font-medium text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-lg shadow-rose-100/50"
+                                        className="flex-1 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-4.5 rounded-lg font-medium text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-lg shadow-rose-100/50"
                                     >
                                         Reject
                                     </button>
                                     <button
                                         onClick={() => handleAction(selectedKyc.id, 'Approved')}
-                                        className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-4.5 rounded-[20px] font-medium text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-xl shadow-sky-200"
+                                        className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-4.5 rounded-lg font-medium text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-xl shadow-sky-200"
                                     >
                                         Approve
                                     </button>
                                 </div>
                             ) : (
-                                <div className={`p-5 rounded-[24px] text-center border-2 ${selectedKyc.status === 'Approved' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
+                                <div className={`p-4 rounded-lg text-center border-2 ${selectedKyc.status === 'Approved' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
                                     <p className="text-[10px] font-medium uppercase tracking-normal mb-1">Verification Record</p>
                                     <p className="text-[12px] font-medium">This submission was verified as <span className="underline decoration-2 underline-offset-4">{selectedKyc.status}</span></p>
                                 </div>

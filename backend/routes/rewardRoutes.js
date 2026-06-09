@@ -2,14 +2,13 @@ const express = require('express');
 const { protect } = require('../middleware/authMiddleware');
 const User = require('../models/User');
 const RewardHistory = require('../models/RewardHistory');
+const Settings = require('../models/Settings');
 
 const router = express.Router();
 
 router.use(protect);
 
-const MAX_DAILY_ADS = 10;
 const REWARD_AMOUNT = 5;
-const COOLDOWN_SECONDS = 30;
 
 // Reset daily count if a new day has started
 const checkAndResetDailyLimit = async (user) => {
@@ -30,6 +29,10 @@ router.get('/status', async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+        const settings = await Settings.findOne() || {};
+        const MAX_DAILY_ADS = settings.adMaxDailyLimit || 10;
+        const COOLDOWN_SECONDS = settings.adCooldownSeconds || 30;
 
         await checkAndResetDailyLimit(user);
 
@@ -69,11 +72,14 @@ router.get('/status', async (req, res) => {
 router.post('/claim', async (req, res) => {
     try {
         const { userId } = req.body;
-        // Check if the user is claiming for themselves, or allow flutter to pass userId (but protect middleware uses req.user.id)
         const idToUse = userId || req.user.id;
         
         const user = await User.findById(idToUse);
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+        const settings = await Settings.findOne() || {};
+        const MAX_DAILY_ADS = settings.adMaxDailyLimit || 10;
+        const COOLDOWN_SECONDS = settings.adCooldownSeconds || 30;
 
         await checkAndResetDailyLimit(user);
 

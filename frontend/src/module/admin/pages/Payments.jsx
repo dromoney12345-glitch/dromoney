@@ -98,7 +98,7 @@ const Payments = () => {
     const failedCount = paymentsList.filter(p => p.status === 'Failed').length;
 
     return (
-        <div className="p-6 animate-in fade-in duration-500 relative font-['Poppins']">
+        <div className="p-4 animate-in fade-in duration-500 relative font-['Poppins']">
             {toast && (
                 <div className={`fixed top-5 right-5 z-[9999] flex items-center gap-3 px-5 py-3.5 rounded-xl border shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300 ${
                     toast.type === 'success' 
@@ -132,11 +132,11 @@ const Payments = () => {
                         placeholder="Search by name, ID or UTR number..."
                         value={search}
                         onChange={handleSearch}
-                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-[14px] font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm transition-all font-['Poppins']"
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-100 rounded-lg text-[14px] font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm transition-all font-['Poppins']"
                     />
                 </div>
 
-                <div className="flex items-center gap-1 bg-white p-1 rounded-2xl border border-slate-100 shadow-sm">
+                <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-100 shadow-sm">
                     {tabs.map(t => (
                         <button key={t} onClick={() => { setFilter(t); setCurrentPage(1); }}
                             className={`px-4 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-tight transition-all font-['Poppins'] ${filter === t ? 'bg-[#0F172A] text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>
@@ -147,7 +147,7 @@ const Payments = () => {
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6 min-h-[400px]">
+            <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden mb-6 min-h-[400px]">
                 <div className="overflow-x-auto scrollbar-hide">
                     <table className="w-full text-sm">
                         <thead>
@@ -250,7 +250,7 @@ const Payments = () => {
             {isModalOpen && selectedPayment && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-[#0F172A]/80 backdrop-blur-sm"></div>
-                    <div className="relative bg-white w-full max-w-[420px] rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
+                    <div className="relative bg-white w-full max-w-[420px] rounded-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
                         <div className="bg-[#0F172A] p-7 text-white relative">
                             <h3 className="text-xl font-semibold tracking-tight mb-1 font-['Poppins']">Payment Verification</h3>
                             <p className="text-[10px] text-sky-400 font-medium uppercase tracking-normal font-['Poppins']">TXN ID: #{selectedPayment.id}</p>
@@ -259,9 +259,9 @@ const Payments = () => {
                             </button>
                         </div>
 
-                        <div className="p-8 space-y-6">
+                        <div className="p-4 space-y-6">
                             {/* User & Amount Info */}
-                            <div className="flex items-center justify-between bg-slate-50 p-5 rounded-[24px] border border-slate-100 shadow-inner">
+                            <div className="flex items-center justify-between bg-slate-50 p-4 rounded-lg border border-slate-100 shadow-inner">
                                 <div className="flex items-center gap-3">
                                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-semibold font-['Poppins'] ${selectedPayment.isDeleted ? 'bg-rose-100 text-rose-400' : 'bg-slate-900 text-sky-400'}`}>
                                         {selectedPayment.user.charAt(0)}
@@ -289,10 +289,10 @@ const Payments = () => {
                                     <p className="text-[13px] font-semibold text-slate-800 tracking-tight font-mono font-['Poppins']">{selectedPayment.utr}</p>
                                 </div>
 
-                                <div className="aspect-[1.5/1] bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
+                                <div className="aspect-[1.5/1] bg-slate-50 rounded-lg border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
                                     <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-4 backdrop-blur-[2px]">
-                                        <button className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><Download size={20} /></button>
-                                        <button className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><ExternalLink size={20} /></button>
+                                        <button className="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><Download size={20} /></button>
+                                        <button className="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><ExternalLink size={20} /></button>
                                     </div>
                                     <div className="flex flex-col items-center gap-2">
                                         <ImageIcon size={40} className="text-slate-300" />
@@ -312,19 +312,19 @@ const Payments = () => {
                                 <div className="flex gap-4 pt-2">
                                     <button
                                         onClick={() => handleStatusUpdate(selectedPayment.id, 'Failed')}
-                                        className="flex-1 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-4.5 rounded-[20px] font-semibold text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-lg shadow-rose-100/50 font-['Poppins']"
+                                        className="flex-1 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-4.5 rounded-lg font-semibold text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-lg shadow-rose-100/50 font-['Poppins']"
                                     >
                                         Decline
                                     </button>
                                     <button
                                         onClick={() => handleStatusUpdate(selectedPayment.id, 'Success')}
-                                        className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-4.5 rounded-[20px] font-semibold text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-xl shadow-sky-200 font-['Poppins']"
+                                        className="flex-1 bg-sky-500 hover:bg-sky-600 text-white py-4.5 rounded-lg font-semibold text-[11px] uppercase tracking-normal transition-all active:scale-95 shadow-xl shadow-sky-200 font-['Poppins']"
                                     >
                                         Verify & Activate
                                     </button>
                                 </div>
                             ) : (
-                                <div className={`p-5 rounded-[24px] text-center border-2 font-['Poppins'] ${selectedPayment.status === 'Success' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
+                                <div className={`p-4 rounded-lg text-center border-2 font-['Poppins'] ${selectedPayment.status === 'Success' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
                                     <p className="text-[10px] font-medium uppercase tracking-normal mb-1">Audit Record</p>
                                     <p className="text-[12px] font-medium tracking-tight">Status: <span className="underline decoration-2 underline-offset-4">{selectedPayment.status}</span></p>
                                 </div>

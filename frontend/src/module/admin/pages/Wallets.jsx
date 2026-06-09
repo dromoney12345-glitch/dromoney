@@ -100,7 +100,7 @@ const Wallets = () => {
     };
 
     return (
-        <div className="p-6 animate-in fade-in duration-500 relative font-['Poppins']">
+        <div className="p-4 animate-in fade-in duration-500 relative font-['Poppins']">
 
             {/* Toast */}
             {toast && (
@@ -128,7 +128,7 @@ const Wallets = () => {
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
@@ -212,7 +212,7 @@ const Wallets = () => {
             {/* ── CONFIRM ACTION MODAL ── */}
             {confirmAction && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white rounded-2xl w-full max-w-sm p-4 shadow-2xl animate-in zoom-in-95 duration-200">
+                    <div className="bg-white rounded-lg w-full max-w-sm p-4 shadow-2xl animate-in zoom-in-95 duration-200">
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${confirmAction.status === 'Approved' ? 'bg-emerald-50' : 'bg-rose-50'}`}>
                             {confirmAction.status === 'Approved'
                                 ? <CheckCircle size={24} className="text-emerald-500" />
@@ -250,7 +250,7 @@ const Wallets = () => {
             {/* ── DETAIL MODAL ── */}
             {showDetailModal && selectedDetail && (
                 <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
+                    <div className="bg-white rounded-lg w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
                         {/* Header */}
                         <div className="bg-slate-900 px-4 py-4 flex items-center justify-between">
                             <div>
@@ -263,7 +263,7 @@ const Wallets = () => {
                         </div>
 
                         {/* Body */}
-                        <div className="p-6 space-y-4">
+                        <div className="p-4 space-y-4">
                             {/* Status badge */}
                             <div className="flex items-center justify-between">
                                 <span className="text-[10px] text-slate-400 uppercase tracking-normal">Status</span>
@@ -336,7 +336,7 @@ const Wallets = () => {
             {/* ── WALLET BALANCE MODAL ── */}
             {showBalanceModal && selectedUser && (
                 <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white rounded-2xl w-full max-w-sm p-4 shadow-2xl animate-in zoom-in-95 duration-200">
+                    <div className="bg-white rounded-lg w-full max-w-sm p-4 shadow-2xl animate-in zoom-in-95 duration-200">
                         <div className="flex items-center justify-between mb-5">
                             <h3 className="text-[14px] text-slate-800">Wallet Balance</h3>
                             <button onClick={() => setShowBalanceModal(false)} className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center text-slate-500 transition-all cursor-pointer">
@@ -344,7 +344,7 @@ const Wallets = () => {
                             </button>
                         </div>
 
-                        <div className="bg-amber-50 border border-amber-100 rounded-xl p-5 text-center mb-4">
+                        <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center mb-4">
                             <p className="text-[10px] text-amber-600 uppercase tracking-normal mb-1">{selectedUser.user}'s Balance</p>
                             <p className="text-3xl text-slate-900">₹{selectedUser.walletBalance?.toLocaleString()}</p>
                         </div>

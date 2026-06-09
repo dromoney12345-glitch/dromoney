@@ -172,7 +172,7 @@ const Users = () => {
     };
 
     return (
-        <div className="p-6 animate-in fade-in duration-500 relative font-['Poppins']">
+        <div className="p-4 animate-in fade-in duration-500 relative font-['Poppins']">
             <PageHeader title="User Management" subtitle="View and manage all registered users" />
 
             {/* Toolbar */}
@@ -184,11 +184,11 @@ const Users = () => {
                         placeholder="Search by name or mobile..."
                         value={search}
                         onChange={handleSearch}
-                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-[14px] font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm font-['Poppins']"
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-100 rounded-lg text-[14px] font-medium text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm font-['Poppins']"
                     />
                 </div>
                 
-                <div className="flex items-center gap-1 bg-white p-1 rounded-2xl border border-slate-100 shadow-sm">
+                <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-100 shadow-sm">
                     {['All', 'Active', 'Blocked'].map(status => (
                         <button
                             key={status}
@@ -206,7 +206,7 @@ const Users = () => {
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6 font-['Poppins']">
+            <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden mb-6 font-['Poppins']">
                 <div className="overflow-x-auto scrollbar-hide">
                     <table className="w-full text-sm">
                         <thead>
@@ -325,7 +325,7 @@ const Users = () => {
                     <div onClick={() => setIsDrawerOpen(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
                     <div className="absolute top-0 right-0 h-full w-full max-w-[400px] bg-slate-50 shadow-2xl animate-in slide-in-from-right duration-500 ease-out flex flex-col overflow-hidden font-['Poppins']">
                         {/* Drawer Header */}
-                        <div className="bg-[#0F172A] p-5 text-white shrink-0 relative">
+                        <div className="bg-[#0F172A] p-4 text-white shrink-0 relative">
                             <div className="flex justify-between items-start">
                                 <div className="flex items-center gap-3">
                                     <div className="w-12 h-12 bg-sky-500/20 rounded-xl flex items-center justify-center text-sky-400 font-semibold text-xl border border-sky-500/30 font-['Poppins']">
@@ -342,9 +342,9 @@ const Users = () => {
                             </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-5 space-y-5 scrollbar-hide">
+                        <div className="flex-1 overflow-y-auto p-4 space-y-5 scrollbar-hide">
                             {/* KYC Approval Card (Crucial Part) */}
-                            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden p-4 space-y-5 font-['Poppins']">
+                            <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden p-4 space-y-5 font-['Poppins']">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2 text-slate-400">
                                         <ShieldAlert size={14} className="text-amber-500" />
@@ -355,7 +355,7 @@ const Users = () => {
 
                                 {activeUserInDrawer.kyc.documentImage ? (
                                     <div className="space-y-4">
-                                        <div className="relative group rounded-2xl overflow-hidden border border-slate-100 aspect-video bg-slate-50">
+                                        <div className="relative group rounded-lg overflow-hidden border border-slate-100 aspect-video bg-slate-50">
                                             <img src={activeUserInDrawer.kyc.documentImage} alt="KYC" className="w-full h-full object-cover" />
                                             <a href={activeUserInDrawer.kyc.documentImage} target="_blank" rel="noreferrer" className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-[2px]">
                                                 <button className="bg-white text-slate-900 px-4 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-normal shadow-xl font-['Poppins']">View Full Size</button>
@@ -375,14 +375,14 @@ const Users = () => {
                                                 <button 
                                                     disabled={kycActionLoading}
                                                     onClick={() => handleManageKyc(activeUserInDrawer.id, 'Approved')}
-                                                    className="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-2xl text-[10px] font-semibold uppercase tracking-normal shadow-lg shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50 font-['Poppins']"
+                                                    className="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-lg text-[10px] font-semibold uppercase tracking-normal shadow-lg shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50 font-['Poppins']"
                                                 >
                                                     {kycActionLoading ? <Loader2 size={14} className="animate-spin" /> : <><Check size={14} /> Approve</>}
                                                 </button>
                                                 <button 
                                                     disabled={kycActionLoading}
                                                     onClick={() => handleManageKyc(activeUserInDrawer.id, 'Rejected')}
-                                                    className="flex items-center justify-center gap-2 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-3.5 rounded-2xl text-[10px] font-semibold uppercase tracking-normal border border-rose-100 transition-all active:scale-95 disabled:opacity-50 font-['Poppins']"
+                                                    className="flex items-center justify-center gap-2 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-3.5 rounded-lg text-[10px] font-semibold uppercase tracking-normal border border-rose-100 transition-all active:scale-95 disabled:opacity-50 font-['Poppins']"
                                                 >
                                                     <XCircle size={14} /> Reject
                                                 </button>
@@ -390,7 +390,7 @@ const Users = () => {
                                         )}
                                     </div>
                                 ) : (
-                                    <div className="py-8 flex flex-col items-center justify-center gap-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                                    <div className="py-8 flex flex-col items-center justify-center gap-3 bg-slate-50 rounded-lg border border-dashed border-slate-200">
                                         <Camera size={24} className="text-slate-300" />
                                         <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">No Document Uploaded</p>
                                     </div>
@@ -399,11 +399,11 @@ const Users = () => {
 
                             {/* Info Grid */}
                             <div className="grid grid-cols-2 gap-3">
-                                <div className="bg-white p-4 rounded-2xl border border-slate-100">
+                                <div className="bg-white p-4 rounded-lg border border-slate-100">
                                     <p className="text-[8px] font-medium text-slate-400 uppercase tracking-normal mb-1 font-['Poppins']">Mobile</p>
                                     <p className="text-[12px] font-medium text-slate-700 font-['Poppins']">{activeUserInDrawer.mobile}</p>
                                 </div>
-                                <div className="bg-white p-4 rounded-2xl border border-slate-100">
+                                <div className="bg-white p-4 rounded-lg border border-slate-100">
                                     <p className="text-[8px] font-medium text-slate-400 uppercase tracking-normal mb-1 font-['Poppins']">Joined</p>
                                     <p className="text-[12px] font-medium text-slate-700 font-['Poppins']">{activeUserInDrawer.joined}</p>
                                 </div>
@@ -411,7 +411,7 @@ const Users = () => {
 
                             {/* Wallet Stats */}
                             <div className="space-y-3">
-                                <div className="bg-emerald-500 p-4 rounded-[28px] text-white shadow-lg shadow-emerald-500/10">
+                                <div className="bg-emerald-500 p-4 rounded-lg text-white shadow-lg shadow-emerald-500/10">
                                     <div className="flex items-center justify-between mb-3">
                                         <Wallet size={16} />
                                         <span className="text-[8px] font-medium uppercase tracking-normal bg-white/20 px-2 py-0.5 rounded-full font-['Poppins']">Earnings</span>
@@ -419,7 +419,7 @@ const Users = () => {
                                     <h4 className="text-2xl font-medium font-['Poppins']">{activeUserInDrawer.earnings}</h4>
                                     <p className="text-emerald-100 text-[9px] font-medium mt-1 font-['Poppins']">Lifetime total revenue</p>
                                 </div>
-                                <div className="bg-sky-500 p-4 rounded-[28px] text-white shadow-lg shadow-sky-500/10">
+                                <div className="bg-sky-500 p-4 rounded-lg text-white shadow-lg shadow-sky-500/10">
                                     <div className="flex items-center justify-between mb-3">
                                         <UsersIcon size={16} />
                                         <span className="text-[8px] font-medium uppercase tracking-normal bg-white/20 px-2 py-0.5 rounded-full font-['Poppins']">Network</span>
@@ -431,10 +431,10 @@ const Users = () => {
                         </div>
 
                         {/* Drawer Footer */}
-                        <div className="p-5 bg-white border-t border-slate-100">
+                        <div className="p-4 bg-white border-t border-slate-100">
                             <button 
                                 onClick={() => toggleStatus(activeUserInDrawer.id)} 
-                                className={`w-full py-4 rounded-2xl font-medium text-[10px] uppercase tracking-normal transition-all active:scale-95 shadow-xl font-['Poppins']
+                                className={`w-full py-4 rounded-lg font-medium text-[10px] uppercase tracking-normal transition-all active:scale-95 shadow-xl font-['Poppins']
                                 ${activeUserInDrawer.status === 'Active' ? 'bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white' : 'bg-emerald-50 text-emerald-500 hover:bg-emerald-500 hover:text-white'}`}
                             >
                                 {activeUserInDrawer.status === 'Active' ? 'Block Account' : 'Unblock Account'}
@@ -448,14 +448,14 @@ const Users = () => {
             {isEditModalOpen && editingUser && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div onClick={() => setIsEditModalOpen(false)} className="absolute inset-0 bg-[#0F172A]/80 backdrop-blur-sm"></div>
-                    <form onSubmit={handleSaveEdit} className="relative bg-white w-full max-w-[400px] rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 font-['Poppins']">
+                    <form onSubmit={handleSaveEdit} className="relative bg-white w-full max-w-[400px] rounded-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 font-['Poppins']">
                         <div className="bg-[#0F172A] p-4 text-white text-center relative">
                             <h3 className="text-lg font-medium tracking-tight font-['Poppins']">Edit Profile</h3>
                             <button title="Close" type="button" onClick={() => setIsEditModalOpen(false)} className="absolute top-6 right-6 text-white/30 hover:text-white transition-colors">
                                 <XCircle size={20} />
                             </button>
                         </div>
-                        <div className="p-8 space-y-6">
+                        <div className="p-4 space-y-6">
                             {editError && (
                                 <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-start gap-2">
                                     <AlertCircle size={14} className="text-rose-500 mt-0.5 shrink-0" />
@@ -479,7 +479,7 @@ const Users = () => {
                                     <p className="text-[9px] text-slate-400 font-medium mt-1.5 ml-1 font-['Poppins']">Use a real email provider (gmail.com, yahoo.com, etc.)</p>
                                 </div>
                             </div>
-                            <button type="submit" className="w-full bg-sky-500 hover:bg-sky-600 text-white py-4 rounded-2xl font-medium text-[12px] uppercase tracking-normal shadow-xl shadow-sky-500/25 transition-all font-['Poppins']">Save Changes</button>
+                            <button type="submit" className="w-full bg-sky-500 hover:bg-sky-600 text-white py-4 rounded-lg font-medium text-[12px] uppercase tracking-normal shadow-xl shadow-sky-500/25 transition-all font-['Poppins']">Save Changes</button>
                         </div>
                     </form>
                 </div>

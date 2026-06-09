@@ -102,7 +102,7 @@ const Promotions = () => {
     };
 
     return (
-        <div className="p-6 animate-in fade-in duration-500 relative">
+        <div className="p-4 animate-in fade-in duration-500 relative">
             {toast && (
                 <div className={`fixed top-5 right-5 z-[9999] flex items-center gap-3 px-5 py-3.5 rounded-xl border shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300 ${
                     toast.type === 'success' 
@@ -132,7 +132,7 @@ const Promotions = () => {
                 <div className="grid grid-cols-1 gap-4">
                     {promotions.map((promo) => (
                         <div key={promo.id} className="bg-white rounded-xl border border-slate-100 shadow-sm p-4 hover:border-sky-100 transition-all border-l-[6px] border-l-sky-500">
-                            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                                 
                                 {/* Info Section */}
                                 <div className="flex-1 space-y-4">
@@ -180,14 +180,14 @@ const Promotions = () => {
                                     </div>
 
                                     {promo.description && (
-                                        <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                                        <div className="bg-slate-50 rounded-lg p-4 border border-slate-100">
                                              <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tight mb-2">Description</p>
                                              <p className="text-xs font-medium text-slate-600 leading-relaxed">"{promo.description}"</p>
                                         </div>
                                     )}
 
                                     {promo.adminResponse && (
-                                        <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100 mt-2">
+                                        <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-100 mt-2">
                                              <p className="text-[10px] font-medium text-emerald-600 uppercase tracking-tight mb-1 flex items-center gap-1"><MessageSquare size={12}/> Your Response</p>
                                              <p className="text-xs font-medium text-emerald-800">{promo.adminResponse}</p>
                                         </div>
@@ -256,7 +256,7 @@ const Promotions = () => {
                             </div>
                             <button onClick={() => setIsMsgModalOpen(false)} className="text-slate-400 hover:bg-slate-50 p-2 rounded-full transition-colors"><X size={24}/></button>
                         </div>
-                        <div className="p-6">
+                        <div className="p-4">
                             <p className="text-xs font-medium text-slate-400 mb-4 leading-relaxed">
                                 This message will appear in the user's notification bell icon. You can confirm that you have added their task or ask for more details.
                             </p>
@@ -264,12 +264,12 @@ const Promotions = () => {
                                 value={adminMsg}
                                 onChange={(e) => setAdminMsg(e.target.value)}
                                 placeholder="Write your message here..."
-                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm font-medium text-slate-800 placeholder-slate-300 focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-500/5 transition-all outline-none resize-none h-32 mb-6"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm font-medium text-slate-800 placeholder-slate-300 focus:outline-none focus:border-sky-500 focus:ring-4 focus:ring-sky-500/5 transition-all outline-none resize-none h-32 mb-6"
                             ></textarea>
                             
                             <button 
                                 onClick={handleMessageSubmit}
-                                className="w-full bg-sky-500 hover:bg-sky-600 text-white font-medium uppercase tracking-normal py-4 rounded-2xl shadow-lg shadow-sky-200 active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-2"
+                                className="w-full bg-sky-500 hover:bg-sky-600 text-white font-medium uppercase tracking-normal py-4 rounded-lg shadow-lg shadow-sky-200 active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-2"
                             >
                                 <Send size={18} /> Send Message
                             </button>

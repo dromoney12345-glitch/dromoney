@@ -136,7 +136,7 @@ const CoinsAndTasks = () => {
     };
 
     return (
-        <div className="p-6 animate-in fade-in duration-500">
+        <div className="p-4 animate-in fade-in duration-500">
             <PageHeader title="Coins & Tasks" subtitle="Manage daily tasks and coin economy settings" />
 
             {/* Tabs */}
@@ -159,7 +159,7 @@ const CoinsAndTasks = () => {
                     <div className="space-y-3">
                         {tasks.length === 0 && <p className="text-center text-slate-400 text-sm py-10 font-medium">No tasks available.</p>}
                         {tasks.map(task => (
-                            <div key={task._id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center justify-between hover:border-slate-200 transition-all">
+                            <div key={task._id} className="bg-white rounded-lg border border-slate-100 shadow-sm p-4 flex items-center justify-between hover:border-slate-200 transition-all">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-slate-50 rounded-xl flex flex-col items-center justify-center border border-slate-100">
                                         <span className="text-[10px] font-medium text-slate-400 uppercase leading-none mb-1">{task.type}</span>
@@ -200,7 +200,7 @@ const CoinsAndTasks = () => {
                 </>
             ) : (
                 <div className="space-y-4">
-                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+                    <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-4">
                         <h3 className="text-sm font-medium text-slate-800 uppercase tracking-normal mb-5 flex items-center gap-2"><Coins size={16} className="text-amber-500" /> Coin Economy</h3>
                         <div className="space-y-5">
                             <div>
@@ -248,7 +248,7 @@ const CoinsAndTasks = () => {
                         </div>
                         
                         {/* Body */}
-                        <div className="p-6 overflow-y-auto max-h-[70vh] space-y-5">
+                        <div className="p-4 overflow-y-auto max-h-[70vh] space-y-5">
                             
                             {/* Task Type Switcher */}
                             <div>
@@ -324,7 +324,7 @@ const CoinsAndTasks = () => {
                             </div>
 
                             {/* 🛠️ DYNAMIC FIELDS BASED ON TYPE 🛠️ */}
-                            <div className="space-y-4 pt-4 border-t border-slate-100 bg-slate-50 p-4 rounded-2xl border">
+                            <div className="space-y-4 pt-4 border-t border-slate-100 bg-slate-50 p-4 rounded-lg border">
                                 <label className="text-[10px] font-medium text-sky-500 uppercase tracking-normal block flex items-center gap-2"><Settings size={12}/> {newTaskType} Settings</label>
                                 
                                 {/* Video Fields */}

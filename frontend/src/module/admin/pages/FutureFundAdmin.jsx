@@ -151,7 +151,7 @@ const FutureFundAdmin = () => {
 
     if (loadingSettings || usersLoading) {
         return (
-            <div className="p-8 text-center bg-slate-50 min-h-screen flex flex-col items-center justify-center font-medium gap-3">
+            <div className="p-4 text-center bg-slate-50 min-h-screen flex flex-col items-center justify-center font-medium gap-3">
                 <Loader2 className="animate-spin text-indigo-600 w-10 h-10" />
                 <p className="text-xs uppercase font-medium text-slate-400">Loading Future Fund CMS...</p>
             </div>
@@ -159,21 +159,21 @@ const FutureFundAdmin = () => {
     }
 
     return (
-        <div className="p-6 animate-in fade-in duration-700 bg-slate-50/50 min-h-screen">
+        <div className="p-4 animate-in fade-in duration-700 bg-slate-50/50 min-h-screen">
             <PageHeader title="Future Fund Evolution" subtitle="Manage milestones, platform content, and view user history" />
 
             {/* Top Stat Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
                 <AdminStatCard label="Total Users" value={usersData.length} change="Platform wide" icon={UserCheck} color="bg-indigo-600" />
                 <AdminStatCard label="Active Stages" value={usersData.filter(u => u.stage === 'Active').length} change="Monetized" icon={TrendingUp} color="bg-sky-500" />
                 <AdminStatCard label="Eligible Today" value={usersData.filter(u => u.stage === 'Eligible').length} change="Move Forward ready" icon={Award} color="bg-emerald-500" />
                 <AdminStatCard label="Criteria Goal" value={`${rules.targetSales}/${rules.targetDays}/${rules.dailyTargetMinutes}`} change="Referral/Days/Mins" icon={LayoutDashboard} color="bg-amber-500" />
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-5">
                 {/* CMS Control */}
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex flex-col relative group overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-sky-50 opacity-50 rounded-full -mr-10 -mt-10 group-hover:scale-125 transition-transform duration-700"></div>
+                <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-4 flex flex-col relative group overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-sky-50 opacity-50 rounded-full -mr-10 -mt-6 group-hover:scale-125 transition-transform duration-700"></div>
                     <div className="flex items-center justify-between mb-6 relative">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center text-indigo-600"><Edit3 size={18} /></div>
@@ -184,17 +184,17 @@ const FutureFundAdmin = () => {
                     <div className="space-y-6 relative">
                         <div>
                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-3 flex items-center gap-2"><Info size={12} /> Description Text</p>
-                            {editingCms ? <textarea value={cms.description} onChange={(e) => setCms({ ...cms, description: e.target.value })} className="w-full bg-slate-50 border border-sky-200 rounded-2xl p-4 text-[13px] font-medium text-slate-700 h-24 outline-none focus:ring-2 focus:ring-sky-500" /> : <p className="text-[13px] font-medium text-slate-600 leading-relaxed bg-slate-50/50 p-4 rounded-2xl border border-slate-50">"{cms.description}"</p>}
+                            {editingCms ? <textarea value={cms.description} onChange={(e) => setCms({ ...cms, description: e.target.value })} className="w-full bg-slate-50 border border-sky-200 rounded-lg p-4 text-[13px] font-medium text-slate-700 h-24 outline-none focus:ring-2 focus:ring-sky-500" /> : <p className="text-[13px] font-medium text-slate-600 leading-relaxed bg-slate-50/50 p-4 rounded-lg border border-slate-50">"{cms.description}"</p>}
                         </div>
                         <div>
                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-3 flex items-center gap-2"><ShieldAlert size={12} /> Guidelines Box</p>
-                            {editingCms ? <textarea value={cms.guideline} onChange={(e) => setCms({ ...cms, guideline: e.target.value })} className="w-full bg-slate-50 border border-sky-200 rounded-2xl p-4 text-[13px] font-medium text-slate-700 h-20 outline-none focus:ring-2 focus:ring-sky-500" /> : <div className="flex items-start gap-3 bg-sky-50/50 p-4 rounded-2xl border border-sky-100"><Info size={16} className="text-sky-400 mt-0.5" /><p className="text-[11px] font-medium text-sky-800 leading-normal">{cms.guideline}</p></div>}
+                            {editingCms ? <textarea value={cms.guideline} onChange={(e) => setCms({ ...cms, guideline: e.target.value })} className="w-full bg-slate-50 border border-sky-200 rounded-lg p-4 text-[13px] font-medium text-slate-700 h-20 outline-none focus:ring-2 focus:ring-sky-500" /> : <div className="flex items-start gap-3 bg-sky-50/50 p-4 rounded-lg border border-sky-100"><Info size={16} className="text-sky-400 mt-0.5" /><p className="text-[11px] font-medium text-sky-800 leading-normal">{cms.guideline}</p></div>}
                         </div>
                     </div>
                 </div>
 
                 {/* Eligibility Thresholds & Today's Activity Goals */}
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 group relative overflow-hidden flex flex-col justify-between">
+                <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-4 group relative overflow-hidden flex flex-col justify-between">
                     <div className="absolute bottom-0 right-0 w-48 h-48 bg-emerald-50 opacity-30 rounded-full -mb-20 -mr-10 group-hover:scale-110 transition-transform duration-700"></div>
                     
                     <div>
@@ -226,7 +226,7 @@ const FutureFundAdmin = () => {
                             ].map((rule) => {
                                 const Icon = rule.icon || TrendingUp;
                                 return (
-                                    <div key={rule.key} className="bg-slate-50/50 border border-slate-100 p-4 rounded-2xl">
+                                    <div key={rule.key} className="bg-slate-50/50 border border-slate-100 p-4 rounded-lg">
                                         <div className="flex items-center gap-2 mb-1.5"><Icon size={13} className={rule.color} /><p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal leading-none">{rule.label}</p></div>
                                         {editingRules ? (
                                             <input type="number" value={rules[rule.key]} onChange={(e) => setRules({ ...rules, [rule.key]: Number(e.target.value) })} className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-md font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-500" />
@@ -248,7 +248,7 @@ const FutureFundAdmin = () => {
                                     { label: 'Events Target', key: 'futureFundEventsTarget', color: 'text-amber-500' },
                                     { label: 'Boosters Target', key: 'futureFundBoostersTarget', color: 'text-rose-500' }
                                 ].map((act) => (
-                                    <div key={act.key} className="bg-slate-50/50 border border-slate-100 p-3.5 rounded-2xl">
+                                    <div key={act.key} className="bg-slate-50/50 border border-slate-100 p-3.5 rounded-lg">
                                         <p className="text-[8px] font-medium text-slate-400 uppercase tracking-tight mb-1.5 leading-none">{act.label}</p>
                                         {editingRules ? (
                                             <input 
@@ -266,22 +266,22 @@ const FutureFundAdmin = () => {
                         </div>
                     </div>
                     
-                    <div className="mt-4 p-3 bg-slate-50 rounded-2xl border border-slate-100 text-[10px] text-slate-400 font-medium leading-normal">
+                    <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-100 text-[10px] text-slate-400 font-medium leading-normal">
                         These dynamic settings configure the targets shown in the User's Active Future Fund screen and are saved directly into the database.
                     </div>
                 </div>
             </div>
 
             {/* Tracker Table with Pagination */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-8">
-                <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden mb-5">
+                <div className="p-4 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-100 font-medium">FF</div>
+                        <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-indigo-100 font-medium">FF</div>
                         <div><h2 className="text-sm font-medium text-slate-800 uppercase tracking-normal">User Progress Tracker</h2><p className="text-[10px] text-slate-400 font-medium uppercase tracking-tighter leading-none mt-1">Milestone Stages</p></div>
                     </div>
                     <div className="relative w-full md:w-80">
                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none" />
-                        <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }} placeholder="Search user history..." className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-9 pr-4 py-3 text-[12px] font-medium text-slate-700 outline-none transition-all shadow-inner" />
+                        <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }} placeholder="Search user history..." className="w-full bg-slate-50 border border-slate-100 rounded-lg pl-9 pr-4 py-3 text-[12px] font-medium text-slate-700 outline-none transition-all shadow-inner" />
                     </div>
                 </div>
                 <div className="overflow-x-auto min-h-[360px]">
@@ -335,12 +335,12 @@ const FutureFundAdmin = () => {
             {selectedUser && (
                 <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
                     <div onClick={() => { setSelectedUser(null); setSelectedUserHistory([]); }} className="absolute inset-0 bg-[#0F172A]/90 backdrop-blur-sm animate-in fade-in duration-300"></div>
-                    <div className="relative bg-white w-full max-w-[380px] rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-400">
+                    <div className="relative bg-white w-full max-w-[380px] rounded-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-400">
                         <div className="bg-[#0F172A] p-4 text-white flex justify-between items-center">
                             <div><h3 className="text-md font-medium tracking-tight">{selectedUser.name}'s History</h3><p className="text-[9px] text-sky-400 font-medium uppercase tracking-normal leading-none mt-1">Last 7 Days Earnings</p></div>
                             <button onClick={() => { setSelectedUser(null); setSelectedUserHistory([]); }} className="text-white/40 hover:text-white"><XCircle size={20} /></button>
                         </div>
-                        <div className="p-6">
+                        <div className="p-4">
                             {historyLoading ? (
                                 <div className="flex flex-col items-center justify-center py-6 gap-3">
                                     <Loader2 className="animate-spin text-indigo-500 w-8 h-8" />
@@ -349,7 +349,7 @@ const FutureFundAdmin = () => {
                             ) : (
                                 <div className="space-y-2 mb-6 max-h-[280px] overflow-y-auto scrollbar-hide">
                                     {selectedUserHistory.length > 0 ? selectedUserHistory.map((day, idx) => (
-                                        <div key={idx} className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-100 rounded-2xl">
+                                        <div key={idx} className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-100 rounded-lg">
                                             <div className="flex items-center gap-3"><Calendar size={12} className="text-slate-300" /><p className="text-[11px] font-medium text-slate-600 tracking-tight">{day.date}</p></div>
                                             <p className={`text-[13px] font-medium ${day.total > 0 ? 'text-emerald-600' : 'text-slate-400'}`}>{day.total > 0 ? `+ ₹${day.total}` : '₹0.00'}</p>
                                         </div>
@@ -360,7 +360,7 @@ const FutureFundAdmin = () => {
                                     )}
                                 </div>
                             )}
-                            <button onClick={() => { setSelectedUser(null); setSelectedUserHistory([]); }} className="w-full bg-[#0F172A] text-white py-4 rounded-[20px] font-medium text-[11px] uppercase tracking-normal shadow-xl active:scale-95 transition-all">Close History</button>
+                            <button onClick={() => { setSelectedUser(null); setSelectedUserHistory([]); }} className="w-full bg-[#0F172A] text-white py-4 rounded-lg font-medium text-[11px] uppercase tracking-normal shadow-xl active:scale-95 transition-all">Close History</button>
                         </div>
                     </div>
                 </div>
