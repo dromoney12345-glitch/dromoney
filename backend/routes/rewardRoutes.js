@@ -9,7 +9,7 @@ router.use(protect);
 
 const MAX_DAILY_ADS = 10;
 const REWARD_AMOUNT = 5;
-const COOLDOWN_MINUTES = 15;
+const COOLDOWN_SECONDS = 30;
 
 // Reset daily count if a new day has started
 const checkAndResetDailyLimit = async (user) => {
@@ -43,7 +43,7 @@ router.get('/status', async (req, res) => {
 
         if (user.lastRewardAt) {
             const diff = Date.now() - new Date(user.lastRewardAt).getTime();
-            const cooldownMs = COOLDOWN_MINUTES * 60 * 1000;
+            const cooldownMs = COOLDOWN_SECONDS * 1000;
             if (diff < cooldownMs) {
                 available = false;
                 nextAdIn = Math.ceil((cooldownMs - diff) / 1000); // seconds remaining
@@ -85,9 +85,9 @@ router.post('/claim', async (req, res) => {
         // Check cooldown
         if (user.lastRewardAt) {
             const diff = Date.now() - new Date(user.lastRewardAt).getTime();
-            const cooldownMs = COOLDOWN_MINUTES * 60 * 1000;
+            const cooldownMs = COOLDOWN_SECONDS * 1000;
             if (diff < cooldownMs) {
-                return res.status(400).json({ success: false, message: `Wait ${COOLDOWN_MINUTES} minutes` });
+                return res.status(400).json({ success: false, message: `Wait ${COOLDOWN_SECONDS} seconds` });
             }
         }
 
