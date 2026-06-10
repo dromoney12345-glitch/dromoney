@@ -72,6 +72,20 @@ api.interceptors.response.use(
 
         const status = error.response?.status;
         console.error('API Error:', message);
+
+        // Auto-logout on 401 Unauthorized — token is expired or invalid
+        // Only trigger on core auth endpoints to avoid redirecting mid-task
+        if (status === 401) {
+            const url = error.config?.url || '';
+            const isAuthEndpoint = url.includes('/auth/') || url.includes('/reward/') || url.includes('/admin/');
+            if (isAuthEndpoint) {
+                localStorage.removeItem('dromoney_token');
+                if (!window.location.pathname.includes('/auth/login')) {
+                    window.location.href = '/user/auth/login';
+                }
+            }
+        }
+
         return Promise.reject({ message, status });
     }
 );

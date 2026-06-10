@@ -20,7 +20,7 @@ exports.register = async (req, res, next) => {
 
         // Verify OTP from database
         const otpRecord = await Otp.findOne({ phone, code: otp });
-        if (!otpRecord && otp !== '123456') { // Master OTP fallback
+        if (!otpRecord) {
             return next(new ErrorResponse('Invalid or expired OTP', 401));
         }
 
@@ -268,8 +268,8 @@ exports.verifyLoginOtp = async (req, res, next) => {
         // Verify OTP from database
         const otpRecord = await Otp.findOne({ phone, code: otp });
         
-        if (!otpRecord && otp !== '123456') { // Master OTP fallback
-             return next(new ErrorResponse('Invalid or expired OTP', 401));
+        if (!otpRecord) {
+            return next(new ErrorResponse('Invalid or expired OTP', 401));
         }
 
         // Delete OTP after verification

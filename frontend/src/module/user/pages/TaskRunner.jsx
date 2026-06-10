@@ -161,10 +161,20 @@ const TaskRunner = () => {
 
         setStatus('completed');
         const rewardAmount = task.coinsReward || task.reward || 0;
-        addCoins(rewardAmount, task.title);
-        // Persist completion state
-        taskStorage.markComplete(task._id || task.id);
+        const taskId = task._id || task.id;
+        const result = await addCoins(rewardAmount, task.title, taskId);
+        
+        if (!result || !result.success) {
+            // Coins failed — show error, reset to verify so user can try again
+            alert(result?.message || 'Failed to add coins. Please try again.');
+            setStatus('verify');
+            return;
+        }
+        
+        // Persist completion state only if coins were successfully added
+        taskStorage.markComplete(taskId);
         setTimeout(() => navigate('/user/earn'), 2000);
+
     };
 
     return (

@@ -29,6 +29,7 @@ const MemoryMasterView = () => {
     const [peekTime, setPeekTime] = useState(2.5);
     const [maxTime, setMaxTime] = useState(60);
     const [cardIcons, setCardIcons] = useState(DEFAULT_CARDS);
+    const [isEvent, setIsEvent] = useState(false); // true only if opened from Events page
 
     const [step, setStep] = useState(0); // 0: Intro, 1: Peek/Ready, 2: Playing, 3: Result
     const [cards, setCards] = useState([]);
@@ -48,9 +49,12 @@ const MemoryMasterView = () => {
                     setMaxTime(cfg?.maxTime || 60);
                     setTimeLeft(cfg?.maxTime || 60);
                     setCardIcons(cfg?.cards || DEFAULT_CARDS);
+                    setIsEvent(true); // confirmed it's an event
                 }
             } catch (err) {
-                console.error("Failed to load Memory Master details:", err);
+                // 404 means this is a task ID, not an event ID — use defaults from taskStorage
+                console.log("Memory Master: Not an event, running as task with defaults");
+                setIsEvent(false);
             } finally {
                 setLoading(false);
             }
@@ -128,26 +132,28 @@ const MemoryMasterView = () => {
         }
     };
 
-    const handleFinish = (isWin) => {
+    const handleFinish = async (isWin) => {
         setStep(3);
         if (isWin) {
             const reward = Math.max(10, Math.floor((timeLeft / maxTime) * 100));
-            addCoins(reward, 'Memory Master Victory');
+            await addCoins(reward, 'Memory Master Victory', id);
             addNotification('Memory Master Won!', `You completed the challenge with ${timeLeft}s left!`, 'success');
             
-            const completed = JSON.parse(localStorage.getItem('dromoney_completed_events') || '[]');
-            const eventIdForStorage = id || 'memory-master';
-            if (!completed.includes(eventIdForStorage)) {
-                completed.push(eventIdForStorage);
-                localStorage.setItem('dromoney_completed_events', JSON.stringify(completed));
-                
-                // Save participant record dynamically
-                api.post(`/user/data/events/${id}/submit`, {
-                    score: timeLeft,
-                    result: `${timeLeft}s remaining`,
-                    prize: `${reward} Coins`,
-                    timeTaken: maxTime - timeLeft
-                }).catch(err => console.error("Failed to save submission:", err));
+            // Only submit to events API if this was opened as an event (not a task)
+            if (isEvent) {
+                const completed = JSON.parse(localStorage.getItem('dromoney_completed_events') || '[]');
+                const eventIdForStorage = id || 'memory-master';
+                if (!completed.includes(eventIdForStorage)) {
+                    completed.push(eventIdForStorage);
+                    localStorage.setItem('dromoney_completed_events', JSON.stringify(completed));
+
+                    api.post(`/user/data/events/${id}/submit`, {
+                        score: timeLeft,
+                        result: `${timeLeft}s remaining`,
+                        prize: `${reward} Coins`,
+                        timeTaken: maxTime - timeLeft
+                    }).catch(err => console.error("Failed to save event submission:", err));
+                }
             }
         }
     };

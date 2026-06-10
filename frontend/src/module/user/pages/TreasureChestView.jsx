@@ -27,10 +27,10 @@ const TreasureChestView = () => {
         setWinningIdx(Math.floor(Math.random() * 3));
         setStep(1);
 
-        setTimeout(() => {
+        setTimeout(async () => {
             setStep(2);
             if (idx === winningIdx || true) { // Logic: For now, always win to make client happy, or use random
-                 addCoins(task.reward, 'Treasure Chest Found', task._id || task.id);
+                 await addCoins(task.reward, 'Treasure Chest Found', task._id || task.id);
                  taskStorage.markComplete(task._id || task.id);
             }
         }, 1500);

@@ -183,7 +183,7 @@ const WatchAndEarn = () => {
                                     </div>
                                     <div className="bg-amber-50 text-amber-600 px-2.5 py-1 rounded-lg border border-amber-100 flex items-center gap-1.5">
                                         <RefreshCw size={12} className="animate-spin" />
-                                        <span className="text-[11px] font-medium">Cooldown</span>
+                                        <span className="text-[11px] font-medium">Countdown</span>
                                     </div>
                                 </div>
                                 <div className="bg-slate-50 rounded-lg p-3 text-center border border-slate-100">

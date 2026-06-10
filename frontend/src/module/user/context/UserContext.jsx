@@ -273,9 +273,20 @@ export const UserProvider = ({ children }) => {
 
     const addCoins = async (amount, source, taskId) => {
         try {
-            await api.post('/user/wallet/add-coins', { amount, source, taskId });
-            await refreshUserProfile();
-        } catch (err) { console.error(err); }
+            const res = await api.post('/user/wallet/add-coins', { amount, source, taskId });
+            // Immediately update local coin balance from the server-confirmed value
+            // This avoids calling refreshUserProfile() which was hitting /auth/me → 401 → auto-logout
+            if (res?.data?.newCoinBalance !== undefined) {
+                setUserData(prev => ({
+                    ...prev,
+                    coins: { ...prev.coins, total: res.data.newCoinBalance }
+                }));
+            }
+            return { success: true };
+        } catch (err) {
+            console.error('addCoins error:', err);
+            return { success: false, message: err.message || 'Failed to add coins' };
+        }
     };
 
     const requestWithdrawal = async (amount, bankDetails) => {

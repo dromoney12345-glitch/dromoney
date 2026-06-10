@@ -53,9 +53,9 @@ const SpeedTapperView = () => {
         }
     };
 
-    const handleWin = () => {
+    const handleWin = async () => {
         setStatus('won');
-        addCoins(task.reward, 'Speed Tapper Mastery', task._id || task.id);
+        await addCoins(task.reward, 'Speed Tapper Mastery', task._id || task.id);
         taskStorage.markComplete(task._id || task.id);
     };
 
