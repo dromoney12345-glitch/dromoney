@@ -5,7 +5,7 @@ import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
 
 const WatchAndEarn = () => {
-    const { userData, fetchUserData } = useUser();
+    const { userData, refreshUserProfile } = useUser();
     const [status, setStatus] = useState(null);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
@@ -47,7 +47,7 @@ const WatchAndEarn = () => {
                 showToast(errMsg, "error");
             }
             await fetchStatus();
-            if (fetchUserData) await fetchUserData(); // Refresh user balance
+            if (refreshUserProfile) await refreshUserProfile(); // Refresh user balance
         };
 
         return () => {
@@ -133,7 +133,7 @@ const WatchAndEarn = () => {
                     <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1 bg-white/15 px-2.5 py-1 rounded-full border border-white/15">
                             <Coins size={11} className="text-yellow-300 fill-yellow-300" />
-                            <span className="text-[11px] text-white">{userData?.coins?.balance || 0}</span>
+                            <span className="text-[11px] text-white">{userData?.coins?.total || 0}</span>
                         </div>
                         <div className="w-9 h-9 bg-white/15 border border-white/20 rounded-xl flex items-center justify-center">
                             <MonitorPlay size={18} className="text-white" />
