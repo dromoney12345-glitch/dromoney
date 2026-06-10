@@ -27,7 +27,8 @@ const checkAndResetDailyLimit = async (user) => {
 // @access  Private
 router.get('/status', async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
+        // req.user is set by the protect middleware from the JWT token
+        const user = req.user;
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
         const settings = await Settings.findOne() || {};
@@ -71,10 +72,8 @@ router.get('/status', async (req, res) => {
 // @access  Private
 router.post('/claim', async (req, res) => {
     try {
-        const { userId } = req.body;
-        const idToUse = userId || req.user.id;
-        
-        const user = await User.findById(idToUse);
+        // req.user is set by the protect middleware from the JWT token (never from req.body)
+        const user = req.user;
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
         const settings = await Settings.findOne() || {};
@@ -101,10 +100,10 @@ router.post('/claim', async (req, res) => {
         if (!user.coins) {
             user.coins = { balance: 0, lifetimeCoins: 0 };
         }
-        
+
         user.coins.balance = (user.coins.balance || 0) + REWARD_AMOUNT;
         user.coins.lifetimeCoins = (user.coins.lifetimeCoins || 0) + REWARD_AMOUNT;
-        
+
         user.lastRewardAt = new Date();
         user.todayRewardCount = (user.todayRewardCount || 0) + 1;
 
