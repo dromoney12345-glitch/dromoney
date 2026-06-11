@@ -8,6 +8,7 @@ const WatchAndEarn = () => {
     const { userData, refreshUserProfile } = useUser();
     const [status, setStatus] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [calling, setCalling] = useState(false);
     const [toast, setToast] = useState(null);
 
     const showToast = (message, type = 'success') => {
@@ -31,12 +32,14 @@ const WatchAndEarn = () => {
 
     useEffect(() => {
         fetchStatus();
+    }, []);
 
-        // Expose a function to flutter so it can tell React to refresh after ad is completed
+    // Expose refreshRewardStatus to Flutter — re-registered when showToast updates
+    useEffect(() => {
         window.refreshRewardStatus = async () => {
             try {
                 const claimRes = await api.post('/reward/claim');
-                if(claimRes.success) {
+                if (claimRes.success) {
                     showToast("Reward earned! Coins added successfully.");
                 } else {
                     showToast(claimRes.message || "Could not claim reward.", "error");
@@ -47,13 +50,13 @@ const WatchAndEarn = () => {
                 showToast(errMsg, "error");
             }
             await fetchStatus();
-            if (refreshUserProfile) await refreshUserProfile(); // Refresh user balance
+            if (refreshUserProfile) await refreshUserProfile();
         };
 
         return () => {
             delete window.refreshRewardStatus;
         };
-    }, []);
+    }, [showToast, refreshUserProfile]);
 
     // Cooldown countdown logic
     const [cooldownRemaining, setCooldownRemaining] = useState(0);
@@ -78,18 +81,24 @@ const WatchAndEarn = () => {
         return () => clearInterval(t);
     }, [status?.nextAdIn]);
 
-    const handleWatchAd = () => {
+    const handleWatchAd = async () => {
         if (!status?.available) {
             showToast("Ad is not available right now.", "error");
             return;
         }
+        if (calling) return;
 
-        // Call flutter handler (mobile app only)
+        // Mobile app only — call Flutter handler
         if (window.flutter_inappwebview) {
-            window.flutter_inappwebview.callHandler('showRewardAd', 'reward_ad_1').catch(e => {
+            try {
+                setCalling(true);
+                await window.flutter_inappwebview.callHandler('showRewardAd', 'reward_ad_1');
+            } catch (e) {
                 console.error("Flutter handler error", e);
-                showToast("Failed to launch Ad.", "error");
-            });
+                showToast("Failed to launch Ad. Please try again.", "error");
+            } finally {
+                setCalling(false);
+            }
         } else {
             showToast("This feature is only available in the mobile app.", "error");
         }
@@ -209,10 +218,15 @@ const WatchAndEarn = () => {
                                     </div>
                                     <button 
                                         onClick={handleWatchAd}
-                                        className="w-full bg-indigo-600 text-white py-3 rounded-xl text-[13px] font-medium flex items-center justify-center gap-2 hover:bg-indigo-700 active:scale-[0.98] transition-all"
+                                        disabled={calling || !status?.available}
+                                        className={`w-full py-3 rounded-xl text-[13px] font-medium flex items-center justify-center gap-2 transition-all ${
+                                            calling || !status?.available
+                                                ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                                                : 'bg-indigo-600 text-white hover:bg-indigo-700 active:scale-[0.98]'
+                                        }`}
                                     >
                                         <MonitorPlay size={16} />
-                                        Watch Ad Now
+                                        {calling ? 'Launching Ad...' : 'Watch Ad Now'}
                                     </button>
                                 </div>
                             </div>
