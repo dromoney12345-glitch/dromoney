@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
-import { ChevronLeft, CheckCircle2, Play, UploadCloud, Link as LinkIcon, Loader2, Image as ImageIcon, Coins, Camera } from 'lucide-react';
+import { ChevronLeft, CheckCircle2, Play, UploadCloud, Link as LinkIcon, Loader2, Image as ImageIcon, Coins, Camera, XCircle } from 'lucide-react';
 
 const TaskRunner = () => {
     const { id } = useParams();
@@ -20,9 +20,15 @@ const TaskRunner = () => {
     // Fetch dynamic task from storage once inside an effect
     const [task, setTask] = useState(null);
     const [timeLeft, setTimeLeft] = useState(0);
-    const [status, setStatus] = useState('idle'); // idle, running, verify, completed
+    const [status, setStatus] = useState('idle'); // idle, running, verify, completed, calling_ad
     const [screenshotFile, setScreenshotFile] = useState(null);
+    const [toast, setToast] = useState(null);
     const fileInputRef = React.useRef(null);
+
+    const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 4000);
+    };
 
     useEffect(() => {
         const loadTask = async () => {
@@ -114,12 +120,33 @@ const TaskRunner = () => {
         return url;
     };
 
-    const startTask = () => {
+    const startTask = async () => {
+        if (task.type === 'Video') {
+            setStatus('calling_ad');
+            if (window.flutter_inappwebview) {
+                // Register callback for when Flutter ad completes
+                window.refreshRewardStatus = async () => {
+                    delete window.refreshRewardStatus;
+                    await submitTask();
+                };
+                try {
+                    await window.flutter_inappwebview.callHandler('showRewardAd', 'reward_ad_1');
+                } catch (e) {
+                    console.error("Flutter handler error", e);
+                    showToast("Failed to launch Ad. Please try again.", "error");
+                    setStatus('idle');
+                }
+            } else {
+                showToast("This feature is only available in the mobile app.", "error");
+                setStatus('idle');
+            }
+            return;
+        }
+
         setStatus('running');
-        
-        // Open the external URL if it's Web/Join/Social task
+        // Open the external URL if it's Web/Join/Social/Watch/Bonus task
         const taskUrl = task.link || task.config?.url;
-        if ((task.type === 'Web' || task.type === 'Join' || task.type === 'Social') && taskUrl) {
+        if ((task.type === 'Web' || task.type === 'Join' || task.type === 'Social' || task.type === 'Watch' || task.type === 'Bonus') && taskUrl) {
             window.open(taskUrl, '_blank', 'noopener,noreferrer');
         }
     };
@@ -179,6 +206,15 @@ const TaskRunner = () => {
 
     return (
         <div className="bg-slate-950 min-h-screen text-slate-200 flex flex-col sm:max-w-md sm:mx-auto relative z-[500] selection:bg-sky-500/30">
+            {toast && (
+                <div className={`fixed top-5 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-2.5 px-4 py-3 rounded-xl border shadow-xl animate-in fade-in slide-in-from-top-4 duration-300 w-[88%] max-w-sm ${
+                    toast.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-rose-50 border-rose-100 text-rose-800'
+                }`}>
+                    {toast.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> : <XCircle className="w-4 h-4 text-rose-600 shrink-0" />}
+                    <span className="text-[11px]">{toast.message}</span>
+                </div>
+            )}
+
             {/* Nav Header */}
             <div className="px-4 py-4 flex items-center gap-4 bg-slate-900 border-b border-slate-800 sticky text-left top-0 z-10 w-full shadow-lg">
                 <button onClick={() => navigate(-1)} className="p-2 bg-slate-950 rounded-full hover:bg-slate-800 transition-colors border border-slate-800">
@@ -201,94 +237,22 @@ const TaskRunner = () => {
             {/* Content Body based on Task Type */}
             <div className="flex-1 p-5 flex flex-col">
                 
-                {/* VIDEO TASK */}
-                {task.type === 'Video' && (
-                    <div className="flex-1 flex flex-col">
-                        <div className="w-full bg-slate-900 rounded-3xl overflow-hidden aspect-video relative border border-slate-800 shadow-2xl flex flex-col justify-center items-center group">
-                            
-                            {status === 'idle' && (
-                                <>
-                                    <div className="absolute inset-0 bg-slate-950"></div>
-                                    <button onClick={startTask} className="z-10 w-16 h-16 bg-sky-500 hover:scale-110 active:scale-95 transition-transform rounded-full flex items-center justify-center pl-1 shadow-[0_0_25px_rgba(14,165,233,0.6)]">
-                                        <Play size={28} className="text-slate-950" />
-                                    </button>
-                                </>
-                            )}
-                            
-                            {status === 'running' && (
-                                <div className="absolute inset-0 flex flex-col bg-slate-950 z-10">
-                                    <iframe 
-                                        src={formatVideoUrl(task.config?.url)} 
-                                        className="w-full flex-1 border-0 h-full"
-                                        title="Sponsor Video"
-                                        allow="autoplay; encrypted-media"
-                                        allowFullScreen
-                                    ></iframe>
-                                    
-                                    {/* Progress Bar Container */}
-                                    <div className="h-2 w-full bg-slate-800 relative z-30">
-                                        {/* Dynamic Progress Line */}
-                                        <div 
-                                            className="absolute top-0 left-0 h-full bg-sky-500 transition-all duration-1000 ease-linear shadow-[0_0_10px_rgba(14,165,233,0.8)]"
-                                            style={{ width: `${((Number(task.config?.timer) || 30) - timeLeft) / (Number(task.config?.timer) || 30) * 100}%` }}
-                                        ></div>
-                                    </div>
-                                    
-                                    {/* Overlay to block clicks but allow seeing the video */}
-                                    <div className="absolute inset-0 z-20 pointer-events-auto bg-transparent h-[calc(100%-8px)]"></div>
-
-                                    <div className="absolute top-3 right-3 bg-slate-950/80 px-3 py-1.5 rounded-full border border-slate-800 backdrop-blur flex items-center gap-2 shadow-xl z-40">
-                                        <div className="w-2 h-2 rounded-full bg-rose-500 animate-[ping_2s_infinite]"></div>
-                                        <span className="text-white font-medium font-mono text-[10px]">00:{timeLeft.toString().padStart(2, '0')}</span>
-                                    </div>
-                                </div>
-                            )}
-
-                            {status === 'verify' && (
-                                <div className="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center z-50 animate-in fade-in duration-500 p-4">
-                                    <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mb-3 border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                                        <CheckCircle2 size={32} className="text-emerald-400" />
-                                    </div>
-                                    <h3 className="text-base font-medium text-white uppercase tracking-tight mb-4">Video Watched!</h3>
-                                    <button 
-                                        onClick={submitTask}
-                                        className="w-full max-w-[200px] px-6 py-3 bg-sky-500 hover:bg-sky-400 active:scale-95 font-medium text-slate-950 rounded-xl shadow-[0_0_15px_rgba(14,165,233,0.3)] transition-all uppercase tracking-widest text-[10px]"
-                                    >
-                                        Claim Reward
-                                    </button>
-                                </div>
-                            )}
-                            
-                            {status === 'completed' && (
-                                <div className="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center z-50 animate-in zoom-in duration-500">
-                                    <Loader2 size={32} className="text-sky-500 animate-spin mb-3" />
-                                    <h3 className="text-[11px] font-medium text-white uppercase tracking-widest">Processing...</h3>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="mt-6 bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-inner">
-                            <h3 className="text-xs font-medium text-slate-300 mb-3 uppercase tracking-widest text-sky-400">Task Instructions</h3>
-                            <ul className="text-xs text-slate-400 list-disc list-inside space-y-2 font-medium leading-relaxed marker:text-slate-600">
-                                <li>Tap PLAY and do not close your screen during playback.</li>
-                                <li>Watch the full Sponsored Video without skipping.</li>
-                                <li>Claim your guaranteed {task.reward || task.coinsReward} Coin reward instantly after end.</li>
-                            </ul>
-                        </div>
-                    </div>
-                )}
-
-                {/* LINK / WEB / JOIN / SOCIAL TASKS */}
-                {(task.type === 'Web' || task.type === 'Join' || task.type === 'Social' || task.type === 'Survey' || task.type === 'Watch' || task.type === 'Bonus') && (
+                {/* LINK / WEB / JOIN / SOCIAL / VIDEO TASKS */}
+                {(task.type === 'Web' || task.type === 'Join' || task.type === 'Social' || task.type === 'Survey' || task.type === 'Watch' || task.type === 'Bonus' || task.type === 'Video') && (
                     <div className="flex-1 flex flex-col justify-center">
                         <div className="w-full flex-1 min-h-[400px] bg-slate-900 border border-slate-800 rounded-3xl flex flex-col overflow-hidden relative shadow-lg items-center justify-center p-6 text-center">
                             
-                            {status === 'idle' && (
+                            {(status === 'idle' || status === 'calling_ad') && (
                                 <div className="flex flex-col items-center justify-center animate-in fade-in zoom-in duration-500">
-                                    <button onClick={startTask} className="px-8 py-4 bg-sky-500 hover:bg-sky-400 active:scale-95 font-medium text-slate-950 rounded-xl shadow-[0_0_20px_rgba(14,165,233,0.3)] transition-all uppercase tracking-widest text-xs flex items-center gap-2">
-                                        Open Sponsor Portal <LinkIcon size={16} />
+                                    <button 
+                                        onClick={startTask}
+                                        disabled={status === 'calling_ad'}
+                                        className="px-8 py-4 bg-sky-500 hover:bg-sky-400 active:scale-95 disabled:bg-slate-800 disabled:text-slate-400 font-medium text-slate-950 rounded-xl shadow-[0_0_20px_rgba(14,165,233,0.3)] disabled:shadow-none transition-all uppercase tracking-widest text-xs flex items-center gap-2">
+                                        {status === 'calling_ad' ? <Loader2 size={16} className="animate-spin" /> : null}
+                                        {status === 'calling_ad' ? 'Launching Ad...' : (task.type === 'Video' ? 'Watch and Earn' : 'Open Sponsor Portal')} 
+                                        {status !== 'calling_ad' && (task.type === 'Video' ? <Play size={16} className="fill-current" /> : <LinkIcon size={16} />)}
                                     </button>
-                                    <p className="text-[10px] text-slate-500 mt-5 font-medium uppercase tracking-widest">Opens in Safe Browser</p>
+                                    <p className="text-[10px] text-slate-500 mt-5 font-medium uppercase tracking-widest">{task.type === 'Video' ? 'Powered by AdMob' : 'Opens in Safe Browser'}</p>
                                 </div>
                             )}
                                 

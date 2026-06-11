@@ -250,6 +250,7 @@ export const UserProvider = ({ children }) => {
         setIsAuthenticated(false);
         setUserData(INITIAL_USER_STATE);
         localStorage.removeItem('dromoney_read_notifs');
+        localStorage.removeItem('dromoney_completed_tasks');
     };
 
     const unlockPlatform = async () => {
