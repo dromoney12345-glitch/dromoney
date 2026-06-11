@@ -18,13 +18,20 @@ exports.register = async (req, res, next) => {
             return next(new ErrorResponse('Please provide phone and OTP', 400));
         }
 
-        // Verify OTP from database
-        const otpRecord = await Otp.findOne({ phone, code: otp });
-        if (!otpRecord) {
-            return next(new ErrorResponse('Invalid or expired OTP', 401));
+        // Mock OTP bypass — ONLY for test number 9999999999
+        const isMockTestNumber = phone === '9999999999';
+        const isMockOtp = otp === '123456';
+
+        // Verify OTP: allow mock bypass for test number, otherwise check DB
+        let otpRecord = null;
+        if (!(isMockTestNumber && isMockOtp)) {
+            otpRecord = await Otp.findOne({ phone, code: otp });
+            if (!otpRecord) {
+                return next(new ErrorResponse('Invalid or expired OTP', 401));
+            }
         }
 
-        // Delete OTP after verification
+        // Delete OTP after verification (skip for mock)
         if (otpRecord) await Otp.deleteOne({ _id: otpRecord._id });
 
         // Check if user already exists
@@ -265,14 +272,20 @@ exports.verifyLoginOtp = async (req, res, next) => {
             return next(new ErrorResponse('Please provide phone and OTP', 400));
         }
 
-        // Verify OTP from database
-        const otpRecord = await Otp.findOne({ phone, code: otp });
-        
-        if (!otpRecord) {
-            return next(new ErrorResponse('Invalid or expired OTP', 401));
+        // Mock OTP bypass — ONLY for test number 9999999999
+        const isMockTestNumber = phone === '9999999999';
+        const isMockOtp = otp === '123456';
+
+        // Verify OTP: allow mock bypass for test number, otherwise check DB
+        let otpRecord = null;
+        if (!(isMockTestNumber && isMockOtp)) {
+            otpRecord = await Otp.findOne({ phone, code: otp });
+            if (!otpRecord) {
+                return next(new ErrorResponse('Invalid or expired OTP', 401));
+            }
         }
 
-        // Delete OTP after verification
+        // Delete OTP after verification (skip for mock)
         if (otpRecord) await Otp.deleteOne({ _id: otpRecord._id });
 
         const user = await User.findOne({ phone });
