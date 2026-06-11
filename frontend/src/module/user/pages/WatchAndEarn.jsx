@@ -78,34 +78,20 @@ const WatchAndEarn = () => {
         return () => clearInterval(t);
     }, [status?.nextAdIn]);
 
-    const handleWatchAd = async () => {
+    const handleWatchAd = () => {
         if (!status?.available) {
             showToast("Ad is not available right now.", "error");
             return;
         }
 
-        // Call flutter handler (mobile app)
+        // Call flutter handler (mobile app only)
         if (window.flutter_inappwebview) {
             window.flutter_inappwebview.callHandler('showRewardAd', 'reward_ad_1').catch(e => {
                 console.error("Flutter handler error", e);
                 showToast("Failed to launch Ad.", "error");
             });
-            // Coins will be credited via window.refreshRewardStatus() callback after ad finishes
         } else {
-            // Web / browser: simulate ad watch and claim coins directly
-            try {
-                const claimRes = await api.post('/reward/claim');
-                if (claimRes.success) {
-                    showToast(`🎉 +${claimRes.coins !== undefined ? status?.rewardAmount || 5 : 5} Coins added successfully!`);
-                } else {
-                    showToast(claimRes.message || "Could not claim reward.", "error");
-                }
-            } catch (err) {
-                const errMsg = err.response?.data?.message || err.message || "Failed to claim reward.";
-                showToast(errMsg, "error");
-            }
-            await fetchStatus();
-            if (refreshUserProfile) await refreshUserProfile();
+            showToast("This feature is only available in the mobile app.", "error");
         }
     };
 
