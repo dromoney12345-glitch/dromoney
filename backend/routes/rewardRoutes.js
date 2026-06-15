@@ -115,13 +115,7 @@ router.post('/claim', async (req, res) => {
         user.coins.balance = (user.coins.balance || 0) + rewardAmount;
         user.coins.lifetimeCoins = (user.coins.lifetimeCoins || 0) + rewardAmount;
 
-        // Conversion logic: 1 Coin = ₹0.1
-        const coinToRupeeConversion = 0.1;
-        const earningsInRupee = parseFloat((rewardAmount * coinToRupeeConversion).toFixed(2));
-        
-        user.wallet.balance = (user.wallet.balance || 0) + earningsInRupee;
-        user.wallet.lifetimeEarnings = (user.wallet.lifetimeEarnings || 0) + earningsInRupee;
-        user.wallet.todayEarnings = (user.wallet.todayEarnings || 0) + earningsInRupee;
+        // Conversion logic removed
 
         user.lastRewardAt = new Date();
         user.todayRewardCount = (user.todayRewardCount || 0) + 1;
@@ -146,20 +140,12 @@ router.post('/claim', async (req, res) => {
             status: 'Success'
         });
 
-        await Transaction.create({
-            user: user._id,
-            type: 'credit',
-            currency: 'INR',
-            amount: earningsInRupee,
-            source: 'Watched Reward Ad Conversion',
-            status: 'Success'
-        });
+        // Removed INR transaction
 
         res.json({
             success: true,
             message: 'Reward claimed successfully',
-            coins: user.coins.balance,
-            amountAdded: earningsInRupee
+            coins: user.coins.balance
         });
     } catch (err) {
         console.error(err);

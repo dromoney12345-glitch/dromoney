@@ -155,18 +155,12 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
     const factor = user.isBoosterActive ? 3 : 1;
     const totalAwardedCoins = baseReward * factor;
 
-    // Conversion logic: 1 Coin = ₹0.1
-    const coinToRupeeConversion = 0.1;
-    const earningsInRupee = parseFloat((totalAwardedCoins * coinToRupeeConversion).toFixed(2));
-
     // Update User
     user.coins.balance += totalAwardedCoins;
     user.coins.lifetimeCoins += totalAwardedCoins;
     
     // Also update wallet balance (Auto-conversion)
-    user.wallet.balance += earningsInRupee;
-    user.wallet.lifetimeEarnings += earningsInRupee;
-    user.wallet.todayEarnings += earningsInRupee;
+    // removed
 
     user.watchedAds.push(adId);
     user.dailyAdCount += 1;
@@ -187,14 +181,7 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
         status: 'Success'
     });
 
-    await Transaction.create({
-        user: user._id,
-        type: 'credit',
-        currency: 'INR',
-        amount: earningsInRupee,
-        source: `Ad Conversion: ${ad.title}`,
-        status: 'Success'
-    });
+    // removed INR transaction
 
     // 8. Update Ad view count
     ad.viewCount += 1;
@@ -205,7 +192,6 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
         message: 'Reward claimed successfully!',
         data: {
             coinsAwarded: totalAwardedCoins,
-            inrAwarded: earningsInRupee,
             newCoinBalance: user.coins.balance,
             newWalletBalance: user.wallet.balance,
             dailyAdCount: user.dailyAdCount,

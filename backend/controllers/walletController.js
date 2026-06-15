@@ -103,16 +103,14 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
     }
     const totalAwardedCoins = amount * factor;
 
-    // Conversion logic: 1 Coin = ₹0.1
-    const coinToRupeeConversion = 0.1;
-    const earningsInRupee = parseFloat((totalAwardedCoins * coinToRupeeConversion).toFixed(2));
-
+    // Remove conversion logic - coins stay as coins and do not convert to wallet balance (Rupees)
+    
     // Update User
     user.coins.balance += totalAwardedCoins;
     user.coins.lifetimeCoins += totalAwardedCoins;
-    user.wallet.balance += earningsInRupee;
-    user.wallet.lifetimeEarnings += earningsInRupee;
-    user.wallet.todayEarnings += earningsInRupee;
+    // user.wallet.balance is no longer updated by coins
+    // user.wallet.lifetimeEarnings is no longer updated by coins
+    // user.wallet.todayEarnings is no longer updated by coins
 
     // Track completed tasks dynamically in database
     if (taskId) {
@@ -145,23 +143,12 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         currency: 'COIN',
         amount: totalAwardedCoins,
         source: factor > 1 ? `Processing Rewards: ${source}` : source,
-        status: 'Success'
-    });
-
-    await Transaction.create({
-        user: user._id,
-        type: 'credit',
-        currency: 'INR',
-        amount: earningsInRupee,
-        source: factor > 1 ? `Speed Rewards Conversion: ${source}` : `Conversion: ${source}`,
-        status: 'Success'
     });
 
     res.status(200).json({
         success: true,
         data: {
             coinsAwarded: totalAwardedCoins,
-            inrCredited: earningsInRupee,
             newWalletBalance: user.wallet.balance,
             newCoinBalance: user.coins.balance
         }

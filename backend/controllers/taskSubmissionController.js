@@ -124,16 +124,10 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
     const baseCoins = submission.coinsReward || task.coinsReward || 1;
     const coinsToAdd = baseCoins * factor;
 
-    // Conversion logic: 1 Coin = ₹0.1
-    const coinToRupeeConversion = 0.1;
-    const earningsInRupee = parseFloat((coinsToAdd * coinToRupeeConversion).toFixed(2));
-
+    // Remove conversion logic
     // Update balances
     user.coins.balance += coinsToAdd;
     user.coins.lifetimeCoins += coinsToAdd;
-    user.wallet.balance += earningsInRupee;
-    user.wallet.lifetimeEarnings += earningsInRupee;
-    user.wallet.todayEarnings += earningsInRupee;
 
     // Track completion
     if (task.isDaily) {
@@ -154,15 +148,6 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
         currency: 'COIN',
         amount: coinsToAdd,
         source: factor > 1 ? `Processing Rewards: Task Approved: ${task.title}` : `Task Approved: ${task.title}`,
-        status: 'Success'
-    });
-
-    await Transaction.create({
-        user: user._id,
-        type: 'credit',
-        currency: 'INR',
-        amount: earningsInRupee,
-        source: factor > 1 ? `Speed Rewards Conversion: Task Approved: ${task.title}` : `Task Approved (Conversion): ${task.title}`,
         status: 'Success'
     });
 
