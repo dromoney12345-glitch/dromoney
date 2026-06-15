@@ -79,9 +79,20 @@ api.interceptors.response.use(
             const url = error.config?.url || '';
             const isAuthEndpoint = url.includes('/auth/') || url.includes('/reward/') || url.includes('/admin/');
             if (isAuthEndpoint) {
-                localStorage.removeItem('dromoney_token');
-                if (!window.location.pathname.includes('/auth/login')) {
-                    window.location.href = '/user/auth/login';
+                const isAdminApi = url.includes('/admin/');
+                const isUserApi = url.includes('/user/') || url.includes('/reward/');
+                const isAdminPath = window.location.pathname.startsWith('/admin');
+
+                if (isAdminApi) {
+                    localStorage.removeItem('dromoney_admin_token');
+                    if (isAdminPath && !window.location.pathname.includes('/admin/login')) {
+                        window.location.href = '/admin/login';
+                    }
+                } else if (isUserApi) {
+                    localStorage.removeItem('dromoney_token');
+                    if (!isAdminPath && !window.location.pathname.includes('/user/auth/login')) {
+                        window.location.href = '/user/auth/login';
+                    }
                 }
             }
         }

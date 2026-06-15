@@ -7,7 +7,8 @@ import { ChevronLeft, Zap, Trophy, Coins, Timer, MousePointer2 } from 'lucide-re
 const SpeedTapperView = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addCoins } = useUser();
+    const { addCoins, userData, boostersConfig } = useUser();
+    const isTaskBoosterActive = userData?.isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes('Speed Tapper'));
     const [task, setTask] = useState(null);
     
     const [taps, setTaps] = useState(0);
@@ -149,8 +150,17 @@ const SpeedTapperView = () => {
                         <Coins size={24} className="text-white" />
                     </div>
                     <div>
-                        <p className="text-[11px] font-medium text-amber-800 tracking-tight leading-tight uppercase">Reward on success</p>
-                        <p className="text-xl font-medium text-amber-600 mt-0.5">+{task.reward} Coins</p>
+                        <div className="flex items-center gap-2">
+                            <p className="text-[11px] font-medium text-amber-800 tracking-tight leading-tight uppercase">Reward on success</p>
+                            {isTaskBoosterActive && (
+                                <span className="bg-sky-500/10 text-sky-600 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest border border-sky-500/20">
+                                    Speed Rewards
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-xl font-medium text-amber-600 mt-0.5">
+                            +{isTaskBoosterActive ? task.reward * 3 : task.reward} Coins
+                        </p>
                     </div>
                 </div>
 

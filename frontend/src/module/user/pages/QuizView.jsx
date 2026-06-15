@@ -7,7 +7,7 @@ import api from '../../shared/services/api';
 const QuizView = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { userData, addCoins } = useUser();
+    const { userData, addCoins, boostersConfig } = useUser();
     
     const [eventData, setEventData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -15,7 +15,8 @@ const QuizView = () => {
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [selectedOption, setSelectedOption] = useState(null);
     const [score, setScore] = useState(0);
-    const [timeLeft, setTimeLeft] = useState(15);
+    const isSupportBoosterActive = userData?.isSupportBoosterActive && (!boostersConfig?.support?.length || boostersConfig.support.includes('Standard Quiz'));
+    const [timeLeft, setTimeLeft] = useState(isSupportBoosterActive ? 18 : 15);
     const [isAnswered, setIsAnswered] = useState(false);
     const [isEventClosed, setIsEventClosed] = useState(false);
     const [startTime, setStartTime] = useState(null);
@@ -88,7 +89,7 @@ const QuizView = () => {
             setCurrentQuestion(prev => prev + 1);
             setSelectedOption(null);
             setIsAnswered(false);
-            setTimeLeft(15);
+            setTimeLeft(isSupportBoosterActive ? 18 : 15);
         } else {
             handleFinish(s);
         }
@@ -166,9 +167,14 @@ const QuizView = () => {
                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none mb-2">Questions</p>
                             <p className="text-lg font-medium text-slate-800">{totalQ || 5}</p>
                         </div>
-                        <div className="bg-white/80 backdrop-blur-md p-4 rounded-3xl border border-slate-100/50 shadow-sm text-center">
+                        <div className="bg-white/80 backdrop-blur-md p-4 rounded-3xl border border-slate-100/50 shadow-sm text-center relative overflow-hidden">
+                            {isSupportBoosterActive && (
+                                <div className="absolute top-0 right-0 bg-amber-400 text-slate-900 text-[7px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-widest">
+                                    +3s Booster
+                                </div>
+                            )}
                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none mb-2">Time/Ques</p>
-                            <p className="text-lg font-medium text-slate-800">15s</p>
+                            <p className="text-lg font-medium text-slate-800">{isSupportBoosterActive ? '18s' : '15s'}</p>
                         </div>
                     </div>
                 </div>

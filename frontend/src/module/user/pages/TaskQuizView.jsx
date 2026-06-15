@@ -8,8 +8,7 @@ import { taskStorage } from '../../shared/services/taskStorage';
 const TaskQuizView = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addCoins } = useUser();
-    
+    const { addCoins, userData, boostersConfig } = useUser();
     // We reuse event questions as a generic bank for 10 questions
     const QUESTIONS = eventStorage.getQuestions();
     const totalQ = QUESTIONS.length;
@@ -20,8 +19,10 @@ const TaskQuizView = () => {
     const [currentStep, setCurrentStep] = useState(0); // 0: Start, 1: Questions, 2: Result
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [selectedOption, setSelectedOption] = useState(null);
+    const isSupportBoosterActive = userData?.isSupportBoosterActive && (!boostersConfig?.support?.length || boostersConfig.support.includes('Task Quiz'));
+    const isTaskBoosterActive = userData?.isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes('Task Quiz'));
+    const [timeLeft, setTimeLeft] = useState(isSupportBoosterActive ? 13 : 10);
     const [score, setScore] = useState(0);
-    const [timeLeft, setTimeLeft] = useState(10);
     const [isAnswered, setIsAnswered] = useState(false);
     const [isEventClosed, setIsEventClosed] = useState(false);
 
@@ -63,21 +64,27 @@ const TaskQuizView = () => {
             setCurrentQuestion(prev => prev + 1);
             setSelectedOption(null);
             setIsAnswered(false);
-            setTimeLeft(10);
+            setTimeLeft(isSupportBoosterActive ? 13 : 10);
         } else {
             handleFinish(score);
         }
     };
 
-    const handleFinish = (finalScore) => {
+    const handleFinish = async (finalScore) => {
         const s = finalScore !== undefined ? finalScore : score;
         setCurrentStep(2);
         
         const completed = taskStorage.getCompletedTasks();
         if (!completed.includes(id)) {
-            taskStorage.markComplete(id);
             if (s === 10) {
-                addCoins(reward, `Task Quiz: ${task?.title}`, id);
+                const res = await addCoins(reward, `Task Quiz: ${task?.title}`, id);
+                if (res && res.success) {
+                    taskStorage.markComplete(id);
+                } else {
+                    alert(res?.message || 'Failed to add coins. Please try again later.');
+                }
+            } else {
+                taskStorage.markComplete(id); // Mark complete even if lost so they can't retry today
             }
         }
     };
@@ -107,9 +114,14 @@ const TaskQuizView = () => {
                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none mb-2">Questions</p>
                             <p className="text-lg font-medium text-slate-800">10</p>
                         </div>
-                        <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-sm">
+                        <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden">
+                            {userData?.isSupportBoosterActive && (
+                                <div className="absolute top-0 right-0 bg-amber-400 text-slate-900 text-[7px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-widest">
+                                    +3s Booster
+                                </div>
+                            )}
                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none mb-2">Time/Ques</p>
-                            <p className="text-lg font-medium text-slate-800">10s</p>
+                            <p className="text-lg font-medium text-slate-800">{userData?.isSupportBoosterActive ? '13s' : '10s'}</p>
                         </div>
                     </div>
                 </div>
@@ -220,8 +232,18 @@ const TaskQuizView = () => {
                                     <Coins size={20} className="text-amber-600 fill-amber-600" />
                                 </div>
                                 <div className="text-left">
-                                    <p className="text-[10px] font-medium text-amber-600 uppercase leading-none mb-1">Task Reward</p>
-                                    <p className="text-xl font-medium text-slate-800 tracking-tighter leading-none">+{reward} Coin</p>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <p className="text-[10px] font-medium text-amber-600 uppercase leading-none">Task Reward</p>
+                                        {isTaskBoosterActive && (
+                                            <span className="text-[10px] font-medium text-amber-500 uppercase tracking-widest ml-2 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">3X Boosted</span>
+                                        )}
+                                    </div>
+                                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-normal">Completed under 5s</p>
+                                </div>
+                                <div className="text-right">
+                                    <div className="font-medium text-amber-500 text-sm">
+                                        +{isTaskBoosterActive ? reward * 3 : reward} Coin
+                                    </div>
                                 </div>
                             </div>
                         </div>

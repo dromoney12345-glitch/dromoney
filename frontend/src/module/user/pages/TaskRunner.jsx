@@ -110,7 +110,7 @@ const TaskRunner = () => {
 
             if (videoId) {
                 // Ensure autoplay and mute for better iframe behavior
-                const base = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&enablejsapi=1`;
+                const base = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1&enablejsapi=1`;
                 return params ? `${base}&${params}` : base;
             }
         } catch (e) {
@@ -197,11 +197,15 @@ const TaskRunner = () => {
             setStatus('verify');
             return;
         }
-        
         // Persist completion state only if coins were successfully added
         taskStorage.markComplete(taskId);
-        setTimeout(() => navigate('/user/earn'), 2000);
-
+        
+        if (userData.isTaskBoosterActive) {
+            setToast({ message: "Task completed! Points + Speed Rewards granted.", type: 'success' });
+            setTimeout(() => { setToast(null); navigate('/user/earn'); }, 2000);
+        } else {
+            setTimeout(() => navigate('/user/earn'), 2000);
+        }
     };
 
     return (

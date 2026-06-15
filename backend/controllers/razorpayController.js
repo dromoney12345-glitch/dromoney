@@ -207,7 +207,7 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
                 type: 'debit',
                 currency: 'INR',
                 amount: payment.amount,
-                source: payment.plan || (payment.paymentType === 'SUPPORT_BOOSTER' ? 'Support Booster' : 'Task Booster'),
+                source: payment.plan || (payment.paymentType === 'SUPPORT_BOOSTER' ? 'Event Support Kit' : 'Daily Boost Pass'),
                 status: 'Success'
             });
         } else {
@@ -308,10 +308,10 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
         try {
             const { sendNotificationToUser } = require('./fcmController');
             if (payment.paymentType === 'SUPPORT_BOOSTER' || payment.paymentType === 'TASK_BOOSTER') {
-                const boosterName = payment.paymentType === 'SUPPORT_BOOSTER' ? 'Support Booster' : 'Task Booster';
+                const boosterName = payment.paymentType === 'SUPPORT_BOOSTER' ? 'Event Support Kit' : 'Daily Boost Pass';
                 await sendNotificationToUser(user._id, {
-                    title: 'Booster Activated! ⚡',
-                    body: `Your ${boosterName} is active! Enjoy 3X coin earnings for the next 30 days.`,
+                    title: 'Utility Pass Activated! ⚡',
+                    body: `Your ${boosterName} is active! Enjoy enhanced performance for the next 30 days.`,
                     data: {
                         type: 'booster',
                         link: '/user/home'

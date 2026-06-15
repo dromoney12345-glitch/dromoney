@@ -40,7 +40,7 @@ const UniversalVideoPlayer = ({ url, className, onEnded, autoPlay = true, contro
         return (
             <div className={`w-full bg-black flex items-center justify-center ${className}`} style={{ aspectRatio: '16/9' }}>
                 <iframe
-                    src={`https://www.youtube.com/embed/${youtubeId}?autoplay=${playing ? 1 : 0}&controls=${controls ? 1 : 0}&mute=${autoPlay ? 1 : 0}&enablejsapi=1&origin=${window.location.origin}`}
+                    src={`https://www.youtube.com/embed/${youtubeId}?autoplay=${playing ? 1 : 0}&controls=${controls ? 1 : 0}&mute=0&enablejsapi=1&origin=${window.location.origin}`}
                     className="w-full h-full"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

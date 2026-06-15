@@ -113,7 +113,14 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
     }
 
     // Calculate coins to add (apply 3X Booster if active)
-    const factor = user.isBoosterActive || user.isTaskBoosterActive ? 3 : 1;
+    let factor = 1;
+    if (user.isBoosterActive || user.isTaskBoosterActive) {
+        const Booster = require('../models/Booster');
+        const taskBooster = await Booster.findOne({ type: 'task' });
+        if (!taskBooster || !taskBooster.applicableTasks || taskBooster.applicableTasks.length === 0 || taskBooster.applicableTasks.includes('General Tasks') || taskBooster.applicableTasks.includes(task.type)) {
+            factor = 3;
+        }
+    }
     const baseCoins = submission.coinsReward || task.coinsReward || 1;
     const coinsToAdd = baseCoins * factor;
 
@@ -146,7 +153,7 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
         type: 'credit',
         currency: 'COIN',
         amount: coinsToAdd,
-        source: `Task Approved: ${task.title}`,
+        source: factor > 1 ? `Processing Rewards: Task Approved: ${task.title}` : `Task Approved: ${task.title}`,
         status: 'Success'
     });
 
@@ -155,7 +162,7 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
         type: 'credit',
         currency: 'INR',
         amount: earningsInRupee,
-        source: `Task Approved (Conversion): ${task.title}`,
+        source: factor > 1 ? `Speed Rewards Conversion: Task Approved: ${task.title}` : `Task Approved (Conversion): ${task.title}`,
         status: 'Success'
     });
 

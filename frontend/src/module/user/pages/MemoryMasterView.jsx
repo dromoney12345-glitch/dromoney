@@ -23,7 +23,7 @@ const DEFAULT_CARDS = [
 const MemoryMasterView = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { userData, addCoins, addNotification } = useUser();
+    const { userData, addCoins, addNotification, boostersConfig } = useUser();
 
     const [loading, setLoading] = useState(true);
     const [peekTime, setPeekTime] = useState(2.5);
@@ -45,7 +45,10 @@ const MemoryMasterView = () => {
                 const res = await api.get(`/public/events/${id}`);
                 if (res.success && res.data) {
                     const cfg = res.data.config;
-                    setPeekTime(cfg?.peekTime || 2.5);
+                    let basePeekTime = cfg?.peekTime || 2.5;
+                    const isSupportActive = userData?.isSupportBoosterActive && (!boostersConfig?.support?.length || boostersConfig.support.includes('Memory Master'));
+                    if (isSupportActive) basePeekTime += 2;
+                    setPeekTime(basePeekTime);
                     setMaxTime(cfg?.maxTime || 60);
                     setTimeLeft(cfg?.maxTime || 60);
                     setCardIcons(cfg?.cards || DEFAULT_CARDS);

@@ -38,6 +38,9 @@ const BoosterSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    applicableTasks: [{
+        type: String
+    }],
     createdAt: {
         type: Date,
         default: Date.now

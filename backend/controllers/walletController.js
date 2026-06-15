@@ -45,9 +45,14 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('User not found', 404));
     }
 
+    const mongoose = require('mongoose');
+
     // Check if already completed
     if (taskId) {
-        const task = await Task.findById(taskId);
+        let task = null;
+        if (mongoose.Types.ObjectId.isValid(taskId)) {
+            task = await Task.findById(taskId);
+        }
         if (task) {
             if (task.isDaily) {
                 const today = new Date().setHours(0, 0, 0, 0);
@@ -83,7 +88,10 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
 
     // Track completed tasks dynamically in database
     if (taskId) {
-        const task = await Task.findById(taskId);
+        let task = null;
+        if (mongoose.Types.ObjectId.isValid(taskId)) {
+            task = await Task.findById(taskId);
+        }
         if (task && task.isDaily) {
             // Add to daily completions
             if (!user.dailyTaskCompletions) {
@@ -112,7 +120,7 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         type: 'credit',
         currency: 'COIN',
         amount: totalAwardedCoins,
-        source: source,
+        source: factor > 1 ? `Processing Rewards: ${source}` : source,
         status: 'Success'
     });
 
@@ -121,7 +129,7 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         type: 'credit',
         currency: 'INR',
         amount: earningsInRupee,
-        source: `Conversion: ${source}`,
+        source: factor > 1 ? `Speed Rewards Conversion: ${source}` : `Conversion: ${source}`,
         status: 'Success'
     });
 

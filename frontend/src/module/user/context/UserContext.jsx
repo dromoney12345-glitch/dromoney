@@ -37,6 +37,7 @@ export const UserProvider = ({ children }) => {
     const [loading, setLoading] = useState(!!localStorage.getItem('dromoney_token'));
     const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('dromoney_token'));
     const [socket, setSocket] = useState(null);
+    const [boostersConfig, setBoostersConfig] = useState({ support: [], task: [] });
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -75,10 +76,14 @@ export const UserProvider = ({ children }) => {
 
     const fetchNotifications = async () => {
         try {
-            const res = await api.get('/public/notifications');
-            if (res.success && res.data) {
+            const [notifRes, boosterRes] = await Promise.all([
+                api.get('/public/notifications').catch(() => ({ success: false })),
+                api.get('/public/boosters').catch(() => ({ success: false }))
+            ]);
+            
+            if (notifRes.success && notifRes.data) {
                 const readIds = JSON.parse(localStorage.getItem('dromoney_read_notifs') || '[]');
-                const mapped = res.data.map(n => ({
+                const mapped = notifRes.data.map(n => ({
                     id: n._id,
                     title: n.title,
                     message: n.message,
@@ -88,8 +93,16 @@ export const UserProvider = ({ children }) => {
                 }));
                 setNotifications(mapped);
             }
+
+            if (boosterRes.success && boosterRes.data) {
+                const config = {};
+                boosterRes.data.forEach(b => {
+                    config[b.type] = b.applicableTasks || [];
+                });
+                setBoostersConfig(config);
+            }
         } catch (err) {
-            console.error("Notifications Fetch Error:", err);
+            console.error("Fetch Error:", err);
         }
     };
 
@@ -349,9 +362,9 @@ export const UserProvider = ({ children }) => {
         refreshUserProfile,
         updateProfileImage,
         updateProfileData,
-        markAsRead,
-        clearNotifications
-    }), [userData, notifications, loading, isAuthenticated]);
+        clearNotifications,
+        boostersConfig
+    }), [userData, notifications, loading, isAuthenticated, boostersConfig]);
 
     return (
         <UserContext.Provider value={value}>

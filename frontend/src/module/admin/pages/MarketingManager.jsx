@@ -653,6 +653,32 @@ const MarketingManager = () => {
                                         </div>
 
                                         <div className="space-y-2">
+                                            <label className="text-[9px] font-medium text-slate-400 uppercase tracking-normal ml-0.5 flex items-center gap-1.5"><Target size={12} /> Applicable Tasks / Events</label>
+                                            <div className="grid grid-cols-2 gap-2 bg-slate-50 border border-slate-100 rounded-xl p-3">
+                                                {['General Tasks', 'Task Quiz', 'Speed Tapper', 'Standard Quiz', 'Memory Master', 'Lucky Draw'].map((taskOption) => (
+                                                    <label key={taskOption} className="flex items-center gap-2 cursor-pointer">
+                                                        <input 
+                                                            type="checkbox" 
+                                                            checked={b.applicableTasks?.includes(taskOption) || false}
+                                                            onChange={(e) => {
+                                                                const current = b.applicableTasks || [];
+                                                                let updated = [];
+                                                                if (e.target.checked) {
+                                                                    updated = [...current, taskOption];
+                                                                } else {
+                                                                    updated = current.filter(t => t !== taskOption);
+                                                                }
+                                                                setBoosters({ ...boosters, [type]: { ...boosters[type], applicableTasks: updated } });
+                                                            }}
+                                                            className="w-3.5 h-3.5 text-sky-500 rounded border-slate-300 focus:ring-sky-500"
+                                                        />
+                                                        <span className="text-[11px] font-medium text-slate-700">{taskOption}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
                                             <label className="text-[9px] font-medium text-slate-400 uppercase tracking-normal ml-0.5 flex items-center gap-1.5"><List size={12} /> Benefit List (Image 1 Dropdown)</label>
                                             {b.benefits.map((text, idx) => (
                                                 <div key={idx} className="flex gap-2">

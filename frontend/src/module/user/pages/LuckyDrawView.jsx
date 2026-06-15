@@ -18,7 +18,8 @@ const DEFAULT_PRIZES = [
 const LuckyDrawView = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { userData, addCoins, addNotification } = useUser();
+    const { userData, addCoins, addNotification, boostersConfig } = useUser();
+    const isSupportBoosterActive = userData?.isSupportBoosterActive && (!boostersConfig?.support?.length || boostersConfig.support.includes('Lucky Draw'));
     
     const [prizes, setPrizes] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -118,7 +119,14 @@ const LuckyDrawView = () => {
                     <button onClick={() => navigate('/user/events')} className="p-2 bg-white/10 rounded-full backdrop-blur active:scale-90 transition-transform">
                         <ChevronLeft size={24} className="text-white" />
                     </button>
-                    <h1 className="text-xl font-medium tracking-tight uppercase">🎟️ Lucky Draw</h1>
+                    <h1 className="text-xl font-medium tracking-tight uppercase flex items-center gap-2">
+                        🎟️ Lucky Draw
+                        {isSupportBoosterActive && (
+                            <span className="bg-amber-400 text-indigo-900 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-widest flex items-center gap-1 shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+                                <Sparkles size={10} /> GOLDEN TICKET
+                            </span>
+                        )}
+                    </h1>
                 </header>
 
                 <div className="flex-1 flex flex-col items-center justify-center text-center space-y-10">

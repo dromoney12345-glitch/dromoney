@@ -18,17 +18,27 @@ const Events = () => {
     const [joinedEvents, setJoinedEvents] = useState([]);
     const [toast, setToast] = useState(null);
     const [eventList, setEventList] = useState([]);
+    const [supportBooster, setSupportBooster] = useState({
+        title: '₹21 Event Support Kit',
+        subtitle: 'Activate Guided Assistance',
+        price: 21,
+        benefits: [
+            "Gain a performance edge with guided assistance",
+            "+3 seconds extra time per question",
+            "Preview cards for +2 seconds",
+            "Exclusive golden ticket visual badge on profile"
+        ]
+    });
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Load events from Backend API
-        const fetchEvents = async () => {
+        const fetchEventsAndBoosters = async () => {
             try {
+                // Fetch Events
                 const res = await api.get('/public/events');
                 if (res.success && res.data && res.data.length > 0) {
                     setEventList(res.data);
                     if (res.joinedEvents && Array.isArray(res.joinedEvents)) {
-                        // Ensure all IDs are strings for comparison
                         const joinedIds = res.joinedEvents.map(id => id.toString());
                         setJoinedEvents(joinedIds);
                         localStorage.setItem('dromoney_joined_events', JSON.stringify(joinedIds));
@@ -36,22 +46,34 @@ const Events = () => {
                         setJoinedEvents([]);
                     }
                 } else {
-                    // Fallback to local storage if DB is empty
                     const allEvents = eventStorage.getEvents();
                     setEventList(allEvents.filter(e => e.status === 'Active'));
                     const saved = JSON.parse(localStorage.getItem('dromoney_joined_events') || '[]');
                     setJoinedEvents(saved);
                 }
             } catch (err) {
-                console.error("Failed to fetch events from DB:", err);
-                const allEvents = eventStorage.getEvents();
-                setEventList(allEvents.filter(e => e.status === 'Active'));
-                const saved = JSON.parse(localStorage.getItem('dromoney_joined_events') || '[]');
-                setJoinedEvents(saved);
+                console.error("Failed to fetch events:", err);
+            }
+
+            try {
+                // Fetch Boosters
+                const res = await api.get('/public/boosters');
+                if (res.success && res.data) {
+                    const support = res.data.find(b => b.type === 'support');
+                    if (support) {
+                        const pricePrefix = `₹${support.price} `;
+                        if (!support.title.includes('₹')) {
+                            support.title = pricePrefix + support.title;
+                        }
+                        setSupportBooster(support);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to fetch boosters:", err);
             }
         };
 
-        fetchEvents();
+        fetchEventsAndBoosters();
     }, [userData?._id]);
 
     const showToast = (message, type = 'info') => {
@@ -65,7 +87,7 @@ const Events = () => {
 
     const handlePaymentSuccess = () => {
         setIsPaymentOpen(false);
-        addNotification("Booster Activated!", "₹11 Event Support Booster successfully activated for 30 days.", "success");
+        addNotification("Utility Pass Activated!", `${supportBooster.title} successfully activated for 30 days.`, "success");
         setIsBoosterExpanded(false);
     };
 
@@ -296,8 +318,8 @@ const Events = () => {
                                 <Zap size={18} className="text-amber-400 fill-amber-400" />
                             </div>
                             <div className="text-left">
-                                <h4 className="text-[12px] text-white leading-none mb-0.5">₹11 Support Booster</h4>
-                                <p className="text-[8px] text-slate-400">Activate 60% Winning Chance</p>
+                                <h4 className="text-[12px] text-white leading-none mb-0.5">{supportBooster.title}</h4>
+                                <p className="text-[8px] text-slate-400">{supportBooster.subtitle}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -323,24 +345,29 @@ const Events = () => {
 
                     {isBoosterExpanded && (
                         <div className="bg-white/5 border-t border-white/5 p-3.5 space-y-2.5 animate-in slide-in-from-top-4 duration-300">
-                            {[
-                                { icon: <Zap size={13} />, title: "60% Winning Boost", desc: "Win big in every event with high prioritization", color: "text-amber-400" },
-                                { icon: <Lightbulb size={13} />, title: "Quiz Support", desc: "Platform support in 6/10 questions automatically", color: "text-yellow-400" },
-                                { icon: <Rocket size={13} />, title: "Priority Entry", desc: "Early access to premium and high prize events", color: "text-orange-400" },
-                                { icon: <Award size={13} />, title: "Elite Badge", desc: "Exclusive profile support badge next to your user name", color: "text-blue-400" }
-                            ].map((item, i) => (
-                                <div key={i} className="flex items-center gap-2.5 text-left">
-                                    <div className={`w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center shrink-0 ${item.color}`}>
-                                        {item.icon}
+                            {supportBooster.benefits.map((item, i) => {
+                                const icons = [<Zap size={13} />, <Lightbulb size={13} />, <Rocket size={13} />, <Award size={13} />];
+                                const colors = ["text-amber-400", "text-yellow-400", "text-orange-400", "text-blue-400"];
+                                return (
+                                    <div key={i} className="flex items-center gap-2.5 text-left">
+                                        <div className={`w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center shrink-0 ${colors[i % colors.length]}`}>
+                                            {icons[i % icons.length]}
+                                        </div>
+                                        <div>
+                                            <h4 className="text-[10px] text-white leading-tight">Benefit {i + 1}</h4>
+                                            <p className="text-[8px] text-slate-400 mt-0.5">{item}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h4 className="text-[10px] text-white leading-tight">{item.title}</h4>
-                                        <p className="text-[8px] text-slate-400 mt-0.5">{item.desc}</p>
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
+                    {/* Disclaimer */}
+                    <div className="bg-slate-950 p-2 text-center border-t border-slate-800">
+                        <p className="text-[8px] text-slate-500 font-medium uppercase tracking-widest leading-relaxed">
+                            This pass is a utility service intended solely to improve task efficiency and user experience.
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -357,8 +384,8 @@ const Events = () => {
             <PaymentModal 
                 isOpen={isPaymentOpen} 
                 onClose={() => setIsPaymentOpen(false)} 
-                amount={11} 
-                plan="Event Support Booster" 
+                amount={supportBooster.price} 
+                plan={supportBooster.title} 
                 onSuccess={handlePaymentSuccess} 
             />
         </div>

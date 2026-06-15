@@ -243,8 +243,8 @@ const Home = () => {
     };
     const [lifetimePromo, setLifetimePromo] = useState(null);
     const [boosters, setBoosters] = useState({
-        support: { title: '₹22 Support Booster', subtitle: 'Boost participation & win more!', price: 22, validity: '2 Months', benefits: [] },
-        task: { title: '₹49 Task Booster', subtitle: 'Increase coin value 3X now!', price: 49, validity: '30 Days', benefits: [] }
+        support: { title: '₹21 Event Support Kit', subtitle: 'Get guided assistance in events!', price: 21, validity: '30 Days', benefits: [] },
+        task: { title: '₹49 Daily Boost Pass', subtitle: 'Boost performance & processing!', price: 49, validity: '30 Days', benefits: [] }
     });
     const [footerPolicies, setFooterPolicies] = useState([
         { label: 'Privacy Policy', path: 'privacy' },
@@ -503,7 +503,7 @@ const Home = () => {
                                             : 'bg-[#10B981] text-white hover:bg-[#059669] shadow-lg shadow-emerald-500/30'
                                     } px-5 py-2.5 rounded-xl text-[11px] font-medium tracking-tight active:scale-95 transition-all w-full sm:w-auto`}
                                 >
-                                    {isSupportBoosterActive ? '✓ Active' : isTaskBoosterActive ? 'Locked' : 'Boost Support'}
+                                    {isSupportBoosterActive ? '✓ Active' : isTaskBoosterActive ? 'Locked' : 'Get Support Kit'}
                                 </button>
                             </div>
                         </div>
@@ -539,10 +539,16 @@ const Home = () => {
                                             : 'bg-sky-500 hover:bg-sky-600 text-white shadow-lg shadow-sky-500/30'
                                     } px-5 py-2.5 rounded-xl text-[10px] font-medium uppercase tracking-tight active:scale-95 transition-all`}
                                 >
-                                    {isTaskBoosterActive ? '✓ Active' : isSupportBoosterActive ? 'Locked' : 'Buy Now'}
+                                    {isTaskBoosterActive ? '✓ Active' : isSupportBoosterActive ? 'Locked' : 'Get Boost Pass'}
                                 </button>
                             </div>
                         </div>
+                    </div>
+                    {/* Disclaimer */}
+                    <div className="mt-2 text-center px-4">
+                        <p className="text-[9px] text-slate-400 font-medium uppercase tracking-widest leading-relaxed">
+                            This pass is a utility service intended solely to improve task efficiency and user experience.
+                        </p>
                     </div>
                 </div>
 
