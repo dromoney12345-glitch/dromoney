@@ -46,10 +46,11 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
     }
 
     const mongoose = require('mongoose');
+    
+    let task = null;
 
     // Check if already completed
     if (taskId) {
-        let task = null;
         if (mongoose.Types.ObjectId.isValid(taskId)) {
             task = await Task.findById(taskId);
         }
@@ -71,8 +72,35 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         }
     }
 
-    // Booster logic (3x if active)
-    const factor = user.isBoosterActive ? 3 : 1;
+    // Booster logic (3x if active and applicable)
+    let factor = 1;
+    if (user.isBoosterActive || user.isTaskBoosterActive) {
+        const Booster = mongoose.models.Booster || require('../models/Booster');
+        const taskBooster = await Booster.findOne({ type: 'task' });
+        
+        let isApplicable = true;
+        if (taskBooster && taskBooster.applicableTasks && taskBooster.applicableTasks.length > 0) {
+            const allowed = taskBooster.applicableTasks.map(t => t.toLowerCase());
+            const s = (source || '').toLowerCase();
+            
+            // Check source string for mini-game names
+            const matchesSource = allowed.some(t => s.includes(t));
+            
+            // Check task type if available
+            const matchesTaskType = task && task.type && allowed.includes(task.type.toLowerCase());
+            
+            // Check General Tasks
+            const isGeneralTask = allowed.includes('general tasks') && task && !['speed tapper', 'memory master', 'quiz', 'lucky draw', 'treasure chest', 'scratch card'].some(gt => s.includes(gt) || (task.type && task.type.toLowerCase() === gt));
+
+            if (!matchesSource && !matchesTaskType && !isGeneralTask) {
+                isApplicable = false;
+            }
+        }
+        
+        if (isApplicable) {
+            factor = 3;
+        }
+    }
     const totalAwardedCoins = amount * factor;
 
     // Conversion logic: 1 Coin = ₹0.1
@@ -88,10 +116,6 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
 
     // Track completed tasks dynamically in database
     if (taskId) {
-        let task = null;
-        if (mongoose.Types.ObjectId.isValid(taskId)) {
-            task = await Task.findById(taskId);
-        }
         if (task && task.isDaily) {
             // Add to daily completions
             if (!user.dailyTaskCompletions) {

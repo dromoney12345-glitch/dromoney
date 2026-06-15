@@ -127,6 +127,7 @@ const AdBanners = ({ navigate }) => {
     return (
         <div className="relative">
             <div
+                onClick={(e) => handleBannerClick(e, banner.path)}
                 className={`cursor-pointer bg-gradient-to-br ${theme.gradient} rounded-2xl p-6 shadow-xl relative overflow-hidden transition-all duration-700 group min-h-[160px] flex flex-col justify-center`}
             >
                 {/* Background Glass Decor */}
