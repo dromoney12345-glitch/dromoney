@@ -204,6 +204,7 @@ const Settings = () => {
                                             { label: 'Referral Commission', field: 'referralCommission', unit: '₹', icon: '🎁', info: 'Direct sale bonus' },
                                             { label: 'Coin Value', field: 'coinRate', unit: '₹', icon: '🪙', info: '1 Coin = ₹ Value', step: 0.01 },
                                             { label: 'Minimum Payout', field: 'minWithdrawal', unit: '₹', icon: '🏧', info: 'Withdrawal limit' },
+                                            { label: 'Ad Reward', field: 'adRewardCoins', unit: '🪙', icon: '💰', info: 'Coins per Watch Ad', step: 1 },
                                             { label: 'Ad Cooldown', field: 'adCooldownSeconds', unit: 's', icon: '⏱️', info: 'Wait time between ads', step: 1 },
                                             { label: 'Max Daily Ads', field: 'adMaxDailyLimit', unit: 'ads', icon: '🎬', info: 'Limit per user', step: 1 }
                                         ].map((item, idx) => (

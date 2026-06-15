@@ -28,17 +28,18 @@ exports.getAffiliateStats = async (req, res) => {
             .sort({ createdAt: -1 });
 
         // 5. Current Commission Rate
-        const settings = await Settings.findOne().select('referralCommission');
+        const settings = await Settings.findOne().select('referralCommission referralLinkBaseUrl');
 
-        res.json({
+        res.status(200).json({
             success: true,
             data: {
                 stats: {
                     totalReferrals,
-                    totalPayouts: totalPayouts[0]?.total || 0,
-                    topReferrer: topReferrers[0]?.name || 'None',
+                    totalPayouts: totalPayouts[0] ? totalPayouts[0].total : 0,
                     activeReferrersCount: topReferrers.length,
-                    currentCommission: settings?.referralCommission || 200
+                    topReferrer: topReferrers[0]?.name || 'None',
+                    currentCommission: settings?.referralCommission || 200,
+                    referralLinkBaseUrl: settings?.referralLinkBaseUrl || 'https://earningapp.com/join/'
                 },
                 logs: logs.map(log => {
                     const regDate = log.referredUser?.createdAt || log.createdAt;

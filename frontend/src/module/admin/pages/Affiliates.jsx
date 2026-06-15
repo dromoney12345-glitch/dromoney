@@ -19,6 +19,12 @@ const Affiliates = () => {
     const [rate, setRate] = useState(200);
     const [editing, setEditing] = useState(false);
     const [tempRate, setTempRate] = useState(200);
+    
+    // Base URL states
+    const [baseUrl, setBaseUrl] = useState('https://earningapp.com/join/');
+    const [editingBaseUrl, setEditingBaseUrl] = useState(false);
+    const [tempBaseUrl, setTempBaseUrl] = useState('');
+
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState('All');
     const [currentPage, setCurrentPage] = useState(1);
@@ -35,6 +41,9 @@ const Affiliates = () => {
                 setReferralsData(res.data.logs);
                 setStats(res.data.stats);
                 setRate(res.data.stats.currentCommission);
+                if (res.data.stats.referralLinkBaseUrl) {
+                    setBaseUrl(res.data.stats.referralLinkBaseUrl);
+                }
             }
         } catch (err) {
             console.error("Affiliate fetch error", err);
@@ -59,6 +68,20 @@ const Affiliates = () => {
             }
         } catch (err) {
             alert('Failed to update rate');
+        }
+    };
+
+    const handleUpdateBaseUrl = async () => {
+        if (!tempBaseUrl.trim()) return alert("Base URL cannot be empty");
+        try {
+            const res = await api.put('/admin/settings', { referralLinkBaseUrl: tempBaseUrl.trim() });
+            if (res.success) {
+                setBaseUrl(tempBaseUrl.trim());
+                setEditingBaseUrl(false);
+                alert('Referral Base URL updated successfully!');
+            }
+        } catch (err) {
+            alert('Failed to update base url');
         }
     };
 
@@ -122,6 +145,32 @@ const Affiliates = () => {
                             <div className="flex items-center gap-2">
                                 <p className="text-lg text-slate-900 leading-none">₹{rate}</p>
                                 <button onClick={() => { setTempRate(rate); setEditing(true); }} className="p-1 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-md transition-all" title="Click to change commission">
+                                    <Edit2 size={10} />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-indigo-50 rounded-lg text-indigo-600 shadow-inner flex items-center justify-center"><Link2 size={18} /></div>
+                    <div>
+                        <h3 className="text-[9px] text-slate-400 uppercase tracking-normal leading-none mb-1.5">Referral Base URL</h3>
+                        {editingBaseUrl ? (
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="text"
+                                    value={tempBaseUrl}
+                                    onChange={(e) => setTempBaseUrl(e.target.value)}
+                                    className="w-48 bg-slate-50 border border-indigo-200 rounded-lg px-2 py-1 text-xs text-slate-900 outline-none focus:ring-2 focus:ring-indigo-500"
+                                />
+                                <button onClick={handleUpdateBaseUrl} className="bg-indigo-500 text-white px-2 py-1 rounded-md text-[9px] uppercase">Save</button>
+                                <button onClick={() => setEditingBaseUrl(false)} className="text-slate-400 text-[9px] uppercase px-1">X</button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <p className="text-xs text-slate-900 max-w-[150px] truncate">{baseUrl}</p>
+                                <button onClick={() => { setTempBaseUrl(baseUrl); setEditingBaseUrl(true); }} className="p-1 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-md transition-all" title="Click to change Base URL">
                                     <Edit2 size={10} />
                                 </button>
                             </div>

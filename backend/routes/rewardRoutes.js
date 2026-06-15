@@ -59,7 +59,7 @@ router.get('/status', async (req, res) => {
             available,
             nextAdIn, // in seconds
             remainingAds,
-            rewardAmount: REWARD_AMOUNT
+            rewardAmount: settings.adRewardCoins || 5
         });
     } catch (err) {
         console.error(err);
@@ -72,13 +72,13 @@ router.get('/status', async (req, res) => {
 // @access  Private
 router.post('/claim', async (req, res) => {
     try {
-        // req.user is set by the protect middleware from the JWT token (never from req.body)
         const user = req.user;
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
         const settings = await Settings.findOne() || {};
         const MAX_DAILY_ADS = settings.adMaxDailyLimit || 10;
         const COOLDOWN_SECONDS = settings.adCooldownSeconds || 30;
+        const BASE_REWARD = settings.adRewardCoins || 5;
 
         await checkAndResetDailyLimit(user);
 
@@ -96,13 +96,32 @@ router.post('/claim', async (req, res) => {
             }
         }
 
-        // Apply reward
-        if (!user.coins) {
-            user.coins = { balance: 0, lifetimeCoins: 0 };
+        // Booster Logic
+        let factor = 1;
+        if (user.isBoosterActive || user.isTaskBoosterActive) {
+            const Booster = require('../models/Booster');
+            const taskBooster = await Booster.findOne({ type: 'task' });
+            if (taskBooster && taskBooster.applicableTasks && (taskBooster.applicableTasks.includes('General Tasks') || taskBooster.applicableTasks.includes('Watch Video') || taskBooster.applicableTasks.includes('Rewarded Ad'))) {
+                factor = 3;
+            }
         }
+        
+        const rewardAmount = BASE_REWARD * factor;
 
-        user.coins.balance = (user.coins.balance || 0) + REWARD_AMOUNT;
-        user.coins.lifetimeCoins = (user.coins.lifetimeCoins || 0) + REWARD_AMOUNT;
+        // Apply reward
+        if (!user.coins) user.coins = { balance: 0, lifetimeCoins: 0 };
+        if (!user.wallet) user.wallet = { balance: 0, lifetimeEarnings: 0, todayEarnings: 0 };
+
+        user.coins.balance = (user.coins.balance || 0) + rewardAmount;
+        user.coins.lifetimeCoins = (user.coins.lifetimeCoins || 0) + rewardAmount;
+
+        // Conversion logic: 1 Coin = ₹0.1
+        const coinToRupeeConversion = 0.1;
+        const earningsInRupee = parseFloat((rewardAmount * coinToRupeeConversion).toFixed(2));
+        
+        user.wallet.balance = (user.wallet.balance || 0) + earningsInRupee;
+        user.wallet.lifetimeEarnings = (user.wallet.lifetimeEarnings || 0) + earningsInRupee;
+        user.wallet.todayEarnings = (user.wallet.todayEarnings || 0) + earningsInRupee;
 
         user.lastRewardAt = new Date();
         user.todayRewardCount = (user.todayRewardCount || 0) + 1;
@@ -111,15 +130,36 @@ router.post('/claim', async (req, res) => {
 
         await RewardHistory.create({
             userId: user._id,
-            reward: REWARD_AMOUNT,
+            reward: rewardAmount,
             adType: 'rewarded',
             rewardedAt: new Date()
+        });
+
+        // Record Transaction
+        const Transaction = require('../models/Transaction');
+        await Transaction.create({
+            user: user._id,
+            type: 'credit',
+            currency: 'COIN',
+            amount: rewardAmount,
+            source: 'Watched Reward Ad',
+            status: 'Success'
+        });
+
+        await Transaction.create({
+            user: user._id,
+            type: 'credit',
+            currency: 'INR',
+            amount: earningsInRupee,
+            source: 'Watched Reward Ad Conversion',
+            status: 'Success'
         });
 
         res.json({
             success: true,
             message: 'Reward claimed successfully',
-            coins: user.coins.balance
+            coins: user.coins.balance,
+            amountAdded: earningsInRupee
         });
     } catch (err) {
         console.error(err);

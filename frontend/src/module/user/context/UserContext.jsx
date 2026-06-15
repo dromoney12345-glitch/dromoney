@@ -134,7 +134,7 @@ export const UserProvider = ({ children }) => {
             ]);
             if (profileRes.success && profileRes.data) {
                 const transactions = txRes.success && txRes.data ? txRes.data : [];
-                mapAndSetUserData(profileRes.data, transactions);
+                mapAndSetUserData(profileRes.data, transactions, profileRes.settings);
                 return profileRes.data;
             }
         } catch (err) {
@@ -146,7 +146,7 @@ export const UserProvider = ({ children }) => {
         return null;
     };
 
-    const mapAndSetUserData = (dbUser, transactions = []) => {
+    const mapAndSetUserData = (dbUser, transactions = [], settings = {}) => {
         setUserData({
             name: dbUser.name,
             id: `AFF-${dbUser.referralCode}`,
@@ -169,7 +169,7 @@ export const UserProvider = ({ children }) => {
             referrals: {
                 count: dbUser.referralCount || 0,
                 code: dbUser.referralCode,
-                link: `https://earningapp.com/join/nhgfAFF-${dbUser.referralCode}`
+                link: `${settings?.referralLinkBaseUrl || 'https://earningapp.com/join/'}${dbUser.referralCode}`
             },
             wallet: {
                 balance: dbUser.wallet?.balance || 0,

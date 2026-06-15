@@ -61,9 +61,17 @@ const SettingsSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    referralLinkBaseUrl: {
+        type: String,
+        default: 'https://earningapp.com/join/'
+    },
     referralCommission: {
         type: Number,
         default: 200
+    },
+    adRewardCoins: {
+        type: Number,
+        default: 5
     },
     coinRate: {
         type: Number,
