@@ -72,9 +72,21 @@ exports.joinEvent = asyncHandler(async (req, res, next) => {
         user: user._id
     });
 
+    const Transaction = require('../models/Transaction');
+    if (event.fee > 0) {
+        await Transaction.create({
+            user: user._id,
+            type: 'debit',
+            currency: 'COIN',
+            amount: event.fee,
+            source: `Joined Event: ${event.title}`,
+        });
+    }
+
     res.status(200).json({
         success: true,
-        message: `Successfully joined ${event.title}`
+        message: `Successfully joined ${event.title}`,
+        newCoinBalance: user.coins.balance
     });
 });
 

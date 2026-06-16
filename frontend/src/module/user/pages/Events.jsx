@@ -11,7 +11,7 @@ import { eventStorage } from '../../shared/services/eventStorage';
 import api from '../../shared/services/api';
 
 const Events = () => {
-    const { userData, addCoins, addNotification, refreshUserProfile } = useUser();
+    const { userData, addCoins, addNotification, refreshUserProfile, updateCoinBalance } = useUser();
     const [isUnlockOpen, setIsUnlockOpen] = useState(false);
     const [isBoosterExpanded, setIsBoosterExpanded] = useState(false);
     const [isPaymentOpen, setIsPaymentOpen] = useState(false);
@@ -118,6 +118,10 @@ const Events = () => {
         try {
             const res = await api.post(`/user/data/events/${id}/join`);
             if (res.success) {
+                if (res.newCoinBalance !== undefined) {
+                    updateCoinBalance(res.newCoinBalance);
+                }
+                
                 // Refresh profile to see updated coins
                 await refreshUserProfile(false);
                 

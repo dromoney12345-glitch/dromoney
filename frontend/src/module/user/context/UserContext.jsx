@@ -368,6 +368,9 @@ export const UserProvider = ({ children }) => {
         unlockPlatform,
         completeCourse,
         addCoins,
+        updateCoinBalance: (newBalance) => {
+            setUserData(prev => ({ ...prev, coins: { ...prev.coins, total: newBalance } }));
+        },
         requestWithdrawal,
         addNotification,
         refreshUserProfile,
