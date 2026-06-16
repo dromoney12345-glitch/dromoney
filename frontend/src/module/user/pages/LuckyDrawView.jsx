@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Trophy, Sparkles, Coins, Star, Gift, ArrowRight } from 'lucide-react';
 import { useUser } from '../context/UserContext';
+import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
 
 const DEFAULT_PRIZES = [
@@ -39,7 +40,11 @@ const LuckyDrawView = () => {
                     setPrizes(res.data.config?.prizes || []);
                 }
             } catch (err) {
-                console.error("Failed to load lucky draw details:", err);
+                if (err.message && err.message.includes('Event not found')) {
+                    // Ignore, it's a task ID not an event ID
+                } else {
+                    console.error("Failed to load lucky draw details:", err);
+                }
             } finally {
                 setLoading(false);
             }
@@ -76,8 +81,9 @@ const LuckyDrawView = () => {
             setStep(2);
             const prize = activePrizes[winner];
             if (prize.coins > 0) {
-                addCoins(prize.coins, `Lucky Draw Prize`);
+                addCoins(prize.coins, `Lucky Draw Prize`, id);
             }
+            taskStorage.markComplete(id);
             addNotification('Lucky Draw Result!', `You won ${prize.label} in the Lucky Draw!`, 'success');
             
             const completed = JSON.parse(localStorage.getItem('dromoney_completed_events') || '[]');
@@ -116,7 +122,7 @@ const LuckyDrawView = () => {
         return (
             <div className="min-h-screen bg-gradient-to-b from-indigo-900 via-purple-900 to-slate-900 flex flex-col p-6 text-white animate-in fade-in duration-500">
                 <header className="flex items-center gap-4 mb-6 pt-2">
-                    <button onClick={() => navigate('/user/events')} className="p-2 bg-white/10 rounded-full backdrop-blur active:scale-90 transition-transform">
+                    <button onClick={() => navigate(-1)} className="p-2 bg-white/10 rounded-full backdrop-blur active:scale-90 transition-transform">
                         <ChevronLeft size={24} className="text-white" />
                     </button>
                     <h1 className="text-xl font-medium tracking-tight uppercase flex items-center gap-2">
@@ -259,10 +265,10 @@ const LuckyDrawView = () => {
             </div>
 
             <button
-                onClick={() => navigate('/user/events')}
+                onClick={() => navigate(-1)}
                 className="w-full bg-white text-indigo-900 py-5 rounded-3xl font-medium text-sm uppercase tracking-widest shadow-2xl active:scale-95 transition-all mb-8 flex items-center justify-center gap-3"
             >
-                Back to Events <ArrowRight size={20} />
+                Go Back <ArrowRight size={20} />
             </button>
         </div>
     );

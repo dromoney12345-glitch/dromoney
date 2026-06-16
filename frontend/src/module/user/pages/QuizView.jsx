@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, CheckCircle2, XCircle, Timer, Trophy, Coins, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
 import { useUser } from '../context/UserContext';
+import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
 
 const QuizView = () => {
@@ -116,7 +117,8 @@ const QuizView = () => {
             
             // Add coins locally for immediate feedback
             const coinPrize = s * 10;
-            addCoins(coinPrize, `Quiz Prize: ${eventData?.title || 'Event'}`);
+            addCoins(coinPrize, `Quiz Prize: ${eventData?.title || 'Event'}`, id);
+            taskStorage.markComplete(id);
 
             try {
                 // Save result to Backend
@@ -144,7 +146,7 @@ const QuizView = () => {
         return (
             <div className="min-h-screen bg-gradient-to-br from-[#EBF2FA] via-[#F1F5F9] to-[#E2E8F0] flex flex-col p-6 animate-in fade-in duration-500">
                 <header className="flex items-center gap-4 mb-10">
-                    <button onClick={() => navigate('/user/events')} className="p-2 bg-white/80 rounded-full active:scale-90 transition-all cursor-pointer shadow-sm border border-slate-100">
+                    <button onClick={() => navigate(-1)} className="p-2 bg-white/80 rounded-full active:scale-90 transition-all cursor-pointer shadow-sm border border-slate-100">
                         <ChevronLeft size={24} className="text-slate-600" />
                     </button>
                     <h1 className="text-xl font-medium text-slate-800 tracking-tight uppercase">{eventData?.title || 'Daily Quiz'}</h1>
@@ -313,10 +315,10 @@ const QuizView = () => {
             </div>
 
             <button 
-                onClick={() => navigate('/user/events')}
+                onClick={() => navigate(-1)}
                 className="w-full max-w-xs mx-auto bg-slate-900 hover:bg-black text-white py-4.5 rounded-3xl font-medium text-sm uppercase tracking-widest shadow-xl hover:shadow-2xl transition-all mb-8 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
             >
-                Continue <ArrowRight size={18} />
+                Go Back <ArrowRight size={18} />
             </button>
         </div>
     );

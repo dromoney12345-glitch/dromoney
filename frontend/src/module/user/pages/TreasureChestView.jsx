@@ -30,8 +30,13 @@ const TreasureChestView = () => {
         setTimeout(async () => {
             setStep(2);
             if (idx === winningIdx || true) { // Logic: For now, always win to make client happy, or use random
-                 await addCoins(task.reward, 'Treasure Chest Found', task._id || task.id);
-                 taskStorage.markComplete(task._id || task.id);
+                 const res = await addCoins(task.reward, 'Treasure Chest Found', task._id || task.id);
+                 if (res && res.success) {
+                     taskStorage.markComplete(task._id || task.id);
+                 } else {
+                     // Still marked as step 2 to show UI, but won't trigger coin addition locally
+                     // We could optionally show an alert here: alert(res?.message || 'Already claimed')
+                 }
             }
         }, 1500);
     };
@@ -99,8 +104,6 @@ const TreasureChestView = () => {
                     ))}
                 </div>
 
-                <div className="flex-1 min-h-[100px]"></div>
-
                 {step === 2 && (
                     <div className="w-full max-w-sm space-y-4 animate-in fade-in slide-in-from-bottom-6">
                         <div className="bg-white/5 p-6 rounded-3xl border border-white/10 text-center relative overflow-hidden group">
@@ -111,7 +114,7 @@ const TreasureChestView = () => {
                         </div>
                         
                         <button
-                            onClick={() => navigate('/user/earn')}
+                            onClick={() => navigate(-1)}
                             className="w-full bg-indigo-500 text-white py-5 rounded-[2rem] font-medium uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all text-xs"
                         >
                             Return to Tasks

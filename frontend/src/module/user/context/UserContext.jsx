@@ -80,7 +80,7 @@ export const UserProvider = ({ children }) => {
                 api.get('/public/notifications').catch(() => ({ success: false })),
                 api.get('/public/boosters').catch(() => ({ success: false }))
             ]);
-            
+
             if (notifRes.success && notifRes.data) {
                 const readIds = JSON.parse(localStorage.getItem('dromoney_read_notifs') || '[]');
                 const mapped = notifRes.data.map(n => ({
@@ -147,6 +147,17 @@ export const UserProvider = ({ children }) => {
     };
 
     const mapAndSetUserData = (dbUser, transactions = [], settings = {}) => {
+        const inrTransactions = transactions.filter(t => t.currency === 'INR');
+        const dynamicWalletBalance = inrTransactions.reduce((acc, tx) => {
+            if (tx.type === 'credit' && tx.status === 'Success') {
+                return acc + (tx.amount || 0);
+            }
+            if (tx.type === 'withdrawal' && tx.status === 'Success') {
+                return acc - (tx.amount || 0);
+            }
+            return acc;
+        }, 0);
+
         setUserData({
             name: dbUser.name,
             id: `AFF-${dbUser.referralCode}`,
@@ -172,8 +183,8 @@ export const UserProvider = ({ children }) => {
                 link: `${settings?.referralLinkBaseUrl || 'https://earningapp.com/join/'}${dbUser.referralCode}`
             },
             wallet: {
-                balance: dbUser.wallet?.balance || 0,
-                transactions: transactions.filter(t => t.currency === 'INR')
+                balance: dynamicWalletBalance,
+                transactions: inrTransactions
             },
             kycStatus: dbUser.kyc?.status || 'Not Started',
             kycRejectionReason: dbUser.kyc?.rejectionReason || '',
@@ -309,10 +320,10 @@ export const UserProvider = ({ children }) => {
             // Note: refreshUserProfile is called by the caller AFTER showing success modal
             return { success: true };
         } catch (err) {
-            return { 
-                success: false, 
-                message: err.response?.data?.message || err.message || 'Withdrawal failed' 
-            }; 
+            return {
+                success: false,
+                message: err.response?.data?.message || err.message || 'Withdrawal failed'
+            };
         }
     };
 
@@ -324,8 +335,8 @@ export const UserProvider = ({ children }) => {
         try {
             const res = await api.patch('/user/data/profile', data);
             if (res.success) {
-                setUserData(prev => ({ 
-                    ...prev, 
+                setUserData(prev => ({
+                    ...prev,
                     ...(data.name && { name: data.name }),
                     ...(data.email && { email: data.email }),
                     ...(data.phone && { phone: data.phone })

@@ -46,7 +46,7 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
     }
 
     const mongoose = require('mongoose');
-    
+
     let task = null;
 
     // Check if already completed
@@ -57,8 +57,8 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         if (task) {
             if (task.isDaily) {
                 const today = new Date().setHours(0, 0, 0, 0);
-                const alreadyDoneToday = user.dailyTaskCompletions?.some(c => 
-                    String(c.taskId) === String(taskId) && 
+                const alreadyDoneToday = user.dailyTaskCompletions?.some(c =>
+                    String(c.taskId) === String(taskId) &&
                     new Date(c.completedAt).setHours(0, 0, 0, 0) === today
                 );
                 if (alreadyDoneToday) {
@@ -77,18 +77,18 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
     if (user.isBoosterActive || user.isTaskBoosterActive) {
         const Booster = mongoose.models.Booster || require('../models/Booster');
         const taskBooster = await Booster.findOne({ type: 'task' });
-        
+
         let isApplicable = true;
         if (taskBooster && taskBooster.applicableTasks && taskBooster.applicableTasks.length > 0) {
             const allowed = taskBooster.applicableTasks.map(t => t.toLowerCase());
             const s = (source || '').toLowerCase();
-            
+
             // Check source string for mini-game names
             const matchesSource = allowed.some(t => s.includes(t));
-            
+
             // Check task type if available
             const matchesTaskType = task && task.type && allowed.includes(task.type.toLowerCase());
-            
+
             // Check General Tasks
             const isGeneralTask = allowed.includes('general tasks') && task && !['speed tapper', 'memory master', 'quiz', 'lucky draw', 'treasure chest', 'scratch card'].some(gt => s.includes(gt) || (task.type && task.type.toLowerCase() === gt));
 
@@ -96,7 +96,7 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
                 isApplicable = false;
             }
         }
-        
+
         if (isApplicable) {
             factor = 3;
         }
@@ -104,7 +104,7 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
     const totalAwardedCoins = amount * factor;
 
     // Remove conversion logic - coins stay as coins and do not convert to wallet balance (Rupees)
-    
+
     // Update User
     user.coins.balance += totalAwardedCoins;
     user.coins.lifetimeCoins += totalAwardedCoins;

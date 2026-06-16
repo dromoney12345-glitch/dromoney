@@ -152,7 +152,7 @@ const HelpCenter = () => {
             {/* --- Modals --- */}
             
             {/* Help Guide Modal */}
-            <div className={`fixed inset-0 z-[100] transition-all duration-300 flex items-end sm:items-center justify-center ${isGuideOpen ? 'visible' : 'invisible'}`}>
+            <div className={`fixed inset-0 z-[100] transition-all duration-300 flex items-end sm:items-center justify-center pb-[80px] sm:pb-0 ${isGuideOpen ? 'visible' : 'invisible'}`}>
                 <div onClick={() => setIsGuideOpen(false)} className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 ${isGuideOpen ? 'opacity-100' : 'opacity-0'}`}></div>
                 <div className={`relative w-full sm:w-[92%] max-w-md bg-white rounded-t-[32px] sm:rounded-3xl overflow-hidden transition-all duration-300 ease-out flex flex-col max-h-[85vh] ${isGuideOpen ? 'translate-y-0 opacity-100' : 'translate-y-full sm:translate-y-8 opacity-0'}`}>
                     <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-sky-50/30">
@@ -193,7 +193,7 @@ const HelpCenter = () => {
             </div>
 
             {/* Report Problem Modal */}
-            <div className={`fixed inset-0 z-[100] transition-all duration-300 flex items-end sm:items-center justify-center ${isReportOpen ? 'visible' : 'invisible'}`}>
+            <div className={`fixed inset-0 z-[100] transition-all duration-300 flex items-end sm:items-center justify-center pb-[80px] sm:pb-0 ${isReportOpen ? 'visible' : 'invisible'}`}>
                 <div onClick={() => setIsReportOpen(false)} className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 ${isReportOpen ? 'opacity-100' : 'opacity-0'}`}></div>
                 <div className={`relative w-full sm:w-[92%] max-w-md bg-white rounded-t-[32px] sm:rounded-3xl overflow-hidden transition-all duration-300 ease-out flex flex-col ${isReportOpen ? 'translate-y-0 opacity-100' : 'translate-y-full sm:translate-y-8 opacity-0'}`}>
                     <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-rose-50/30">

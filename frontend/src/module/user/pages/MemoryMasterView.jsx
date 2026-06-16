@@ -5,6 +5,7 @@ import {
     RefreshCcw, Star, Zap, Heart, Ghost, Gem, Smile, Rocket, HelpCircle
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
+import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
 
 const ICON_MAP = {
@@ -140,6 +141,7 @@ const MemoryMasterView = () => {
         if (isWin) {
             const reward = Math.max(10, Math.floor((timeLeft / maxTime) * 100));
             await addCoins(reward, 'Memory Master Victory', id);
+            taskStorage.markComplete(id);
             addNotification('Memory Master Won!', `You completed the challenge with ${timeLeft}s left!`, 'success');
             
             // Only submit to events API if this was opened as an event (not a task)
@@ -178,7 +180,7 @@ const MemoryMasterView = () => {
         return (
             <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 flex flex-col p-6 text-white animate-in fade-in duration-500">
                 <header className="flex items-center gap-4 mb-10 pt-2">
-                    <button onClick={() => navigate('/user/events')} className="p-2 bg-white/10 rounded-full backdrop-blur transition-all active:scale-90">
+                    <button onClick={() => navigate(-1)} className="p-2 bg-white/10 rounded-full backdrop-blur transition-all active:scale-90">
                         <ChevronLeft size={24} className="text-white" />
                     </button>
                     <h1 className="text-xl font-medium tracking-tight uppercase">🧩 Memory Master</h1>
@@ -336,10 +338,10 @@ const MemoryMasterView = () => {
 
                     <div className="w-full space-y-3">
                         <button
-                            onClick={() => navigate('/user/events')}
+                            onClick={() => navigate(-1)}
                             className="w-full bg-white text-slate-900 py-5 rounded-[2rem] font-medium uppercase tracking-widest shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3"
                         >
-                            Back to Events <ArrowRight size={20} />
+                            Go Back <ArrowRight size={20} />
                         </button>
                         <button
                             onClick={() => setStep(0)}
