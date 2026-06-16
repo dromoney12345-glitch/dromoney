@@ -56,7 +56,7 @@ const HelpCenter = () => {
     };
 
     const handleWhatsApp = () => {
-        const message = encodeURIComponent("Hello Drowmoney Support, I need assistance.");
+        const message = encodeURIComponent("Hello Dromoney Support, I need assistance.");
         window.open(`https://wa.me/919680947738?text=${message}`, '_blank');
     };
 

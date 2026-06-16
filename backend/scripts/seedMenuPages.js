@@ -131,10 +131,10 @@ const DEFAULT_CONTENT = {
         ]
     },
     'income_projects': {
-        title: 'Drowmoney Projects',
+        title: 'Dromoney Projects',
         description: 'Access exclusive high-ticket affiliate projects and scale your monthly income with verified partners.',
         data: {
-            title: 'Drowmoney Projects',
+            title: 'Dromoney Projects',
             description: 'Access exclusive high-ticket affiliate projects and scale your monthly income with verified partners.'
         }
     },

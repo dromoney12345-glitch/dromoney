@@ -10,7 +10,7 @@ const seedData = [
         title: 'Premium Income Projects',
         description: 'Access exclusive high-ticket affiliate projects and scale your monthly income with verified strategies.',
         data: {
-            title: 'Drowmoney Premium Projects',
+            title: 'Dromoney Premium Projects',
             description: 'Enroll in state-of-the-art affiliate projects curated for high-velocity earnings.'
         }
     },

@@ -16,7 +16,7 @@ const WatchAndEarnAdmin = () => {
         videoUrl: ''
     });
     const [introVideo, setIntroVideo] = useState({
-        title: 'Welcome to Drowmoney',
+        title: 'Welcome to Dromoney',
         subtitle: 'Watch our guide to start earning today!',
         videoUrl: '',
         thumbnailUrl: '',

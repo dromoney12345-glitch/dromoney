@@ -257,7 +257,7 @@ const IncomeInfo = () => {
                         <Info size={14} className="text-emerald-500" />
                         <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">Knowledge is Wealth</span>
                     </div>
-                    <p className="text-[9px] font-medium text-slate-300 uppercase tracking-[0.3em] leading-none">Powered by Drowmoney Intelligence</p>
+                    <p className="text-[9px] font-medium text-slate-300 uppercase tracking-[0.3em] leading-none">Powered by Dromoney Intelligence</p>
                 </div>
             </div>
 
