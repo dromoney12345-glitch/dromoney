@@ -12,10 +12,20 @@ exports.getEvents = asyncHandler(async (req, res, next) => {
     const query = (req.baseUrl && req.baseUrl.includes('admin')) ? {} : { status: { $ne: 'Draft' } };
     const events = await Event.find(query);
 
-    // Calculate dynamic counts for each event
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Calculate dynamic counts for each event for today
     const eventsWithStats = await Promise.all(events.map(async (event) => {
-        const totalParticipants = await EventParticipant.countDocuments({ event: event._id });
-        const awardedCount = await EventParticipant.countDocuments({ event: event._id, prizeStatus: 'Awarded' });
+        const totalParticipants = await EventParticipant.countDocuments({ 
+            event: event._id,
+            createdAt: { $gte: today }
+        });
+        const awardedCount = await EventParticipant.countDocuments({ 
+            event: event._id, 
+            prizeStatus: 'Awarded',
+            createdAt: { $gte: today }
+        });
         
         return {
             ...event.toObject(),
@@ -24,10 +34,13 @@ exports.getEvents = asyncHandler(async (req, res, next) => {
         };
     }));
 
-    // If user is logged in, mark which events they've joined
+    // If user is logged in, mark which events they've joined today
     let joinedEventIds = [];
     if (req.user) {
-        const participations = await EventParticipant.find({ user: req.user.id });
+        const participations = await EventParticipant.find({ 
+            user: req.user.id,
+            createdAt: { $gte: today }
+        });
         joinedEventIds = participations.map(p => p.event.toString());
     }
 
@@ -48,8 +61,16 @@ exports.joinEvent = asyncHandler(async (req, res, next) => {
 
     const user = await User.findById(req.user.id);
 
-    // Check if already joined
-    const existing = await EventParticipant.findOne({ event: event._id, user: user._id });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Check if already joined today
+    const existing = await EventParticipant.findOne({ 
+        event: event._id, 
+        user: user._id,
+        createdAt: { $gte: today }
+    });
+    
     if (existing) {
         return res.status(200).json({
             success: true,
