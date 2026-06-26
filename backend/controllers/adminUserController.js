@@ -6,6 +6,7 @@ const ReferralTransaction = require('../models/ReferralTransaction');
 const TaskSubmission = require('../models/TaskSubmission');
 const EventParticipant = require('../models/EventParticipant');
 const ErrorResponse = require('../utils/errorResponse');
+const { sendNotificationToUser } = require('./fcmController');
 
 // @desc    Get all users
 // @route   GET /api/admin/users
@@ -190,6 +191,122 @@ exports.getUserTransactions = async (req, res, next) => {
                 last7Days
             }
         });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// @desc    Distribute profit to active Future Fund users
+// @route   POST /api/admin/users/future-fund/distribute
+// @access  Private (Admin)
+exports.distributeFutureFundProfit = async (req, res, next) => {
+    try {
+        const { amount } = req.body;
+        if (!amount || amount <= 0) {
+            return next(new ErrorResponse('Please provide a valid amount to distribute', 400));
+        }
+
+        // Find all users with active future fund
+        const users = await User.find({ 'futureFund.status': 'active' });
+
+        if (users.length === 0) {
+            return res.status(404).json({ success: false, message: 'No active Future Fund users found' });
+        }
+
+        // Distribute proportionally
+        const Settings = require('../models/Settings');
+        let settings = await Settings.findOne();
+        if (!settings) {
+            settings = await Settings.create({});
+        }
+
+        const adWeight = settings.ffAdScoreWeight || 1;
+        const taskWeight = settings.ffTaskScoreWeight || 1;
+        const boosterMultiplier = settings.ffBoosterMultiplier || 1.5;
+
+        // Calculate Activity Scores
+        let totalActivityScore = 0;
+        const scoredUsers = [];
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+
+        for (let user of users) {
+            // Ads Score
+            let adScore = user.dailyAdCount || 0;
+            if (user.lastAdCountResetAt && user.lastAdCountResetAt < todayStart) {
+                adScore = 0;
+            }
+
+            // Tasks Score
+            let taskScore = 0;
+            if (user.dailyTaskCompletions && user.dailyTaskCompletions.length > 0) {
+                taskScore = user.dailyTaskCompletions.filter(tc => new Date(tc.completedAt) >= todayStart).length;
+            }
+
+            // Booster Multiplier
+            let multiplier = 1.0;
+            if (user.isTaskBoosterActive || user.isSupportBoosterActive) {
+                multiplier = boosterMultiplier;
+            }
+
+            // Base score must be at least 1 so everyone gets a minimum piece of the pie
+            let baseScore = (adScore * adWeight) + (taskScore * taskWeight);
+            if (baseScore === 0) baseScore = 1;
+
+            let finalScore = baseScore * multiplier;
+            totalActivityScore += finalScore;
+
+            scoredUsers.push({
+                user: user,
+                score: finalScore,
+                breakdown: { ads: adScore, tasks: taskScore, multiplier }
+            });
+        }
+
+        // Distribute proportionally
+        let totalDistributed = 0;
+        for (let item of scoredUsers) {
+            let userShare = (item.score / totalActivityScore) * Number(amount);
+            userShare = Math.floor(userShare * 100) / 100; // Keep up to 2 decimals
+
+            if (userShare > 0) {
+                item.user.wallet.balance += userShare;
+                item.user.wallet.lifetimeEarnings += userShare;
+                
+                await Transaction.create({
+                    user: item.user._id,
+                    type: 'credit',
+                    currency: 'INR',
+                    amount: userShare,
+                    source: 'Future Fund Daily Distribution',
+                    status: 'Success'
+                });
+
+                await item.user.save();
+                totalDistributed += userShare;
+
+                // Send notification
+                try {
+                    const { sendNotificationToUser } = require('./fcmController');
+                    await sendNotificationToUser(item.user._id, {
+                        title: 'Future Fund Reward! 🏆',
+                        body: `Based on your activity score (${item.score.toFixed(1)}), ₹${userShare} has been added to your wallet!`,
+                        data: {
+                            type: 'future_fund',
+                            link: '/user/future-fund'
+                        }
+                    });
+                } catch (err) {
+                    console.error(`Failed to send FF notification to ${item.user._id}`);
+                }
+            }
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `Successfully distributed ₹${amount} each to ${users.length} users. Total: ₹${totalDistributed}`
+        });
+
     } catch (err) {
         next(err);
     }

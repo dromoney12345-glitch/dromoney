@@ -133,13 +133,14 @@ const MarketingManager = () => {
         'menu_how_it_works': { title: '', subtitle: '', sections: [] },
         'menu_benefits': { title: '', subtitle: '', sections: [] },
         'menu_support': { title: '', subtitle: '', sections: [] },
-        'menu_about': { title: '', subtitle: '', sections: [] }
+        'menu_about': { title: '', subtitle: '', sections: [] },
+        'menu_contact': { title: '', subtitle: '', sections: [] }
     });
     const [selectedPage, setSelectedPage] = useState('menu_how_it_works');
 
     const fetchAllMarketingData = async () => {
         const keys = [
-            'menu_how_it_works', 'menu_benefits', 'menu_support', 'menu_about',
+            'menu_how_it_works', 'menu_benefits', 'menu_support', 'menu_about', 'menu_contact',
             'menu_boosters', 'menu_future_features'
         ];
         try {
@@ -149,7 +150,7 @@ const MarketingManager = () => {
                 const data = res.data;
 
                 // 1. Process Info Pages
-                const infoKeys = ['menu_how_it_works', 'menu_benefits', 'menu_support', 'menu_about'];
+                const infoKeys = ['menu_how_it_works', 'menu_benefits', 'menu_support', 'menu_about', 'menu_contact'];
                 infoKeys.forEach(key => {
                     const item = data[key];
                     if (item && item.data) {

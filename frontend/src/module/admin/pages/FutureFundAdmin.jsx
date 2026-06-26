@@ -12,6 +12,10 @@ import StatusBadge from '../components/StatusBadge';
 import api from '../../shared/services/api';
 
 const FutureFundAdmin = () => {
+    // ── Profit Distribution States ──
+    const [distributeAmount, setDistributeAmount] = useState('');
+    const [distributing, setDistributing] = useState(false);
+
     // ── CMS States ──
     const [cms, setCms] = useState({
         description: "Future Fund is a long-term earning opportunity. Once activated, users become eligible for cash rewards derived from platform profits.",
@@ -130,6 +134,36 @@ const FutureFundAdmin = () => {
         } catch (err) {
             console.error("Failed to update rules", err);
             alert("Save failed: " + err.message);
+        }
+    };
+
+    // ── Distribute Profit API ──
+    const handleDistribute = async () => {
+        if (!distributeAmount || distributeAmount <= 0) {
+            return alert("Please enter a valid amount.");
+        }
+        
+        const activeUsersCount = usersData.filter(u => u.stage === 'Active').length;
+        if (activeUsersCount === 0) {
+            return alert("There are no active Future Fund users to distribute profit to.");
+        }
+
+        if (!window.confirm(`Are you sure you want to distribute ₹${distributeAmount} to EACH of the ${activeUsersCount} Active Future Fund users? (Total: ₹${activeUsersCount * distributeAmount})`)) return;
+
+        setDistributing(true);
+        try {
+            const res = await api.post('/admin/users/future-fund/distribute', { amount: Number(distributeAmount) });
+            if (res.success) {
+                alert(res.message);
+                setDistributeAmount('');
+            } else {
+                alert(res.message || "Failed to distribute.");
+            }
+        } catch (err) {
+            console.error("Distribution error", err);
+            alert("Error: " + err.message);
+        } finally {
+            setDistributing(false);
         }
     };
 
@@ -269,6 +303,38 @@ const FutureFundAdmin = () => {
                     <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-100 text-[10px] text-slate-400 font-medium leading-normal">
                         These dynamic settings configure the targets shown in the User's Active Future Fund screen and are saved directly into the database.
                     </div>
+                </div>
+            </div>
+
+            {/* ── Profit Distribution Section ── */}
+            <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-5 mb-5 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
+                        <IndianRupee size={24} />
+                    </div>
+                    <div>
+                        <h2 className="text-sm font-medium text-slate-800 uppercase tracking-normal">Distribute Platform Profit</h2>
+                        <p className="text-[10px] font-medium text-slate-400 mt-1 uppercase tracking-widest">Send profit share directly to Active Future Fund users</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                    <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm">₹</span>
+                        <input 
+                            type="number" 
+                            placeholder="Amount per user" 
+                            value={distributeAmount}
+                            onChange={(e) => setDistributeAmount(e.target.value)}
+                            className="w-full md:w-48 pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all shadow-inner"
+                        />
+                    </div>
+                    <button 
+                        onClick={handleDistribute}
+                        disabled={distributing}
+                        className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white rounded-xl font-medium uppercase tracking-widest text-[11px] shadow-lg shadow-emerald-600/20 active:scale-95 transition-all flex items-center gap-2"
+                    >
+                        {distributing ? <Loader2 size={16} className="animate-spin" /> : 'Send to All Active'}
+                    </button>
                 </div>
             </div>
 

@@ -338,3 +338,89 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
     });
 });
 
+// @desc    Submit Manual Payment Proof
+// @route   POST /api/user/data/manual-payment
+// @access  Private
+exports.submitManualPayment = asyncHandler(async (req, res, next) => {
+    const { amount, type, ideaId, planName: reqPlanName, planDuration: reqPlanDuration, durationInDays: reqDurationInDays, utrNumber } = req.body;
+
+    if (!utrNumber || utrNumber.length !== 12) {
+        return next(new ErrorResponse('Please provide a valid 12-digit UTR/Ref number', 400));
+    }
+
+    if (!req.file) {
+        return next(new ErrorResponse('Please upload a screenshot of your payment', 400));
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) return next(new ErrorResponse('User not found', 404));
+
+    let finalAmount = parseFloat(amount);
+    let planName = reqPlanName || 'Manual Payment';
+    let pType = type || 'PLATFORM_UNLOCK';
+    let durationDays = reqDurationInDays || 30;
+
+    if (!reqPlanName) {
+        if (pType === 'PLATFORM_UNLOCK') {
+            planName = 'Lifetime Access';
+            durationDays = 9999;
+        } else if (pType === 'SUPPORT_BOOSTER') {
+            planName = 'Support Booster';
+        } else if (pType === 'TASK_BOOSTER') {
+            planName = 'Task Booster';
+        }
+    }
+
+    const cloudinary = require('cloudinary').v2;
+    const { Readable } = require('stream');
+
+    const uploadPromise = new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            { folder: 'dromoney/payments' },
+            (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+            }
+        );
+        Readable.from(req.file.buffer).pipe(stream);
+    });
+
+    const uploadResult = await uploadPromise;
+
+    const payment = await Payment.create({
+        user: req.user.id,
+        userName: user.name || '',
+        userEmail: user.email || '',
+        userPhone: user.phone || '',
+        plan: planName,
+        paymentType: pType,
+        planDuration: reqPlanDuration || 'Monthly',
+        durationInDays: durationDays,
+        businessIdea: ideaId || null,
+        amount: finalAmount,
+        method: 'Manual',
+        utrNumber: utrNumber,
+        screenshot: uploadResult.secure_url,
+        status: 'Pending',
+        processedAt: null
+    });
+
+    try {
+        const { sendNotificationToAllAdmins } = require('./fcmController');
+        await sendNotificationToAllAdmins({
+            title: 'Manual Deposit Auto-Approved 💰',
+            body: `User ${user.name} uploaded a receipt for ₹${finalAmount}. Access was auto-granted.`,
+            data: {
+                type: 'deposit_alert',
+                link: '/admin/payments'
+            }
+        });
+    } catch (pushErr) {
+        console.error('Admin push notification failed for manual deposit pending:', pushErr.message);
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'Payment proof submitted and access activated successfully!'
+    });
+});

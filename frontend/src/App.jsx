@@ -256,7 +256,7 @@ function App() {
             </Route>
 
             {/* Fallback for safety */}
-            <Route path="*" element={<Navigate to="/user/auth/login" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
         )}

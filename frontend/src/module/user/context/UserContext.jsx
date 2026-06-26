@@ -304,7 +304,9 @@ export const UserProvider = ({ children }) => {
             if (res?.data?.newCoinBalance !== undefined) {
                 setUserData(prev => ({
                     ...prev,
-                    coins: { ...prev.coins, total: res.data.newCoinBalance }
+                    coins: { ...prev.coins, total: res.data.newCoinBalance },
+                    completedTasks: res.data.completedTasks || prev.completedTasks,
+                    dailyTaskCompletions: res.data.dailyTaskCompletions || prev.dailyTaskCompletions
                 }));
             }
             return { success: true };
@@ -314,9 +316,9 @@ export const UserProvider = ({ children }) => {
         }
     };
 
-    const requestWithdrawal = async (amount, bankDetails) => {
+    const requestWithdrawal = async (amount, bankDetails, paymentMethod = 'Bank Transfer') => {
         try {
-            await api.post('/user/wallet/withdraw', { amount, bankDetails });
+            await api.post('/user/wallet/withdraw', { amount, bankDetails, paymentMethod });
             // Note: refreshUserProfile is called by the caller AFTER showing success modal
             return { success: true };
         } catch (err) {

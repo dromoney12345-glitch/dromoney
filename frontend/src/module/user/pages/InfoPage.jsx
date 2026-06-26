@@ -111,6 +111,14 @@ const LOCAL_FALLBACKS = {
             { title: '2. Eligibility Criteria', text: 'To qualify for the Future Fund, you need to:\n• Successfully generate 10 affiliate sales.\n• Maintain 15 minutes of daily active participation for 10 consecutive days.\n• Follow all community guidelines strictly.' },
             { title: '3. Performance Rewards', text: 'Once eligible, your earnings are scaled based on your platform activity. The more actively you participate and refer, the higher your tiered rewards.' }
         ]
+    },
+    'contact': {
+        title: 'Contact Us',
+        subtitle: 'We are always here to help',
+        sections: [
+            { title: 'Email Support', text: 'app@dromoney.com' },
+            { title: 'Phone Support / WhatsApp', text: '+91 9876543210' }
+        ]
     }
 };
 
@@ -179,6 +187,7 @@ const InfoPage = () => {
             case 'how-it-works': return <HelpCircle {...props} />;
             case 'benefits': return <Sparkles {...props} />;
             case 'support': return <Headset {...props} />;
+            case 'contact': return <Headset {...props} />;
             case 'about': return <Building2 {...props} />;
             default: return <Info {...props} />;
         }

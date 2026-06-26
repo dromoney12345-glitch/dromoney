@@ -93,6 +93,11 @@ const WatchAndEarn = () => {
             try {
                 setCalling(true);
                 await window.flutter_inappwebview.callHandler('showRewardAd', 'reward_ad_1');
+                
+                // Automatically claim reward after Flutter handler finishes showing the ad
+                if (window.refreshRewardStatus) {
+                    await window.refreshRewardStatus();
+                }
             } catch (e) {
                 console.error("Flutter handler error", e);
                 showToast("Failed to launch Ad. Please try again.", "error");
@@ -110,7 +115,7 @@ const WatchAndEarn = () => {
         return `${m}m ${s}s`;
     };
 
-    const maxDailyLimit = 10;
+    const maxDailyLimit = status?.maxDailyLimit || 10;
     const dailyAdCount = status ? (maxDailyLimit - status.remainingAds) : 0;
 
     return (

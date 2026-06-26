@@ -491,3 +491,63 @@ exports.updateProfile = asyncHandler(async (req, res, next) => {
         data: updatedUser
     });
 });
+
+// @desc    Get user's estimated Future Fund reward
+// @route   GET /api/user/data/future-fund/estimation
+// @access  Private
+exports.getFutureFundEstimation = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+    if (!user) return next(new ErrorResponse('User not found', 404));
+
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    let settings = await Settings.findOne();
+    if (!settings) {
+        settings = await Settings.create({});
+    }
+    const adWeight = settings.ffAdScoreWeight || 1;
+    const taskWeight = settings.ffTaskScoreWeight || 1;
+    const boosterMultiplier = settings.ffBoosterMultiplier || 1.5;
+
+    let adScore = user.dailyAdCount || 0;
+    if (user.lastAdCountResetAt && user.lastAdCountResetAt < todayStart) adScore = 0;
+
+    let taskScore = 0;
+    if (user.dailyTaskCompletions && user.dailyTaskCompletions.length > 0) {
+        taskScore = user.dailyTaskCompletions.filter(tc => new Date(tc.completedAt) >= todayStart).length;
+    }
+
+    let multiplier = 1.0;
+    if (user.isTaskBoosterActive || user.isSupportBoosterActive) {
+        multiplier = boosterMultiplier;
+    }
+
+    let baseScore = (adScore * adWeight) + (taskScore * taskWeight);
+    if (baseScore === 0) baseScore = 1;
+
+    let finalScore = baseScore * multiplier;
+
+    const activeUsersCount = await User.countDocuments({ 'futureFund.status': 'active' });
+    const estimatedTotalScore = activeUsersCount > 0 ? (activeUsersCount * 5) : 5;
+    const estimatedPool = activeUsersCount * 25; 
+
+    let estimatedReward = 0;
+    if (estimatedTotalScore > 0) {
+        estimatedReward = (finalScore / (estimatedTotalScore + finalScore)) * estimatedPool;
+    }
+
+    res.status(200).json({
+        success: true,
+        data: {
+            activityScore: finalScore,
+            breakdown: {
+                ads: adScore,
+                tasks: taskScore,
+                multiplier: multiplier
+            },
+            estimatedTotalPool: estimatedPool,
+            estimatedReward: Math.floor(estimatedReward * 100) / 100
+        }
+    });
+});

@@ -150,13 +150,15 @@ const Wallets = () => {
                                     <td className="px-5 py-4 text-slate-900 text-[13px]">{w.amount}</td>
                                     <td className="px-5 py-4">
                                         <p className="text-[12px] text-slate-600">{w.method}</p>
-                                        {w.bankDetails ? (
+                                        {w.method === 'UPI' ? (
+                                            <p className="text-[10px] text-slate-400">{w.bankDetails?.upiId || 'N/A'}</p>
+                                        ) : w.bankDetails ? (
                                             <div className="text-[10px] text-slate-400 mt-0.5 space-y-0.5">
                                                 <p>A/C: {w.bankDetails.accountNumber}</p>
                                                 <p>IFSC: {w.bankDetails.ifscCode}</p>
                                             </div>
                                         ) : (
-                                            <p className="text-[10px] text-slate-400">{w.upiId || 'N/A'}</p>
+                                            <p className="text-[10px] text-slate-400">N/A</p>
                                         )}
                                     </td>
                                     <td className="px-5 py-4 text-[12px] text-slate-400">{w.date}</td>
@@ -293,7 +295,7 @@ const Wallets = () => {
                             </div>
 
                             {/* Bank Details */}
-                            {selectedDetail.bankDetails && (
+                            {selectedDetail.method === 'Bank Transfer' && selectedDetail.bankDetails && (
                                 <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 space-y-2">
                                     <p className="text-[9px] text-slate-400 uppercase tracking-normal flex items-center gap-1 mb-2"><Building2 size={9} /> Bank Details</p>
                                     <div className="grid grid-cols-2 gap-2 text-[11px]">
@@ -304,10 +306,10 @@ const Wallets = () => {
                                     </div>
                                 </div>
                             )}
-                            {selectedDetail.upiId && (
+                            {selectedDetail.method === 'UPI' && selectedDetail.bankDetails?.upiId && (
                                 <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
                                     <p className="text-[9px] text-slate-400 uppercase tracking-normal mb-1">UPI ID</p>
-                                    <p className="text-[12px] text-slate-700 font-mono">{selectedDetail.upiId}</p>
+                                    <p className="text-[12px] text-slate-700 font-mono">{selectedDetail.bankDetails.upiId}</p>
                                 </div>
                             )}
 

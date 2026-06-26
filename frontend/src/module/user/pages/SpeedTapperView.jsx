@@ -56,7 +56,7 @@ const SpeedTapperView = () => {
 
     const handleWin = async () => {
         setStatus('won');
-        await addCoins(task.reward, 'Speed Tapper Mastery', task._id || task.id);
+        await addCoins((task.coinsReward || task.reward || 0), 'Speed Tapper Mastery', task._id || task.id);
         taskStorage.markComplete(task._id || task.id);
     };
 
@@ -159,7 +159,7 @@ const SpeedTapperView = () => {
                             )}
                         </div>
                         <p className="text-xl font-medium text-amber-600 mt-0.5">
-                            +{isTaskBoosterActive ? task.reward * 3 : task.reward} Coins
+                            +{isTaskBoosterActive ? (task.coinsReward || task.reward || 0) * 3 : (task.coinsReward || task.reward || 0)} Coins
                         </p>
                     </div>
                 </div>

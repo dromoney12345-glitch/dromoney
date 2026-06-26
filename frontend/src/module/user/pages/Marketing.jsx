@@ -49,7 +49,8 @@ const Marketing = () => {
                 console.log('Share failed or cancelled');
             }
         } else {
-            handleCopy();
+            const message = encodeURIComponent(`Hey! Join Dromoney using my link and start earning ₹${rewardAmount} per referral easily! 🚀\n\n${referralLink}`);
+            window.open(`https://wa.me/?text=${message}`, '_blank');
         }
     };
 
@@ -89,9 +90,9 @@ const Marketing = () => {
 
                         {/* Referral Link Box */}
                         <div className="bg-slate-50 border border-slate-200 p-1 pl-4 flex items-center justify-between gap-3 mb-4">
-                            <p className="text-[11px] font-medium text-slate-500 truncate tracking-tight">
+                            <a href={referralLink} target="_blank" rel="noopener noreferrer" className="text-[11px] font-medium text-slate-500 truncate tracking-tight hover:text-blue-600 hover:underline">
                                 {referralLink}
-                            </p>
+                            </a>
                             <button
                                 onClick={handleCopy}
                                 className={`px-4 py-2 text-[10px] font-medium uppercase tracking-widest transition-all active:scale-95 shrink-0

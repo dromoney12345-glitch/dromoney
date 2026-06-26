@@ -43,6 +43,7 @@ const Earn = () => {
     // DYNAMIC TASKS STATE
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [boosterData, setBoosterData] = useState({ title: '₹49 Task Booster', subtitle: 'Priority Enabled', price: 49 });
 
     useEffect(() => {
         const loadTasks = async () => {
@@ -63,7 +64,28 @@ const Earn = () => {
             }
         };
 
+        const loadBoosters = async () => {
+            try {
+                const res = await api.get('/public/boosters');
+                if (res.success && res.data) {
+                    const taskBooster = res.data.find(b => b.type === 'task');
+                    if (taskBooster) {
+                        const pricePrefix = `₹${taskBooster.price} `;
+                        if (!taskBooster.title.includes('₹')) {
+                            taskBooster.title = pricePrefix + taskBooster.title;
+                        }
+                        setBoosterData({
+                            title: taskBooster.title,
+                            subtitle: taskBooster.subtitle || 'Priority Enabled',
+                            price: taskBooster.price || 49
+                        });
+                    }
+                }
+            } catch (err) {}
+        };
+
         loadTasks();
+        loadBoosters();
     }, []);
 
     // Get actually completed tasks dynamically from backend userData (and fallback storage)
@@ -268,8 +290,8 @@ const Earn = () => {
                     {/* Card Header Row */}
                     <div className="px-5 py-3 flex items-center justify-between">
                         <div className="flex flex-col">
-                            <h4 className="text-[14px] font-medium text-slate-800 tracking-tight leading-none mb-1">₹49 Task Booster</h4>
-                            <p className="text-[9px] font-semibold text-emerald-600/80 uppercase tracking-[0.15em]">Priority Enabled</p>
+                            <h4 className="text-[14px] font-medium text-slate-800 tracking-tight leading-none mb-1">{boosterData.title}</h4>
+                            <p className="text-[9px] font-semibold text-emerald-600/80 uppercase tracking-[0.15em]">{boosterData.subtitle}</p>
                         </div>
                         <div className="flex items-center gap-2">
                             <button
@@ -320,8 +342,9 @@ const Earn = () => {
             <PaymentModal
                 isOpen={isPaymentOpen}
                 onClose={() => setIsPaymentOpen(false)}
-                amount={49}
-                plan="Task Booster Pack"
+                amount={Math.round(boosterData.price * 1.04 * 100) / 100}
+                type="TASK_BOOSTER"
+                plan={boosterData.title}
                 onSuccess={() => {
                     setIsPaymentOpen(false);
                     setIsBoosterExpanded(false);

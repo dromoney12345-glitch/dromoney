@@ -57,23 +57,28 @@ const BusinessIdeas = () => {
 
     // When ideas load and ideaId is in URL, auto-select the idea
     useEffect(() => {
-        if (ideaId && ideas.length > 0) {
-            const found = ideas.find(i => i._id === ideaId);
-            if (found) {
-                setSelectedIdea(found);
-                // Restore eco card from cardId if present
-                if (cardId && found.ecosystemCards) {
-                    const ecoColors = [
-                        { color: 'text-emerald-500', bg: 'bg-emerald-50', ring: 'ring-emerald-200' },
-                        { color: 'text-indigo-500',  bg: 'bg-indigo-50',  ring: 'ring-indigo-200' },
-                        { color: 'text-blue-500',    bg: 'bg-blue-50',    ring: 'ring-blue-200' },
-                        { color: 'text-amber-500',   bg: 'bg-amber-50',   ring: 'ring-amber-200' }
-                    ];
-                    const cardIdx = found.ecosystemCards.findIndex(c => c.id === cardId);
-                    if (cardIdx !== -1) {
-                        setSelectedEcoCard({ ...found.ecosystemCards[cardIdx], colorStyle: ecoColors[cardIdx % 4] });
+        if (ideas.length > 0) {
+            if (ideaId) {
+                const found = ideas.find(i => i._id === ideaId);
+                if (found) {
+                    setSelectedIdea(found);
+                    // Restore eco card from cardId if present
+                    if (cardId && found.ecosystemCards) {
+                        const ecoColors = [
+                            { color: 'text-emerald-500', bg: 'bg-emerald-50', ring: 'ring-emerald-200' },
+                            { color: 'text-indigo-500',  bg: 'bg-indigo-50',  ring: 'ring-indigo-200' },
+                            { color: 'text-blue-500',    bg: 'bg-blue-50',    ring: 'ring-blue-200' },
+                            { color: 'text-amber-500',   bg: 'bg-amber-50',   ring: 'ring-amber-200' }
+                        ];
+                        const cardIdx = found.ecosystemCards.findIndex(c => c.id === cardId);
+                        if (cardIdx !== -1) {
+                            setSelectedEcoCard({ ...found.ecosystemCards[cardIdx], colorStyle: ecoColors[cardIdx % 4] });
+                        }
                     }
                 }
+            } else {
+                // If on intro screen, use the first idea to make content dynamic
+                setSelectedIdea(ideas[0]);
             }
         }
     }, [ideaId, cardId, ideas]);

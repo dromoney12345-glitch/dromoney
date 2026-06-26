@@ -27,8 +27,10 @@ const Wallet = () => {
         accountNumber: '',
         ifscCode: '',
         holderName: '',
-        bankName: ''
+        bankName: '',
+        upiId: ''
     });
+    const [paymentMethod, setPaymentMethod] = useState('UPI');
 
     const [pendingWithdrawal, setPendingWithdrawal] = useState(null);
     const [recentWithdrawal, setRecentWithdrawal] = useState(null);
@@ -118,9 +120,9 @@ const Wallet = () => {
             
             // Show a custom popup modal or beautiful top toast!
             if (data.status === 'Approved') {
-                showToast("Your withdrawal request has been approved by admin! Wallet updated.", "success");
+                showToast("Your redeem request has been approved by admin! Wallet updated.", "success");
             } else if (data.status === 'Rejected') {
-                showToast("Your withdrawal request was rejected by admin.", "error");
+                showToast("Your redeem request was rejected by admin.", "error");
             }
         };
 
@@ -138,20 +140,20 @@ const Wallet = () => {
 
         // Enforce cooldown check
         if (cooldownRemaining > 0) {
-            showToast("You can only withdraw once every 24 hours.", "warning");
+            showToast("You can only redeem once every 24 hours.", "warning");
             return;
         }
 
         // Enforce pending check
         if (pendingWithdrawal) {
-            showToast("You already have a pending withdrawal request.", "warning");
+            showToast("You already have a pending redeem request.", "warning");
             return;
         }
 
         const val = parseFloat(amount);
         if (isNaN(val) || val < minWithdrawal) {
-            addNotification("Invalid Amount", `Minimum withdrawal is ₹${minWithdrawal}.`, "warning");
-            showToast(`Minimum withdrawal is ₹${minWithdrawal}.`, "warning");
+            addNotification("Invalid Amount", `Minimum redeem is ₹${minWithdrawal}.`, "warning");
+            showToast(`Minimum redeem is ₹${minWithdrawal}.`, "warning");
             return;
         }
 
@@ -168,37 +170,52 @@ const Wallet = () => {
             return;
         }
 
-        // Open Bank Details Modal
-        setIsBankModalOpen(true);
+        if (paymentMethod === 'UPI') {
+            const upiRegex = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/;
+            if (!bankDetails.upiId) {
+                showToast('UPI ID is required.', 'error');
+                return;
+            } else if (!upiRegex.test(bankDetails.upiId)) {
+                showToast('Enter a valid UPI ID (e.g. example@ybl).', 'error');
+                return;
+            }
+            // Directly submit for UPI
+            submitWithdrawal();
+        } else {
+            // Open Bank Details Modal for Bank Transfer
+            setIsBankModalOpen(true);
+        }
     };
 
     const submitWithdrawal = async () => {
         // Field-level validation
         const errors = {};
 
-        if (!bankDetails.holderName.trim()) {
-            errors.holderName = 'Account holder name is required.';
-        } else if (/\d/.test(bankDetails.holderName)) {
-            errors.holderName = 'Name cannot contain numbers.';
-        } else if (bankDetails.holderName.trim().length < 3) {
-            errors.holderName = 'Name must be at least 3 characters.';
-        }
+        if (paymentMethod === 'Bank Transfer') {
+            if (!bankDetails.holderName.trim()) {
+                errors.holderName = 'Account holder name is required.';
+            } else if (/\d/.test(bankDetails.holderName)) {
+                errors.holderName = 'Name cannot contain numbers.';
+            } else if (bankDetails.holderName.trim().length < 3) {
+                errors.holderName = 'Name must be at least 3 characters.';
+            }
 
-        if (!bankDetails.bankName.trim()) {
-            errors.bankName = 'Bank name is required.';
-        }
+            if (!bankDetails.bankName.trim()) {
+                errors.bankName = 'Bank name is required.';
+            }
 
-        if (!bankDetails.accountNumber) {
-            errors.accountNumber = 'Account number is required.';
-        } else if (bankDetails.accountNumber.length !== 16) {
-            errors.accountNumber = 'Account number must be exactly 16 digits.';
-        }
+            if (!bankDetails.accountNumber) {
+                errors.accountNumber = 'Account number is required.';
+            } else if (bankDetails.accountNumber.length !== 16) {
+                errors.accountNumber = 'Account number must be exactly 16 digits.';
+            }
 
-        const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
-        if (!bankDetails.ifscCode) {
-            errors.ifscCode = 'IFSC code is required.';
-        } else if (!ifscRegex.test(bankDetails.ifscCode)) {
-            errors.ifscCode = 'Enter a valid IFSC code (e.g. SBIN0001234).';
+            const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+            if (!bankDetails.ifscCode) {
+                errors.ifscCode = 'IFSC code is required.';
+            } else if (!ifscRegex.test(bankDetails.ifscCode)) {
+                errors.ifscCode = 'Enter a valid IFSC code (e.g. SBIN0001234).';
+            }
         }
 
         if (Object.keys(errors).length > 0) {
@@ -210,24 +227,24 @@ const Wallet = () => {
         setIsSubmitting(true);
         try {
             const val = parseFloat(amount);
-            const res = await requestWithdrawal(val, bankDetails);
+            const res = await requestWithdrawal(val, bankDetails, paymentMethod);
             if (res.success) {
                 // Close bank modal & reset form FIRST
                 setIsBankModalOpen(false);
                 setAmount('');
-                setBankDetails({ accountNumber: '', ifscCode: '', holderName: '', bankName: '' });
+                setBankDetails({ accountNumber: '', ifscCode: '', holderName: '', bankName: '', upiId: '' });
                 setBankErrors({});
                 setIsSubmitting(false);
                 // Show success popup immediately
                 setIsSuccessModalOpen(true);
-                addNotification("Request Sent", "Withdrawal request submitted! Waiting for admin approval.", "success");
-                showToast("Withdrawal request submitted! Waiting for admin approval.", "success");
+                addNotification("Request Sent", "Redeem request submitted! Waiting for admin approval.", "success");
+                showToast("Redeem request submitted! Waiting for admin approval.", "success");
                 // Refresh profile silently in background (no await so it doesn't block UI)
                 refreshUserProfile();
                 // Fetch latest wallet/withdrawal status to immediately show the green pending banner
                 fetchWalletStatus();
             } else {
-                addNotification("Withdrawal Denied", res.message || "Request failed. Try again.", "error");
+                addNotification("Redeem Denied", res.message || "Request failed. Try again.", "error");
                 showToast(res.message || "Request failed. Try again.", "error");
                 setIsSubmitting(false);
             }
@@ -263,7 +280,7 @@ const Wallet = () => {
                         </div>
                         <div>
                             <h4 className="text-[10px] text-emerald-900 uppercase tracking-tight leading-none mb-1">waiting for the admin confirmation..</h4>
-                            <p className="text-[9px] font-medium text-emerald-600/70">Your withdrawal request of ₹{pendingWithdrawal.amount} is pending review.</p>
+                            <p className="text-[9px] font-medium text-emerald-600/70">Your redeem request of ₹{pendingWithdrawal.amount} is pending review.</p>
                         </div>
                     </div>
                     <span className="bg-emerald-100 text-emerald-800 text-[8px] uppercase tracking-wider px-2 py-1 rounded-md shrink-0">
@@ -356,7 +373,7 @@ const Wallet = () => {
                     <div className="flex items-center justify-between border-b border-slate-50 pb-2.5">
                         <h3 className="text-[11px] text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                             <ArrowRightLeft size={14} className="text-blue-500" />
-                            Withdraw Cash
+                            Redeem Cash
                         </h3>
                         <span className="bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full text-[8.5px] uppercase tracking-wider">
                             ₹5 Fee Added
@@ -382,6 +399,22 @@ const Wallet = () => {
                     )}
 
                     <div className="flex flex-col gap-2.5">
+                        {/* Payment Method Toggle */}
+                        <div className="flex bg-slate-50 p-1 rounded-lg border border-slate-100">
+                            <button
+                                onClick={() => setPaymentMethod('UPI')}
+                                className={`flex-1 py-2 rounded-md text-xs font-medium transition-all ${paymentMethod === 'UPI' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                UPI Transfer
+                            </button>
+                            <button
+                                onClick={() => setPaymentMethod('Bank Transfer')}
+                                className={`flex-1 py-2 rounded-md text-xs font-medium transition-all ${paymentMethod === 'Bank Transfer' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                Bank Transfer
+                            </button>
+                        </div>
+
                         <input
                             type="number"
                             value={amount}
@@ -389,6 +422,18 @@ const Wallet = () => {
                             placeholder={`Amount (Min. ₹${minWithdrawal})`}
                             className="w-full bg-slate-50 border border-slate-100 rounded-lg py-2.5 px-3.5 text-[13px] font-medium text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-blue-500 transition-all"
                         />
+
+                        {paymentMethod === 'UPI' && (
+                            <div className="animate-in fade-in slide-in-from-top-1 duration-300">
+                                <input
+                                    type="text"
+                                    value={bankDetails.upiId}
+                                    onChange={(e) => setBankDetails({...bankDetails, upiId: e.target.value})}
+                                    placeholder="Enter your UPI ID (e.g. name@ybl)"
+                                    className="w-full bg-slate-50 border border-slate-100 rounded-lg py-2.5 px-3.5 text-[13px] font-medium text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-blue-500 transition-all"
+                                />
+                            </div>
+                        )}
 
 
                         
@@ -413,14 +458,14 @@ const Wallet = () => {
                                 }`}>
                                     {pendingWithdrawal ? (
                                         <>
-                                            आपकी एक निकासी (withdraw) अभी Pending है। कृपया Admin के approval का इंतज़ार करें।
+                                            आपकी एक निकासी (redeem) अभी Pending है। कृपया Admin के approval का इंतज़ार करें।
                                         </>
                                     ) : cooldownRemaining > 0 ? (
                                         <>
-                                            निकासी सीमा: आप 24 घंटे में केवल एक बार ही निकासी (withdraw) कर सकते हैं। अगला withdrawal {Math.floor(cooldownRemaining / (1000 * 60 * 60))}h {Math.floor((cooldownRemaining % (1000 * 60 * 60)) / (1000 * 60))}m {Math.floor((cooldownRemaining % (1000 * 60)) / 1000)}s बाद कर सकते हैं।
+                                            निकासी सीमा: आप 24 घंटे में केवल एक बार ही निकासी (redeem) कर सकते हैं। अगला redeem {Math.floor(cooldownRemaining / (1000 * 60 * 60))}h {Math.floor((cooldownRemaining % (1000 * 60 * 60)) / (1000 * 60))}m {Math.floor((cooldownRemaining % (1000 * 60)) / 1000)}s बाद कर सकते हैं।
                                         </>
                                     ) : (
-                                        "नोट: आप 24 घंटे में केवल एक बार ही निकासी (withdraw) कर सकते हैं।"
+                                        "नोट: आप 24 घंटे में केवल एक बार ही निकासी (redeem) कर सकते हैं।"
                                     )}
                                 </p>
                             </div>
@@ -428,7 +473,7 @@ const Wallet = () => {
 
                         <button
                             onClick={handleWithdraw}
-                            disabled={!!pendingWithdrawal || cooldownRemaining > 0}
+                            disabled={!!pendingWithdrawal || cooldownRemaining > 0 || isSubmitting}
                             className={`w-full py-3.5 rounded-lg text-[10px] uppercase tracking-widest transition-all
                                 ${pendingWithdrawal 
                                     ? 'bg-amber-50 text-amber-400 border border-amber-100 cursor-not-allowed'
@@ -438,13 +483,13 @@ const Wallet = () => {
                                     ? 'bg-[#1a233b] hover:bg-black text-white shadow-md active:scale-95 cursor-pointer'
                                     : 'bg-slate-50 text-slate-300 pointer-events-none border border-slate-100'}`}
                         >
-                            {pendingWithdrawal 
-                                ? 'Withdrawal Pending Approval' 
+                            {isSubmitting ? 'PROCESSING...' : (pendingWithdrawal 
+                                ? 'Redeem Pending Approval' 
                                 : cooldownRemaining > 0 
-                                ? 'Withdrawal Locked (24h Cooldown)' 
+                                ? 'Redeem Locked (24h Cooldown)' 
                                 : isPaid 
-                                ? 'Withdraw Now' 
-                                : 'Unlock to Withdraw'}
+                                ? 'Redeem Now' 
+                                : 'Unlock to Redeem')}
                         </button>
                     </div>
                 </div>
@@ -568,6 +613,7 @@ const Wallet = () => {
                         </div>
                         
                         <div className="p-5 flex flex-col gap-3.5 bg-white">
+                            <div className="space-y-3.5 animate-in fade-in duration-300">
                             <div>
                                 <label className="block text-[10px] text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Account Holder Name</label>
                                 <input
@@ -651,8 +697,9 @@ const Wallet = () => {
                                 )}
                             </div>
                         </div>
-
-                        <div className="p-5 pt-2 bg-slate-50/50 border-t border-slate-100">
+                    </div>
+                        
+                    <div className="p-5 pt-2 bg-slate-50/50 border-t border-slate-100">
                             <button
                                 onClick={submitWithdrawal}
                                 disabled={isSubmitting}
@@ -670,7 +717,7 @@ const Wallet = () => {
                                 ) : (
                                     <>
                                         <ShieldCheck size={15} />
-                                        Confirm Withdrawal
+                                        Confirm Redeem
                                     </>
                                 )}
                             </button>
@@ -701,7 +748,7 @@ const Wallet = () => {
 
                             <div className="bg-blue-50 border border-blue-100 rounded-xl p-3.5 text-left mb-3">
                                 <p className="text-[10.5px] font-semibold text-slate-600 leading-relaxed">
-                                    आपका withdrawal request सफलतापूर्वक submit हो गया है।
+                                    आपका redeem request सफलतापूर्वक submit हो गया है।
                                     Admin के approve करने के बाद amount आपके bank account में transfer किया जाएगा।
                                 </p>
                             </div>

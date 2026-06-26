@@ -49,7 +49,7 @@ const INCOME_OPTIONS = [
     },
     {
         id: 4,
-        title: 'Win Real Cash',
+        title: 'Free to Play',
         subtitle: 'Join events and win rewards',
         icon: Trophy,
         bg: 'bg-purple-50',
@@ -736,6 +736,23 @@ const Income = () => {
                                     <h3 className={`text-xl font-medium leading-tight ${textTitleClass}`}>
                                         {courseData.page3.title}
                                     </h3>
+
+                                    {/* Daily Plan */}
+                                    <div className="space-y-3.5">
+                                        <h4 className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                                            {courseData.page3.dailyPlanTitle}
+                                        </h4>
+                                        <div className="space-y-3">
+                                            {courseData.page3.dailyPlans?.map((plan, idx) => (
+                                                <div key={idx} className="rounded-2xl p-4 border border-slate-100 bg-white flex items-start gap-3 shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
+                                                    <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                                        <BookOpen size={12} />
+                                                    </div>
+                                                    <p className="text-[12px] font-semibold leading-relaxed text-slate-600 font-poppins">{plan}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
 
                                              {/* Examples */}
                                     <div className="rounded-3xl p-5 border border-indigo-100 bg-gradient-to-br from-indigo-50/40 to-blue-50/40 space-y-3.5 relative overflow-hidden shadow-sm">

@@ -59,7 +59,10 @@ const Users = () => {
     };
 
     const handleSearch = (e) => {
-        setSearch(e.target.value);
+        const val = e.target.value;
+        // Restrict to 10 digits if the input is purely numeric (mobile search)
+        if (/^\d+$/.test(val) && val.length > 10) return;
+        setSearch(val);
         setCurrentPage(1);
     };
 

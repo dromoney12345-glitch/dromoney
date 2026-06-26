@@ -14,7 +14,7 @@ const TaskQuizView = () => {
     const totalQ = QUESTIONS.length;
     
     const task = taskStorage.getTasks().find(t => String(t.id) === String(id));
-    const reward = task ? task.reward : 1;
+    const reward = task ? (task.coinsReward || task.reward || 1) : 1;
     
     const [currentStep, setCurrentStep] = useState(0); // 0: Start, 1: Questions, 2: Result
     const [currentQuestion, setCurrentQuestion] = useState(0);

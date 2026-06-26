@@ -9,16 +9,45 @@ const ErrorResponse = require('../utils/errorResponse');
 exports.getStats = async (req, res, next) => {
     try {
         const Payment = require('../models/Payment');
+        const ReferralTransaction = require('../models/ReferralTransaction');
 
         // 1. Active Users Count
         const activeUsersCount = await User.countDocuments();
         
-        // 2. Total Revenue (Real data from successful payments)
-        const revenueResult = await Payment.aggregate([
+        // 2. Advanced Revenue Tracking (Net Revenue)
+        const revenueAggregation = await Payment.aggregate([
             { $match: { status: { $in: ['Success', 'success'] } } },
+            { 
+                $group: { 
+                    _id: { $cond: [ { $eq: [{ $type: "$paymentType" }, "missing"] }, "PLATFORM_UNLOCK", "$paymentType" ] }, 
+                    total: { $sum: '$amount' } 
+                } 
+            }
+        ]);
+
+        let platformSubGross = 0;
+        let businessPlanRevenue = 0;
+        let boosterRevenue = 0;
+        let otherRevenue = 0;
+
+        revenueAggregation.forEach(item => {
+            const type = item._id;
+            const amount = item.total || 0;
+            if (type === 'PLATFORM_UNLOCK') platformSubGross += amount;
+            else if (type === 'BUSINESS_HUB_PLAN') businessPlanRevenue += amount;
+            else if (type === 'TASK_BOOSTER' || type === 'SUPPORT_BOOSTER') boosterRevenue += amount;
+            else otherRevenue += amount;
+        });
+
+        // Calculate Referral Payouts to get Net Platform Revenue
+        const referralPayoutsResult = await ReferralTransaction.aggregate([
+            { $match: { status: 'Completed' } },
             { $group: { _id: null, total: { $sum: '$amount' } } }
         ]);
-        const totalRevenue = revenueResult[0]?.total || 0;
+        const totalReferralPayouts = referralPayoutsResult[0]?.total || 0;
+
+        const platformSubNet = Math.max(0, platformSubGross - totalReferralPayouts);
+        const totalNetRevenue = platformSubNet + businessPlanRevenue + boosterRevenue + otherRevenue;
 
         const paidUsersCount = await User.countDocuments({ isPaid: true });
 
@@ -44,7 +73,7 @@ exports.getStats = async (req, res, next) => {
             data: {
                 stats: [
                     { label: 'Active Users', value: activeUsersCount.toLocaleString(), trend: 'Live', color: 'from-sky-500 to-indigo-600' },
-                    { label: 'Total Revenue', value: `₹${totalRevenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: 'Live', color: 'from-emerald-500 to-teal-600' },
+                    { label: 'Total Revenue', value: `₹${totalNetRevenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: 'Live', color: 'from-emerald-500 to-teal-600' },
                     { label: 'Coins in Market', value: (totalCoins[0]?.total || 0).toLocaleString(), trend: 'Active', color: 'from-amber-400 to-orange-600' },
                     { label: 'Pending Payouts', value: `₹${(pendingWithdrawals[0]?.total || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: `${pendingWithdrawals[0]?.count || 0} requests`, color: 'from-rose-500 to-pink-600' }
                 ],
@@ -53,7 +82,15 @@ exports.getStats = async (req, res, next) => {
                     { label: 'Registrations', value: activeUsersCount, percent: activeUsersCount > 0 ? `${((activeUsersCount / (activeUsersCount * 3.4)) * 100).toFixed(1)}%` : '0%', color: 'bg-indigo-400' },
                     { label: 'Paid Members', value: paidUsersCount, percent: activeUsersCount > 0 ? `${((paidUsersCount / activeUsersCount) * 100).toFixed(1)}%` : '0%', color: 'bg-sky-500' },
                     { label: 'Active Earners', value: activeEarnersCount, percent: paidUsersCount > 0 ? `${((activeEarnersCount / paidUsersCount) * 100).toFixed(1)}%` : '0%', color: 'bg-emerald-500' }
-                ]
+                ],
+                revenueBreakdown: {
+                    platformSubNet,
+                    businessPlanRevenue,
+                    boosterRevenue,
+                    otherRevenue,
+                    totalReferralPayouts,
+                    platformSubGross
+                }
             }
         });
     } catch (err) {

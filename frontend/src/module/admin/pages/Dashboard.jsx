@@ -137,6 +137,15 @@ const Dashboard = () => {
         { label: 'Active Earners', value: '...', percent: '0%', color: 'bg-emerald-500' },
     ];
 
+    const revenueBreakdown = liveStats?.revenueBreakdown || {
+        platformSubNet: 0,
+        businessPlanRevenue: 0,
+        boosterRevenue: 0,
+        otherRevenue: 0,
+        totalReferralPayouts: 0,
+        platformSubGross: 0
+    };
+
     const fraudAlerts = alerts.length > 0 ? alerts : [
         { user: 'Security Bot', reason: 'Scanning for anomalies...', severity: 'low', time: 'Active' },
     ];
@@ -278,6 +287,40 @@ const Dashboard = () => {
                         </div>
                     );
                 })}
+            </div>
+
+            {/* ── REVENUE BREAKDOWN WIDGET ── */}
+            <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-50 opacity-30 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform duration-700 pointer-events-none"></div>
+                <div className="flex items-center justify-between mb-5 relative z-10">
+                    <div>
+                        <h2 className="text-[14px] font-medium text-slate-900 tracking-tight uppercase flex items-center gap-2"><DollarSign size={14} className="text-emerald-500" /> Platform Revenue Breakdown</h2>
+                        <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mt-0.5">Net earnings across all streams</p>
+                    </div>
+                </div>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
+                    <div className="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100/50">
+                        <p className="text-[9px] font-medium text-emerald-600 uppercase tracking-tight mb-1">Platform Subs (Net)</p>
+                        <h3 className="text-xl font-medium text-slate-900 tracking-tight">₹{revenueBreakdown.platformSubNet.toLocaleString()}</h3>
+                        <p className="text-[8px] font-medium text-slate-400 mt-1 uppercase">After ₹{revenueBreakdown.totalReferralPayouts.toLocaleString()} Referrals</p>
+                    </div>
+                    <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100/50">
+                        <p className="text-[9px] font-medium text-indigo-600 uppercase tracking-tight mb-1">Business Hub</p>
+                        <h3 className="text-xl font-medium text-slate-900 tracking-tight">₹{revenueBreakdown.businessPlanRevenue.toLocaleString()}</h3>
+                        <p className="text-[8px] font-medium text-slate-400 mt-1 uppercase">Idea Subscriptions</p>
+                    </div>
+                    <div className="bg-amber-50/50 p-4 rounded-xl border border-amber-100/50">
+                        <p className="text-[9px] font-medium text-amber-600 uppercase tracking-tight mb-1">Boosters & Extras</p>
+                        <h3 className="text-xl font-medium text-slate-900 tracking-tight">₹{revenueBreakdown.boosterRevenue.toLocaleString()}</h3>
+                        <p className="text-[8px] font-medium text-slate-400 mt-1 uppercase">Performance Add-ons</p>
+                    </div>
+                    <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+                        <p className="text-[9px] font-medium text-slate-500 uppercase tracking-tight mb-1">Other Revenue</p>
+                        <h3 className="text-xl font-medium text-slate-900 tracking-tight">₹{revenueBreakdown.otherRevenue.toLocaleString()}</h3>
+                        <p className="text-[8px] font-medium text-slate-400 mt-1 uppercase">Miscellaneous</p>
+                    </div>
+                </div>
             </div>
 
             {/* ── SECOND LAYER: FUNNEL & FRAUD ── */}

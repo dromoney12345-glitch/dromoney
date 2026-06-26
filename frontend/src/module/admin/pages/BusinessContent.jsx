@@ -555,6 +555,10 @@ const BusinessContent = () => {
                                     <input type="text" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium outline-none" required />
                                 </div>
                                 <div className="space-y-2">
+                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Hindi Title</label>
+                                    <input type="text" value={formData.hindiTitle} onChange={(e) => setFormData({...formData, hindiTitle: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium outline-none" placeholder="e.g. बिजनेस आइडिया" />
+                                </div>
+                                <div className="space-y-2">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Monthly Profit</label>
                                     <input type="text" value={formData.potentialEarnings} onChange={(e) => setFormData({...formData, potentialEarnings: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium outline-none" required />
                                 </div>

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { motion } from "framer-motion";
 import { useUser } from './context/UserContext';
+import api from '../shared/services/api';
 import LogoImg from '../../assets/WhatsApp_Image_2026-04-28_at_10.52.49_PM-removebg-preview.png';
 import PullToRefreshWrapper from './components/PullToRefreshWrapper';
 
@@ -256,14 +257,14 @@ const UserLayout = () => {
 
                             <div className="h-px bg-white/5 mx-4 mb-2"></div>
 
-                            {/* Options with reduced padding */}
                             {[
                                 { icon: User, label: 'Settings', path: '/user/profile' },
                                 { icon: HelpCircle, label: 'How It Works', path: '/user/info/how-it-works' },
                                 { icon: Sparkles, label: 'Benefits', path: '/user/info/benefits' },
                                 { icon: Share2, label: 'Refer & Earn', path: '/user/marketing' },
                                 { icon: Rocket, label: 'Promote Brand', path: '/user/promote-brand' },
-                                { icon: Building2, label: 'About Us', path: '/user/info/about' }
+                                { icon: Building2, label: 'About Us', path: '/user/info/about' },
+                                { icon: Headset, label: 'Contact Us', path: '/user/info/contact' }
                             ].map((item, idx) => (
                                 <button 
                                     key={idx}

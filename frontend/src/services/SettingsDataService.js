@@ -19,5 +19,19 @@ export const SettingsDataService = {
             console.error('Error saving settings:', err);
             throw err;
         }
+    },
+
+    uploadImage: async (file) => {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const response = await api.post('/admin/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            return response.url;
+        } catch (err) {
+            console.error('Error uploading image:', err);
+            throw err;
+        }
     }
 };

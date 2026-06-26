@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
     Settings as SettingsIcon, Shield, CreditCard, 
     Layout, Coins, Bell, Save, CheckCircle2,
-    Lock, Mail, Globe, AlertTriangle, Eye, EyeOff
+    Lock, Mail, Globe, AlertTriangle, Eye, EyeOff, ImageIcon, Loader2
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { SettingsDataService } from '../../../services/SettingsDataService';
@@ -145,6 +145,18 @@ const Settings = () => {
                                                 className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all" 
                                             />
                                         </div>
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <Globe size={14} className="text-slate-400" />
+                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal">Contact Phone / WhatsApp</label>
+                                            </div>
+                                            <input 
+                                                type="text" 
+                                                value={config.contactPhone}
+                                                onChange={(e) => handleChange('contactPhone', e.target.value)}
+                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all" 
+                                            />
+                                        </div>
                                         <div className="lg:col-span-2 p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
                                             <div>
                                                 <h4 className="text-[13px] font-medium text-slate-800 uppercase tracking-tight">Maintenance Mode</h4>
@@ -182,6 +194,45 @@ const Settings = () => {
                                                 placeholder="yourname@upi" 
                                                 className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" 
                                             />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">QR Scanner Image</label>
+                                            <div className="flex items-center gap-4">
+                                                {config.qrScannerImage ? (
+                                                    <img src={config.qrScannerImage} alt="QR Scanner" className="w-20 h-20 object-cover rounded-lg border border-slate-200" />
+                                                ) : (
+                                                    <div className="w-20 h-20 bg-slate-100 rounded-lg flex items-center justify-center border border-slate-200">
+                                                        <ImageIcon className="text-slate-300" size={24} />
+                                                    </div>
+                                                )}
+                                                <div className="flex-1 relative">
+                                                    <input 
+                                                        type="file" 
+                                                        accept="image/*"
+                                                        onChange={async (e) => {
+                                                            const file = e.target.files[0];
+                                                            if (file) {
+                                                                try {
+                                                                    const btn = e.target.nextElementSibling;
+                                                                    if (btn) btn.classList.remove('hidden');
+                                                                    const url = await SettingsDataService.uploadImage(file);
+                                                                    handleChange('qrScannerImage', url);
+                                                                } catch (err) {
+                                                                    alert('Failed to upload image. Please try again.');
+                                                                } finally {
+                                                                    const btn = e.target.nextElementSibling;
+                                                                    if (btn) btn.classList.add('hidden');
+                                                                }
+                                                            }
+                                                        }}
+                                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" 
+                                                    />
+                                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 hidden bg-white/80 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium text-indigo-500 flex items-center gap-2">
+                                                        <Loader2 size={14} className="animate-spin" /> Uploading...
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p className="text-[9px] text-slate-400 mt-1">Make sure to click "Save Settings" at the top after uploading your image.</p>
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Manual Bank Details</label>

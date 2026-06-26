@@ -59,6 +59,7 @@ router.get('/status', async (req, res) => {
             available,
             nextAdIn, // in seconds
             remainingAds,
+            maxDailyLimit: MAX_DAILY_ADS,
             rewardAmount: settings.adRewardCoins || 5
         });
     } catch (err) {

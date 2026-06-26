@@ -9,11 +9,12 @@ const {
     updateFutureFundProgress,
     unlockFutureFund,
     getReferrals,
-    updateProfile
+    updateProfile,
+    getFutureFundEstimation
 } = require('../controllers/userController');
 const { submitTask } = require('../controllers/taskSubmissionController');
 const { unlockIdea } = require('../controllers/businessIdeaController');
-const { createOrder, verifyPayment } = require('../controllers/razorpayController');
+const { createOrder, verifyPayment, submitManualPayment } = require('../controllers/razorpayController');
 const { rewardUserForAd } = require('../controllers/adController');
 const { joinEvent, submitResult } = require('../controllers/eventController');
 const { protect } = require('../middleware/authMiddleware');
@@ -37,6 +38,7 @@ router.patch('/profile', updateProfile);
 router.patch('/photo', upload.single('photo'), updateProfilePhoto);
 router.post('/future-fund/progress', updateFutureFundProgress);
 router.post('/future-fund/unlock', unlockFutureFund);
+router.get('/future-fund/estimation', getFutureFundEstimation);
 router.post('/feedback', submitFeedback);
 router.post('/reports', submitReport);
 router.post('/business-ideas/unlock', unlockIdea);
@@ -44,9 +46,11 @@ router.post('/ads/reward', rewardUserForAd);
 router.post('/events/:id/join', joinEvent);
 router.post('/events/:id/submit', submitResult);
 
-// Razorpay Routes
+// Razorpay & Payment Routes
 router.post('/razorpay/create-order', createOrder);
 router.post('/razorpay/verify', verifyPayment);
+router.post('/manual-payment', upload.single('screenshot'), submitManualPayment);
+
 router.post('/tasks/submit', submitTask);
 router.post('/upload', uploadMiddleware, uploadToCloud);
 

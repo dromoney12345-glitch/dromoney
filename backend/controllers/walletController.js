@@ -150,7 +150,9 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         data: {
             coinsAwarded: totalAwardedCoins,
             newWalletBalance: user.wallet.balance,
-            newCoinBalance: user.coins.balance
+            newCoinBalance: user.coins.balance,
+            completedTasks: user.completedTasks,
+            dailyTaskCompletions: user.dailyTaskCompletions
         }
     });
 });
@@ -159,7 +161,7 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
 // @route   POST /api/user/wallet/withdraw
 // @access  Private
 exports.requestWithdrawal = asyncHandler(async (req, res, next) => {
-    const { amount, bankDetails } = req.body;
+    const { amount, bankDetails, paymentMethod = 'Bank Transfer' } = req.body;
     const user = await User.findById(req.user.id);
 
     if (!user) {
@@ -210,7 +212,7 @@ exports.requestWithdrawal = asyncHandler(async (req, res, next) => {
         type: 'withdrawal',
         currency: 'INR',
         amount: amount,
-        source: 'Bank Payout',
+        source: paymentMethod === 'UPI' ? 'UPI Payout' : 'Bank Payout',
         status: 'Pending'
     });
 
@@ -228,7 +230,7 @@ exports.requestWithdrawal = asyncHandler(async (req, res, next) => {
     await Withdrawal.create({
         user: user._id,
         amount: amount,
-        paymentMethod: 'Bank Transfer',
+        paymentMethod: paymentMethod,
         bankDetails: bankDetails,
         status: 'Pending',
         transaction: transaction._id,

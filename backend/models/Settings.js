@@ -10,6 +10,10 @@ const SettingsSchema = new mongoose.Schema({
         type: String,
         default: 'app@dromoney.com'
     },
+    contactPhone: {
+        type: String,
+        default: '+91 9876543210'
+    },
     maintenanceMode: {
         type: Boolean,
         default: false
@@ -23,6 +27,10 @@ const SettingsSchema = new mongoose.Schema({
     adminUpiId: {
         type: String,
         default: 'dromoney@upi'
+    },
+    qrScannerImage: {
+        type: String,
+        default: ''
     },
     bankDetails: {
         type: String,
@@ -85,6 +93,19 @@ const SettingsSchema = new mongoose.Schema({
         type: Number,
         default: 100
     },
+    
+    // Future Fund Rules & Targets
+    futureFundSalesTarget: { type: Number, default: 10 },
+    futureFundDaysTarget: { type: Number, default: 7 },
+    futureFundDailyTasksTarget: { type: Number, default: 10 },
+    futureFundWatchAdTarget: { type: Number, default: 5 },
+    futureFundEventsTarget: { type: Number, default: 3 },
+    futureFundBoostersTarget: { type: Number, default: 1 },
+    
+    // Future Fund Activity Score Weights
+    ffAdScoreWeight: { type: Number, default: 1 },
+    ffTaskScoreWeight: { type: Number, default: 1 },
+    ffBoosterMultiplier: { type: Number, default: 1.5 },
     
     // Auth
     adminEmail: {

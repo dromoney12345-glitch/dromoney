@@ -145,7 +145,7 @@ const ScratchCardView = () => {
             }
             return next;
         });
-        const rewardCoins = Math.floor(task?.reward / 3) || 1;
+        const rewardCoins = Math.floor((task?.coinsReward || task?.reward || 0) / 3) || 1;
         addCoins(rewardCoins, 'Scratch Card Reward', (completedCount + 1 === 3) ? (task?._id || task?.id) : undefined);
     };
 
@@ -186,7 +186,7 @@ const ScratchCardView = () => {
                     {[0, 1, 2].map((i) => (
                         <ScratchCard 
                             key={i} 
-                            rewardPerCard={Math.ceil(task.reward / 3)} 
+                            rewardPerCard={Math.ceil((task.coinsReward || task.reward || 0) / 3)} 
                             quote={randomQuotes[i] || ""}
                             onComplete={handleCardFinish} 
                         />
