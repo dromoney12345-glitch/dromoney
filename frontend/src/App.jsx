@@ -43,6 +43,7 @@ import Payments from './module/admin/pages/Payments';
 import Affiliates from './module/admin/pages/Affiliates';
 import CoinsAndTasks from './module/admin/pages/CoinsAndTasks';
 import FutureFundAdmin from './module/admin/pages/FutureFundAdmin';
+import FutureFundReport from './module/admin/pages/FutureFundReport';
 import EventsAdmin from './module/admin/pages/Events';
 import BusinessContent from './module/admin/pages/BusinessContent';
 import Wallets from './module/admin/pages/Wallets';
@@ -241,7 +242,9 @@ function App() {
               <Route path="affiliates" element={<Affiliates />} />
               <Route path="tasks" element={<CoinsAndTasks />} />
               <Route path="task-approvals" element={<TaskApprovals />} />
-              <Route path="future-fund" element={<FutureFundAdmin />} />
+              <Route path="future-fund" element={<Navigate to="/admin/future-fund/settings" replace />} />
+              <Route path="future-fund/settings" element={<FutureFundAdmin />} />
+              <Route path="future-fund/report" element={<FutureFundReport />} />
               <Route path="events" element={<EventsAdmin />} />
               <Route path="business-content" element={<BusinessContent />} />
               <Route path="withdrawals" element={<Wallets />} />

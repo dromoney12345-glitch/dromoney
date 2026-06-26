@@ -196,6 +196,100 @@ exports.getUserTransactions = async (req, res, next) => {
     }
 };
 
+// @desc    Get complete activity report of active Future Fund users
+// @route   GET /api/admin/users/future-fund/report
+// @access  Private (Admin)
+exports.getFutureFundReport = async (req, res, next) => {
+    try {
+        // User wants to see all regular users in the report, not just 'active' ones.
+        const users = await User.find({ role: { $ne: 'admin' } });
+
+        if (users.length === 0) {
+            return res.status(200).json({ success: true, count: 0, data: [] });
+        }
+
+        const Settings = require('../models/Settings');
+        let settings = await Settings.findOne();
+        if (!settings) {
+            settings = await Settings.create({});
+        }
+
+        const adWeight = settings.ffAdScoreWeight || 1;
+        const taskWeight = settings.ffTaskScoreWeight || 1;
+        const boosterMultiplier = settings.ffBoosterMultiplier || 1.5;
+
+        let totalActivityScore = 0;
+        const scoredUsers = [];
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+
+        for (let user of users) {
+            let adScore = user.dailyAdCount || 0;
+            if (user.lastAdCountResetAt && user.lastAdCountResetAt < todayStart) {
+                adScore = 0;
+            }
+
+            let taskScore = 0;
+            if (user.dailyTaskCompletions && user.dailyTaskCompletions.length > 0) {
+                taskScore = user.dailyTaskCompletions.filter(tc => new Date(tc.completedAt) >= todayStart).length;
+            }
+
+            let multiplier = 1.0;
+            if (user.isTaskBoosterActive || user.isSupportBoosterActive) {
+                multiplier = boosterMultiplier;
+            }
+
+            let baseScore = (adScore * adWeight) + (taskScore * taskWeight);
+            if (baseScore === 0) baseScore = 1;
+
+            let finalScore = baseScore * multiplier;
+            let isCorrected = false;
+            
+            if (user.futureFund && user.futureFund.correctedScore !== undefined && user.futureFund.correctedScore !== null) {
+                finalScore = user.futureFund.correctedScore;
+                isCorrected = true;
+            }
+
+            totalActivityScore += finalScore;
+
+            scoredUsers.push({
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                referrals: user.referralCount || 0,
+                lifetimeEarnings: user.wallet?.lifetimeEarnings || 0,
+                score: finalScore,
+                correctedScore: isCorrected ? user.futureFund.correctedScore : null,
+                breakdown: { ads: adScore, tasks: taskScore, multiplier }
+            });
+        }
+
+        // Calculate Share %
+        const reportData = scoredUsers.map(item => {
+            let sharePercentage = 0;
+            if (totalActivityScore > 0) {
+                sharePercentage = (item.score / totalActivityScore) * 100;
+            }
+            return {
+                ...item,
+                sharePercentage: Number(sharePercentage.toFixed(2))
+            };
+        });
+
+        // Sort by share percentage descending
+        reportData.sort((a, b) => b.sharePercentage - a.sharePercentage);
+
+        res.status(200).json({
+            success: true,
+            count: reportData.length,
+            totalActivityScore,
+            data: reportData
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
 // @desc    Distribute profit to active Future Fund users
 // @route   POST /api/admin/users/future-fund/distribute
 // @access  Private (Admin)
@@ -206,8 +300,8 @@ exports.distributeFutureFundProfit = async (req, res, next) => {
             return next(new ErrorResponse('Please provide a valid amount to distribute', 400));
         }
 
-        // Find all users with active future fund
-        const users = await User.find({ 'futureFund.status': 'active' });
+        // Distribute to all regular users based on activity
+        const users = await User.find({ role: { $ne: 'admin' } });
 
         if (users.length === 0) {
             return res.status(404).json({ success: false, message: 'No active Future Fund users found' });
@@ -249,11 +343,14 @@ exports.distributeFutureFundProfit = async (req, res, next) => {
                 multiplier = boosterMultiplier;
             }
 
-            // Base score must be at least 1 so everyone gets a minimum piece of the pie
             let baseScore = (adScore * adWeight) + (taskScore * taskWeight);
             if (baseScore === 0) baseScore = 1;
 
             let finalScore = baseScore * multiplier;
+            if (user.futureFund && user.futureFund.correctedScore !== undefined && user.futureFund.correctedScore !== null) {
+                finalScore = user.futureFund.correctedScore;
+            }
+            
             totalActivityScore += finalScore;
 
             scoredUsers.push({
@@ -307,6 +404,70 @@ exports.distributeFutureFundProfit = async (req, res, next) => {
             message: `Successfully distributed ₹${amount} each to ${users.length} users. Total: ₹${totalDistributed}`
         });
 
+    } catch (err) {
+        next(err);
+    }
+};
+
+// @desc    Update user's corrected score
+// @route   PUT /api/admin/users/:id/future-fund/score
+// @access  Private (Admin)
+exports.updateCorrectedScore = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return next(new ErrorResponse('User not found', 404));
+        }
+
+        const { score } = req.body;
+        
+        // If score is null or empty string, we remove the override
+        if (score === null || score === '') {
+            user.futureFund.correctedScore = null;
+        } else {
+            user.futureFund.correctedScore = Number(score);
+        }
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            data: user.futureFund.correctedScore,
+            message: 'Corrected score updated successfully'
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// @desc    Get distribution history for Future Fund
+// @route   GET /api/admin/users/future-fund/history
+// @access  Private (Admin)
+exports.getFutureFundHistory = async (req, res, next) => {
+    try {
+        const Transaction = require('../models/Transaction');
+        // Group transactions by date
+        const history = await Transaction.aggregate([
+            { $match: { source: 'Future Fund Daily Distribution', status: 'Success' } },
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" },
+                        day: { $dayOfMonth: "$createdAt" }
+                    },
+                    totalAmount: { $sum: "$amount" },
+                    userCount: { $sum: 1 },
+                    date: { $first: "$createdAt" }
+                }
+            },
+            { $sort: { "date": -1 } }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            data: history
+        });
     } catch (err) {
         next(err);
     }

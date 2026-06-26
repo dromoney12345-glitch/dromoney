@@ -46,8 +46,19 @@ exports.getStats = async (req, res, next) => {
         ]);
         const totalReferralPayouts = referralPayoutsResult[0]?.total || 0;
 
-        const platformSubNet = Math.max(0, platformSubGross - totalReferralPayouts);
-        const totalNetRevenue = platformSubNet + businessPlanRevenue + boosterRevenue + otherRevenue;
+        // Calculate Future Fund Payouts
+        const Transaction = require('../models/Transaction');
+        const futureFundPayoutsResult = await Transaction.aggregate([
+            { $match: { source: 'Future Fund Daily Distribution', status: 'Success' } },
+            { $group: { _id: null, total: { $sum: '$amount' } } }
+        ]);
+        const totalFutureFundPayouts = futureFundPayoutsResult[0]?.total || 0;
+
+        const platformSubNet = platformSubGross;
+        const totalGrossRevenue = platformSubNet + businessPlanRevenue + boosterRevenue + otherRevenue;
+        
+        // Total Net Revenue = Everything earned MINUS everything distributed
+        const totalNetRevenue = totalGrossRevenue - totalReferralPayouts - totalFutureFundPayouts;
 
         const paidUsersCount = await User.countDocuments({ isPaid: true });
 
