@@ -386,8 +386,35 @@ const sendTokenResponse = (user, statusCode, res) => {
 // @access  Private
 exports.getMe = async (req, res, next) => {
     try {
-        const user = await User.findById(req.user.id);
+        let user = await User.findById(req.user.id);
         const settings = await Settings.findOne() || {};
+
+        if (user) {
+            let modified = false;
+
+            // 1. Clear old style completedTasks so they can be renewed
+            if (user.completedTasks && user.completedTasks.length > 0) {
+                user.completedTasks = [];
+                modified = true;
+            }
+
+            // 2. Filter dailyTaskCompletions older than 24 hours
+            if (user.dailyTaskCompletions && user.dailyTaskCompletions.length > 0) {
+                const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+                const activeCompletions = user.dailyTaskCompletions.filter(
+                    c => new Date(c.completedAt) >= twentyFourHoursAgo
+                );
+                
+                if (activeCompletions.length !== user.dailyTaskCompletions.length) {
+                    user.dailyTaskCompletions = activeCompletions;
+                    modified = true;
+                }
+            }
+
+            if (modified) {
+                await user.save({ validateBeforeSave: false });
+            }
+        }
 
         res.status(200).json({
             success: true,

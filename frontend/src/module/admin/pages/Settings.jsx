@@ -293,6 +293,41 @@ const Settings = () => {
                                                 <p className="text-[10px] font-medium text-slate-400 mt-3 ml-1 uppercase tracking-tight opacity-60">{item.info}</p>
                                             </div>
                                         ))}
+
+                                        {/* Task Window Settings */}
+                                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 hover:border-emerald-200 transition-all group col-span-1 md:col-span-2 lg:col-span-3">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-2xl">⏰</span>
+                                                    <div>
+                                                        <h4 className="text-[13px] font-medium text-slate-800 uppercase tracking-tight">Daily Task Time Window</h4>
+                                                        <p className="text-[10px] font-medium text-slate-400 mt-1">Specify between what times users are allowed to complete tasks</p>
+                                                    </div>
+                                                </div>
+                                                <span className="bg-white/80 px-2 py-1 rounded-lg text-[9px] font-medium text-slate-400 uppercase tracking-normal border border-slate-200">System Parameter</span>
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-2 gap-4 mt-4">
+                                                <div>
+                                                    <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal ml-1">Start Time (24H)</label>
+                                                    <input 
+                                                        type="time" 
+                                                        value={config.taskWindowStart || '00:00'}
+                                                        onChange={(e) => handleChange('taskWindowStart', e.target.value)}
+                                                        className="w-full mt-2 bg-white border border-slate-200 rounded-lg px-4 py-4 text-lg font-medium text-emerald-600 focus:outline-none focus:border-emerald-500 transition-all" 
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal ml-1">End Time (24H)</label>
+                                                    <input 
+                                                        type="time" 
+                                                        value={config.taskWindowEnd || '23:59'}
+                                                        onChange={(e) => handleChange('taskWindowEnd', e.target.value)}
+                                                        className="w-full mt-2 bg-white border border-slate-200 rounded-lg px-4 py-4 text-lg font-medium text-emerald-600 focus:outline-none focus:border-emerald-500 transition-all" 
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-between gap-4">
                                         <div className="flex items-center gap-4">

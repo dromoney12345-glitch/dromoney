@@ -10,7 +10,8 @@ const {
     unlockFutureFund,
     getReferrals,
     updateProfile,
-    getFutureFundEstimation
+    getFutureFundEstimation,
+    clearPersonalNotifications
 } = require('../controllers/userController');
 const { submitTask } = require('../controllers/taskSubmissionController');
 const { unlockIdea } = require('../controllers/businessIdeaController');
@@ -45,6 +46,7 @@ router.post('/business-ideas/unlock', unlockIdea);
 router.post('/ads/reward', rewardUserForAd);
 router.post('/events/:id/join', joinEvent);
 router.post('/events/:id/submit', submitResult);
+router.delete('/notifications', clearPersonalNotifications);
 
 // Razorpay & Payment Routes
 router.post('/razorpay/create-order', createOrder);

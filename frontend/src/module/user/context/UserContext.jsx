@@ -115,8 +115,17 @@ export const UserProvider = ({ children }) => {
         }
     };
 
-    const clearNotifications = () => {
+    const clearNotifications = async () => {
         setNotifications([]);
+        
+        if (userData?.userNotifications?.length > 0) {
+            try {
+                await api.delete('/user/data/notifications');
+                setUserData(prev => ({ ...prev, userNotifications: [] }));
+            } catch (err) {
+                console.error("Failed to clear personal notifications", err);
+            }
+        }
     };
 
     const refreshUserProfile = async (showSpinner = false) => {

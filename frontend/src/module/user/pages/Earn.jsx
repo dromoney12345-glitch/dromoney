@@ -43,6 +43,8 @@ const Earn = () => {
     // DYNAMIC TASKS STATE
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [settings, setSettings] = useState(null);
+    const [isWithinWindow, setIsWithinWindow] = useState(true);
     const [boosterData, setBoosterData] = useState({ title: '₹49 Task Booster', subtitle: 'Priority Enabled', price: 49 });
 
     useEffect(() => {
@@ -84,8 +86,32 @@ const Earn = () => {
             } catch (err) {}
         };
 
+        const loadSettings = async () => {
+            try {
+                const res = await api.get('/public/settings');
+                if (res.success && res.data) {
+                    setSettings(res.data);
+                    checkWindow(res.data.taskWindowStart, res.data.taskWindowEnd);
+                }
+            } catch (err) {}
+        };
+
+        const checkWindow = (startStr, endStr) => {
+            if (!startStr || !endStr) return;
+            const now = new Date();
+            const currentMins = now.getHours() * 60 + now.getMinutes();
+            const [sh, sm] = startStr.split(':').map(Number);
+            const startMins = (sh || 0) * 60 + (sm || 0);
+            const [eh, em] = endStr.split(':').map(Number);
+            const endMins = (eh || 0) * 60 + (em || 0);
+            if (startMins < endMins) {
+                setIsWithinWindow(currentMins >= startMins && currentMins <= endMins);
+            }
+        };
+
         loadTasks();
         loadBoosters();
+        loadSettings();
     }, []);
 
     // Get actually completed tasks dynamically from backend userData (and fallback storage)
@@ -102,14 +128,12 @@ const Earn = () => {
     const totalCount = tasks.length;
     const completedCount = tasks.filter(task => {
         const taskId = task._id || task.id;
-        if (task.isDaily) {
-            const today = new Date().setHours(0, 0, 0, 0);
-            return userData.dailyTaskCompletions?.some(c => 
-                String(c.taskId) === String(taskId) && 
-                new Date(c.completedAt).setHours(0, 0, 0, 0) === today
-            );
-        }
-        return completedTasks.includes(String(taskId));
+        // ALL tasks now use 24-hour daily Task Completions tracking
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        return userData.dailyTaskCompletions?.some(c => 
+            String(c.taskId) === String(taskId) && 
+            new Date(c.completedAt) >= twentyFourHoursAgo
+        );
     }).length;
     const remainingCount = Math.max(0, totalCount - completedCount);
 
@@ -121,15 +145,11 @@ const Earn = () => {
         }
 
         let isCompleted = false;
-        if (task.isDaily) {
-            const today = new Date().setHours(0, 0, 0, 0);
-            isCompleted = userData.dailyTaskCompletions?.some(c => 
-                String(c.taskId) === String(taskId) && 
-                new Date(c.completedAt).setHours(0, 0, 0, 0) === today
-            );
-        } else {
-            isCompleted = completedTasks.includes(String(taskId));
-        }
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        isCompleted = userData.dailyTaskCompletions?.some(c => 
+            String(c.taskId) === String(taskId) && 
+            new Date(c.completedAt) >= twentyFourHoursAgo
+        );
 
         if (isCompleted) {
             // Do not open if already completed
@@ -206,7 +226,20 @@ const Earn = () => {
                     </div>
                 </div>
 
+                {!isWithinWindow && (
+                    <div className="mx-4 mt-6 bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center">
+                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span className="text-3xl">⏰</span>
+                        </div>
+                        <h3 className="text-[15px] font-medium text-slate-800 tracking-tight">Tasks are Sleeping</h3>
+                        <p className="text-[12px] font-medium text-slate-500 mt-2 leading-relaxed">
+                            Tasks are only available between <span className="text-emerald-600 font-semibold">{settings?.taskWindowStart}</span> and <span className="text-emerald-600 font-semibold">{settings?.taskWindowEnd}</span>. Please come back later to earn coins!
+                        </p>
+                    </div>
+                )}
+
                 {/* ── Task List ── */}
+                {isWithinWindow && (
                 <div className="flex flex-col gap-0 mt-4">
                     {tasks.map((task, idx) => {
                         const taskId = task._id || task.id;
@@ -214,15 +247,11 @@ const Earn = () => {
                         const IconEl = iconConfig.el;
                         
                         let isCompleted = false;
-                        if (task.isDaily) {
-                            const today = new Date().setHours(0, 0, 0, 0);
-                            isCompleted = userData.dailyTaskCompletions?.some(c => 
-                                String(c.taskId) === String(taskId) && 
-                                new Date(c.completedAt).setHours(0, 0, 0, 0) === today
-                            );
-                        } else {
-                            isCompleted = completedTasks.includes(String(taskId));
-                        }
+                        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+                        isCompleted = userData.dailyTaskCompletions?.some(c => 
+                            String(c.taskId) === String(taskId) && 
+                            new Date(c.completedAt) >= twentyFourHoursAgo
+                        );
 
                         return (
                             <div
@@ -277,6 +306,7 @@ const Earn = () => {
                         </div>
                     )}
                 </div>
+                )}
 
                 {/* ── Footer Banner ── */}
                 <div className="mx-4 mt-4 bg-[#F59E0B] py-4 px-5 rounded-2xl flex items-center justify-center gap-2 shadow-sm">

@@ -20,27 +20,41 @@ exports.submitTask = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('Task not found', 404));
     }
 
-    // Check if already submitted today (if daily) or ever (if one-time)
+    // Check Admin Task Timing Window
+    const Settings = require('../models/Settings');
+    const settings = await Settings.findOne();
+    if (settings && settings.taskWindowStart && settings.taskWindowEnd) {
+        const now = new Date();
+        const currentHours = now.getHours();
+        const currentMinutes = now.getMinutes();
+        const currentTotalMins = currentHours * 60 + currentMinutes;
+
+        const [startH, startM] = settings.taskWindowStart.split(':').map(Number);
+        const startTotalMins = (startH || 0) * 60 + (startM || 0);
+
+        const [endH, endM] = settings.taskWindowEnd.split(':').map(Number);
+        const endTotalMins = (endH || 0) * 60 + (endM || 0);
+
+        // Simple check (assuming start < end, e.g., 09:00 to 17:00)
+        if (startTotalMins < endTotalMins) {
+            if (currentTotalMins < startTotalMins || currentTotalMins > endTotalMins) {
+                return next(new ErrorResponse(`Tasks are currently unavailable. Available from ${settings.taskWindowStart} to ${settings.taskWindowEnd}`, 400));
+            }
+        }
+    }
+
     const user = await User.findById(req.user.id);
     
-    if (task.isDaily) {
-        const today = new Date().setHours(0, 0, 0, 0);
-        const alreadySubmittedToday = await TaskSubmission.findOne({
-            user: req.user.id,
-            task: taskId,
-            createdAt: { $gte: today }
-        });
-        if (alreadySubmittedToday) {
-            return next(new ErrorResponse('You have already submitted proof for this task today', 400));
-        }
-    } else {
-        const alreadySubmitted = await TaskSubmission.findOne({
-            user: req.user.id,
-            task: taskId
-        });
-        if (alreadySubmitted) {
-            return next(new ErrorResponse('You have already submitted proof for this task', 400));
-        }
+    // Check if already submitted within the last 24 hours
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const alreadySubmitted = await TaskSubmission.findOne({
+        user: req.user.id,
+        task: taskId,
+        createdAt: { $gte: twentyFourHoursAgo }
+    });
+
+    if (alreadySubmitted) {
+        return next(new ErrorResponse('You have already submitted proof for this task in the last 24 hours. Please wait before submitting again.', 400));
     }
 
     const submission = await TaskSubmission.create({
@@ -129,15 +143,11 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
     user.coins.balance += coinsToAdd;
     user.coins.lifetimeCoins += coinsToAdd;
 
-    // Track completion
-    if (task.isDaily) {
-        user.dailyTaskCompletions.push({
-            taskId: task._id,
-            completedAt: new Date()
-        });
-    } else {
-        user.completedTasks.push(task._id);
-    }
+    // Track completion uniformly for 24-hour cycle
+    user.dailyTaskCompletions.push({
+        taskId: task._id,
+        completedAt: new Date()
+    });
 
     await user.save();
 

@@ -20,6 +20,21 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET || 'io9bbDuRyDZ0Sd1C2fy2sCP4YmI'
 });
 
+// @desc    Clear personal notifications
+// @route   DELETE /api/user/data/notifications
+// @access  Private
+exports.clearPersonalNotifications = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+        return next(new ErrorResponse('User not found', 404));
+    }
+    
+    user.notifications = [];
+    await user.save();
+    
+    res.status(200).json({ success: true, data: {} });
+});
+
 // @desc    Update KYC Status and Documents
 // @route   PATCH /api/user/data/kyc
 // @access  Private

@@ -6,7 +6,7 @@ const User = require('../models/User');
 // @access  Public
 exports.getPublicSettings = async (req, res) => {
     try {
-        const settings = await Settings.findOne().select('appName contactEmail contactPhone adminUpiId qrScannerImage bankDetails referralSystemEnabled referralCommission registrationFee minWithdrawal futureFundDailyTasksTarget futureFundWatchAdTarget futureFundEventsTarget futureFundBoostersTarget futureFundSalesTarget futureFundDaysTarget businessPlans maintenanceMode registrationOpen');
+        const settings = await Settings.findOne().select('appName contactEmail contactPhone adminUpiId qrScannerImage bankDetails referralSystemEnabled referralCommission registrationFee minWithdrawal futureFundDailyTasksTarget futureFundWatchAdTarget futureFundEventsTarget futureFundBoostersTarget futureFundSalesTarget futureFundDaysTarget businessPlans maintenanceMode registrationOpen taskWindowStart taskWindowEnd');
         
         res.status(200).json({
             success: true,

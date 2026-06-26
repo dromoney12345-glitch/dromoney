@@ -102,6 +102,10 @@ const SettingsSchema = new mongoose.Schema({
     futureFundEventsTarget: { type: Number, default: 3 },
     futureFundBoostersTarget: { type: Number, default: 1 },
     
+    // Task Window Timings
+    taskWindowStart: { type: String, default: '00:00' },
+    taskWindowEnd: { type: String, default: '23:59' },
+    
     // Future Fund Activity Score Weights
     ffAdScoreWeight: { type: Number, default: 1 },
     ffTaskScoreWeight: { type: Number, default: 1 },
