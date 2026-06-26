@@ -12,8 +12,8 @@ const FutureFundReport = () => {
     
     // Modal state
     const [editingUser, setEditingUser] = useState(null);
-    const [newCorrectedScore, setNewCorrectedScore] = useState('');
-    const [savingScore, setSavingScore] = useState(false);
+    const [newOverrideProfit, setNewOverrideProfit] = useState('');
+    const [savingProfit, setSavingProfit] = useState(false);
     
     // Custom Popups State
     const [confirmModal, setConfirmModal] = useState({ show: false, title: '', message: '', amount: '', users: 0, onConfirm: null });
@@ -97,29 +97,28 @@ const FutureFundReport = () => {
 
     const handleEdit = (user) => {
         setEditingUser(user);
-        setNewCorrectedScore(user.correctedScore !== null && user.correctedScore !== undefined ? user.correctedScore.toString() : '');
+        setNewOverrideProfit(user.overrideProfit !== null && user.overrideProfit !== undefined ? user.overrideProfit.toString() : '');
     };
 
-    const handleSaveCorrectedScore = async () => {
+    const handleSaveOverrideProfit = async () => {
         if (!editingUser) return;
-        setSavingScore(true);
+        setSavingProfit(true);
         try {
-            const res = await api.put(`/admin/users/${editingUser.id}/future-fund/score`, { score: newCorrectedScore });
+            const res = await api.put(`/admin/users/${editingUser.id}/future-fund/override`, { profit: newOverrideProfit });
             if (res.success) {
-                // Update local state without fetching again
                 setReportData(prev => prev.map(u => 
-                    u.id === editingUser.id ? { ...u, correctedScore: res.data, score: res.data !== null ? res.data : u.score } : u
+                    u.id === editingUser.id ? { ...u, overrideProfit: res.data } : u
                 ));
                 setEditingUser(null);
-                showAlert('success', 'Score Updated', 'User corrected score has been saved successfully.');
+                showAlert('success', 'Profit Override Saved', 'User custom profit has been updated successfully.');
             } else {
-                showAlert('error', 'Update Failed', res.message || "Failed to update score.");
+                showAlert('error', 'Update Failed', res.message || "Failed to update custom profit.");
             }
         } catch (err) {
-            console.error("Save score error", err);
+            console.error("Save profit error", err);
             showAlert('error', 'Error', err.message);
         } finally {
-            setSavingScore(false);
+            setSavingProfit(false);
         }
     };
 
@@ -229,16 +228,20 @@ const FutureFundReport = () => {
                                     <th className="px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider text-center">Tasks</th>
                                     <th className="px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider text-center">Ads</th>
                                     <th className="px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider text-center">Referrals</th>
-                                    <th className="px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider text-center">Score</th>
-                                    <th className="px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider text-center">Corrected</th>
+                                    <th className="px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider text-center">Tier</th>
+                                    <th className="px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider text-center">Share %</th>
                                     <th className="px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider text-right">Est. Profit</th>
                                     <th className="px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase tracking-wider text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {filteredData.map((user) => {
-                                    const poolAmount = Number(distributeAmount) || 0;
-                                    const estProfit = (user.sharePercentage / 100) * poolAmount;
+                                    const totalPool = Number(distributeAmount) || 0;
+                                    const totalFixedProfit = reportData.reduce((acc, u) => acc + (u.overrideProfit || 0), 0);
+                                    const remainingPool = Math.max(0, totalPool - totalFixedProfit);
+
+                                    let baseProfit = (user.sharePercentage / 100) * remainingPool;
+                                    let estProfit = baseProfit + (user.overrideProfit || 0);
 
                                     return (
                                         <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
@@ -249,16 +252,21 @@ const FutureFundReport = () => {
                                             <td className="px-6 py-3 text-sm text-slate-700 text-center">{user.breakdown?.tasks || 0}</td>
                                             <td className="px-6 py-3 text-sm text-slate-700 text-center">{user.breakdown?.ads || 0}</td>
                                             <td className="px-6 py-3 text-sm text-slate-700 text-center">{user.referrals || 0}</td>
-                                            <td className="px-6 py-3 text-sm text-slate-700 text-center">{user.score.toFixed(1)}</td>
                                             <td className="px-6 py-3 text-sm text-slate-700 text-center">
-                                                {user.correctedScore !== null && user.correctedScore !== undefined ? (
-                                                    <span className="font-medium text-amber-600">{user.correctedScore.toFixed(1)}</span>
+                                                {user.breakdown?.isHighTier ? (
+                                                    <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider">HIGH TIER</span>
                                                 ) : (
-                                                    <span className="text-slate-400">—</span>
+                                                    <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider">LOW TIER</span>
                                                 )}
+                                            </td>
+                                            <td className="px-6 py-3 text-sm font-bold text-sky-600 text-center">
+                                                {user.sharePercentage.toFixed(1)}%
                                             </td>
                                             <td className="px-6 py-3 text-sm font-medium text-slate-900 text-right">
                                                 ₹{estProfit.toFixed(2)}
+                                                {user.overrideProfit !== null && user.overrideProfit !== undefined && (
+                                                    <div className="text-[10px] text-emerald-600 mt-0.5 font-bold">+ ₹{user.overrideProfit} bonus</div>
+                                                )}
                                             </td>
                                             <td className="px-6 py-3 text-center">
                                                 <button 
@@ -283,7 +291,7 @@ const FutureFundReport = () => {
                 <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-slate-800">Edit Member Score</h3>
+                            <h3 className="text-lg font-semibold text-slate-800">Set Extra Bonus</h3>
                             <button onClick={() => setEditingUser(null)} className="text-slate-400 hover:text-slate-600 transition-colors">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                             </button>
@@ -296,17 +304,17 @@ const FutureFundReport = () => {
                             </div>
                             
                             <div>
-                                <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Corrected Score Override</label>
+                                <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Extra Bonus Amount (₹)</label>
                                 <input 
                                     type="number" 
-                                    step="0.1"
-                                    value={newCorrectedScore}
-                                    onChange={(e) => setNewCorrectedScore(e.target.value)}
-                                    placeholder="e.g. 5.5"
+                                    step="1"
+                                    value={newOverrideProfit}
+                                    onChange={(e) => setNewOverrideProfit(e.target.value)}
+                                    placeholder="e.g. 200"
                                     className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium text-slate-800 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                                 />
                                 <p className="text-[10px] text-slate-500 mt-1.5 leading-relaxed">
-                                    Set a manual activity score for this user. This overrides their automatically calculated score. Leave blank to clear override.
+                                    Set an extra bonus for this user. This amount will be deducted from the total pool before normal distribution, and added on top of their normal share. Leave blank to remove.
                                 </p>
                             </div>
                         </div>
@@ -318,11 +326,11 @@ const FutureFundReport = () => {
                                 Cancel
                             </button>
                             <button 
-                                onClick={handleSaveCorrectedScore}
-                                disabled={savingScore}
+                                onClick={handleSaveOverrideProfit}
+                                disabled={savingProfit}
                                 className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white rounded-lg text-sm font-medium transition-all flex items-center gap-2 shadow-sm"
                             >
-                                {savingScore ? <Loader2 size={16} className="animate-spin" /> : 'Save Changes'}
+                                {savingProfit ? <Loader2 size={16} className="animate-spin" /> : 'Save Profit'}
                             </button>
                         </div>
                     </div>

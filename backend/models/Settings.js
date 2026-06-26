@@ -105,6 +105,16 @@ const SettingsSchema = new mongoose.Schema({
     // Task Window Timings
     taskWindowStart: { type: String, default: '00:00' },
     taskWindowEnd: { type: String, default: '23:59' },
+
+    // KYC Window Timings
+    kycWindowStart: { type: String, default: '07:00' },
+    kycWindowEnd: { type: String, default: '19:00' },
+
+    // Future Fund Profit Distribution Tiers
+    ffTier1TasksLimit: { type: Number, default: 5 },
+    ffTier1AdsLimit: { type: Number, default: 5 },
+    ffTier1ProfitPercent: { type: Number, default: 60 },
+    ffTier2ProfitPercent: { type: Number, default: 40 },
     
     // Future Fund Activity Score Weights
     ffAdScoreWeight: { type: Number, default: 1 },

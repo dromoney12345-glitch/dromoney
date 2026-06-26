@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { login, getMe } = require('../controllers/adminAuthController');
 const { getStats, getDashboardAlerts, getEngagement } = require('../controllers/adminDashboardController');
-const { getUsers, manageKYC, toggleBlock, getPendingKyc, deleteUser, getUserTransactions, distributeFutureFundProfit, getFutureFundReport, updateCorrectedScore, getFutureFundHistory } = require('../controllers/adminUserController');
+const { getUsers, manageKYC, toggleBlock, getPendingKyc, deleteUser, getUserTransactions, distributeFutureFundProfit, getFutureFundReport, updateOverrideProfit, getFutureFundHistory } = require('../controllers/adminUserController');
 const { 
     createTask, getTasks, updateTask,
     deleteContent 
@@ -49,7 +49,7 @@ router.get('/dashboard/engagement', protectAdmin, getEngagement);
 router.get('/users', protectAdmin, getUsers);
 router.get('/users/future-fund/report', protectAdmin, getFutureFundReport);
 router.post('/users/future-fund/distribute', protectAdmin, distributeFutureFundProfit);
-router.put('/users/:id/future-fund/score', protectAdmin, updateCorrectedScore);
+router.put('/users/:id/future-fund/override', protectAdmin, updateOverrideProfit);
 router.get('/users/future-fund/history', protectAdmin, getFutureFundHistory);
 router.get('/users/:id/transactions', protectAdmin, getUserTransactions);
 router.put('/users/:id/kyc', protectAdmin, manageKYC);

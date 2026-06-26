@@ -4,7 +4,7 @@ import {
     XCircle, Edit3, Save, Info, ChevronRight,
     History, Search, Filter, ArrowUpRight,
     LayoutDashboard, UserCheck, ShieldAlert,
-    Users, IndianRupee, Loader2
+    Users, IndianRupee, Loader2, AlertCircle
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import AdminStatCard from '../components/AdminStatCard';
@@ -15,6 +15,14 @@ const FutureFundAdmin = () => {
     // ── Profit Distribution States ──
     const [distributeAmount, setDistributeAmount] = useState('');
     const [distributing, setDistributing] = useState(false);
+
+    // Toast state
+    const [toast, setToast] = useState(null);
+
+    const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 4000);
+    };
 
     // ── CMS States ──
     const [cms, setCms] = useState({
@@ -123,7 +131,11 @@ const FutureFundAdmin = () => {
                         futureFundDailyTasksTarget: Number(res.data.futureFundDailyTasksTarget) || 10,
                         futureFundWatchAdTarget: Number(res.data.futureFundWatchAdTarget) || 5,
                         futureFundEventsTarget: Number(res.data.futureFundEventsTarget) || 3,
-                        futureFundBoostersTarget: Number(res.data.futureFundBoostersTarget) || 1
+                        futureFundBoostersTarget: Number(res.data.futureFundBoostersTarget) || 1,
+                        ffTier1TasksLimit: Number(res.data.ffTier1TasksLimit) || 5,
+                        ffTier1AdsLimit: Number(res.data.ffTier1AdsLimit) || 5,
+                        ffTier1ProfitPercent: Number(res.data.ffTier1ProfitPercent) || 60,
+                        ffTier2ProfitPercent: Number(res.data.ffTier2ProfitPercent) || 40
                     });
                 }
             } catch (err) {
@@ -144,43 +156,50 @@ const FutureFundAdmin = () => {
                 futureFundDailyTasksTarget: Number(rules.futureFundDailyTasksTarget),
                 futureFundWatchAdTarget: Number(rules.futureFundWatchAdTarget),
                 futureFundEventsTarget: Number(rules.futureFundEventsTarget),
-                futureFundBoostersTarget: Number(rules.futureFundBoostersTarget)
+                futureFundBoostersTarget: Number(rules.futureFundBoostersTarget),
+                ffTier1TasksLimit: Number(rules.ffTier1TasksLimit),
+                ffTier1AdsLimit: Number(rules.ffTier1AdsLimit),
+                ffTier1ProfitPercent: Number(rules.ffTier1ProfitPercent),
+                ffTier2ProfitPercent: Number(rules.ffTier2ProfitPercent)
             });
             if (res.success) {
                 setEditingRules(false);
-                alert("Rules and Targets successfully updated in Database!");
+                showToast("Rules and Targets successfully updated in Database!");
+            } else {
+                showToast(res.message || "Failed to update rules", "error");
             }
         } catch (err) {
             console.error("Failed to update rules", err);
-            alert("Save failed: " + err.message);
+            showToast("Save failed: " + err.message, "error");
         }
     };
 
     // ── Distribute Profit API ──
     const handleDistribute = async () => {
         if (!distributeAmount || distributeAmount <= 0) {
-            return alert("Please enter a valid amount.");
+            return showToast("Please enter a valid amount.", "error");
         }
         
         const activeUsersCount = usersData.filter(u => u.stage === 'Active').length;
         if (activeUsersCount === 0) {
-            return alert("There are no active Future Fund users to distribute profit to.");
+            return showToast("There are no active Future Fund users.", "error");
         }
 
-        if (!window.confirm(`Are you sure you want to distribute ₹${distributeAmount} to EACH of the ${activeUsersCount} Active Future Fund users? (Total: ₹${activeUsersCount * distributeAmount})`)) return;
+        if (!window.confirm(`Are you sure you want to distribute a total pool of ₹${distributeAmount} among all Future Fund users?`)) return;
 
         setDistributing(true);
         try {
             const res = await api.post('/admin/users/future-fund/distribute', { amount: Number(distributeAmount) });
             if (res.success) {
-                alert(res.message);
                 setDistributeAmount('');
+                fetchReport(); // refresh report
+                showToast(res.message || "Profit distributed successfully!");
             } else {
-                alert(res.message || "Failed to distribute.");
+                showToast(res.message || "Failed to distribute profit", "error");
             }
         } catch (err) {
             console.error("Distribution error", err);
-            alert("Error: " + err.message);
+            showToast("Error: " + err.message, "error");
         } finally {
             setDistributing(false);
         }
@@ -212,8 +231,23 @@ const FutureFundAdmin = () => {
     }
 
     return (
-        <div className="p-4 animate-in fade-in duration-700 bg-slate-50/50 min-h-screen">
-            <PageHeader title="Future Fund Evolution" subtitle="Manage milestones, platform content, and view user history" />
+        <div className="p-4 animate-in fade-in duration-500 max-w-7xl mx-auto">
+            {toast && (
+                <div className={`fixed top-5 right-5 z-[9999] flex items-center gap-3 px-5 py-3.5 rounded-xl border shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300 ${
+                    toast.type === 'success' 
+                        ? 'bg-emerald-50 border-emerald-100 text-emerald-800' 
+                        : 'bg-rose-50 border-rose-100 text-rose-800'
+                }`}>
+                    {toast.type === 'success' ? (
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 animate-bounce" />
+                    ) : (
+                        <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+                    )}
+                    <span className="text-xs font-semibold">{toast.message}</span>
+                </div>
+            )}
+            
+            <PageHeader title="Future Fund" subtitle="Manage long-term earning pools and milestone targets" />
 
             {/* Top Stat Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
@@ -282,7 +316,12 @@ const FutureFundAdmin = () => {
                                     <div key={rule.key} className="bg-slate-50/70 border border-slate-100 p-3 rounded-md">
                                         <div className="flex items-center gap-1.5 mb-1"><Icon size={12} className={rule.color} /><p className="text-[9px] font-semibold text-slate-500 uppercase tracking-widest leading-none">{rule.label}</p></div>
                                         {editingRules ? (
-                                            <input type="number" value={rules[rule.key]} onChange={(e) => setRules({ ...rules, [rule.key]: Number(e.target.value) })} className="w-full bg-white border border-slate-200 rounded px-2 py-1 text-[13px] font-bold text-slate-800 outline-none focus:ring-1 focus:ring-sky-500" />
+                                            <input 
+                                                type="number" 
+                                                value={rules[rule.key] === undefined ? '' : rules[rule.key].toString()} 
+                                                onChange={(e) => setRules({ ...rules, [rule.key]: e.target.value === '' ? '' : Number(e.target.value) })} 
+                                                className="w-full bg-white border border-slate-200 rounded px-2 py-1 text-[13px] font-bold text-slate-800 outline-none focus:ring-1 focus:ring-sky-500" 
+                                            />
                                         ) : (
                                             <p className="text-[15px] font-bold text-slate-800 leading-none">{rules[rule.key]}{rule.suffix || ''}</p>
                                         )}
@@ -306,12 +345,39 @@ const FutureFundAdmin = () => {
                                         {editingRules ? (
                                             <input 
                                                 type="number" 
-                                                value={rules[act.key]} 
-                                                onChange={(e) => setRules({ ...rules, [act.key]: Number(e.target.value) })} 
+                                                value={rules[act.key] === undefined ? '' : rules[act.key].toString()} 
+                                                onChange={(e) => setRules({ ...rules, [act.key]: e.target.value === '' ? '' : Number(e.target.value) })} 
                                                 className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-sm font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-500" 
                                             />
                                         ) : (
                                             <p className={`text-lg font-medium ${act.color} leading-none`}>{rules[act.key]}</p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Profit Distribution Tiers */}
+                        <div className="mt-5 border-t border-slate-100 pt-5">
+                            <h3 className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-3 flex items-center gap-1.5"><IndianRupee size={12} className="text-amber-500" /> Tiered Profit Rules</h3>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                {[
+                                    { label: 'High Tier Tasks >', key: 'ffTier1TasksLimit', color: 'text-indigo-500' },
+                                    { label: 'High Tier Ads >', key: 'ffTier1AdsLimit', color: 'text-sky-500' },
+                                    { label: 'High Tier Profit %', key: 'ffTier1ProfitPercent', color: 'text-emerald-500', suffix: '%' },
+                                    { label: 'Low Tier Profit %', key: 'ffTier2ProfitPercent', color: 'text-rose-500', suffix: '%' }
+                                ].map((act) => (
+                                    <div key={act.key} className="bg-slate-50 border border-slate-100 p-3.5 rounded-lg">
+                                        <p className="text-[8px] font-medium text-slate-500 uppercase tracking-tight mb-1.5 leading-none">{act.label}</p>
+                                        {editingRules ? (
+                                            <input 
+                                                type="number" 
+                                                value={rules[act.key] === undefined ? '' : rules[act.key].toString()} 
+                                                onChange={(e) => setRules({ ...rules, [act.key]: e.target.value === '' ? '' : Number(e.target.value) })} 
+                                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-sm font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-500" 
+                                            />
+                                        ) : (
+                                            <p className={`text-lg font-medium ${act.color} leading-none`}>{rules[act.key] || 0}{act.suffix || ''}</p>
                                         )}
                                     </div>
                                 ))}

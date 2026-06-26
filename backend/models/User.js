@@ -106,7 +106,7 @@ const UserSchema = new mongoose.Schema({
     futureFund: {
         status: { type: String, enum: ['locked', 'active'], default: 'locked' },
         progress: { type: Number, default: 0 },
-        correctedScore: { type: Number, default: null },
+        overrideProfit: { type: Number, default: null },
         criteria: [{
             id: Number,
             title: String,

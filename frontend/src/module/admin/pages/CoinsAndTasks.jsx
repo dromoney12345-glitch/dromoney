@@ -11,6 +11,12 @@ const CoinsAndTasks = () => {
     const [dailyLimit, setDailyLimit] = useState(100);
     const [activeTab, setActiveTab] = useState('tasks');
     
+    // Timing Settings
+    const [taskWindowStart, setTaskWindowStart] = useState('00:00');
+    const [taskWindowEnd, setTaskWindowEnd] = useState('23:59');
+    const [kycWindowStart, setKycWindowStart] = useState('07:00');
+    const [kycWindowEnd, setKycWindowEnd] = useState('19:00');
+    
     // Modal State
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingTaskId, setEditingTaskId] = useState(null);
@@ -36,6 +42,10 @@ const CoinsAndTasks = () => {
             if (response.success) {
                 setCoinValue(response.data.coinRate || 0.1);
                 setDailyLimit(response.data.maxCoinsPerDay || 100);
+                setTaskWindowStart(response.data.taskWindowStart || '00:00');
+                setTaskWindowEnd(response.data.taskWindowEnd || '23:59');
+                setKycWindowStart(response.data.kycWindowStart || '07:00');
+                setKycWindowEnd(response.data.kycWindowEnd || '19:00');
             }
         } catch (err) {
             console.error("Fetch Settings Error:", err);
@@ -122,7 +132,11 @@ const CoinsAndTasks = () => {
         try {
             const response = await api.put('/admin/settings', {
                 coinRate: Number(coinValue),
-                maxCoinsPerDay: Number(dailyLimit)
+                maxCoinsPerDay: Number(dailyLimit),
+                taskWindowStart,
+                taskWindowEnd,
+                kycWindowStart,
+                kycWindowEnd
             });
             
             if (response.success) {
@@ -219,6 +233,44 @@ const CoinsAndTasks = () => {
                                     <span className="text-sm font-medium text-slate-400">coins/day limit per user</span>
                                 </div>
                             </div>
+
+                            <hr className="border-slate-100 my-4" />
+                            <h3 className="text-sm font-medium text-slate-800 uppercase tracking-normal mb-3 flex items-center gap-2">🕒 Working Hours</h3>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <h4 className="text-xs font-semibold text-slate-700 uppercase mb-3">Tasks Window</h4>
+                                    <div className="flex items-center gap-3">
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 block mb-1">Start Time</label>
+                                            <input type="time" value={taskWindowStart} onChange={e => setTaskWindowStart(e.target.value)} className="border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:border-sky-500" />
+                                        </div>
+                                        <span className="text-slate-400 mt-5">to</span>
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 block mb-1">End Time</label>
+                                            <input type="time" value={taskWindowEnd} onChange={e => setTaskWindowEnd(e.target.value)} className="border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:border-sky-500" />
+                                        </div>
+                                    </div>
+                                    <p className="text-[10px] text-slate-500 mt-2">Users can only complete tasks during this time window.</p>
+                                </div>
+
+                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    <h4 className="text-xs font-semibold text-slate-700 uppercase mb-3">KYC Window</h4>
+                                    <div className="flex items-center gap-3">
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 block mb-1">Start Time</label>
+                                            <input type="time" value={kycWindowStart} onChange={e => setKycWindowStart(e.target.value)} className="border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:border-sky-500" />
+                                        </div>
+                                        <span className="text-slate-400 mt-5">to</span>
+                                        <div>
+                                            <label className="text-[10px] text-slate-500 block mb-1">End Time</label>
+                                            <input type="time" value={kycWindowEnd} onChange={e => setKycWindowEnd(e.target.value)} className="border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:border-sky-500" />
+                                        </div>
+                                    </div>
+                                    <p className="text-[10px] text-slate-500 mt-2">Users can only submit KYC requests during this time window.</p>
+                                </div>
+                            </div>
+
                             <button 
                                 onClick={handleSaveSettings}
                                 disabled={saveLoading}

@@ -9,8 +9,37 @@ const KycModal = ({ isOpen, onClose }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const fileInputRef = useRef(null);
+    const [settings, setSettings] = useState(null);
+    const [isWithinKycWindow, setIsWithinKycWindow] = useState(true);
 
     const status = (userData?.kycStatus || 'Not Started').toLowerCase();
+
+    React.useEffect(() => {
+        if (!isOpen) return;
+        const fetchSettings = async () => {
+            try {
+                const res = await api.get('/public/settings');
+                if (res.success && res.data) {
+                    setSettings(res.data);
+                    checkKycWindow(res.data.kycWindowStart, res.data.kycWindowEnd);
+                }
+            } catch (err) {}
+        };
+        fetchSettings();
+    }, [isOpen]);
+
+    const checkKycWindow = (startStr, endStr) => {
+        if (!startStr || !endStr) return;
+        const now = new Date();
+        const currentMins = now.getHours() * 60 + now.getMinutes();
+        const [sh, sm] = startStr.split(':').map(Number);
+        const startMins = (sh || 0) * 60 + (sm || 0);
+        const [eh, em] = endStr.split(':').map(Number);
+        const endMins = (eh || 0) * 60 + (em || 0);
+        if (startMins < endMins) {
+            setIsWithinKycWindow(currentMins >= startMins && currentMins <= endMins);
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -134,7 +163,17 @@ const KycModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="p-3">
-                    {status === 'not started' || status === 'rejected' ? (
+                    {!isWithinKycWindow && (status === 'not started' || status === 'rejected') ? (
+                        <div className="p-6 text-center space-y-3">
+                            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <Clock className="text-slate-400" size={32} />
+                            </div>
+                            <h3 className="text-[15px] font-medium text-slate-800 tracking-tight">KYC Submissions Closed</h3>
+                            <p className="text-[12px] font-medium text-slate-500 leading-relaxed">
+                                KYC submissions are only accepted between <span className="text-emerald-600 font-semibold">{settings?.kycWindowStart}</span> and <span className="text-emerald-600 font-semibold">{settings?.kycWindowEnd}</span>.
+                            </p>
+                        </div>
+                    ) : status === 'not started' || status === 'rejected' ? (
                         <div className="p-4 space-y-4">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Aadhaar Number</label>
@@ -192,7 +231,14 @@ const KycModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="p-6 bg-white border-t border-slate-50">
-                    {status === 'not started' || status === 'rejected' ? (
+                    {!isWithinKycWindow && (status === 'not started' || status === 'rejected') ? (
+                        <button 
+                            onClick={onClose}
+                            className={`w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium text-[12px] uppercase tracking-[0.2em] rounded-2xl active:scale-[0.98] transition-all`}
+                        >
+                            Understood
+                        </button>
+                    ) : status === 'not started' || status === 'rejected' ? (
                         <button 
                             onClick={handleSubmit} 
                             disabled={submitting}

@@ -46,6 +46,23 @@ exports.updateKyc = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('User not found', 404));
     }
 
+    // Check Admin KYC Timing Window
+    const Settings = require('../models/Settings');
+    const settings = await Settings.findOne();
+    if (settings && settings.kycWindowStart && settings.kycWindowEnd) {
+        const now = new Date();
+        const currentTotalMins = now.getHours() * 60 + now.getMinutes();
+        const [startH, startM] = settings.kycWindowStart.split(':').map(Number);
+        const startTotalMins = (startH || 0) * 60 + (startM || 0);
+        const [endH, endM] = settings.kycWindowEnd.split(':').map(Number);
+        const endTotalMins = (endH || 0) * 60 + (endM || 0);
+        if (startTotalMins < endTotalMins) {
+            if (currentTotalMins < startTotalMins || currentTotalMins > endTotalMins) {
+                return next(new ErrorResponse(`KYC submissions are only available between ${settings.kycWindowStart} and ${settings.kycWindowEnd}`, 400));
+            }
+        }
+    }
+
     // Prevent resubmission if already Approved/Verified
     if (user.kyc?.status === 'Approved' || user.kyc?.status === 'Verified') {
         return res.status(200).json({

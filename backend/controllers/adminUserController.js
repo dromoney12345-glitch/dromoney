@@ -201,7 +201,6 @@ exports.getUserTransactions = async (req, res, next) => {
 // @access  Private (Admin)
 exports.getFutureFundReport = async (req, res, next) => {
     try {
-        // User wants to see all regular users in the report, not just 'active' ones.
         const users = await User.find({ role: { $ne: 'admin' } });
 
         if (users.length === 0) {
@@ -214,43 +213,32 @@ exports.getFutureFundReport = async (req, res, next) => {
             settings = await Settings.create({});
         }
 
-        const adWeight = settings.ffAdScoreWeight || 1;
-        const taskWeight = settings.ffTaskScoreWeight || 1;
-        const boosterMultiplier = settings.ffBoosterMultiplier || 1.5;
+        const tier1Tasks = settings.ffTier1TasksLimit || 5;
+        const tier1Ads = settings.ffTier1AdsLimit || 5;
+        const tier1Pct = settings.ffTier1ProfitPercent || 60;
+        const tier2Pct = settings.ffTier2ProfitPercent || 40;
 
-        let totalActivityScore = 0;
+        let highTierCount = 0;
+        let lowTierCount = 0;
         const scoredUsers = [];
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
 
+        // First pass: identify tiers and counts
         for (let user of users) {
             let adScore = user.dailyAdCount || 0;
-            if (user.lastAdCountResetAt && user.lastAdCountResetAt < todayStart) {
-                adScore = 0;
-            }
+            if (user.lastAdCountResetAt && user.lastAdCountResetAt < todayStart) adScore = 0;
 
             let taskScore = 0;
             if (user.dailyTaskCompletions && user.dailyTaskCompletions.length > 0) {
                 taskScore = user.dailyTaskCompletions.filter(tc => new Date(tc.completedAt) >= todayStart).length;
             }
 
-            let multiplier = 1.0;
-            if (user.isTaskBoosterActive || user.isSupportBoosterActive) {
-                multiplier = boosterMultiplier;
-            }
+            let isHighTier = (taskScore > tier1Tasks && adScore > tier1Ads);
+            let overrideProfit = user.futureFund?.overrideProfit;
 
-            let baseScore = (adScore * adWeight) + (taskScore * taskWeight);
-            if (baseScore === 0) baseScore = 1;
-
-            let finalScore = baseScore * multiplier;
-            let isCorrected = false;
-            
-            if (user.futureFund && user.futureFund.correctedScore !== undefined && user.futureFund.correctedScore !== null) {
-                finalScore = user.futureFund.correctedScore;
-                isCorrected = true;
-            }
-
-            totalActivityScore += finalScore;
+            if (isHighTier) highTierCount++;
+            else lowTierCount++;
 
             scoredUsers.push({
                 id: user._id,
@@ -258,31 +246,35 @@ exports.getFutureFundReport = async (req, res, next) => {
                 email: user.email,
                 referrals: user.referralCount || 0,
                 lifetimeEarnings: user.wallet?.lifetimeEarnings || 0,
-                score: finalScore,
-                correctedScore: isCorrected ? user.futureFund.correctedScore : null,
-                breakdown: { ads: adScore, tasks: taskScore, multiplier }
+                breakdown: { ads: adScore, tasks: taskScore, isHighTier },
+                overrideProfit: overrideProfit,
+                isHighTier
             });
         }
 
-        // Calculate Share %
-        const reportData = scoredUsers.map(item => {
-            let sharePercentage = 0;
-            if (totalActivityScore > 0) {
-                sharePercentage = (item.score / totalActivityScore) * 100;
+        // Second pass: Calculate exact percentage share of the REMAINING pool
+        // High Tier Pool is 60% of remaining pool. If H users, each gets (60/H)% of remaining pool.
+        for (let user of scoredUsers) {
+            if (user.isHighTier) {
+                user.sharePercentage = highTierCount > 0 ? (tier1Pct / highTierCount) : 0;
+            } else {
+                user.sharePercentage = lowTierCount > 0 ? (tier2Pct / lowTierCount) : 0;
             }
-            return {
-                ...item,
-                sharePercentage: Number(sharePercentage.toFixed(2))
-            };
-        });
+            
+            // If one tier is completely empty, the other tier should absorb the 100% pool
+            if (highTierCount === 0 && !user.isHighTier) {
+                user.sharePercentage = 100 / lowTierCount;
+            }
+            if (lowTierCount === 0 && user.isHighTier) {
+                user.sharePercentage = 100 / highTierCount;
+            }
+        }
 
-        // Sort by share percentage descending
-        reportData.sort((a, b) => b.sharePercentage - a.sharePercentage);
+        const reportData = scoredUsers.sort((a, b) => b.sharePercentage - a.sharePercentage);
 
         res.status(200).json({
             success: true,
             count: reportData.length,
-            totalActivityScore,
             data: reportData
         });
     } catch (err) {
@@ -314,12 +306,16 @@ exports.distributeFutureFundProfit = async (req, res, next) => {
             settings = await Settings.create({});
         }
 
-        const adWeight = settings.ffAdScoreWeight || 1;
-        const taskWeight = settings.ffTaskScoreWeight || 1;
-        const boosterMultiplier = settings.ffBoosterMultiplier || 1.5;
+        const tier1Tasks = settings.ffTier1TasksLimit || 5;
+        const tier1Ads = settings.ffTier1AdsLimit || 5;
+        const tier1Pct = settings.ffTier1ProfitPercent || 60;
+        const tier2Pct = settings.ffTier2ProfitPercent || 40;
 
-        // Calculate Activity Scores
-        let totalActivityScore = 0;
+        // Calculate Tier Shares
+        let highTierCount = 0;
+        let lowTierCount = 0;
+        let totalFixedProfit = 0;
+
         const scoredUsers = [];
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
@@ -327,9 +323,7 @@ exports.distributeFutureFundProfit = async (req, res, next) => {
         for (let user of users) {
             // Ads Score
             let adScore = user.dailyAdCount || 0;
-            if (user.lastAdCountResetAt && user.lastAdCountResetAt < todayStart) {
-                adScore = 0;
-            }
+            if (user.lastAdCountResetAt && user.lastAdCountResetAt < todayStart) adScore = 0;
 
             // Tasks Score
             let taskScore = 0;
@@ -337,34 +331,53 @@ exports.distributeFutureFundProfit = async (req, res, next) => {
                 taskScore = user.dailyTaskCompletions.filter(tc => new Date(tc.completedAt) >= todayStart).length;
             }
 
-            // Booster Multiplier
-            let multiplier = 1.0;
-            if (user.isTaskBoosterActive || user.isSupportBoosterActive) {
-                multiplier = boosterMultiplier;
-            }
+            let isHighTier = (taskScore > tier1Tasks && adScore > tier1Ads);
+            let overrideProfit = user.futureFund?.overrideProfit;
 
-            let baseScore = (adScore * adWeight) + (taskScore * taskWeight);
-            if (baseScore === 0) baseScore = 1;
-
-            let finalScore = baseScore * multiplier;
-            if (user.futureFund && user.futureFund.correctedScore !== undefined && user.futureFund.correctedScore !== null) {
-                finalScore = user.futureFund.correctedScore;
+            if (overrideProfit !== null && overrideProfit !== undefined) {
+                totalFixedProfit += overrideProfit;
             }
             
-            totalActivityScore += finalScore;
+            if (isHighTier) highTierCount++;
+            else lowTierCount++;
 
             scoredUsers.push({
                 user: user,
-                score: finalScore,
-                breakdown: { ads: adScore, tasks: taskScore, multiplier }
+                isHighTier,
+                overrideProfit
             });
         }
 
-        // Distribute proportionally
+        // Calculate pool math
+        const totalPool = Number(amount);
+        const remainingPool = Math.max(0, totalPool - totalFixedProfit);
+
+        for (let item of scoredUsers) {
+            let sharePercentage = item.isHighTier ? tier1Pct : tier2Pct;
+            
+            let shareFraction = 0;
+            if (item.isHighTier) {
+                shareFraction = highTierCount > 0 ? ((sharePercentage / 100) / highTierCount) : 0;
+            } else {
+                shareFraction = lowTierCount > 0 ? ((sharePercentage / 100) / lowTierCount) : 0;
+            }
+
+            // If one tier is empty, the other gets 100% of remaining pool
+            if (highTierCount === 0 && !item.isHighTier) shareFraction = 1 / lowTierCount;
+            if (lowTierCount === 0 && item.isHighTier) shareFraction = 1 / highTierCount;
+
+            item.userShare = remainingPool * shareFraction;
+            
+            // Add the bonus profit on top
+            if (item.overrideProfit !== null && item.overrideProfit !== undefined) {
+                item.userShare += item.overrideProfit;
+            }
+        }
+
+        // Distribute based on tiers
         let totalDistributed = 0;
         for (let item of scoredUsers) {
-            let userShare = (item.score / totalActivityScore) * Number(amount);
-            userShare = Math.floor(userShare * 100) / 100; // Keep up to 2 decimals
+            let userShare = Math.floor(item.userShare * 100) / 100; // Keep up to 2 decimals
 
             if (userShare > 0) {
                 item.user.wallet.balance += userShare;
@@ -387,7 +400,7 @@ exports.distributeFutureFundProfit = async (req, res, next) => {
                     const { sendNotificationToUser } = require('./fcmController');
                     await sendNotificationToUser(item.user._id, {
                         title: 'Future Fund Reward! 🏆',
-                        body: `Based on your activity score (${item.score.toFixed(1)}), ₹${userShare} has been added to your wallet!`,
+                        body: `Based on your activity today, ₹${userShare} has been added to your wallet!`,
                         data: {
                             type: 'future_fund',
                             link: '/user/future-fund'
@@ -401,7 +414,7 @@ exports.distributeFutureFundProfit = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            message: `Successfully distributed ₹${amount} each to ${users.length} users. Total: ₹${totalDistributed}`
+            message: `Successfully distributed ₹${totalDistributed} across ${users.length} users.`
         });
 
     } catch (err) {
@@ -409,31 +422,31 @@ exports.distributeFutureFundProfit = async (req, res, next) => {
     }
 };
 
-// @desc    Update user's corrected score
-// @route   PUT /api/admin/users/:id/future-fund/score
+// @desc    Update user's override profit
+// @route   PUT /api/admin/users/:id/future-fund/override
 // @access  Private (Admin)
-exports.updateCorrectedScore = async (req, res, next) => {
+exports.updateOverrideProfit = async (req, res, next) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) {
             return next(new ErrorResponse('User not found', 404));
         }
 
-        const { score } = req.body;
+        const { profit } = req.body;
         
-        // If score is null or empty string, we remove the override
-        if (score === null || score === '') {
-            user.futureFund.correctedScore = null;
+        // If profit is null or empty string, we remove the override
+        if (profit === null || profit === '') {
+            user.futureFund.overrideProfit = null;
         } else {
-            user.futureFund.correctedScore = Number(score);
+            user.futureFund.overrideProfit = Number(profit);
         }
 
         await user.save();
 
         res.status(200).json({
             success: true,
-            data: user.futureFund.correctedScore,
-            message: 'Corrected score updated successfully'
+            data: user.futureFund.overrideProfit,
+            message: 'Custom profit updated successfully'
         });
     } catch (err) {
         next(err);
