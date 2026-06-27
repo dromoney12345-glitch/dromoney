@@ -12,7 +12,14 @@ import { useAdmin } from '../context/AdminContext';
 
 const MarketingManager = () => {
     const { addNotification } = useAdmin();
-    const [activeTab, setActiveTab] = useState('banners');
+    const [activeTab, setActiveTab] = useState(() => {
+        return localStorage.getItem('admin_marketing_active_tab') || 'banners';
+    });
+
+    const handleTabChange = (tabId) => {
+        setActiveTab(tabId);
+        localStorage.setItem('admin_marketing_active_tab', tabId);
+    };
 
     // ── Banners Data ──
     const [banners, setBanners] = useState([]);
@@ -251,7 +258,7 @@ const MarketingManager = () => {
                 ].map(tab => (
                     <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
+                        onClick={() => handleTabChange(tab.id)}
                         className={`flex items-center gap-3 px-8 py-3.5 rounded-lg font-medium text-[11px] uppercase tracking-normal transition-all ${activeTab === tab.id ? 'bg-[#0F172A] text-white shadow-xl shadow-slate-200' : 'text-slate-400 hover:bg-slate-50'}`}
                     >
                         <tab.icon size={14} /> {tab.label}
@@ -656,7 +663,9 @@ const MarketingManager = () => {
                                         <div className="space-y-2">
                                             <label className="text-[9px] font-medium text-slate-400 uppercase tracking-normal ml-0.5 flex items-center gap-1.5"><Target size={12} /> Applicable Tasks / Events</label>
                                             <div className="grid grid-cols-2 gap-2 bg-slate-50 border border-slate-100 rounded-xl p-3">
-                                                {['General Tasks', 'Task Quiz', 'Speed Tapper', 'Standard Quiz', 'Memory Master', 'Lucky Draw'].map((taskOption) => (
+                                                {(type === 'support' 
+                                                    ? ['Speed Tapper', 'Standard Quiz', 'Memory Master', 'Lucky Draw'] 
+                                                    : ['General Tasks', 'Task Quiz', 'Speed Tapper', 'Standard Quiz', 'Memory Master', 'Lucky Draw', 'Scratch Card', 'Treasure Chest', 'Watch & Earn', 'Contests']).map((taskOption) => (
                                                     <label key={taskOption} className="flex items-center gap-2 cursor-pointer">
                                                         <input 
                                                             type="checkbox" 

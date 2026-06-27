@@ -21,9 +21,11 @@ const LuckyDrawView = () => {
     const navigate = useNavigate();
     const { userData, addCoins, addNotification, boostersConfig } = useUser();
     const isSupportBoosterActive = userData?.isSupportBoosterActive && (!boostersConfig?.support?.length || boostersConfig.support.includes('Lucky Draw'));
+    const isTaskBoosterActive = userData?.isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes('Lucky Draw'));
     
     const [prizes, setPrizes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [taskReward, setTaskReward] = useState(null);
     const [step, setStep] = useState(0);
     const [prizeIndex, setPrizeIndex] = useState(null);
     const [rotationDeg, setRotationDeg] = useState(0);
@@ -42,6 +44,15 @@ const LuckyDrawView = () => {
             } catch (err) {
                 if (err.message && err.message.includes('Event not found')) {
                     // Ignore, it's a task ID not an event ID
+                    try {
+                        const taskRes = await api.get('/user/data/tasks');
+                        if (taskRes.success) {
+                            const currentTask = taskRes.data.find(t => String(t._id) === String(id) || String(t.id) === String(id));
+                            if (currentTask && currentTask.reward) {
+                                setTaskReward(currentTask.reward);
+                            }
+                        }
+                    } catch(e) {}
                 } else {
                     console.error("Failed to load lucky draw details:", err);
                 }
@@ -58,9 +69,15 @@ const LuckyDrawView = () => {
 
     const activePrizes = prizes.length > 0 ? prizes.map((p, idx) => ({
         ...p,
-        bg: p.bg || DEFAULT_PRIZES[idx % DEFAULT_PRIZES.length].bg,
-        color: p.color || DEFAULT_PRIZES[idx % DEFAULT_PRIZES.length].color
-    })) : DEFAULT_PRIZES;
+        bg: ['bg-indigo-500/10 text-indigo-400', 'bg-emerald-500/10 text-emerald-400', 'bg-sky-500/10 text-sky-400', 'bg-amber-500/10 text-amber-400', 'bg-rose-500/10 text-rose-400'][idx % 5],
+        color: ['text-indigo-400', 'text-emerald-400', 'text-sky-400', 'text-amber-400', 'text-rose-400'][idx % 5]
+    })) : DEFAULT_PRIZES.map(p => {
+        // If it's a task, override the default prizes with the actual task reward
+        if (taskReward !== null) {
+             return { ...p, label: `${taskReward} Coins`, coins: taskReward, cash: 0 };
+        }
+        return p;
+    });
 
     const handleStartDraw = () => {
         setStep(1);
@@ -77,11 +94,12 @@ const LuckyDrawView = () => {
             setIsSpinning(false);
         }, 4000);
 
-        setTimeout(() => {
+        setTimeout(async () => {
             setStep(2);
             const prize = activePrizes[winner];
             if (prize.coins > 0) {
-                addCoins(prize.coins, `Lucky Draw Prize`, id);
+                const reward = prize.coins;
+                await addCoins(reward, `Lucky Draw Prize`, id);
             }
             taskStorage.markComplete(id);
             addNotification('Lucky Draw Result!', `You won ${prize.label} in the Lucky Draw!`, 'success');
@@ -244,9 +262,14 @@ const LuckyDrawView = () => {
                     <p className="text-[10px] font-medium uppercase tracking-widest mb-3 opacity-70">Your Prize</p>
                     <p className="text-6xl font-medium mb-4">{prize?.label}</p>
                     {prize?.coins > 0 && (
-                        <div className="flex items-center justify-center gap-2 bg-white/85 rounded-2xl p-3 shadow-md">
-                            <Coins size={20} className="text-amber-500 fill-amber-500" />
-                            <span className="text-[13px] font-medium text-slate-700">+{prize.coins} Coins added to wallet</span>
+                        <div className="flex flex-col items-center justify-center gap-1 bg-white/90 rounded-2xl p-3 shadow-md">
+                            <div className="flex items-center gap-2">
+                                <Coins size={20} className="text-amber-500 fill-amber-500" />
+                                <span className="text-[13px] font-bold text-slate-800">+{isTaskBoosterActive ? prize.coins * 3 : prize.coins} Coins added to wallet</span>
+                            </div>
+                            {isTaskBoosterActive && (
+                                <span className="text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded border border-sky-100 uppercase">3X Boost Applied</span>
+                            )}
                         </div>
                     )}
                     {prize?.cash > 0 && (

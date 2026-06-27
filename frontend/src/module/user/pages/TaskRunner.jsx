@@ -187,7 +187,8 @@ const TaskRunner = () => {
         }
 
         setStatus('completed');
-        const rewardAmount = task.coinsReward || task.reward || 0;
+        let rewardAmount = task.coinsReward || task.reward || 0;
+        
         const taskId = task._id || task.id;
         const result = await addCoins(rewardAmount, task.title, taskId);
         
@@ -201,7 +202,7 @@ const TaskRunner = () => {
         taskStorage.markComplete(taskId);
         
         if (userData.isTaskBoosterActive) {
-            setToast({ message: "Task completed! Points + Speed Rewards granted.", type: 'success' });
+            setToast({ message: `Task completed! 3X Booster Applied! +${rewardAmount} Coins`, type: 'success' });
             setTimeout(() => { setToast(null); navigate('/user/earn'); }, 2000);
         } else {
             setTimeout(() => navigate('/user/earn'), 2000);
@@ -234,7 +235,7 @@ const TaskRunner = () => {
                         <Coins size={12} className="text-amber-400" />
                         <span className="font-medium text-amber-400 text-xs">{userData.coins.total}</span>
                     </div>
-                    <span className="font-medium text-amber-400 text-xs">+{task.coinsReward || task.reward} Coin</span>
+                    <span className="font-medium text-amber-400 text-xs">+{userData.isTaskBoosterActive ? (task.coinsReward || task.reward) * 3 : (task.coinsReward || task.reward)} Coin {userData.isTaskBoosterActive && '(3X Boost)'}</span>
                 </div>
             </div>
 

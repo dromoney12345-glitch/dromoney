@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import {
     ChevronLeft, ChevronDown, Trophy, Users,
-    Sparkles, Zap, Coins, Clock, Lightbulb, Rocket, Award, CheckCircle2, AlertCircle
+    Sparkles, Zap, Coins, Clock, Lightbulb, Rocket, Award, CheckCircle2, AlertCircle, RefreshCw
 } from 'lucide-react';
 import UnlockModal from '../components/UnlockModal';
 import PaymentModal from '../components/PaymentModal';
@@ -17,6 +17,36 @@ const Events = () => {
     const [isPaymentOpen, setIsPaymentOpen] = useState(false);
     const [joinedEvents, setJoinedEvents] = useState([]);
     const [toast, setToast] = useState(null);
+    const [isRefreshingCoins, setIsRefreshingCoins] = useState(false);
+
+    const handleRefreshCoins = async () => {
+        setIsRefreshingCoins(true);
+        await refreshUserProfile(false);
+        
+        try {
+            // Also refresh events data on click
+            const res = await api.get('/public/events');
+            if (res.success && res.data && res.data.length > 0) {
+                setEventList(res.data);
+                if (res.joinedEvents && Array.isArray(res.joinedEvents)) {
+                    const joinedIds = res.joinedEvents.map(id => id.toString());
+                    setJoinedEvents(joinedIds);
+                    localStorage.setItem('dromoney_joined_events', JSON.stringify(joinedIds));
+                } else {
+                    setJoinedEvents([]);
+                }
+            } else {
+                const allEvents = eventStorage.getEvents();
+                setEventList(allEvents.filter(e => e.status === 'Active'));
+                const saved = JSON.parse(localStorage.getItem('dromoney_joined_events') || '[]');
+                setJoinedEvents(saved);
+            }
+        } catch (err) {
+            console.error("Failed to refresh events:", err);
+        }
+
+        setIsRefreshingCoins(false);
+    };
     const [eventList, setEventList] = useState([]);
     const [supportBooster, setSupportBooster] = useState({
         title: '₹21 Event Support Kit',
@@ -102,11 +132,6 @@ const Events = () => {
     };
 
     const handleJoinEvent = async (event) => {
-        if (!userData.isPaid) {
-            setIsUnlockOpen(true);
-            return;
-        }
-
         const id = event._id || event.id;
 
         // Strict double-check: If already joined, just navigate and block any API calls
@@ -204,9 +229,14 @@ const Events = () => {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
-                        <Coins size={12} className="text-yellow-400 fill-yellow-400" />
-                        <span className="text-[12px] text-white">{userData.coins.total}</span>
+                    <div className="flex items-center gap-2">
+                        <button onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-7 h-7 flex items-center justify-center bg-white/10 text-white rounded-full border border-white/20 active:scale-95 transition-all">
+                            <RefreshCw size={12} className={isRefreshingCoins ? 'animate-spin' : ''} />
+                        </button>
+                        <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+                            <Coins size={12} className="text-yellow-400 fill-yellow-400" />
+                            <span className="text-[12px] text-white">{userData.coins.total}</span>
+                        </div>
                     </div>
                 </div>
 

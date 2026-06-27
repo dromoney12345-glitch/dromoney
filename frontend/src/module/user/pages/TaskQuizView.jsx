@@ -153,9 +153,14 @@ const TaskQuizView = () => {
                         <span className="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-[12px] font-medium uppercase tracking-widest border border-blue-100">
                             Question {currentQuestion + 1}/{totalQ}
                         </span>
-                        <div className="flex items-center gap-2 bg-rose-50 px-4 py-1.5 rounded-full border border-rose-100">
+                        <div className="flex items-center gap-2 bg-rose-50 px-4 py-1.5 rounded-full border border-rose-100 relative">
                             <Timer size={16} className={`text-rose-500 ${timeLeft < 5 ? 'animate-pulse' : ''}`} />
                             <span className={`text-[14px] font-medium ${timeLeft < 5 ? 'text-rose-600' : 'text-slate-700'}`}>{timeLeft}s</span>
+                            {isSupportBoosterActive && (
+                                <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[7px] font-bold text-[#F59E0B] bg-amber-50 px-1 py-0.5 rounded border border-amber-200 uppercase whitespace-nowrap">
+                                    +3s Boost
+                                </span>
+                            )}
                         </div>
                     </div>
                     {/* Progress Bar */}

@@ -388,6 +388,7 @@ export const UserProvider = ({ children }) => {
         updateProfileImage,
         updateProfileData,
         clearNotifications,
+        fetchNotifications,
         boostersConfig
     }), [userData, notifications, loading, isAuthenticated, boostersConfig]);
 

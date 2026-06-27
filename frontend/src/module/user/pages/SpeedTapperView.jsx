@@ -9,6 +9,7 @@ const SpeedTapperView = () => {
     const navigate = useNavigate();
     const { addCoins, userData, boostersConfig } = useUser();
     const isTaskBoosterActive = userData?.isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes('Speed Tapper'));
+    const isSupportBoosterActive = userData?.isSupportBoosterActive && (!boostersConfig?.support?.length || boostersConfig.support.includes('Speed Tapper'));
     const [task, setTask] = useState(null);
     
     const [taps, setTaps] = useState(0);
@@ -16,7 +17,7 @@ const SpeedTapperView = () => {
     const [timeLeft, setTimeLeft] = useState(0);
     
     const target = 25;
-    const duration = 10;
+    const duration = isSupportBoosterActive ? 13 : 10;
 
     useEffect(() => {
         const allTasks = taskStorage.getTasks();
@@ -56,7 +57,8 @@ const SpeedTapperView = () => {
 
     const handleWin = async () => {
         setStatus('won');
-        await addCoins((task.coinsReward || task.reward || 0), 'Speed Tapper Mastery', task._id || task.id);
+        const rewardAmount = task.coinsReward || task.reward || 0;
+        await addCoins(rewardAmount, 'Speed Tapper Mastery', task._id || task.id);
         taskStorage.markComplete(task._id || task.id);
     };
 

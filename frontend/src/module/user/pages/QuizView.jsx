@@ -17,6 +17,7 @@ const QuizView = () => {
     const [selectedOption, setSelectedOption] = useState(null);
     const [score, setScore] = useState(0);
     const isSupportBoosterActive = userData?.isSupportBoosterActive && (!boostersConfig?.support?.length || boostersConfig.support.includes('Standard Quiz'));
+    const isTaskBoosterActive = userData?.isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes('Standard Quiz'));
     const [timeLeft, setTimeLeft] = useState(isSupportBoosterActive ? 18 : 15);
     const [isAnswered, setIsAnswered] = useState(false);
     const [isEventClosed, setIsEventClosed] = useState(false);
@@ -116,8 +117,8 @@ const QuizView = () => {
             localStorage.setItem('dromoney_event_scores', JSON.stringify(savedScores));
             
             // Add coins locally for immediate feedback
-            const coinPrize = s * 10;
-            addCoins(coinPrize, `Quiz Prize: ${eventData?.title || 'Event'}`, id);
+            const baseCoinPrize = eventData?.config?.reward || s * 10;
+            addCoins(baseCoinPrize, `Quiz Prize: ${eventData?.title || 'Event'}`, id);
             taskStorage.markComplete(id);
 
             try {
@@ -208,9 +209,14 @@ const QuizView = () => {
                         <span className="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-[12px] font-medium uppercase tracking-widest border border-blue-100">
                             Question {currentQuestion + 1}/{totalQ}
                         </span>
-                        <div className="flex items-center gap-2 bg-rose-50 px-4 py-1.5 rounded-full border border-rose-100">
+                        <div className="flex items-center gap-2 bg-rose-50 px-4 py-1.5 rounded-full border border-rose-100 relative">
                             <Timer size={16} className={`text-rose-500 ${timeLeft < 5 ? 'animate-pulse' : ''}`} />
                             <span className={`text-[14px] font-medium ${timeLeft < 5 ? 'text-rose-600' : 'text-slate-700'}`}>{timeLeft}s</span>
+                            {isSupportBoosterActive && (
+                                <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[7px] font-bold text-[#F59E0B] bg-amber-50 px-1 py-0.5 rounded border border-amber-200 uppercase whitespace-nowrap">
+                                    +3s Boost
+                                </span>
+                            )}
                         </div>
                     </div>
                     {/* Progress Bar */}
@@ -297,7 +303,10 @@ const QuizView = () => {
                         </div>
                         <div className="text-left">
                             <p className="text-[9px] font-medium text-amber-600 uppercase leading-none mb-1">Total Prize</p>
-                            <p className="text-lg font-medium text-slate-800 tracking-tight leading-none">+{score * 10} Coins</p>
+                            <p className="text-lg font-medium text-slate-800 tracking-tight leading-none">+{isTaskBoosterActive ? score * 30 : score * 10} Coins</p>
+                            {isTaskBoosterActive && (
+                                <p className="text-[8px] font-bold text-sky-500 uppercase mt-1">3X Boost Applied</p>
+                            )}
                         </div>
                     </div>
                 </div>

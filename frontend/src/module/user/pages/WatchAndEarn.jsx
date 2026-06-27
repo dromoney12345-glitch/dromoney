@@ -16,6 +16,13 @@ const WatchAndEarn = () => {
         setTimeout(() => setToast(null), 4000);
     };
 
+    const [isRefreshingCoins, setIsRefreshingCoins] = useState(false);
+    const handleRefreshCoins = async () => {
+        setIsRefreshingCoins(true);
+        await refreshUserProfile(false);
+        setIsRefreshingCoins(false);
+    };
+
     const fetchStatus = async () => {
         setLoading(true);
         try {
@@ -143,6 +150,9 @@ const WatchAndEarn = () => {
                         <p className="text-indigo-200 text-[10px] opacity-70">Get extra coins daily!</p>
                     </div>
                     <div className="flex items-center gap-2">
+                        <button onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-8 h-8 flex items-center justify-center bg-white/10 text-white rounded-full border border-white/20 active:scale-95 transition-all">
+                            <RefreshCw size={14} className={isRefreshingCoins ? 'animate-spin' : ''} />
+                        </button>
                         <div className="flex items-center gap-1 bg-white/15 px-2.5 py-1 rounded-full border border-white/15">
                             <Coins size={11} className="text-yellow-300 fill-yellow-300" />
                             <span className="text-[11px] text-white">{userData?.coins?.total || 0}</span>

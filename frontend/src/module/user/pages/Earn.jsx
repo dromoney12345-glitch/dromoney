@@ -6,7 +6,7 @@ import {
     ChevronLeft, ChevronRight, ChevronDown,
     Monitor, Play, Lightbulb, Disc, MessageCircle,
     Camera, ThumbsUp, MessageSquare, Link2,
-    Coins, Bell, ClipboardList, TrendingUp, AlertCircle, Rocket, Zap, CheckCircle2
+    Coins, Bell, ClipboardList, TrendingUp, AlertCircle, Rocket, Zap, CheckCircle2, RefreshCw
 } from 'lucide-react';
 import UnlockModal from '../components/UnlockModal';
 import PaymentModal from '../components/PaymentModal';
@@ -33,19 +33,32 @@ const ICON_MAP = {
 import api from '../../shared/services/api';
 
 const Earn = () => {
-    const { userData, refreshUserProfile } = useUser();
+    const { userData, refreshUserProfile, boostersConfig, fetchNotifications } = useUser();
     const { isPaid, isBoosterActive } = userData;
+    const isTaskBoosterActive = userData?.isTaskBoosterActive;
     const [isUnlockOpen, setIsUnlockOpen] = useState(false);
     const [isBoosterExpanded, setIsBoosterExpanded] = useState(false);
     const [isPaymentOpen, setIsPaymentOpen] = useState(false);
     const navigate = useNavigate();
+    const [isRefreshingCoins, setIsRefreshingCoins] = useState(false);
+
+    const handleRefreshCoins = async () => {
+        setIsRefreshingCoins(true);
+        await refreshUserProfile(false);
+        setIsRefreshingCoins(false);
+    };
+
+    useEffect(() => {
+        // Fetch latest booster config immediately when user visits earn page without hard refresh
+        if (fetchNotifications) fetchNotifications();
+    }, []);
 
     // DYNAMIC TASKS STATE
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [settings, setSettings] = useState(null);
     const [isWithinWindow, setIsWithinWindow] = useState(true);
-    const [boosterData, setBoosterData] = useState({ title: '₹49 Task Booster', subtitle: 'Priority Enabled', price: 49 });
+    const [boosterData, setBoosterData] = useState({ title: '₹49 Daily Boost Pass', subtitle: 'Priority Enabled', price: 49, benefits: [] });
 
     useEffect(() => {
         const loadTasks = async () => {
@@ -79,7 +92,8 @@ const Earn = () => {
                         setBoosterData({
                             title: taskBooster.title,
                             subtitle: taskBooster.subtitle || 'Priority Enabled',
-                            price: taskBooster.price || 49
+                            price: taskBooster.price || 49,
+                            benefits: taskBooster.benefits || []
                         });
                     }
                 }
@@ -114,6 +128,15 @@ const Earn = () => {
         loadSettings();
     }, []);
 
+    const formatTime = (timeStr) => {
+        if (!timeStr) return '';
+        const [h, m] = timeStr.split(':');
+        const hours = parseInt(h, 10);
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const hr12 = hours % 12 || 12;
+        return `${hr12}:${m} ${ampm}`;
+    };
+
     // Get actually completed tasks dynamically from backend userData (and fallback storage)
     const completedTasks = (() => {
         const dbCompleted = userData.completedTasks || [];
@@ -133,7 +156,7 @@ const Earn = () => {
         return userData.dailyTaskCompletions?.some(c => 
             String(c.taskId) === String(taskId) && 
             new Date(c.completedAt) >= twentyFourHoursAgo
-        );
+        ) || completedTasks.includes(String(taskId));
     }).length;
     const remainingCount = Math.max(0, totalCount - completedCount);
 
@@ -193,11 +216,16 @@ const Earn = () => {
                     </button>
                     <h1 className="text-[17px] font-medium text-slate-800 tracking-tight">Tasks</h1>
                 </div>
-                <div className="flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-100">
-                    <div className="w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center">
-                        <Coins size={11} className="text-white" />
+                <div className="flex items-center gap-2">
+                    <button onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-8 h-8 flex items-center justify-center bg-slate-50 text-slate-400 rounded-full border border-slate-200 active:scale-95 transition-all">
+                        <RefreshCw size={14} className={isRefreshingCoins ? 'animate-spin' : ''} />
+                    </button>
+                    <div className="flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-100">
+                        <div className="w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center">
+                            <Coins size={11} className="text-white" />
+                        </div>
+                        <span className="text-[13px] font-medium text-amber-700">{userData.coins?.total || 0}</span>
                     </div>
-                    <span className="text-[13px] font-medium text-amber-700">{userData.coins?.total || 0}</span>
                 </div>
             </div>
 
@@ -221,19 +249,33 @@ const Earn = () => {
                         </div>
                     </div>
                     {/* Coin Bag Illustration */}
-                    <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-2xl border border-amber-100 shadow-sm">
+                    <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-2xl border border-amber-100 shadow-sm shrink-0">
                         💰
                     </div>
                 </div>
 
-                {!isWithinWindow && (
-                    <div className="mx-4 mt-6 bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center">
-                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <span className="text-3xl">⏰</span>
+                {settings?.taskWindowStart && settings?.taskWindowEnd && (
+                    <div className="mx-4 mt-4 bg-sky-50/70 border border-sky-100 rounded-xl p-3 flex items-center gap-3">
+                        <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center shrink-0">
+                            <span className="text-sky-500 text-lg">⏰</span>
                         </div>
-                        <h3 className="text-[15px] font-medium text-slate-800 tracking-tight">Tasks are Sleeping</h3>
-                        <p className="text-[12px] font-medium text-slate-500 mt-2 leading-relaxed">
-                            Tasks are only available between <span className="text-emerald-600 font-semibold">{settings?.taskWindowStart}</span> and <span className="text-emerald-600 font-semibold">{settings?.taskWindowEnd}</span>. Please come back later to earn coins!
+                        <div>
+                            <h4 className="text-[11px] font-bold text-sky-700 uppercase tracking-wider mb-0.5">Operating Hours</h4>
+                            <p className="text-[11px] font-medium text-slate-600">
+                                Tasks are open between <span className="text-sky-600 font-bold">{formatTime(settings.taskWindowStart)}</span> and <span className="text-sky-600 font-bold">{formatTime(settings.taskWindowEnd)}</span> daily.
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {!isWithinWindow && (
+                    <div className="mx-4 mt-4 bg-rose-50 border border-rose-100 rounded-2xl p-6 text-center">
+                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-rose-100">
+                            <span className="text-3xl opacity-80">😴</span>
+                        </div>
+                        <h3 className="text-[15px] font-semibold text-rose-800 tracking-tight">Tasks are Sleeping!</h3>
+                        <p className="text-[12px] font-medium text-rose-600/80 mt-2 leading-relaxed">
+                            Come back during the operating hours to earn more coins.
                         </p>
                     </div>
                 )}
@@ -251,7 +293,7 @@ const Earn = () => {
                         isCompleted = userData.dailyTaskCompletions?.some(c => 
                             String(c.taskId) === String(taskId) && 
                             new Date(c.completedAt) >= twentyFourHoursAgo
-                        );
+                        ) || completedTasks.includes(String(taskId));
 
                         return (
                             <div
@@ -282,9 +324,38 @@ const Earn = () => {
 
                                 {/* Right Side: Coins & Action */}
                                 <div className="flex flex-col items-end gap-1.5 min-w-[85px] shrink-0">
-                                    <span className="text-[10px] font-medium text-slate-400 mb-0.5 whitespace-nowrap">
-                                        {task.coinsReward || task.reward} Coins
-                                    </span>
+                                    {(() => {
+                                        const getTaskOptionName = (type) => {
+                                            switch (type) {
+                                                case 'Quiz': return 'Task Quiz';
+                                                case 'Spin': return 'Lucky Draw';
+                                                case 'Memory': return 'Memory Master';
+                                                case 'Treasure': return 'Treasure Chest';
+                                                case 'Scratch': return 'Scratch Card';
+                                                case 'Tapper': return 'Speed Tapper';
+                                                case 'Watch': 
+                                                case 'Video': return 'Watch & Earn';
+                                                default: return 'General Tasks';
+                                            }
+                                        };
+                                        const taskOptionName = getTaskOptionName(task.type);
+                                        const apply3x = isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes(taskOptionName));
+                                        const baseCoins = task.coinsReward || task.reward || 0;
+                                        const displayCoins = apply3x ? baseCoins * 3 : baseCoins;
+
+                                        return (
+                                            <div className="flex flex-col items-end">
+                                                <span className="text-[10px] font-bold text-slate-700 whitespace-nowrap">
+                                                    {displayCoins} Coins
+                                                </span>
+                                                {apply3x && (
+                                                    <span className="text-[8px] font-bold text-[#F59E0B] whitespace-nowrap bg-amber-50 px-1 py-0.5 rounded border border-amber-200 mt-0.5">
+                                                        3x Booster Applied
+                                                    </span>
+                                                )}
+                                            </div>
+                                        );
+                                    })()}
                                     
                                     {!isCompleted ? (
                                         <button className="px-3.5 py-1.5 bg-[#2563EB] hover:bg-blue-700 text-white text-[10px] font-medium uppercase tracking-wider rounded-xl shadow-sm transition-all duration-200 active:scale-95 leading-none min-w-[76px] text-center">
@@ -344,14 +415,19 @@ const Earn = () => {
                     {/* Expandable Benefits */}
                     {isBoosterExpanded && (
                         <div className="bg-white border-t border-amber-100 px-4 py-3 space-y-3">
-                            {[
-                                { icon: <Bell size={16} className="text-yellow-500" fill="currentColor" />, bg: 'bg-yellow-50', title: 'Fast Notifications', desc: 'Tasks and updates instantly' },
-                                { icon: <ClipboardList size={16} className="text-green-500" />, bg: 'bg-green-50', title: 'Early Task Access', desc: 'New tasks are available first' },
-                                { icon: <Coins size={16} className="text-amber-500" fill="currentColor" />, bg: 'bg-amber-50', title: '3X Coin Earnings', desc: '1 task = 3 coins' },
-                                { icon: <Lightbulb size={16} className="text-yellow-400" fill="currentColor" />, bg: 'bg-yellow-50', title: 'Business Ideas First', desc: 'Early access to new ideas' },
-                                { icon: <AlertCircle size={16} className="text-orange-500" fill="currentColor" />, bg: 'bg-orange-50', title: 'Priority Alerts', desc: 'Important alerts sent first' },
-                                { icon: <Rocket size={16} className="text-pink-500" fill="currentColor" />, bg: 'bg-pink-50', title: 'Faster Growth', desc: 'Earn coins 3X faster' },
-                            ].map((b, i) => (
+                            {(boosterData.benefits && boosterData.benefits.length > 0 
+                                ? boosterData.benefits.map((benefitStr, i) => ({
+                                    icon: <Rocket size={16} className="text-emerald-500" fill="currentColor" />, 
+                                    bg: 'bg-emerald-50', 
+                                    title: benefitStr, 
+                                    desc: 'Exclusive booster perk'
+                                }))
+                                : [
+                                    { icon: <Coins size={16} className="text-amber-500" fill="currentColor" />, bg: 'bg-amber-50', title: '3X Coins on Tasks', desc: '1 task = 3 coins' },
+                                    { icon: <Zap size={16} className="text-emerald-500" fill="currentColor" />, bg: 'bg-emerald-50', title: 'Fast Rewards Processing', desc: 'Priority handling' },
+                                    { icon: <CheckCircle2 size={16} className="text-blue-500" fill="currentColor" />, bg: 'bg-blue-50', title: 'Priority Task Verification', desc: 'Get verified first' },
+                                ]
+                            ).map((b, i) => (
                                 <div key={i} className="flex items-center gap-3">
                                     <div className={`w-8 h-8 ${b.bg} rounded-lg flex items-center justify-center shrink-0`}>
                                         {b.icon}

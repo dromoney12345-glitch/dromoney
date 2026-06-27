@@ -41,6 +41,15 @@ const KycModal = ({ isOpen, onClose }) => {
         }
     };
 
+    const formatTime = (timeStr) => {
+        if (!timeStr) return '';
+        const [h, m] = timeStr.split(':');
+        const hours = parseInt(h, 10);
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const hr12 = hours % 12 || 12;
+        return `${hr12}:${m} ${ampm}`;
+    };
+
     if (!isOpen) return null;
 
     const handleFileChange = (e) => {
@@ -170,11 +179,19 @@ const KycModal = ({ isOpen, onClose }) => {
                             </div>
                             <h3 className="text-[15px] font-medium text-slate-800 tracking-tight">KYC Submissions Closed</h3>
                             <p className="text-[12px] font-medium text-slate-500 leading-relaxed">
-                                KYC submissions are only accepted between <span className="text-emerald-600 font-semibold">{settings?.kycWindowStart}</span> and <span className="text-emerald-600 font-semibold">{settings?.kycWindowEnd}</span>.
+                                KYC submissions are only accepted between <span className="text-emerald-600 font-semibold">{formatTime(settings?.kycWindowStart)}</span> and <span className="text-emerald-600 font-semibold">{formatTime(settings?.kycWindowEnd)}</span>.
                             </p>
                         </div>
                     ) : status === 'not started' || status === 'rejected' ? (
                         <div className="p-4 space-y-4">
+                            {settings?.kycWindowStart && settings?.kycWindowEnd && (
+                                <div className="bg-sky-50 rounded-xl p-3 border border-sky-100 flex items-center gap-2 mb-2">
+                                    <Clock className="text-sky-500 shrink-0" size={16} />
+                                    <p className="text-[10px] font-medium text-sky-700 leading-snug">
+                                        Submissions close at <span className="font-bold">{formatTime(settings.kycWindowEnd)}</span>.
+                                    </p>
+                                </div>
+                            )}
                             <div className="space-y-1">
                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Aadhaar Number</label>
                                 <input 

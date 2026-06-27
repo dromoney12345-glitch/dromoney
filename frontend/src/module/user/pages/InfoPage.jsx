@@ -195,7 +195,7 @@ const InfoPage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-white flex flex-col items-center justify-center font-poppins">
+            <div className="max-w-md mx-auto shadow-2xl min-h-screen bg-white flex flex-col items-center justify-center font-poppins">
                 <div className="w-12 h-12 border-4 border-slate-100 border-t-red-500 rounded-full animate-spin"></div>
                 <p className="mt-4 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] animate-pulse">Syncing Design...</p>
             </div>
@@ -206,7 +206,7 @@ const InfoPage = () => {
 
     // Premium Layout for Information Pages
     return (
-        <div className="flex flex-col min-h-screen bg-[#F8FAFC] font-poppins pb-24 relative overflow-hidden">
+        <div className="max-w-md mx-auto shadow-2xl flex flex-col min-h-screen bg-[#F8FAFC] font-poppins pb-24 relative overflow-hidden">
             {/* Ultra-Compact Header Row - Navy Blue Theme */}
             <div className="relative h-16 bg-gradient-to-br from-[#0B1221] to-[#1E293B] rounded-b-3xl shadow-lg overflow-hidden flex items-center px-5">
                 {/* Decorative Elements */}

@@ -61,9 +61,9 @@ const HelpCenter = () => {
     };
 
     return (
-        <div className="fixed inset-0 top-[48px] bottom-[80px] flex flex-col bg-[#F1F9F3] overflow-hidden z-0">
+        <div className="flex flex-col min-h-screen bg-[#F1F9F3] font-poppins pb-24">
             {/* Ultra-Compact Header Row - Navy Blue Theme */}
-            <div className="relative shrink-0 bg-gradient-to-br from-[#0B1221] to-[#1E293B] rounded-b-3xl shadow-lg overflow-hidden flex items-center px-5" style={{ height: '72px' }}>
+            <div className="sticky top-0 z-40 shrink-0 bg-gradient-to-br from-[#0B1221] to-[#1E293B] rounded-b-3xl shadow-lg overflow-hidden flex items-center px-5 py-4 min-h-[72px]">
                 <div className="absolute right-[-10px] top-[-10px] opacity-[0.03] pointer-events-none">
                     <BookOpen size={120} className="text-white" />
                 </div>

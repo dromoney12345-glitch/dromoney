@@ -15,7 +15,7 @@ const QUOTES = [
     "Every coin counts towards your goal."
 ];
 
-const ScratchCard = ({ onComplete, rewardPerCard, quote }) => {
+const ScratchCard = ({ rewardPerCard, quote, onComplete, isTaskBoosterActive }) => {
     const canvasRef = useRef(null);
     const [isScratched, setIsScratched] = useState(false);
     const [isDrawing, setIsDrawing] = useState(false);
@@ -96,6 +96,9 @@ const ScratchCard = ({ onComplete, rewardPerCard, quote }) => {
                     <Coins size={18} className={isScratched ? 'text-white' : 'text-amber-500'} />
                 </div>
                 <p className={`text-[15px] font-medium tracking-tight ${isScratched ? 'text-white' : 'text-slate-800'}`}>+{rewardPerCard} Coins</p>
+                {isTaskBoosterActive && isScratched && (
+                    <span className="text-[7px] font-bold text-sky-200 uppercase bg-black/20 px-1 py-0.5 rounded">3X Boost</span>
+                )}
                 <div className={`h-[1px] w-8 my-1.5 ${isScratched ? 'bg-white/30' : 'bg-slate-100'}`}></div>
                 <p className={`text-[9px] font-medium italic leading-tight px-1 ${isScratched ? 'text-white/80' : 'text-slate-400'}`}>"{quote}"</p>
             </div>
@@ -123,7 +126,8 @@ const ScratchCard = ({ onComplete, rewardPerCard, quote }) => {
 const ScratchCardView = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addCoins, addNotification } = useUser();
+    const { addCoins, addNotification, userData, boostersConfig } = useUser();
+    const isTaskBoosterActive = userData?.isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes('Scratch Card'));
     const [task, setTask] = useState(null);
     const [completedCount, setCompletedCount] = useState(0);
     const [randomQuotes, setRandomQuotes] = useState([]);
@@ -145,8 +149,8 @@ const ScratchCardView = () => {
             }
             return next;
         });
-        const rewardCoins = Math.floor((task?.coinsReward || task?.reward || 0) / 3) || 1;
-        addCoins(rewardCoins, 'Scratch Card Reward', (completedCount + 1 === 3) ? (task?._id || task?.id) : undefined);
+        const baseReward = Math.floor((task?.coinsReward || task?.reward || 0) / 3) || 1;
+        addCoins(baseReward, 'Scratch Card Reward', (completedCount + 1 === 3) ? (task?._id || task?.id) : undefined);
     };
 
     if (!task) return null;
@@ -183,14 +187,18 @@ const ScratchCardView = () => {
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 w-full">
-                    {[0, 1, 2].map((i) => (
-                        <ScratchCard 
-                            key={i} 
-                            rewardPerCard={Math.ceil((task.coinsReward || task.reward || 0) / 3)} 
-                            quote={randomQuotes[i] || ""}
-                            onComplete={handleCardFinish} 
-                        />
-                    ))}
+                    {[0, 1, 2].map((i) => {
+                        const baseRewardPerCard = Math.ceil((task.coinsReward || task.reward || 0) / 3);
+                        return (
+                            <ScratchCard 
+                                key={i} 
+                                rewardPerCard={isTaskBoosterActive ? baseRewardPerCard * 3 : baseRewardPerCard} 
+                                quote={randomQuotes[i] || ""}
+                                onComplete={handleCardFinish} 
+                                isTaskBoosterActive={isTaskBoosterActive}
+                            />
+                        );
+                    })}
                 </div>
 
                 <div className="w-full">

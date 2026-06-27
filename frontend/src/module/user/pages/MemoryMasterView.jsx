@@ -27,10 +27,12 @@ const MemoryMasterView = () => {
     const { userData, addCoins, addNotification, boostersConfig } = useUser();
 
     const [loading, setLoading] = useState(true);
+    const isTaskBoosterActive = userData?.isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes('Memory Master'));
     const [peekTime, setPeekTime] = useState(2.5);
     const [maxTime, setMaxTime] = useState(60);
     const [cardIcons, setCardIcons] = useState(DEFAULT_CARDS);
     const [isEvent, setIsEvent] = useState(false); // true only if opened from Events page
+    const [taskReward, setTaskReward] = useState(1);
 
     const [step, setStep] = useState(0); // 0: Intro, 1: Peek/Ready, 2: Playing, 3: Result
     const [cards, setCards] = useState([]);
@@ -39,6 +41,7 @@ const MemoryMasterView = () => {
     const [timeLeft, setTimeLeft] = useState(60);
     const [moves, setMoves] = useState(0);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [showHowToPlay, setShowHowToPlay] = useState(false);
 
     useEffect(() => {
         const fetchEventDetails = async () => {
@@ -48,17 +51,33 @@ const MemoryMasterView = () => {
                     const cfg = res.data.config;
                     let basePeekTime = cfg?.peekTime || 2.5;
                     const isSupportActive = userData?.isSupportBoosterActive && (!boostersConfig?.support?.length || boostersConfig.support.includes('Memory Master'));
-                    if (isSupportActive) basePeekTime += 2;
+                    let finalMaxTime = cfg?.maxTime || 60;
+                    if (isSupportActive) {
+                        basePeekTime += 3;
+                        finalMaxTime += 3;
+                    }
                     setPeekTime(basePeekTime);
-                    setMaxTime(cfg?.maxTime || 60);
-                    setTimeLeft(cfg?.maxTime || 60);
+                    setMaxTime(finalMaxTime);
+                    setTimeLeft(finalMaxTime);
                     setCardIcons(cfg?.cards || DEFAULT_CARDS);
+                    if (cfg?.reward) {
+                        setTaskReward(cfg.reward);
+                    }
                     setIsEvent(true); // confirmed it's an event
                 }
             } catch (err) {
                 // 404 means this is a task ID, not an event ID — use defaults from taskStorage
                 console.log("Memory Master: Not an event, running as task with defaults");
                 setIsEvent(false);
+                try {
+                    const taskRes = await api.get('/user/data/tasks');
+                    if (taskRes.success) {
+                        const currentTask = taskRes.data.find(t => String(t._id) === String(id) || String(t.id) === String(id));
+                        if (currentTask && currentTask.reward) {
+                            setTaskReward(currentTask.reward);
+                        }
+                    }
+                } catch(e) {}
             } finally {
                 setLoading(false);
             }
@@ -139,8 +158,7 @@ const MemoryMasterView = () => {
     const handleFinish = async (isWin) => {
         setStep(3);
         if (isWin) {
-            const reward = Math.max(10, Math.floor((timeLeft / maxTime) * 100));
-            await addCoins(reward, 'Memory Master Victory', id);
+            await addCoins(taskReward, 'Memory Master Victory', id);
             taskStorage.markComplete(id);
             addNotification('Memory Master Won!', `You completed the challenge with ${timeLeft}s left!`, 'success');
             
@@ -186,6 +204,13 @@ const MemoryMasterView = () => {
                     <h1 className="text-xl font-medium tracking-tight uppercase">🧩 Memory Master</h1>
                 </header>
 
+                <div className="absolute top-6 right-6">
+                    <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full border border-white/15 backdrop-blur-md">
+                        <Coins size={14} className="text-yellow-300 fill-yellow-300" />
+                        <span className="text-sm font-medium text-white">{userData?.coins?.total || 0}</span>
+                    </div>
+                </div>
+
                 <div className="flex-1 flex flex-col items-center justify-center space-y-8 text-center pt-10">
                     <div className="relative">
                         <div className="w-40 h-40 bg-white/10 rounded-[3rem] flex items-center justify-center border-4 border-indigo-400/30 backdrop-blur-xl shadow-[0_0_50px_rgba(129,140,248,0.2)]">
@@ -226,8 +251,43 @@ const MemoryMasterView = () => {
                     >
                         🚀 Enter Game
                     </button>
+                    <button
+                        onClick={() => setShowHowToPlay(true)}
+                        className="w-full bg-white/5 border border-white/10 text-white/70 py-4 rounded-2xl font-medium text-sm uppercase tracking-widest active:scale-[0.98] transition-all"
+                    >
+                        ❓ How to Play
+                    </button>
                     <div className="h-4" />
                 </div>
+
+                {/* How to Play Modal */}
+                {showHowToPlay && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+                        <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl max-w-sm w-full shadow-2xl relative">
+                            <h2 className="text-xl font-medium text-white mb-4">How to Play</h2>
+                            <ul className="space-y-3 text-sm text-slate-300 mb-6">
+                                <li className="flex items-start gap-2">
+                                    <span className="text-indigo-400 mt-0.5">1.</span>
+                                    <span>You will have <strong>{peekTime}s</strong> to memorize the cards at the start.</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-indigo-400 mt-0.5">2.</span>
+                                    <span>Flip cards to find matching pairs before the timer runs out.</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-indigo-400 mt-0.5">3.</span>
+                                    <span>Faster completion = More coins rewarded!</span>
+                                </li>
+                            </ul>
+                            <button
+                                onClick={() => setShowHowToPlay(false)}
+                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-medium transition-colors"
+                            >
+                                Got it!
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
@@ -244,10 +304,22 @@ const MemoryMasterView = () => {
                     </div>
                 </div>
 
+                <div className="absolute top-6 right-6 z-20">
+                    <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full border border-white/15 backdrop-blur-md">
+                        <Coins size={14} className="text-yellow-300 fill-yellow-300" />
+                        <span className="text-sm font-medium text-white">{userData?.coins?.total || 0}</span>
+                    </div>
+                </div>
+
                 <div className="flex items-center gap-3">
-                    <div className="bg-white/5 rounded-2xl p-3 border border-white/10 text-center min-w-[70px]">
+                    <div className="bg-white/5 rounded-2xl p-3 border border-white/10 text-center min-w-[70px] relative">
                         <p className="text-[9px] font-medium text-white/30 uppercase mb-0.5">Time</p>
                         <p className={`text-xl font-medium ${timeLeft < 10 ? 'text-rose-500 animate-pulse' : 'text-white'}`}>{timeLeft}s</p>
+                        {userData?.isSupportBoosterActive && (!boostersConfig?.support?.length || boostersConfig.support.includes('Memory Master')) && (
+                            <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[7px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-1 py-0.5 rounded uppercase whitespace-nowrap">
+                                +3s Boost
+                            </span>
+                        )}
                     </div>
                     <div className="bg-white/5 rounded-2xl p-3 border border-white/10 text-center min-w-[70px]">
                         <p className="text-[9px] font-medium text-white/30 uppercase mb-0.5">Pairs</p>
@@ -331,8 +403,15 @@ const MemoryMasterView = () => {
                             <p className="text-[9px] font-medium text-white/40 uppercase mb-1">Prize</p>
                             <div className="flex items-center justify-center gap-1.5">
                                 <Coins size={14} className="text-amber-400" />
-                                <p className="text-2xl font-medium text-white">+{Math.max(10, Math.floor((timeLeft / maxTime) * 100))}</p>
+                                <p className="text-2xl font-medium text-white">
+                                    +{isTaskBoosterActive ? taskReward * 3 : taskReward}
+                                </p>
                             </div>
+                            {isTaskBoosterActive && (
+                                <span className="block text-center mt-1 text-[8px] font-bold text-sky-400 bg-sky-400/10 border border-sky-400/20 px-1 py-0.5 rounded uppercase">
+                                    3X Boost Applied
+                                </span>
+                            )}
                         </div>
                     </div>
 

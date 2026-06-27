@@ -300,8 +300,8 @@ const Settings = () => {
                                                 <div className="flex items-center gap-3">
                                                     <span className="text-2xl">⏰</span>
                                                     <div>
-                                                        <h4 className="text-[13px] font-medium text-slate-800 uppercase tracking-tight">Daily Task Time Window</h4>
-                                                        <p className="text-[10px] font-medium text-slate-400 mt-1">Specify between what times users are allowed to complete tasks</p>
+                                                        <h4 className="text-[13px] font-medium text-slate-800 uppercase tracking-tight">Daily KYC Time Window</h4>
+                                                        <p className="text-[10px] font-medium text-slate-400 mt-1">Specify between what times users are allowed to complete KYC</p>
                                                     </div>
                                                 </div>
                                                 <span className="bg-white/80 px-2 py-1 rounded-lg text-[9px] font-medium text-slate-400 uppercase tracking-normal border border-slate-200">System Parameter</span>
@@ -312,8 +312,8 @@ const Settings = () => {
                                                     <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal ml-1">Start Time (24H)</label>
                                                     <input 
                                                         type="time" 
-                                                        value={config.taskWindowStart || '00:00'}
-                                                        onChange={(e) => handleChange('taskWindowStart', e.target.value)}
+                                                        value={config.kycWindowStart || '07:00'}
+                                                        onChange={(e) => handleChange('kycWindowStart', e.target.value)}
                                                         className="w-full mt-2 bg-white border border-slate-200 rounded-lg px-4 py-4 text-lg font-medium text-emerald-600 focus:outline-none focus:border-emerald-500 transition-all" 
                                                     />
                                                 </div>
@@ -321,8 +321,8 @@ const Settings = () => {
                                                     <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal ml-1">End Time (24H)</label>
                                                     <input 
                                                         type="time" 
-                                                        value={config.taskWindowEnd || '23:59'}
-                                                        onChange={(e) => handleChange('taskWindowEnd', e.target.value)}
+                                                        value={config.kycWindowEnd || '19:00'}
+                                                        onChange={(e) => handleChange('kycWindowEnd', e.target.value)}
                                                         className="w-full mt-2 bg-white border border-slate-200 rounded-lg px-4 py-4 text-lg font-medium text-emerald-600 focus:outline-none focus:border-emerald-500 transition-all" 
                                                     />
                                                 </div>
