@@ -18,6 +18,7 @@ const Events = () => {
     const [joinedEvents, setJoinedEvents] = useState([]);
     const [toast, setToast] = useState(null);
     const [isRefreshingCoins, setIsRefreshingCoins] = useState(false);
+    const [isJoining, setIsJoining] = useState(false);
 
     const handleRefreshCoins = async () => {
         setIsRefreshingCoins(true);
@@ -140,6 +141,9 @@ const Events = () => {
             return;
         }
 
+        if (isJoining) return;
+        setIsJoining(true);
+
         try {
             const res = await api.post(`/user/data/events/${id}/join`);
             if (res.success) {
@@ -162,6 +166,8 @@ const Events = () => {
             }
         } catch (err) {
             showToast(err.message || "Something went wrong", "error");
+        } finally {
+            setIsJoining(false);
         }
     };
 
@@ -298,7 +304,7 @@ const Events = () => {
                                             if (isJoined) navigateToEvent(event);
                                             else handleJoinEvent(event);
                                         }}
-                                        disabled={isComingSoon}
+                                        disabled={(isComingSoon && !isJoined) || isJoining}
                                         className={`ml-2 px-3 py-2 rounded-xl text-[9px] tracking-widest uppercase transition-all active:scale-95 shrink-0 cursor-pointer ${
                                             isJoined
                                                 ? 'bg-emerald-500 text-white'

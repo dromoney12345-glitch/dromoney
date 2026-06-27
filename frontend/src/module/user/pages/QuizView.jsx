@@ -116,9 +116,12 @@ const QuizView = () => {
             savedScores[id] = s;
             localStorage.setItem('dromoney_event_scores', JSON.stringify(savedScores));
             
-            // Add coins locally for immediate feedback
-            const baseCoinPrize = eventData?.config?.reward || s * 10;
-            addCoins(baseCoinPrize, `Quiz Prize: ${eventData?.title || 'Event'}`, id);
+            // Add coins locally for immediate feedback ONLY if they get all questions correct
+            let baseCoinPrize = 0;
+            if (s === totalQ) {
+                baseCoinPrize = eventData?.config?.reward || s * 10;
+                addCoins(baseCoinPrize, `Quiz Prize: ${eventData?.title || 'Event'}`, id);
+            }
             taskStorage.markComplete(id);
 
             try {
