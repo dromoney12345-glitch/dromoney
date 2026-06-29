@@ -53,6 +53,33 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
     if (taskId) {
         if (mongoose.Types.ObjectId.isValid(taskId)) {
             task = await Task.findById(taskId);
+            
+            if (!task) {
+                // If not a Task, check if it's an Event
+                const Event = require('../models/Event');
+                const event = await Event.findById(taskId);
+                if (event) {
+                    const EventParticipant = require('../models/EventParticipant');
+                    const todayDate = new Date();
+                    todayDate.setHours(0, 0, 0, 0);
+                    
+                    const participant = await EventParticipant.findOne({
+                        event: event._id,
+                        user: user._id,
+                        createdAt: { $gte: todayDate }
+                    });
+                    
+                    if (participant && participant.prizeStatus === 'Awarded') {
+                        return next(new ErrorResponse('You have already claimed the reward for this event today', 400));
+                    }
+                    
+                    // Mark as awarded so they can't claim again today
+                    if (participant) {
+                        participant.prizeStatus = 'Awarded';
+                        await participant.save();
+                    }
+                }
+            }
         }
         if (task) {
             if (task.isDaily) {

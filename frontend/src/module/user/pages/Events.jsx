@@ -128,6 +128,7 @@ const Events = () => {
             case 'Quiz': navigate(`/user/quiz/${id}`); break;
             case 'Draw': navigate(`/user/lucky-draw/${id}`); break;
             case 'Brain': navigate(`/user/memory-master/${id}`); break;
+            case 'Gold': navigate(`/user/gold-production/${id}`); break;
             default: break;
         }
     };
@@ -200,6 +201,15 @@ const Events = () => {
                     statsBg: 'bg-white/60 border border-emerald-100/40',
                     button: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-100',
                     accentIcon: <Lightbulb size={14} className="text-emerald-600" />
+                };
+            case 'Gold':
+                return {
+                    cardBg: 'bg-gradient-to-br from-[#FFFBEB] via-[#FEF3C7] to-[#FDE68A]', // Soft Amber/Gold
+                    border: 'border-amber-200/80',
+                    tagBadge: 'bg-amber-100/80 text-amber-700 border border-amber-300/50',
+                    statsBg: 'bg-white/60 border border-amber-200/40',
+                    button: 'bg-amber-500 hover:bg-amber-600 text-slate-900 shadow-amber-200 font-bold',
+                    accentIcon: <Coins size={14} className="text-amber-600" />
                 };
             default:
                 return {

@@ -183,6 +183,10 @@ const UserSchema = new mongoose.Schema({
         type: { type: String, default: 'info' },
         isRead: { type: Boolean, default: false },
         createdAt: { type: Date, default: Date.now }
+    }],
+    readBroadcasts: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'Notification'
     }]
 
 }, {

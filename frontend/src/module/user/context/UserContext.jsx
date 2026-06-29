@@ -40,6 +40,17 @@ export const UserProvider = ({ children }) => {
     const [boostersConfig, setBoostersConfig] = useState({ support: [], task: [] });
 
     useEffect(() => {
+        // Cache bust for new versions
+        const CURRENT_VERSION = '1.1';
+        if (localStorage.getItem('dromoney_app_version') !== CURRENT_VERSION) {
+            // Preserve token but clear other cached data like notifications
+            const token = localStorage.getItem('dromoney_token');
+            localStorage.clear();
+            if (token) localStorage.setItem('dromoney_token', token);
+            localStorage.setItem('dromoney_app_version', CURRENT_VERSION);
+            window.location.reload();
+        }
+
         if (isAuthenticated) {
             fetchNotifications();
 

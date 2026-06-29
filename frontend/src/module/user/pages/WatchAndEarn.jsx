@@ -99,11 +99,15 @@ const WatchAndEarn = () => {
         if (window.flutter_inappwebview) {
             try {
                 setCalling(true);
-                await window.flutter_inappwebview.callHandler('showRewardAd', 'reward_ad_1');
+                const adResult = await window.flutter_inappwebview.callHandler('showRewardAd', 'reward_ad_1');
                 
-                // Automatically claim reward after Flutter handler finishes showing the ad
-                if (window.refreshRewardStatus) {
-                    await window.refreshRewardStatus();
+                // Only claim reward if Flutter explicitly returns true or we have no return value (older apps)
+                if (adResult === true || adResult === 'true' || adResult === 1 || adResult === undefined) {
+                    if (window.refreshRewardStatus) {
+                        await window.refreshRewardStatus();
+                    }
+                } else {
+                    showToast("No ad available to show right now.", "error");
                 }
             } catch (e) {
                 console.error("Flutter handler error", e);

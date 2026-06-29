@@ -77,6 +77,7 @@ const admin = require('./routes/adminRoutes');
 const chat = require('./routes/chatRoutes');
 const fcm = require('./routes/fcmRoutes');
 const reward = require('./routes/rewardRoutes');
+const payment = require('./routes/payment.routes');
 const errorHandler = require('./middleware/error');
 
 // Mount routers
@@ -88,6 +89,7 @@ app.use('/api/admin', admin);
 app.use('/api/chat', chat);
 app.use('/api/fcm-tokens', fcm);
 app.use('/api/reward', reward);
+app.use('/api/payment', payment);
 
 // Error handler (Must be after routers)
 app.use(errorHandler);
@@ -118,6 +120,10 @@ io.on('connection', (socket) => {
         console.log('Client disconnected:', socket.id);
     });
 });
+
+// Initialize Cron Jobs
+const { startFutureFundCron } = require('./cron/futureFundCron');
+startFutureFundCron();
 
 server.listen(PORT, () => {
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);

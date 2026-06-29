@@ -173,9 +173,14 @@ const Promotions = () => {
                                         </div>
                                         <div className="space-y-1">
                                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">Task Link</p>
-                                            <a href={promo.link} target="_blank" rel="noreferrer" className="text-xs font-medium text-blue-500 hover:underline flex items-center gap-1.5 truncate max-w-[150px]">
-                                                <Globe size={12} /> Visit Link
-                                            </a>
+                                            <div className="flex items-center gap-2">
+                                                <a href={promo.link} target="_blank" rel="noreferrer" className="text-xs font-medium text-blue-500 hover:underline flex items-center gap-1.5 truncate max-w-[100px]">
+                                                    <Globe size={12} /> Visit
+                                                </a>
+                                                <button onClick={() => { navigator.clipboard.writeText(promo.link); showToast('Link Copied!', 'success'); }} className="text-[10px] text-slate-500 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded cursor-pointer transition-all active:scale-95">
+                                                    Copy
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 

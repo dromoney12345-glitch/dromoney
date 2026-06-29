@@ -22,6 +22,7 @@ const defaultTasks = [
         link: 'https://google.com',
         icon: 'Monitor',
         status: 'Active',
+        isDaily: true,
         config: { timer: '15' }
     },
     {
@@ -33,6 +34,7 @@ const defaultTasks = [
         link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         icon: 'Youtube',
         status: 'Active',
+        isDaily: true,
         config: {
             url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
             timer: '30'
@@ -47,6 +49,7 @@ const defaultTasks = [
         link: 'https://dromoney.app/quiz',
         icon: 'Lightbulb',
         status: 'Active',
+        isDaily: true,
         config: {
             question: 'What is the color of the sky?',
             optA: 'Red',
@@ -64,7 +67,8 @@ const defaultTasks = [
         category: 'Other',
         link: 'https://dromoney.com/lucky-draw',
         icon: 'Disc',
-        status: 'Active'
+        status: 'Active',
+        isDaily: true
     },
     {
         title: 'Memory Master',
@@ -74,7 +78,8 @@ const defaultTasks = [
         category: 'Other',
         link: 'https://dromoney.com/memory',
         icon: 'Zap',
-        status: 'Active'
+        status: 'Active',
+        isDaily: true
     },
     {
         title: 'Treasure Chest',
@@ -84,7 +89,8 @@ const defaultTasks = [
         category: 'Other',
         link: 'https://dromoney.com/treasure',
         icon: 'Rocket',
-        status: 'Active'
+        status: 'Active',
+        isDaily: true
     },
     {
         title: 'Speed Tapper',
@@ -94,7 +100,8 @@ const defaultTasks = [
         category: 'Other',
         link: 'https://dromoney.com/tapper',
         icon: 'Zap',
-        status: 'Active'
+        status: 'Active',
+        isDaily: true
     },
     {
         title: 'Magic Scratch Card',
@@ -104,7 +111,8 @@ const defaultTasks = [
         category: 'Other',
         link: 'https://dromoney.com/scratch',
         icon: 'Monitor',
-        status: 'Active'
+        status: 'Active',
+        isDaily: true
     },
     {
         title: 'Share Platform Task',
@@ -114,7 +122,8 @@ const defaultTasks = [
         category: 'WhatsApp',
         link: 'https://dromoney.com',
         icon: 'MessageCircle',
-        status: 'Active'
+        status: 'Active',
+        isDaily: true
     },
     {
         title: 'Like & Follow Task',
@@ -156,20 +165,16 @@ const defaultTasks = [
 
 exports.getTasks = async (req, res, next) => {
     try {
-        let tasks = await Task.find();
-
-        // Auto-seed missing standard tasks to MongoDB if count is low
-        if (!tasks || tasks.length < 10) {
-            for (const dt of defaultTasks) {
-                await Task.updateOne(
-                    { title: dt.title },
-                    { $setOnInsert: dt },
-                    { upsert: true }
-                );
-            }
-            // Re-fetch tasks after seeding
-            tasks = await Task.find();
+        // Auto-seed and always ensure dummy tasks are set to isDaily: true
+        for (const dt of defaultTasks) {
+            await Task.updateOne(
+                { title: dt.title },
+                { $set: { isDaily: true }, $setOnInsert: dt },
+                { upsert: true }
+            );
         }
+        
+        const tasks = await Task.find();
 
         const topTitles = [
             "Sponsored Task",

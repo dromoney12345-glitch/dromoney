@@ -17,7 +17,7 @@ router.get('/content/bulk', getBulkContent);
 router.get('/content/:key', getContent);
 router.get('/banners', getActiveBanners);
 router.get('/boosters', getBoosters); // Public view of boosters
-router.get('/notifications', getPublicNotifications);
+router.get('/notifications', getOptionalUser, getPublicNotifications);
 router.get('/business-ideas', getOptionalUser, getBusinessIdeas);
 router.get('/business-ideas/:id', getOptionalUser, getBusinessIdeaById);
 router.get('/ads', getOptionalUser, getAds);

@@ -161,6 +161,22 @@ exports.getEvent = asyncHandler(async (req, res, next) => {
 exports.createEvent = asyncHandler(async (req, res, next) => {
     const event = await Event.create(req.body);
 
+    if (event.status === 'Active') {
+        try {
+            const { sendBroadcastNotification } = require('./fcmController');
+            await sendBroadcastNotification({
+                title: `New Event: ${event.title}`,
+                body: `A new ${event.tag} event is live! Join now to win ${event.prize || 'rewards'}.`,
+                data: {
+                    type: 'event',
+                    link: '/user/events'
+                }
+            });
+        } catch (pushErr) {
+            console.error('Push broadcast failed:', pushErr.message);
+        }
+    }
+
     res.status(201).json({
         success: true,
         data: event
@@ -227,9 +243,68 @@ exports.getEventParticipants = asyncHandler(async (req, res, next) => {
 exports.updateParticipantStatus = asyncHandler(async (req, res, next) => {
     const { prizeStatus, prizeNote } = req.body;
 
-    let participant = await EventParticipant.findById(req.params.id);
+    let participant = await EventParticipant.findById(req.params.id).populate('user event');
     if (!participant) {
         return next(new ErrorResponse('Participant record not found', 404));
+    }
+
+    if (prizeStatus === 'Awarded' && participant.prizeStatus !== 'Awarded') {
+        const user = participant.user;
+        const prizeStr = participant.prize || prizeNote || participant.event.prize || '';
+        
+        let coinsToAdd = 0;
+        let cashToAdd = 0;
+        
+        // Basic parser: "50 Coins", "₹50", "100"
+        const numMatch = prizeStr.match(/\d+/);
+        const amount = numMatch ? parseInt(numMatch[0]) : 0;
+        
+        if (amount > 0) {
+            if (prizeStr.toLowerCase().includes('coin')) {
+                coinsToAdd = amount;
+            } else {
+                // Default to cash if it's ₹ or unspecified
+                cashToAdd = amount;
+            }
+
+            const Transaction = require('../models/Transaction');
+
+            if (coinsToAdd > 0) {
+                user.coins.balance += coinsToAdd;
+                user.coins.total += coinsToAdd;
+                await Transaction.create({
+                    user: user._id,
+                    type: 'credit',
+                    currency: 'COIN',
+                    amount: coinsToAdd,
+                    source: `Event Reward: ${participant.event.title}`
+                });
+            }
+            if (cashToAdd > 0) {
+                user.wallet.balance += cashToAdd;
+                user.wallet.totalEarned += cashToAdd;
+                await Transaction.create({
+                    user: user._id,
+                    type: 'credit',
+                    currency: 'CASH',
+                    amount: cashToAdd,
+                    source: `Event Reward: ${participant.event.title}`
+                });
+            }
+            await user.save();
+
+            // Send Push Notification
+            try {
+                const { sendNotificationToUser } = require('./fcmController');
+                await sendNotificationToUser(user._id, {
+                    title: '🎉 You Won!',
+                    body: `Congratulations! You won ${prizeStr} in ${participant.event.title}.`,
+                    data: { type: 'reward', link: '/user/wallet' }
+                });
+            } catch (e) {
+                console.error('Failed to send win notification:', e.message);
+            }
+        }
     }
 
     participant.prizeStatus = prizeStatus;

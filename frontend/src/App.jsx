@@ -28,6 +28,7 @@ import MemoryMasterView from './module/user/pages/MemoryMasterView';
 import ScratchCardView from './module/user/pages/ScratchCardView';
 import SpeedTapperView from './module/user/pages/SpeedTapperView';
 import TreasureChestView from './module/user/pages/TreasureChestView';
+import GoldProductionView from './module/user/pages/GoldProductionView';
 
 // Auth Pages
 import AuthLayout from './module/user/auth/AuthLayout';
@@ -228,6 +229,7 @@ function App() {
             <Route path="/user/scratch-card/:id" element={<ProtectedUserRoute><ScratchCardView /></ProtectedUserRoute>} />
             <Route path="/user/speed-tapper/:id" element={<ProtectedUserRoute><SpeedTapperView /></ProtectedUserRoute>} />
             <Route path="/user/treasure-chest/:id" element={<ProtectedUserRoute><TreasureChestView /></ProtectedUserRoute>} />
+            <Route path="/user/gold-production/:id" element={<ProtectedUserRoute><GoldProductionView /></ProtectedUserRoute>} />
             <Route path="/user/contest/:id" element={<ProtectedUserRoute><ContestView /></ProtectedUserRoute>} />
 
             {/* Admin Module Routes (Protected) */}

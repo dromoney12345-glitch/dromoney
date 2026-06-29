@@ -49,6 +49,7 @@ const EventSchema = new mongoose.Schema({
             coins: Number,
             cash: Number
         }],
+        fixedWinningPrizeIndex: { type: Number, default: null }, // Added for fixed winning ticket in Lucky Draw
         // For Memory
         cards: [{
             icon: String,

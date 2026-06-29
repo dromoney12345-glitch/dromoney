@@ -24,6 +24,7 @@ const LuckyDrawView = () => {
     const isTaskBoosterActive = userData?.isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes('Lucky Draw'));
     
     const [prizes, setPrizes] = useState([]);
+    const [fixedWinnerIdx, setFixedWinnerIdx] = useState(null);
     const [loading, setLoading] = useState(true);
     const [taskReward, setTaskReward] = useState(null);
     const [step, setStep] = useState(0);
@@ -33,6 +34,8 @@ const LuckyDrawView = () => {
     const [tickets, setTickets] = useState(['🎫', '🎟️', '🎁', '⭐', '🏆', '💫', '🌟', '🎉']);
     const [flippedTicket, setFlippedTicket] = useState(null);
     const [revealed, setRevealed] = useState(false);
+    const [startTime, setStartTime] = useState(Date.now());
+    const [timeTakenMs, setTimeTakenMs] = useState(0);
 
     useEffect(() => {
         const fetchEventDetails = async () => {
@@ -40,6 +43,9 @@ const LuckyDrawView = () => {
                 const res = await api.get(`/public/events/${id}`);
                 if (res.success && res.data) {
                     setPrizes(res.data.config?.prizes || []);
+                    if (res.data.config?.fixedWinningPrizeIndex >= 0) {
+                        setFixedWinnerIdx(res.data.config.fixedWinningPrizeIndex);
+                    }
                 }
             } catch (err) {
                 if (err.message && err.message.includes('Event not found')) {
@@ -81,7 +87,9 @@ const LuckyDrawView = () => {
 
     const handleStartDraw = () => {
         setStep(1);
-        const winner = Math.floor(Math.random() * activePrizes.length);
+        const winner = fixedWinnerIdx !== null && fixedWinnerIdx < activePrizes.length 
+            ? fixedWinnerIdx 
+            : Math.floor(Math.random() * activePrizes.length);
         setPrizeIndex(winner);
         
         // Spin the wheel
@@ -113,7 +121,8 @@ const LuckyDrawView = () => {
                 // Save participant record to DB dynamically
                 api.post(`/user/data/events/${id}/submit`, {
                     score: null,
-                    result: `Won: ${prize.label}`,
+                    timeTaken: timeTakenMs > 0 ? Math.floor(timeTakenMs / 1000) : 0,
+                    result: `Picked Card ${flippedTicket + 1} - ${prize.label}`,
                     prize: prize.label
                 }).catch(err => console.error("Failed to save submission:", err));
             }
@@ -123,6 +132,7 @@ const LuckyDrawView = () => {
     const handleTicketReveal = (i) => {
         if (flippedTicket !== null || revealed) return;
         setFlippedTicket(i);
+        setTimeTakenMs(Date.now() - startTime);
         setTimeout(() => setRevealed(true), 800);
     };
 

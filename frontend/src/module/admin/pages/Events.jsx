@@ -13,7 +13,8 @@ const TAG_COLORS = {
     Prediction: 'bg-amber-50 text-amber-600 border-amber-100',
     Brain: 'bg-indigo-50 text-indigo-600 border-indigo-100',
     Tapper: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-    Scratch: 'bg-rose-50 text-rose-600 border-rose-100'
+    Scratch: 'bg-rose-50 text-rose-600 border-rose-100',
+    Gold: 'bg-amber-100 text-amber-700 border-amber-200'
 };
 
 const STATUS_COLORS = {
@@ -208,6 +209,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
     const [goldReward, setGoldReward] = useState(40);
     const [peekTime, setPeekTime] = useState(2.5);
     const [maxTime, setMaxTime] = useState(60);
+    const [fixedWinningPrizeIndex, setFixedWinningPrizeIndex] = useState(-1);
 
     const sel = events.find(e => e.id === selectedEventId) || events[0];
 
@@ -225,6 +227,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
             setGoldReward(sel.config?.coinReward || 40);
             setPeekTime(sel.config?.peekTime || 2.5);
             setMaxTime(sel.config?.maxTime || 60);
+            setFixedWinningPrizeIndex(sel.config?.fixedWinningPrizeIndex ?? -1);
         }
     }, [sel]);
 
@@ -277,7 +280,8 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
                         label: p.label,
                         coins: p.coins,
                         cash: p.cash
-                    }))
+                    })),
+                    fixedWinningPrizeIndex: fixedWinningPrizeIndex >= 0 ? fixedWinningPrizeIndex : null
                 }
             });
             if (res.success) {
@@ -398,6 +402,13 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
                     <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
                         {prizes.map((p, idx) => (
                             <div key={p.id || idx} className="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-xl p-3 animate-in fade-in duration-350">
+                                <button
+                                    title="Set as Fixed Winner"
+                                    onClick={() => setFixedWinningPrizeIndex(fixedWinningPrizeIndex === idx ? -1 : idx)}
+                                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${fixedWinningPrizeIndex === idx ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 text-transparent'}`}
+                                >
+                                    <Check size={12} />
+                                </button>
                                 <Gift size={16} className="text-purple-500 shrink-0" />
                                 <input value={p.label} onChange={e => updatePrize(idx, 'label', e.target.value)} className="flex-1 text-sm font-medium text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 outline-none" placeholder="Label (e.g. ₹500)" />
                                 <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-2 py-1.5">

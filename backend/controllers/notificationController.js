@@ -79,8 +79,15 @@ exports.getNotifications = async (req, res, next) => {
 // @access  Public
 exports.getPublicNotifications = async (req, res, next) => {
     try {
-        // Fetch last 10 active broadcasts
-        const notifications = await Notification.find({ isActive: true }).sort('-createdAt').limit(10);
+        let query = { isActive: true };
+        
+        // If user is logged in, don't show notifications that were created before they registered
+        if (req.user) {
+            query.createdAt = { $gte: req.user.createdAt };
+        }
+
+        // Fetch last 10 active broadcasts matching the query
+        const notifications = await Notification.find(query).sort('-createdAt').limit(10);
         res.status(200).json({
             success: true,
             data: notifications

@@ -3,6 +3,7 @@ import { X, ShieldCheck, Loader2, CheckCircle2, AlertCircle, Copy, UploadCloud, 
 import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
 import QRCode from 'react-qr-code';
+import { usePayment } from '../../../hooks/usePayment';
 
 const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK', itemId = null, onSuccess, extraData = {} }) => {
     const [status, setStatus] = useState('idle'); // idle | loading | processing | success | error
@@ -16,6 +17,9 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
     const [screenshot, setScreenshot] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const [copied, setCopied] = useState(false);
+    const [showManual, setShowManual] = useState(false);
+    
+    const { createPayment, loading: zuelpayLoading } = usePayment();
     
     const fileInputRef = useRef(null);
 
@@ -128,6 +132,14 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
     // Construct UPI Link for QR Code
     const upiLink = adminUpiId ? `upi://pay?pa=${adminUpiId}&pn=Dromoney&am=${amount}&cu=INR` : '';
 
+    const handleZuelpay = async () => {
+        const orderType = ['PLATFORM_UNLOCK', 'BUSINESS_HUB_PLAN', 'SUPPORT_CHAT_RENEWAL'].includes(type) 
+            ? 'SUBSCRIPTION' 
+            : 'BOOSTER';
+        
+        await createPayment(amount, orderType, `Plan: ${plan}, Type: ${type}`);
+    };
+
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-5 font-poppins">
             {/* Backdrop */}
@@ -187,8 +199,34 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                 </div>
                             )}
 
-                            <div className="p-5">
-                                {/* QR Code Area */}
+                            {/* ZUELPAY INTEGRATION */}
+                            <div className="p-4 border-b border-slate-100">
+                                <button
+                                    onClick={handleZuelpay}
+                                    disabled={zuelpayLoading || isPlatformAlreadyUnlocked}
+                                    className="w-full py-3.5 rounded-xl text-[12px] font-semibold text-white bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {zuelpayLoading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
+                                    {zuelpayLoading ? 'Processing...' : 'Pay with Zuelpay (Automatic)'}
+                                </button>
+                                
+                                <div className="mt-4 flex items-center justify-center gap-2">
+                                    <div className="h-px bg-slate-200 flex-1"></div>
+                                    <span className="text-[10px] text-slate-400 font-medium uppercase tracking-widest">OR</span>
+                                    <div className="h-px bg-slate-200 flex-1"></div>
+                                </div>
+                                
+                                <button
+                                    onClick={() => setShowManual(!showManual)}
+                                    className="w-full mt-4 py-2.5 rounded-lg text-[11px] font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+                                >
+                                    {showManual ? 'Hide Manual Setup' : 'Use Manual Payment Setup'}
+                                </button>
+                            </div>
+
+                            {showManual && (
+                                <div className="p-5 animate-in fade-in slide-in-from-top-2">
+                                    {/* QR Code Area */}
                                 <div className="flex flex-col items-center justify-center mb-6">
                                     <div className="bg-white p-3 rounded-xl border-2 border-slate-100 shadow-sm mb-3">
                                         {qrScannerImage ? (
@@ -292,6 +330,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                     </button>
                                 </form>
                             </div>
+                            )}
                         </>
                     )}
 

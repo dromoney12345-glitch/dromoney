@@ -14,6 +14,7 @@ const Marketing = () => {
     const [copied, setCopied] = useState(false);
     const [rewardAmount, setRewardAmount] = useState(200);
     const [showReferralLink, setShowReferralLink] = useState(location.state?.showReferral || false);
+    const [showShareModal, setShowShareModal] = useState(false);
 
     const referralLink = userData?.referrals?.link || `https://earningapp.com/join/nhgfAFF-${userData?.referrals?.code || ''}`;
 
@@ -49,9 +50,28 @@ const Marketing = () => {
                 console.log('Share failed or cancelled');
             }
         } else {
-            const message = encodeURIComponent(`Hey! Join Dromoney using my link and start earning ₹${rewardAmount} per referral easily! 🚀\n\n${referralLink}`);
-            window.open(`https://wa.me/?text=${message}`, '_blank');
+            setShowShareModal(true);
         }
+    };
+
+    const shareOnSocial = (platform) => {
+        const message = encodeURIComponent(`Hey! Join Dromoney using my link and start earning ₹${rewardAmount} per referral easily! 🚀\n\n${referralLink}`);
+        const url = encodeURIComponent(referralLink);
+        
+        switch (platform) {
+            case 'whatsapp':
+                window.open(`https://wa.me/?text=${message}`, '_blank');
+                break;
+            case 'telegram':
+                window.open(`https://t.me/share/url?url=${url}&text=${message}`, '_blank');
+                break;
+            case 'facebook':
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+                break;
+            default:
+                break;
+        }
+        setShowShareModal(false);
     };
 
     if (showReferralLink) {
@@ -154,6 +174,44 @@ const Marketing = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* Share Modal */}
+                {showShareModal && (
+                    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
+                        <div className="bg-white w-full sm:w-96 rounded-t-2xl sm:rounded-2xl p-5 animate-in slide-in-from-bottom-full duration-300">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-medium text-slate-800">Share via</h3>
+                                <button onClick={() => setShowShareModal(false)} className="text-slate-400 hover:text-slate-600">✕</button>
+                            </div>
+                            <div className="grid grid-cols-4 gap-4 mb-4">
+                                <button onClick={() => shareOnSocial('whatsapp')} className="flex flex-col items-center gap-2">
+                                    <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
+                                        <Share2 size={20} />
+                                    </div>
+                                    <span className="text-[10px] font-medium text-slate-600">WhatsApp</span>
+                                </button>
+                                <button onClick={() => shareOnSocial('telegram')} className="flex flex-col items-center gap-2">
+                                    <div className="w-12 h-12 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center">
+                                        <Send size={20} />
+                                    </div>
+                                    <span className="text-[10px] font-medium text-slate-600">Telegram</span>
+                                </button>
+                                <button onClick={() => shareOnSocial('facebook')} className="flex flex-col items-center gap-2">
+                                    <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                                        <Users size={20} />
+                                    </div>
+                                    <span className="text-[10px] font-medium text-slate-600">Facebook</span>
+                                </button>
+                                <button onClick={() => { handleCopy(); setShowShareModal(false); }} className="flex flex-col items-center gap-2">
+                                    <div className="w-12 h-12 bg-slate-100 text-slate-600 rounded-full flex items-center justify-center">
+                                        <Copy size={20} />
+                                    </div>
+                                    <span className="text-[10px] font-medium text-slate-600">Copy Link</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }

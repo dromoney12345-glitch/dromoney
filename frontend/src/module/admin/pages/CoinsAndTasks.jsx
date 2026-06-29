@@ -105,7 +105,7 @@ const CoinsAndTasks = () => {
             title: newTaskData.title,
             description: newTaskData.description,
             coinsReward: Number(newTaskData.reward),
-            link: newTaskData.link,
+            link: newTaskData.link ? newTaskData.link.trim() : '',
             isDaily: newTaskData.isDaily,
             config: newTaskData.config
         };
