@@ -1,0 +1,902 @@
+[balance] POST 
+
+[fund_request] POST 
+Payload: {
+    "lamount": 15,
+    "bank": "IDFC BANK-0004",
+    "utr": "389716790601",
+    "category": "TRANSFER",
+    "action": "DELETE"
+    
+}
+
+[pan] POST 
+Payload: {
+    "id_number": "AABC*****E"
+}
+
+[voter] POST 
+Payload: {
+    "id_number": "AABCZ6645E"
+}
+
+[aadhar-genrate-otp] POST 
+Payload: {
+  "id_number": "438735396446"
+}
+
+[aadhar-verify] POST 
+Payload: {
+  "id_number": "123412341234",
+  "client_id": "aadhaar_v2_dcIySSWLROKcyTKORiEy",
+  "otp": "751855"
+}
+
+[upi] POST 
+Payload: {
+  "id_number": "gpay-****@okbizaxis"
+}
+
+[bank] POST 
+Payload: {
+  "id_number": "**900**509**",
+  "ifsc": "RATN0000240"
+}
+
+[licesnce] POST 
+Payload: {
+    "id_number": "WB***114******",
+    "dob": "{{date of birth : exp: year-month-date}}"
+}
+
+[passport] POST 
+Payload: {
+    "id_number": "{{passport file_number}}",
+    "dob": "{{date of birth : exp: year-month-date}}"
+}
+
+[GSTIN LookUp] POST 
+Payload: {
+    "id_number": "19AABCZ6645E1Z2",
+    "filing_status_get": true
+    
+}
+
+[FASTAG] POST 
+Payload: {
+    "rc_number": "TN85C0659"
+    
+}
+
+[operators] GET 
+
+[payment] POST 
+Payload: {
+  "code": "IDP",
+  "number": "9230328725",
+  "agent_id": "ZLP0000000394430307KM14",
+  "amount": "10"
+
+}
+
+[operator_lookup] POST 
+Payload: {
+  "number": "9051689072"
+}
+
+[mobile_recharge_plans] POST 
+Payload: {
+    "code": "RJP",
+    "state_id": "1"
+}
+
+[Get Category] GET 
+
+[Biller Lists] GET 
+
+[Biller Fetch] POST 
+Payload: {
+  "code": "ICT",
+  "agent_id": "ZLP0000000394430301",
+  "param_primary": "TN30AM6971",
+  "optional1": "9432839941",
+  "optional2": "9432839941",
+  "optional3": "",
+  "optional4": ""
+}
+
+[Biller Payment] POST 
+Payload: {
+  "code": "VFC",
+  "agent_id": "ZLP000KLO0000PPLO00P03",
+  "param_primary": "90*******72",
+  "optional1": "",
+  "optional2": "",
+  "optional3": "",
+  "optional4": "",
+  "amount": 10
+
+}
+
+[Get Category] GET 
+
+[Brand Lists] GET 
+
+[Buy Giftcard Voucher] POST 
+Payload: {
+  "code": "AMAZFR",
+  "agent_id": "ZLP000KLO0000PPLO008",
+  "amount": 10,
+  "receiver_name":"mohan ram",
+  "receiver_email":"zuelgiftcard@gmail.com",
+  "receiver_mobile":"6109090921",
+  "gift_message":"Happy birthday gift"
+
+}
+
+[webhook] POST 
+
+[validation] POST 
+Payload: {
+  "code": "RJP",
+  "number": "9432839941",
+  "agent_id": "ZLP0000000394430K309",
+  "amount": 349
+
+}
+
+[cityList] GET 
+
+[flightList] POST 
+Payload: {
+    "FlightSearchDetails": [
+        {
+            "Origin": "BOM",
+            "Destination": " GOI",
+            "BeginDate": "2020-09-29"
+        }
+    ],
+    "EngineID": [
+        7,
+        0,
+        1,
+        5,
+        10,
+        6,
+        11
+    ],
+    "TripType": 0,
+    "Cabin": 0,
+    "Adults": "1",
+    "Childs": "0",
+    "Infants": "0"
+}
+
+[flightRePrice] POST 
+Payload: {
+    "FlightAvailabilityRQ": {
+        "Adults": "1",
+        "Cabin": 0,
+        "Childs": "0",
+        "TraceId": "",
+        "EngineID": [
+            7,
+            0,
+            1,
+            5,
+            10,
+            6,
+            11
+        ],
+        "FlightSearchDetails": [
+            {
+                "Origin": "CCU",
+                "Destination": "DEL",
+                "BeginDate": "2020-09-29"
+            }
+        ],
+        "Infants": "0",
+        "TripType": 0
+    },
+    "Segment": [
+        {
+            "BondType": "OutBound",
+            "Bonds": [
+                {
+                    "BoundType": "OutBound",
+                    "IsBaggageFare": false,
+                    "IsSSR": false,
+                    "ItineraryKey": "b7SqRwmVDL7OJQP+J0ySES9vx7BMZSMJFZdVwW+LEF0=",
+                    "JourneyTime": "02h 25m",
+                    "Legs": [
+                        {
+                            "AircraftCode": "6E",
+                            "AircraftType": "320",
+                            "AirlineName": "6E",
+                            "AirlinePnr": null,
+                            "ArrivalDate": "Tue-29Sep2020",
+                            "ArrivalTerminal": "2",
+                            "ArrivalTime": "03:45",
+                            "AvailableSeat": null,
+                            "BaggageUnit": "KG",
+                            "BaggageWeight": "20",
+                            "BookSeat": null,
+                            "BoundType": "OutBound",
+                            "Cabin": "Economy",
+                            "CabinClasses": null,
+                            "Capacity": 0,
+                            "CarrierCode": "6E",
+                            "CurrencyCode": "INR",
+                            "DepartureDate": "Tue-29Sep2020",
+                            "DepartureTerminal": "",
+                            "DepartureTime": "01:20",
+                            "Destination": "DEL",
+                            "Duration": "02h 25m",
+                            "FareBasisCode": "R0IP",
+                            "FareClassOfService": "R",
+                            "FareRulesKey": null,
+                            "FlightDesignator": null,
+                            "FlightDetailRefKey": "6E~2127~ ~~CCU~09/29/2020 01:20~DEL~09/29/2020 03:45~~",
+                            "FlightName": "Indigo",
+                            "FlightNumber": "2127",
+                            "GDSPnr": null,
+                            "Group": "0",
+                            "IsConnecting": false,
+                            "IsSeatOpen": false,
+                            "LayoverArrDT": null,
+                            "LayoverAt": null,
+                            "LayoverDepDT": null,
+                            "LayoverDuration": null,
+                            "NumberOfStops": "0",
+                            "OperatedBy": "",
+                            "Origin": "CCU",
+                            "ProviderCode": "6E`2127` ``CCU`09/29/2020 01:20`DEL`09/29/2020 03:45``!0`R` `6E`R0IP`1057``0`7``X!!6E`320`2``KG`20`Economy``6E``0`False`0``````02h 25m`R0IP`R",
+                            "Remarks": null,
+                            "SSRDetails": null,
+                            "Sold": 0,
+                            "Status": null
+                        }
+                    ],
+                    "addOnDetail": null
+                }
+            ],
+            "CurrencyCode": "INR",
+            "Deeplink": "",
+            "EngineID": 0,
+            "Fare": {
+                "BasicFare": 3400,
+                "BrandKeys": null,
+                "DueAmount": 0,
+                "ExchangeRate": 0,
+                "FareName": 7,
+                "OfferedFare": 0,
+                "PNRAmount": 0,
+                "PaxFares": [
+                    {
+                        "AirlinePnr": null,
+                        "BaggageUnit": "KG",
+                        "BaggageWeight": "20",
+                        "BaseTransactionAmount": 0,
+                        "BasicFare": 3400,
+                        "Branded": null,
+                        "CancelPenalty": 3000,
+                        "Cashback": 0,
+                        "ChangePenalty": 2500,
+                        "Commission": 0,
+                        "DFValue": "0",
+                        "EquivCurrencyCode": "INR",
+                        "Fare": [
+                            {
+                                "Amount": 1141,
+                                "ChargeCode": "Tax",
+                                "ChargeType": "Tax"
+                            }
+                        ],
+                        "FareBasisCode": "R0IP",
+                        "FareInfoKey": "0~R~ ~6E~R0IP~1057~~0~7~~X",
+                        "FareInfoValue": "R",
+                        "GDSPnr": null,
+                        "IsZeroCancellation": false,
+                        "MarkUP": 0,
+                        "PaxType": 0,
+                        "Refundable": true,
+                        "STF": 0,
+                        "ServiceFee": 0,
+                        "TDS": 0,
+                        "TotalFare": 4541,
+                        "TotalTax": 1141,
+                        "TransactionAmount": 0,
+                        "TransactionFee": 0,
+                        "ZeroCancellationCharge": 100,
+                        "ZeroCancellationValidity": "28"
+                    }
+                ],
+                "RefundAmount": 0,
+                "SeatCharge": 0,
+                "TotalFareWithOutMarkUp": 4541,
+                "TotalTaxWithOutMarkUp": 1141
+            },
+            "FareCategory": 0,
+            "FareIndicator": 0,
+            "FareRule": "CAN-BEF 8760_72:3000|CAN-BEF 72_4:3500|CHG-BEF 8760_72:2500|CHG-BEF 72_4:3000|EMTFee-0|CANCEL-BEF 8760_72:3000|CANCEL-BEF 72_4:3500|CHANGE-BEF 8760_72:2500|CHANGE-BEF 72_4:3000",
+            "Fares": null,
+            "IsBaggageFare": false,
+            "IsBrandAvailable": false,
+            "IsBranded": false,
+            "IsCache": true,
+            "IsHoldBooking": false,
+            "IsInternational": false,
+            "IsRoundTrip": false,
+            "IsSegmentChanged": false,
+            "IsSpecial": false,
+            "IsSpecialId": false,
+            "ItineraryKey": "b7SqRwmVDL7OJQP+J0ySES9vx7BMZSMJFZdVwW+LEF0=",
+            "JourneyIndex": 0,
+            "MemoryCreationTime": "/Date(1598778443084+0530)/",
+            "NearByAirport": false,
+            "PaxSSRs": null,
+            "PromoCode": null,
+            "Remark": "",
+            "SSDetails": null,
+            "SSRDetails": null,
+            "SearchId": "102,ADT:BF=3400.0000 Tax=1141.00000,CHD:BF=0 Tax=0,INF:BF=0 Tax=0,DFValue=0,APFV=4541.00000`1141.00000`3400.0000`3000`2500`0`0`R0IP``KG`20`True`0`0`0`0`,CPFV=,IPFV=,ATB=`Tax:1141.00000,CTB=,ITB=,TBA=3400.0000,TTA=1141.00000,TFA=4541.00000",
+            "Sessionfilepath": null,
+            "ShellPNR": null,
+            "VisaInfo": null,
+            "ZCStatus": false,
+            "description": null
+        }
+    ]
+}
+
+[flightBook] POST 
+Payload: {
+    "BookSegment": [
+        {
+            "BondType": "OutBound",
+            "Bonds": [
+                {
+                    "BoundType": "OutBound",
+                    "IsBaggageFare": false,
+                    "IsSSR": false,
+                    "ItineraryKey": "IY8Y5uF2M9EKQh3DWSNY05f09dBTuoZuqpGfmxUKLEM=",
+                    "JourneyTime": "01h 20m",
+                    "Legs": [
+                        {
+                            "AircraftCode": null,
+                            "AircraftType": "737",
+                            "AirlineName": "SG",
+                            "AirlinePnr": null,
+                            "ArrivalDate": "Thu-29Nov2018",
+                            "ArrivalTerminal": "1B",
+                            "ArrivalTime": "02:10",
+                            "AvailableSeat": null,
+                            "BaggageUnit": "KG",
+                            "BaggageWeight": "15",
+                            "BookSeat": null,
+                            "BoundType": "OutBound",
+                            "Cabin": "ECONOMY",
+                            "CabinClasses": null,
+                            "Capacity": 149,
+                            "CarrierCode": "SG",
+                            "CurrencyCode": "INR",
+                            "DepartureDate": "Thu-29Nov2018",
+                            "DepartureTerminal": "1",
+                            "DepartureTime": "00:50",
+                            "Destination": "GOI",
+                            "Duration": "01h 20m",
+                            "FareBasisCode": "ASAVER",
+                            "FareClassOfService": "A",
+                            "FareRulesKey": null,
+                            "FlightDesignator": null,
+                            "FlightDetailRefKey": null,
+                            "FlightName": "Spicejet",
+                            "FlightNumber": "612",
+                            "GDSPnr": null,
+                            "Group": null,
+                            "IsConnecting": false,
+                            "IsSeatOpen": false,
+                            "LayoverAt": null,
+                            "LayoverDuration": null,
+                            "NumberOfStops": "0",
+                            "OperatedBy": null,
+                            "Origin": "BOM",
+                            "ProviderCode": "SG` 612` ``BOM`11/29/2018 00:50`GOI`11/29/2018 02:10`!0`A``ASAVER`2025``4`X!!`737`1B``KG`15`ECONOMY``SG`1``False`0``````01h 20m`ASAVER`A",
+                            "Remarks": null,
+                            "SSRDetails": null,
+                            "Sold": 0,
+                            "Status": "Normal"
+                        }
+                    ],
+                    "addOnDetail": null
+                }
+            ],
+            "CurrencyCode": null,
+            "Deeplink": "",
+            "EngineID": 1,
+            "Fare": {
+                "BasicFare": 2537,
+                "BrandKeys": null,
+                "ExchangeRate": 0,
+                "PaxFares": [
+                    {
+                        "AirlinePnr": null,
+                        "BaggageUnit": "KG",
+                        "BaggageWeight": "15",
+                        "BaseTransactionAmount": 0,
+                        "BasicFare": 2537,
+                        "Branded": null,
+                        "CancelPenalty": 3000,
+                        "Cashback": 0,
+                        "ChangePenalty": 2500,
+                        "Commission": 0,
+                        "DFValue": "0",
+                        "EquivCurrencyCode": null,
+                        "Fare": [
+                            {
+                                "Amount": 2537,
+                                "ChargeCode": "",
+                                "ChargeType": "FarePrice"
+                            },
+                            {
+                                "Amount": 100,
+                                "ChargeCode": "RCS",
+                                "ChargeType": "TravelFee"
+                            },
+                            {
+                                "Amount": 50,
+                                "ChargeCode": "TRF",
+                                "ChargeType": "TravelFee"
+                            },
+                            {
+                                "Amount": 142,
+                                "ChargeCode": "ADF",
+                                "ChargeType": "TravelFee"
+                            },
+                            {
+                                "Amount": 153,
+                                "ChargeCode": "PSF",
+                                "ChargeType": "TravelFee"
+                            },
+                            {
+                                "Amount": 4,
+                                "ChargeCode": "CGST27",
+                                "ChargeType": "Tax"
+                            },
+                            {
+                                "Amount": 64,
+                                "ChargeCode": "CGST27",
+                                "ChargeType": "Tax"
+                            },
+                            {
+                                "Amount": 4,
+                                "ChargeCode": "SGST27",
+                                "ChargeType": "Tax"
+                            },
+                            {
+                                "Amount": 64,
+                                "ChargeCode": "SGST27",
+                                "ChargeType": "Tax"
+                            },
+                            {
+                                "Amount": 0,
+                                "ChargeCode": "OC",
+                                "ChargeType": "OtherCharge"
+                            }
+                        ],
+                        "FareBasisCode": null,
+                        "FareInfoKey": null,
+                        "FareInfoValue": null,
+                        "GDSPnr": null,
+                        "IsZeroCancellation": false,
+                        "MarkUP": 0,
+                        "PaxType": 0,
+                        "Refundable": true,
+                        "STF": 0,
+                        "ServiceFee": 0,
+                        "TDS": 0,
+                        "TotalFare": 3118,
+                        "TotalTax": 581,
+                        "TransactionAmount": 0,
+                        "TransactionFee": 0,
+                        "ZeroCancellationCharge": 100,
+                        "ZeroCancellationValidity": "28"
+                    }
+                ],
+                "TotalFareWithOutMarkUp": 3118,
+                "TotalTaxWithOutMarkUp": 581
+            },
+            "FareIndicator": 0,
+            "FareRule": "CAN-BEF 4_0:3000|CHG-BEF 4_0:2500|EMTFee-250|CANCEL-BEF 4_0:3000|CHANGE-BEF 4_0:2500",
+            "Fares": null,
+            "IsBaggageFare": false,
+            "IsBranded": false,
+            "IsCache": true,
+            "IsHoldBooking": false,
+            "IsInternational": false,
+            "IsRoundTrip": false,
+            "IsSpecial": false,
+            "IsSpecialId": false,
+            "ItineraryKey": "IY8Y5uF2M9EKQh3DWSNY05f09dBTuoZuqpGfmxUKLEM=",
+            "JourneyIndex": 0,
+            "MemoryCreationTime": "/Date(1542913325687+0530)/",
+            "NearByAirport": false,
+            "PaxSSRs": null,
+            "PromoCode": null,
+            "Remark": "",
+            "SSDetails": null,
+            "SearchId": "107,ADT:BF=2537.0000 Tax=581,CHD:BF=0 Tax=0,INF:BF=0 Tax=0,DFValue=0,APFV=3118`581`2537.0000`3000`2500`0`0```KG`15`True`0`0`0`0`,CPFV=,IPFV=,ATB=`:2537.0000`RCS:100.000`TRF:50.0000`ADF:142.00000`PSF:153.00000`CGST27:4.00000`CGST27:64.00000`SGST27:4.00000`SGST27:64.00000`OC:0,CTB=,ITB=,TBA=2537.0000,TTA=581,TFA=3118.0000",
+            "Sessionfilepath": "",
+            "description": null
+        }
+    ],
+    "EngineID": 7,
+    "EngineIDList": [
+        7,
+        0,
+        1,
+        5,
+        10,
+        6,
+        11
+    ],
+    "IsAndroidBooking": false,
+    "IsDomestic": false,
+    "IPAddress": "203.171.247.16",
+    "InsuranceCharge": "0",
+    "InsuranceStatus": true,
+    "IsAppBooking": false,
+    "PaymentDetails": {
+        "BookingAmount": "3118",
+        "BookingCurrencyCode": "INR"
+    },
+    "Browser": "Crome",
+    "Cabin": 0,
+    "ConvenienceFee": 0,
+    "CouponAmt": 0,
+    "CouponCode": "dgg",
+    "CustomerId": "",
+    "FlightSearchDetails": [
+        {
+            "BeginDate": "2020-09-19",
+            "Cabin": "0",
+            "CurrencyCode": "INR",
+            "Origin": "BOM",
+            "Destination": "GOI"
+        }
+    ],
+    "GSTDetail": {
+        "Address": "Kolkata",
+        "CompanyName": "ZuelPay Services Private Limited",
+        "Email": "zuelpay@gmail.com",
+        "GSTNumber": "16AAVCS6905NAB",
+        "Phone": "9432839941"
+    },
+    "TraceId": "2018122358ed0cac70e145bd00c006cf6b4c28b6",
+    "TransactionId": "TRVL262277227",
+    "Traveller": {
+        "AdultTraveller": [
+            {
+                "CountryCode": "IN",
+                "DOB": "08-03-1963",
+                "EmailAddress": "zuelpay@gmail.com",
+                "FirstName": "Dipak",
+                "FrequentFlierNumber": "",
+                "Gender": 0,
+                "LastName": "Sarkar",
+                "MiddleName": "",
+                "MobileNumber": "9432839941",
+                "Nationality": "Indian",
+                "PassportExpiryDate": "",
+                "PassportNo": "",
+                "ResidentCountry": "IN",
+                "Title": "Mr"
+            }
+        ],
+        "ChildTraveller": [],
+        "InfantTraveller": []
+    },
+    "TripType": 0
+}
+
+[cityList] GET 
+
+[searchBus] GET 
+Payload: {
+    "sourceCity": "Hyderabad",
+    "destinationCity": "Bangalore",
+    "doj": "2025-06-25"
+}
+
+[seatLayout] POST 
+Payload: {
+    "sourceCity": "Hyderabad",
+    "destinationCity": "Chennai",
+    "doj": "2020-09-21",
+    "inventoryType": "0",
+    "routeScheduleId": "23214"
+}
+
+[blockSeat] POST 
+Payload: {
+    "sourceCity": "Hyderabad",
+    "destinationCity": "Chennai",
+    "doj": "2020-09-21",
+    "routeScheduleId": "23214",
+    "boardingPoint": {
+        "id": "2224",
+        "location": "S.R Nagar,ABC Complex KAVERI TRAVELS OFFICE ,Ph No : 7799888678,7799888674",
+        "time": "10:00PM"
+    },
+    "customerName": "test",
+    "customerLastName": "testing",
+    "customerEmail": "test@gmail.com",
+    "customerPhone": "9999999999",
+    "emergencyPhNumber": "8888888888",
+    "customerAddress": "kphp",
+    "blockSeatPaxDetails": [
+        {
+            "age": "26",
+            "name": "test123",
+            "seatNbr": "3L",
+            "sex": "M",
+            "fare": 1280,
+            "totalFareWithTaxes": 1344,
+            "ladiesSeat": false,
+            "lastName": "test456",
+            "mobile": "7777777777",
+            "title": "Mr",
+            "email": "testing@gmail.com",
+            "idType": "PAN",
+            "idNumber": "AWk123232",
+            "nameOnId": "test",
+            "primary": true,
+            "ac": false,
+            "sleeper": false
+        }
+    ],
+    "inventoryType": 0
+}
+
+[bookSeat] GET 
+Payload: {
+    "sourceCity": "Hyderabad",
+    "destinationCity": "Chennai",
+    "doj": "2020-09-21",
+    "routeScheduleId": "23214",
+    "boardingPoint": {
+        "id": "2224",
+        "location": "S.R Nagar,ABC Complex KAVERI TRAVELS OFFICE ,Ph No : 7799888678,7799888674",
+        "time": "10:00PM"
+    },
+    "customerName": "test",
+    "customerLastName": "testing",
+    "customerEmail": "test@gmail.com",
+    "customerPhone": "9999999999",
+    "emergencyPhNumber": "8888888888",
+    "customerAddress": "kphp",
+    "blockSeatPaxDetails": [
+        {
+            "age": "26",
+            "name": "test123",
+            "seatNbr": "3L",
+            "sex": "M",
+            "fare": 1280,
+            "totalFareWithTaxes": 1344,
+            "ladiesSeat": false,
+            "lastName": "test456",
+            "mobile": "7777777777",
+            "title": "Mr",
+            "email": "testing@gmail.com",
+            "idType": "PAN",
+            "idNumber": "AWk123232",
+            "nameOnId": "test",
+            "primary": true,
+            "ac": false,
+            "sleeper": false
+        }
+    ],
+    "inventoryType": 0
+}
+
+[cancelTicket] POST 
+Payload: {
+    "etsTicketNo": "ETS950B0PT10530",
+    "seatNbrsToCancel": [
+        "3L"
+    ]
+}
+
+[biller list] GET 
+
+[Fetch Credit Bill] POST 
+Payload: {
+  "code": "CCFDRLB",
+  "agent_id": "ZLP0000000394430303",
+  "card_number": "1020",
+  "registered_mobile": "6551689072",
+  "customer_name": "PRONAY HALDER",
+  "customer_pan": "JDHPS1669K",
+  "customer_aadhaar": "429282925420",
+  "customer_mobile": "9432839941",
+  "customer_email": "zuelpay3@gmail.com"
+  
+  
+}
+
+[Pay Credit Bill] POST 
+Payload: {
+  "code": "CCUTIB",
+  "agent_id": "ZLP0000000394430305",
+  "card_number": "1020",
+  "registered_mobile": "7651689072",
+  "customer_name": "PRONAY HALDER",
+  "customer_pan": "JDHPS1669K",
+  "customer_aadhaar": "429282925420",
+  "customer_mobile": "9432839941",
+  "customer_email": "zuelpay3@gmail.com",
+  "REFID":"APIZPb8W7A06gwmyVa1k2iN0PKE43001117",
+  "amount":10
+  
+  
+}
+
+[createLink] POST 
+Payload: {
+  
+  "customer_name": "JD SARKAR",
+  "customer_mobile": "9432839941",
+  "customer_email": "zuelpay@gmail.com",
+  "customer_pan": "EDHPS1665t",
+  "customer_aadhaar": "4510030303033",
+   "amount": "50",
+   "pg_type":"OPENMONEY"
+}
+
+[payout] POST 
+Payload: {
+       "account": "11111110000111",
+        "account_name": "Zuelpay",
+        "agent_id": "ZLPO020070088150019002OP01",
+        "amount": "10",
+        "ifsc": "ICIC0002517",
+        "email": "Zuelpay@gmail.com",
+        "mobile": "9432839941",
+        "remark": "Commission Payout",
+        "payment_type": "IMPS"
+}
+
+[balance] GET 
+
+[status] GET 
+
+[create upi deeplink] POST 
+Payload: {"name": "JD SARKAR",
+  "mobile": "6781816751",
+  "email": "ajdhbd@yahoo.com"}
+
+[get virtual account] POST 
+Payload: {
+    "name": "JD SARKAR",
+    "mobile": "6781816751",
+    "email": "ajdhbd@yahoo.com"
+}
+
+[update_utr] POST 
+Payload: {
+  "type": "UPI",
+  "utr": "524331199338"
+}
+
+[create order] POST 
+Payload: {
+    "name": "JD SARKAR",
+    "mobile": "6781816751",
+    "email": "ajdhbd@yahoo.com",
+    "merchant_order_id": "TST0022000330000013",
+    "amount":"10"
+}
+
+[status] GET 
+
+[create order] POST 
+Payload: {
+    "name": "Pronay Halder",
+    "mobile": "9051689072",
+    "email": "zuelpay@gmail.com",
+    "merchant_order_id": "TST00220003300000107",
+    "amount":"10"
+}
+
+[status] GET 
+
+[Rc Details] POST 
+Payload: {
+    "id_number": "GJ06FK8666"
+    
+    
+}
+
+[Get Challan] POST 
+Payload: {
+    "rc_number": "GJ06FK8666",
+    "chassis_number": "MA3FLEB1S00152087",
+    "engine_number": "D13A1956078"
+}
+
+[Pay Challan] POST 
+Payload: {
+  "code": "FHDF",
+  "agent_id": "ZLP000KLO0000PPLO001",
+  "param_primary": "TN63CW5611",
+  "optional1": "9432839941",
+  "amount": 1000,
+  "remark": "Traffic E cHallan Fine",
+  "challan_number": "GJ4160822241201045021"
+
+
+}
+
+[live_rate] GET 
+
+[get_cus] GET 
+
+[add_cus] POST 
+Payload: {
+    "customer_name": "ZUELPAY",
+    "customer_pan": "DZMPS6535L",
+    "customer_aadhaar": "689927867760",
+    "customer_mobile": "8017416521",
+    "customer_email": "zuelpay@gmail.com",
+    "customer_address": "Kolkata,India"
+}
+
+[calculate_rate] POST 
+Payload: {
+    "gold_rate": "15131.07",
+    "type": "buy",
+    "amount": "5000"
+    
+   
+}
+
+[buy_gold] POST 
+Payload: {
+    "customer_id": "D1776256699219mQueU",
+    "blockId": "qEmdWLkq",
+    "merchant_order_id":"ZLPP40045006006",
+    "amount": "2500"
+    
+   
+}
+
+[add_bank] POST 
+Payload: {
+    "customer_id": "D1776256699219mQueU",
+    "bank_account": "1249163305123",
+    "bank_ifsc": "SBIN0010538"
+}
+
+[sell_gold] POST 
+Payload: {
+    "customer_id": "D1776256699219mQueU",
+    "blockId": "9mBn5WpX",
+    "merchant_order_id": "ZLPP400450060ZP06",
+    "quantity": "1.7523",
+    "bank_id": "wv4RIGsWn1s"
+}
+
+[experian_report] POST 
+Payload: {
+  "pan": "FPVPR1234Q",
+  "name": "Vishal Rathore",
+  "mobile": "8890858585"
+}
+
+[equifax_report] POST 
+Payload: {
+  "pan": "FPVPR1234Q",
+  "name": "Vishal Rathore ",
+  "mobile": "8890858585"
+}
+
