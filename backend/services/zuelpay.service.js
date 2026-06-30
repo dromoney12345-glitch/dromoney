@@ -38,7 +38,7 @@ class ZuelpayService {
      */
     async createPayment(orderData) {
         try {
-            const endpoint = `${ZUELPAY_BASE_URL}/pg/order/create`;
+            const endpoint = `${ZUELPAY_BASE_URL}/finance/virtual/upilink`;
             const payload = {
                 merchant_order_id: orderData.orderId,
                 amount: orderData.amount.toString(),
@@ -60,9 +60,16 @@ class ZuelpayService {
             const headers = this.generateHeaders();
             const response = await this.retryRequest(() => axios.post(endpoint, payload, { headers }));
             
-            // Expected Zuelpay response: { status: true, msg: "success", payment_url: "..." }
-            // Let's normalize it to our expected shape if needed, but we'll return the raw data and let the controller handle it
-            return response.data;
+            // Expected Zuelpay response: { result: 0, status: "SUCCESS", payment_link: "...", merchant_order_id: "..." }
+            const responseData = response.data;
+            if (responseData.result !== 0) {
+                throw new Error(responseData.msg || 'Zuelpay request failed');
+            }
+            if (responseData && responseData.payment_link) {
+                // Normalize to expected shape
+                responseData.payment_url = responseData.payment_link;
+            }
+            return responseData;
         } catch (error) {
             const detail = error.response?.data ? JSON.stringify(error.response.data) : error.message;
             console.error('[Zuelpay Create Error]:', detail);
@@ -76,7 +83,7 @@ class ZuelpayService {
     async verifyPayment(orderId) {
         try {
             // Using GET request with query param as per Zuelpay documentation structure for status checking
-            const endpoint = `${ZUELPAY_BASE_URL}/pg/order/status?merchant_order_id=${orderId}`;
+            const endpoint = `${ZUELPAY_BASE_URL}/finance/virtual/status?merchant_order_id=${orderId}`;
             
             if (ZUELPAY_API_KEY === 'dummy_api_key') {
                 console.log('[Mock Zuelpay] Verifying order:', orderId);
@@ -104,7 +111,7 @@ class ZuelpayService {
      */
     async fetchTransaction(transactionId) {
         try {
-            const endpoint = `${ZUELPAY_BASE_URL}/pg/order/status?merchant_order_id=${transactionId}`;
+            const endpoint = `${ZUELPAY_BASE_URL}/finance/virtual/status?merchant_order_id=${transactionId}`;
             const headers = this.generateHeaders();
             const response = await axios.get(endpoint, { headers });
             

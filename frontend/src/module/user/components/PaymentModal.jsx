@@ -175,7 +175,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                     </div>
                                     <div>
                                         <h4 className="text-[12px] font-semibold text-slate-800 line-clamp-1 leading-tight">{plan}</h4>
-                                        <p className="text-[10px] text-slate-500 mt-0.5">Manual Payment Setup</p>
+                                        <p className="text-[10px] text-slate-500 mt-0.5">Zuelpay Secure Payment</p>
                                     </div>
                                 </div>
                                 <div className="text-right shrink-0 ml-2">
@@ -220,7 +220,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                     onClick={() => setShowManual(!showManual)}
                                     className="w-full mt-4 py-2.5 rounded-lg text-[11px] font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
                                 >
-                                    {showManual ? 'Hide Manual Setup' : 'Use Manual Payment Setup'}
+                                    {showManual ? 'Hide Zuelpay Setup' : 'Use Zuelpay Secure Payment'}
                                 </button>
                             </div>
 

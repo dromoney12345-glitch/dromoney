@@ -1,0 +1,301 @@
+[
+  {
+    "name": "create order",
+    "id": "65e97e3a-63bb-4ae2-9e0e-d622b940a601",
+    "protocolProfileBehavior": {
+      "disableBodyPruning": true
+    },
+    "request": {
+      "method": "POST",
+      "header": [
+        {
+          "key": "checkSum",
+          "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+          "type": "text"
+        },
+        {
+          "key": "Token",
+          "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+          "type": "text"
+        }
+      ],
+      "body": {
+        "mode": "raw",
+        "raw": "{\n    \"name\": \"JD SARKAR\",\n    \"mobile\": \"6781816751\",\n    \"email\": \"ajdhbd@yahoo.com\",\n    \"merchant_order_id\": \"TST0022000330000013\",\n    \"amount\":\"10\"\n}",
+        "options": {
+          "raw": {
+            "language": "json"
+          }
+        }
+      },
+      "url": "https://api.zuelpay.in/finance/virtual/upiorder",
+      "urlObject": {
+        "protocol": "https",
+        "path": [
+          "finance",
+          "virtual",
+          "upiorder"
+        ],
+        "host": [
+          "api",
+          "zuelpay",
+          "in"
+        ],
+        "query": [],
+        "variable": []
+      }
+    },
+    "response": [
+      {
+        "id": "ffc3beff-3ee9-4ed7-a873-4082de79ded4",
+        "name": "success",
+        "originalRequest": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "checkSum",
+              "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+              "type": "text"
+            },
+            {
+              "key": "Token",
+              "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"name\": \"JD SARKAR\",\n    \"mobile\": \"6781816751\",\n    \"email\": \"ajdhbd@yahoo.com\",\n    \"merchant_order_id\": \"TST0022000330000012\",\n    \"amount\":\"100\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": "https://api.zuelpay.in/finance/virtual/upiorder"
+        },
+        "status": "OK",
+        "code": 200,
+        "_postman_previewlanguage": "json",
+        "header": [
+          {
+            "key": "Date",
+            "value": "Wed, 10 Sep 2025 17:11:13 GMT"
+          },
+          {
+            "key": "Server",
+            "value": "Apache"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, private"
+          },
+          {
+            "key": "Keep-Alive",
+            "value": "timeout=5, max=100"
+          },
+          {
+            "key": "Connection",
+            "value": "Keep-Alive"
+          },
+          {
+            "key": "Transfer-Encoding",
+            "value": "chunked"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "cookie": [],
+        "responseTime": null,
+        "body": "{\n    \"result\": 0,\n    \"status\": \"SUCCESS\",\n    \"order_id\": \"pt_e368C1Ca304E42B\",\n    \"tlid\": \"UPI1757530670739P9JC7ll\",\n    \"deeplink\": \"upi://pay?pa=open9432839941674@yesbank&pn=collection&tr=qr_pt_e368C1Ca304E42B&am=100&cu=INR&tn=UPI%20QR%20Transaction&mc=8220\",\n    \"paytm\": \"paytmmp://pay?pa=open9432839941674@yesbank&pn=collection&tr=qr_pt_e368C1Ca304E42B&am=100&cu=INR&tn=UPI%20QR%20Transaction&mc=8220\",\n    \"merchant_order_id\": \"TST0022000330000012\"\n}"
+      }
+    ],
+    "_postman_id": "65e97e3a-63bb-4ae2-9e0e-d622b940a601"
+  },
+  {
+    "name": "create order",
+    "id": "f20fe2db-4c01-4fc1-8547-0617285c93d4",
+    "protocolProfileBehavior": {
+      "disableBodyPruning": true
+    },
+    "request": {
+      "method": "POST",
+      "header": [
+        {
+          "key": "checkSum",
+          "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+          "type": "text"
+        },
+        {
+          "key": "Token",
+          "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+          "type": "text"
+        }
+      ],
+      "body": {
+        "mode": "raw",
+        "raw": "{\n    \"name\": \"Pronay Halder\",\n    \"mobile\": \"9051689072\",\n    \"email\": \"zuelpay@gmail.com\",\n    \"merchant_order_id\": \"TST00220003300000107\",\n    \"amount\":\"10\"\n}",
+        "options": {
+          "raw": {
+            "language": "json"
+          }
+        }
+      },
+      "url": "https://api.zuelpay.in/finance/virtual/upilink",
+      "urlObject": {
+        "protocol": "https",
+        "path": [
+          "finance",
+          "virtual",
+          "upilink"
+        ],
+        "host": [
+          "api",
+          "zuelpay",
+          "in"
+        ],
+        "query": [],
+        "variable": []
+      }
+    },
+    "response": [
+      {
+        "id": "5773b0c6-6de0-406f-93c2-6f1b0079a2d4",
+        "name": "success",
+        "originalRequest": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "checkSum",
+              "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+              "type": "text"
+            },
+            {
+              "key": "Token",
+              "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"name\": \"Pronay Halder\",\n    \"mobile\": \"9051689072\",\n    \"email\": \"zuelpay@gmail.com\",\n    \"merchant_order_id\": \"TST00220003300000107\",\n    \"amount\":\"10\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": "https://api.zuelpay.in/finance/virtual/upilink"
+        },
+        "status": "OK",
+        "code": 200,
+        "_postman_previewlanguage": "json",
+        "header": [
+          {
+            "key": "Date",
+            "value": "Thu, 01 Jan 2026 22:20:34 GMT"
+          },
+          {
+            "key": "Server",
+            "value": "Apache"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, private"
+          },
+          {
+            "key": "Keep-Alive",
+            "value": "timeout=5, max=100"
+          },
+          {
+            "key": "Connection",
+            "value": "Keep-Alive"
+          },
+          {
+            "key": "Transfer-Encoding",
+            "value": "chunked"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "cookie": [],
+        "responseTime": null,
+        "body": "{\n    \"result\": 0,\n    \"status\": \"SUCCESS\",\n    \"tlid\": \"IUPI1767306033780JHSW9hI7d\",\n    \"payment_link\": \"https://rzp.io/rzp/Z8JFji3f\",\n    \"merchant_order_id\": \"TST00220003300000107\"\n}"
+      },
+      {
+        "id": "b725677b-4dfb-4308-bcad-d225c27a178b",
+        "name": "create order",
+        "originalRequest": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "checkSum",
+              "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+              "type": "text"
+            },
+            {
+              "key": "Token",
+              "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"name\": \"Pronay Halder\",\n    \"mobile\": \"9051689072\",\n    \"email\": \"zuelpay@gmail.com\",\n    \"merchant_order_id\": \"TST00220003300000108K01\",\n    \"amount\":\"10\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": "https://api.zuelpay.in/finance/virtual/upilink"
+        },
+        "status": "OK",
+        "code": 200,
+        "_postman_previewlanguage": null,
+        "header": [
+          {
+            "key": "Date",
+            "value": "Tue, 12 May 2026 07:20:01 GMT"
+          },
+          {
+            "key": "Server",
+            "value": "Apache"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, private"
+          },
+          {
+            "key": "Upgrade",
+            "value": "h2,h2c"
+          },
+          {
+            "key": "Connection",
+            "value": "Upgrade, Keep-Alive"
+          },
+          {
+            "key": "Keep-Alive",
+            "value": "timeout=5, max=100"
+          },
+          {
+            "key": "Transfer-Encoding",
+            "value": "chunked"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "cookie": [],
+        "responseTime": null,
+        "body": "{\n    \"result\": 0,\n    \"status\": \"SUCCESS\",\n    \"tlid\": \"IUPI1778570400859kOspkS3am\",\n    \"payment_link\": \"upi://pay?ver=01&tn=Collection&pa=0605264609456027473242jsfb@janabank&pn=ZUELPAY%20SERVICES%20PRIVATE%20LIMITED&mc=4900&cu=INR&url=https://www.janabank.com/&mode=15&orgid=159788&purpose=00&am=10.00&mg=ONLINE&qrMedium=00&tr=JFSINDIDQR3672948372722481694476529&QRexpire=2026-05-12T12:55:01.160Z\",\n    \"merchant_order_id\": \"TST00220003300000108K01\"\n}"
+      }
+    ],
+    "_postman_id": "f20fe2db-4c01-4fc1-8547-0617285c93d4"
+  }
+]

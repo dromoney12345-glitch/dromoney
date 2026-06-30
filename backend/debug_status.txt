@@ -1,0 +1,751 @@
+[
+  {
+    "name": "status",
+    "id": "3fdaa8f6-a160-400e-8cc4-2c81839ff983",
+    "protocolProfileBehavior": {
+      "disableBodyPruning": true
+    },
+    "request": {
+      "method": "GET",
+      "header": [
+        {
+          "key": "Token",
+          "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+          "type": "text"
+        },
+        {
+          "key": "checkSum",
+          "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+          "type": "text"
+        }
+      ],
+      "body": {
+        "mode": "raw",
+        "raw": "",
+        "options": {
+          "raw": {
+            "language": "json"
+          }
+        }
+      },
+      "url": "https://api.zuelpay.in/finance/payout/status?agent_id=ZLPO02007008019EDU13",
+      "description": "<div class=\"click-to-expand-wrapper is-table-wrapper\"><table>\n<thead>\n<tr>\n<th><strong>PARAM</strong></th>\n<th>Default</th>\n<th>Mandatory (M) , Optional (O)</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>tlid</td>\n<td>zuelpay transaction id</td>\n<td>O</td>\n</tr>\n<tr>\n<td>agent_id</td>\n<td>your unique order id</td>\n<td>O</td>\n</tr>\n</tbody>\n</table>\n</div>",
+      "urlObject": {
+        "protocol": "https",
+        "path": [
+          "finance",
+          "payout",
+          "status"
+        ],
+        "host": [
+          "api",
+          "zuelpay",
+          "in"
+        ],
+        "query": [
+          {
+            "disabled": true,
+            "key": "tlid",
+            "value": "ZIMP1753273690115HQZ"
+          },
+          {
+            "key": "agent_id",
+            "value": "ZLPO02007008019EDU13"
+          }
+        ],
+        "variable": []
+      }
+    },
+    "response": [
+      {
+        "id": "ee648de1-1f2a-47a3-a4a8-19492c01f1ae",
+        "name": "success",
+        "originalRequest": {
+          "method": "GET",
+          "header": [
+            {
+              "key": "Token",
+              "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+              "type": "text"
+            },
+            {
+              "key": "checkSum",
+              "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": {
+            "raw": "https://api.zuelpay.in/finance/payout/status?agent_id=ZLPO02007008019EDU13",
+            "protocol": "https",
+            "host": [
+              "api",
+              "zuelpay",
+              "in"
+            ],
+            "path": [
+              "finance",
+              "payout",
+              "status"
+            ],
+            "query": [
+              {
+                "key": "tlid",
+                "value": "ZIMP1753273690115HQZ",
+                "disabled": true
+              },
+              {
+                "key": "agent_id",
+                "value": "ZLPO02007008019EDU13"
+              }
+            ]
+          }
+        },
+        "status": "OK",
+        "code": 200,
+        "_postman_previewlanguage": "json",
+        "header": [
+          {
+            "key": "Date",
+            "value": "Thu, 24 Jul 2025 09:09:07 GMT"
+          },
+          {
+            "key": "Server",
+            "value": "Apache"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, private"
+          },
+          {
+            "key": "Keep-Alive",
+            "value": "timeout=5, max=100"
+          },
+          {
+            "key": "Connection",
+            "value": "Keep-Alive"
+          },
+          {
+            "key": "Transfer-Encoding",
+            "value": "chunked"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "cookie": [],
+        "responseTime": null,
+        "body": "{\n    \"created_at\": \"2025-07-23 17:58:10\",\n    \"amount\": 100,\n    \"charged_amount\": 104.72,\n    \"tlid\": \"ZIMP1753273690115HQZ\",\n    \"agent_id\": \"ZLPO02007008019EDU13\",\n    \"bank\": \"IMPS PAYOUT\",\n    \"account\": \"2223333434761529\",\n    \"ifsc\": \"ICIC0002517\",\n    \"utr\": \"520417784756\",\n    \"status\": \"SUCCESS\",\n    \"result\": 0\n}"
+      }
+    ],
+    "_postman_id": "3fdaa8f6-a160-400e-8cc4-2c81839ff983"
+  },
+  {
+    "name": "status",
+    "id": "cb3dfd78-94a7-44a2-8dcf-5042812c0755",
+    "protocolProfileBehavior": {
+      "disableBodyPruning": true
+    },
+    "request": {
+      "method": "GET",
+      "header": [
+        {
+          "key": "Token",
+          "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+          "type": "text"
+        },
+        {
+          "key": "checkSum",
+          "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+          "type": "text"
+        }
+      ],
+      "body": {
+        "mode": "raw",
+        "raw": "",
+        "options": {
+          "raw": {
+            "language": "json"
+          }
+        }
+      },
+      "url": "https://api.zuelpay.in/finance/upi/status?agent_id=ZLPO02007008019EDU13",
+      "description": "<div class=\"click-to-expand-wrapper is-table-wrapper\"><table>\n<thead>\n<tr>\n<th><strong>PARAM</strong></th>\n<th>Default</th>\n<th>Mandatory (M) , Optional (O)</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>tlid</td>\n<td>zuelpay transaction id</td>\n<td>O</td>\n</tr>\n<tr>\n<td>agent_id</td>\n<td>your unique order id</td>\n<td>O</td>\n</tr>\n</tbody>\n</table>\n</div>",
+      "urlObject": {
+        "protocol": "https",
+        "path": [
+          "finance",
+          "upi",
+          "status"
+        ],
+        "host": [
+          "api",
+          "zuelpay",
+          "in"
+        ],
+        "query": [
+          {
+            "disabled": true,
+            "key": "tlid",
+            "value": "ZIMP1753273690115HQZ"
+          },
+          {
+            "key": "agent_id",
+            "value": "ZLPO02007008019EDU13"
+          }
+        ],
+        "variable": []
+      }
+    },
+    "response": [
+      {
+        "id": "0fe523d1-dd64-4f99-ac7c-f7f12ab455b2",
+        "name": "success",
+        "originalRequest": {
+          "method": "GET",
+          "header": [
+            {
+              "key": "Token",
+              "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+              "type": "text"
+            },
+            {
+              "key": "checkSum",
+              "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": {
+            "raw": "https://api.zuelpay.in/finance/upi/status?agent_id=ZLPO02007008019EDU13",
+            "protocol": "https",
+            "host": [
+              "api",
+              "zuelpay",
+              "in"
+            ],
+            "path": [
+              "finance",
+              "upi",
+              "status"
+            ],
+            "query": [
+              {
+                "key": "tlid",
+                "value": "ZIMP1753273690115HQZ",
+                "disabled": true
+              },
+              {
+                "key": "agent_id",
+                "value": "ZLPO02007008019EDU13"
+              }
+            ]
+          }
+        },
+        "status": "OK",
+        "code": 200,
+        "_postman_previewlanguage": "json",
+        "header": [
+          {
+            "key": "Date",
+            "value": "Thu, 24 Jul 2025 09:09:07 GMT"
+          },
+          {
+            "key": "Server",
+            "value": "Apache"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, private"
+          },
+          {
+            "key": "Keep-Alive",
+            "value": "timeout=5, max=100"
+          },
+          {
+            "key": "Connection",
+            "value": "Keep-Alive"
+          },
+          {
+            "key": "Transfer-Encoding",
+            "value": "chunked"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "cookie": [],
+        "responseTime": null,
+        "body": "{\n    \"created_at\": \"2025-07-23 17:58:10\",\n    \"amount\": 100,\n    \"charged_amount\": 104.72,\n    \"tlid\": \"ZIMP1753273690115HQZ\",\n    \"agent_id\": \"ZLPO02007008019EDU13\",\n    \"bank\": \"IMPS PAYOUT\",\n    \"account\": \"2223333434761529\",\n    \"ifsc\": \"ICIC0002517\",\n    \"utr\": \"520417784756\",\n    \"status\": \"SUCCESS\",\n    \"result\": 0\n}"
+      }
+    ],
+    "_postman_id": "cb3dfd78-94a7-44a2-8dcf-5042812c0755"
+  },
+  {
+    "name": "status",
+    "id": "2372142b-a4cc-41f7-a8b3-c6d04b37abdc",
+    "protocolProfileBehavior": {
+      "disableBodyPruning": true
+    },
+    "request": {
+      "method": "GET",
+      "header": [
+        {
+          "key": "Token",
+          "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+          "type": "text"
+        },
+        {
+          "key": "checkSum",
+          "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+          "type": "text"
+        }
+      ],
+      "body": {
+        "mode": "raw",
+        "raw": "",
+        "options": {
+          "raw": {
+            "language": "json"
+          }
+        }
+      },
+      "url": "https://api.zuelpay.in/finance/credit/status?agent_id=ZLPO02007008019EDU13",
+      "description": "<div class=\"click-to-expand-wrapper is-table-wrapper\"><table>\n<thead>\n<tr>\n<th><strong>PARAM</strong></th>\n<th>Default</th>\n<th>Mandatory (M) , Optional (O)</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>tlid</td>\n<td>zuelpay transaction id</td>\n<td>O</td>\n</tr>\n<tr>\n<td></td>\n<td>your unique order id</td>\n<td>O</td>\n</tr>\n</tbody>\n</table>\n</div>",
+      "urlObject": {
+        "protocol": "https",
+        "path": [
+          "finance",
+          "credit",
+          "status"
+        ],
+        "host": [
+          "api",
+          "zuelpay",
+          "in"
+        ],
+        "query": [
+          {
+            "disabled": true,
+            "key": "tlid",
+            "value": "ZIMP1753273690115HQZ"
+          },
+          {
+            "key": "agent_id",
+            "value": "ZLPO02007008019EDU13"
+          }
+        ],
+        "variable": []
+      }
+    },
+    "response": [
+      {
+        "id": "fd9764d2-4bcf-42ab-a4d4-09e1bccc7875",
+        "name": "success",
+        "originalRequest": {
+          "method": "GET",
+          "header": [
+            {
+              "key": "Token",
+              "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+              "type": "text"
+            },
+            {
+              "key": "checkSum",
+              "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": {
+            "raw": "https://api.zuelpay.in/finance/credit/status?agent_id=ZLPO02007008019EDU13",
+            "protocol": "https",
+            "host": [
+              "api",
+              "zuelpay",
+              "in"
+            ],
+            "path": [
+              "finance",
+              "credit",
+              "status"
+            ],
+            "query": [
+              {
+                "key": "tlid",
+                "value": "ZIMP1753273690115HQZ",
+                "disabled": true
+              },
+              {
+                "key": "agent_id",
+                "value": "ZLPO02007008019EDU13"
+              }
+            ]
+          }
+        },
+        "status": "OK",
+        "code": 200,
+        "_postman_previewlanguage": "json",
+        "header": [
+          {
+            "key": "Date",
+            "value": "Thu, 24 Jul 2025 09:09:07 GMT"
+          },
+          {
+            "key": "Server",
+            "value": "Apache"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, private"
+          },
+          {
+            "key": "Keep-Alive",
+            "value": "timeout=5, max=100"
+          },
+          {
+            "key": "Connection",
+            "value": "Keep-Alive"
+          },
+          {
+            "key": "Transfer-Encoding",
+            "value": "chunked"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "cookie": [],
+        "responseTime": null,
+        "body": "{\n    \"created_at\": \"2025-07-23 17:58:10\",\n    \"amount\": 100,\n    \"charged_amount\": 104.72,\n    \"tlid\": \"ZIMP1753273690115HQZ\",\n    \"agent_id\": \"ZLPO02007008019EDU13\",\n    \"bank\": \"IMPS PAYOUT\",\n    \"account\": \"2223333434761529\",\n    \"ifsc\": \"ICIC0002517\",\n    \"utr\": \"520417784756\",\n    \"status\": \"SUCCESS\",\n    \"result\": 0\n}"
+      }
+    ],
+    "_postman_id": "2372142b-a4cc-41f7-a8b3-c6d04b37abdc"
+  },
+  {
+    "name": "status",
+    "id": "433e6246-635d-4043-841e-8973c8023802",
+    "protocolProfileBehavior": {
+      "disableBodyPruning": true
+    },
+    "request": {
+      "method": "GET",
+      "header": [
+        {
+          "key": "Token",
+          "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+          "type": "text"
+        },
+        {
+          "key": "checkSum",
+          "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+          "type": "text"
+        }
+      ],
+      "body": {
+        "mode": "raw",
+        "raw": "",
+        "options": {
+          "raw": {
+            "language": "json"
+          }
+        }
+      },
+      "url": "https://api.zuelpay.in/finance/virtual/status?tlid=UPI1757524271282ZJV0zOF&order_id=pt_1e68c1b130d3BF7",
+      "description": "<div class=\"click-to-expand-wrapper is-table-wrapper\"><table>\n<thead>\n<tr>\n<th><strong>PARAM</strong></th>\n<th>Default</th>\n<th>Mandatory (M) , Optional (O)</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>tlid</td>\n<td>zuelpay transaction id</td>\n<td>O</td>\n</tr>\n<tr>\n<td></td>\n<td>your unique order id</td>\n<td>O</td>\n</tr>\n</tbody>\n</table>\n</div>",
+      "urlObject": {
+        "protocol": "https",
+        "path": [
+          "finance",
+          "virtual",
+          "status"
+        ],
+        "host": [
+          "api",
+          "zuelpay",
+          "in"
+        ],
+        "query": [
+          {
+            "key": "tlid",
+            "value": "UPI1757524271282ZJV0zOF"
+          },
+          {
+            "key": "order_id",
+            "value": "pt_1e68c1b130d3BF7"
+          }
+        ],
+        "variable": []
+      }
+    },
+    "response": [
+      {
+        "id": "83e61f78-2bda-4ade-b628-9518294211ae",
+        "name": "success",
+        "originalRequest": {
+          "method": "GET",
+          "header": [
+            {
+              "key": "Token",
+              "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+              "type": "text"
+            },
+            {
+              "key": "checkSum",
+              "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": {
+            "raw": "https://api.zuelpay.in/finance/credit/status?agent_id=ZLPO02007008019EDU13",
+            "protocol": "https",
+            "host": [
+              "api",
+              "zuelpay",
+              "in"
+            ],
+            "path": [
+              "finance",
+              "credit",
+              "status"
+            ],
+            "query": [
+              {
+                "key": "tlid",
+                "value": "UPI1757524271282ZJV0zOF",
+                "disabled": true
+              },
+              {
+                "key": "agent_id",
+                "value": "ZLPO02007008019EDU13"
+              }
+            ]
+          }
+        },
+        "status": "OK",
+        "code": 200,
+        "_postman_previewlanguage": "json",
+        "header": [
+          {
+            "key": "Date",
+            "value": "Thu, 24 Jul 2025 09:09:07 GMT"
+          },
+          {
+            "key": "Server",
+            "value": "Apache"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, private"
+          },
+          {
+            "key": "Keep-Alive",
+            "value": "timeout=5, max=100"
+          },
+          {
+            "key": "Connection",
+            "value": "Keep-Alive"
+          },
+          {
+            "key": "Transfer-Encoding",
+            "value": "chunked"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "cookie": [],
+        "responseTime": null,
+        "body": "{\n    \"created_at\": \"2025-07-23 17:58:10\",\n    \"amount\": 100,\n    \"charged_amount\": 104.72,\n    \"tlid\": \"ZIMP1753273690115HQZ\",\n    \"agent_id\": \"ZLPO02007008019EDU13\",\n    \"bank\": \"UPI\",\n    \"account\": \"2223333434761529\",\n    \"ifsc\": \"ICIC0002517\",\n    \"utr\": \"520417784756\",\n    \"status\": \"SUCCESS\",\n    \"result\": 0\n}"
+      }
+    ],
+    "_postman_id": "433e6246-635d-4043-841e-8973c8023802"
+  },
+  {
+    "name": "status",
+    "id": "2b11c876-a054-4f35-8b8e-b5e6226a7355",
+    "protocolProfileBehavior": {
+      "disableBodyPruning": true
+    },
+    "request": {
+      "method": "GET",
+      "header": [
+        {
+          "key": "Token",
+          "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+          "type": "text"
+        },
+        {
+          "key": "checkSum",
+          "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+          "type": "text"
+        }
+      ],
+      "body": {
+        "mode": "raw",
+        "raw": "",
+        "options": {
+          "raw": {
+            "language": "json"
+          }
+        }
+      },
+      "url": "https://api.zuelpay.in/finance/virtual/status?merchant_order_id=TST00220003300000107",
+      "description": "<div class=\"click-to-expand-wrapper is-table-wrapper\"><table>\n<thead>\n<tr>\n<th><strong>PARAM</strong></th>\n<th>Default</th>\n<th>Mandatory (M) , Optional (O)</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>tlid</td>\n<td>zuelpay transaction id</td>\n<td>O</td>\n</tr>\n<tr>\n<td></td>\n<td>your unique order id</td>\n<td>O</td>\n</tr>\n</tbody>\n</table>\n</div>",
+      "urlObject": {
+        "protocol": "https",
+        "path": [
+          "finance",
+          "virtual",
+          "status"
+        ],
+        "host": [
+          "api",
+          "zuelpay",
+          "in"
+        ],
+        "query": [
+          {
+            "disabled": true,
+            "key": "tlid",
+            "value": "TST00220003300000107"
+          },
+          {
+            "key": "merchant_order_id",
+            "value": "TST00220003300000107"
+          }
+        ],
+        "variable": []
+      }
+    },
+    "response": [
+      {
+        "id": "910c7929-56d0-4637-be95-6a588517583c",
+        "name": "success",
+        "originalRequest": {
+          "method": "GET",
+          "header": [
+            {
+              "key": "Token",
+              "value": "ZKEYza2COHK0QVkcVkwUb6WeIgWiS",
+              "type": "text"
+            },
+            {
+              "key": "checkSum",
+              "value": "739f448d1cc4f5bbbd048e68ba2b8885b0f8414ed4090ad967df7d15d7cdbbae",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": {
+            "raw": "https://api.zuelpay.in/finance/virtual/status?merchant_order_id=TST00220003300000107",
+            "protocol": "https",
+            "host": [
+              "api",
+              "zuelpay",
+              "in"
+            ],
+            "path": [
+              "finance",
+              "virtual",
+              "status"
+            ],
+            "query": [
+              {
+                "key": "tlid",
+                "value": "TST00220003300000107",
+                "disabled": true
+              },
+              {
+                "key": "merchant_order_id",
+                "value": "TST00220003300000107"
+              }
+            ]
+          }
+        },
+        "status": "OK",
+        "code": 200,
+        "_postman_previewlanguage": "json",
+        "header": [
+          {
+            "key": "Date",
+            "value": "Thu, 01 Jan 2026 22:28:11 GMT"
+          },
+          {
+            "key": "Server",
+            "value": "Apache"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, private"
+          },
+          {
+            "key": "Keep-Alive",
+            "value": "timeout=5, max=100"
+          },
+          {
+            "key": "Connection",
+            "value": "Keep-Alive"
+          },
+          {
+            "key": "Transfer-Encoding",
+            "value": "chunked"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "cookie": [],
+        "responseTime": null,
+        "body": "{\n    \"created_at\": \"2026-01-02 03:50:34\",\n    \"amount\": 10,\n    \"tlid\": \"IUPI1767306033780JHSW9hI7d\",\n    \"merchant_order_id\": \"TST00220003300000107\",\n    \"utr\": \"394767493003\",\n    \"status\": \"SUCCESS\",\n    \"result\": 0\n}"
+      }
+    ],
+    "_postman_id": "2b11c876-a054-4f35-8b8e-b5e6226a7355"
+  }
+]
