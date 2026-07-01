@@ -124,11 +124,12 @@ const Events = () => {
 
     const navigateToEvent = (event) => {
         const id = event._id || event.id;
-        switch (event.tag) {
-            case 'Quiz': navigate(`/user/quiz/${id}`); break;
-            case 'Draw': navigate(`/user/lucky-draw/${id}`); break;
-            case 'Brain': navigate(`/user/memory-master/${id}`); break;
-            case 'Gold': navigate(`/user/gold-production/${id}`); break;
+        const tag = (event.tag || '').toUpperCase();
+        switch (tag) {
+            case 'QUIZ': navigate(`/user/quiz/${id}`); break;
+            case 'DRAW': navigate(`/user/lucky-draw/${id}`); break;
+            case 'BRAIN': navigate(`/user/memory-master/${id}`); break;
+            case 'GOLD': navigate(`/user/gold-production/${id}`); break;
             default: break;
         }
     };
@@ -174,8 +175,9 @@ const Events = () => {
 
     // Pastel palette styles configuration per event tag
     const getPastelTheme = (tag) => {
-        switch (tag) {
-            case 'Quiz':
+        const normalizedTag = (tag || '').toUpperCase();
+        switch (normalizedTag) {
+            case 'QUIZ':
                 return {
                     cardBg: 'bg-gradient-to-br from-[#F5F3FF] via-[#FAF9FF] to-[#EEF2FF]', // Soft Lavender-Indigo
                     border: 'border-purple-100/80',
@@ -184,7 +186,7 @@ const Events = () => {
                     button: 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-100',
                     accentIcon: <Trophy size={14} className="text-indigo-500" />
                 };
-            case 'Draw':
+            case 'DRAW':
                 return {
                     cardBg: 'bg-gradient-to-br from-[#FFF1F2] via-[#FFF8F8] to-[#FFF5F5]', // Soft Rose-Pink
                     border: 'border-rose-100/80',
@@ -193,7 +195,7 @@ const Events = () => {
                     button: 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-100',
                     accentIcon: <Sparkles size={14} className="text-rose-500" />
                 };
-            case 'Brain':
+            case 'BRAIN':
                 return {
                     cardBg: 'bg-gradient-to-br from-[#ECFDF5] via-[#F9FEFB] to-[#F0FDF4]', // Soft Mint-Emerald
                     border: 'border-emerald-100/80',
@@ -202,7 +204,7 @@ const Events = () => {
                     button: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-100',
                     accentIcon: <Lightbulb size={14} className="text-emerald-600" />
                 };
-            case 'Gold':
+            case 'GOLD':
                 return {
                     cardBg: 'bg-gradient-to-br from-[#FFFBEB] via-[#FEF3C7] to-[#FDE68A]', // Soft Amber/Gold
                     border: 'border-amber-200/80',
@@ -337,8 +339,8 @@ const Events = () => {
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
-                                        <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Prize</p>
-                                        <span className="text-[10px] text-emerald-600">{event.prize || '₹500'}</span>
+                                        <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Pool</p>
+                                        <span className="text-[10px] text-emerald-600">50% Auto</span>
                                     </div>
                                     <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
                                         <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Time</p>

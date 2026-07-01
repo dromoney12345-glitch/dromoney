@@ -46,6 +46,7 @@ import CoinsAndTasks from './module/admin/pages/CoinsAndTasks';
 import FutureFundAdmin from './module/admin/pages/FutureFundAdmin';
 import FutureFundReport from './module/admin/pages/FutureFundReport';
 import EventsAdmin from './module/admin/pages/Events';
+import EventsReport from './module/admin/pages/EventsReport';
 import BusinessContent from './module/admin/pages/BusinessContent';
 import Wallets from './module/admin/pages/Wallets';
 import NotificationsAdmin from './module/admin/pages/Notifications';
@@ -248,6 +249,7 @@ function App() {
               <Route path="future-fund/settings" element={<FutureFundAdmin />} />
               <Route path="future-fund/report" element={<FutureFundReport />} />
               <Route path="events" element={<EventsAdmin />} />
+              <Route path="events/report" element={<EventsReport />} />
               <Route path="business-content" element={<BusinessContent />} />
               <Route path="withdrawals" element={<Wallets />} />
               <Route path="notifications" element={<NotificationsAdmin />} />

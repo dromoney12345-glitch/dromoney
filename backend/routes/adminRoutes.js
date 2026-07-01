@@ -23,7 +23,7 @@ const {
     updateBusinessIdea, 
     deleteBusinessIdea 
 } = require('../controllers/businessIdeaController');
-const { getEvents, getEventParticipants, updateParticipantStatus, createEvent, updateEvent, deleteEvent } = require('../controllers/eventController');
+const { getEvents, getEventParticipants, updateParticipantStatus, createEvent, updateEvent, deleteEvent, approveWinners } = require('../controllers/eventController');
 const { getSettings, updateSettings } = require('../controllers/adminSettingsController');
 const { getAdminSubmissions, approveSubmission, rejectSubmission } = require('../controllers/taskSubmissionController');
 
@@ -142,5 +142,10 @@ router.route('/events/:id')
 
 router.get('/events/:id/participants', protectAdmin, getEventParticipants);
 router.put('/events/participants/:id', protectAdmin, updateParticipantStatus);
+router.post('/events/:id/approve-winners', protectAdmin, approveWinners);
+
+// Admin Profit Routes
+const { getAdminProfits } = require('../controllers/adminProfitController');
+router.get('/profits', protectAdmin, getAdminProfits);
 
 module.exports = router;

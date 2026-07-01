@@ -96,6 +96,16 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
                     return next(new ErrorResponse('Task already completed', 400));
                 }
             }
+        } else {
+            // It's a mock task from frontend (e.g., id "1", "2", "3"). Treat as daily task.
+            const today = new Date().setHours(0, 0, 0, 0);
+            const alreadyDoneToday = user.dailyTaskCompletions?.some(c =>
+                String(c.taskId) === String(taskId) &&
+                new Date(c.completedAt).setHours(0, 0, 0, 0) === today
+            );
+            if (alreadyDoneToday) {
+                return next(new ErrorResponse('Task already completed today', 400));
+            }
         }
     }
 
@@ -141,8 +151,8 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
 
     // Track completed tasks dynamically in database
     if (taskId) {
-        if (task && task.isDaily) {
-            // Add to daily completions
+        if ((task && task.isDaily) || !task) {
+            // Add to daily completions (both real daily tasks and mock tasks)
             if (!user.dailyTaskCompletions) {
                 user.dailyTaskCompletions = [];
             }

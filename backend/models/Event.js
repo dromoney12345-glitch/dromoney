@@ -35,6 +35,10 @@ const EventSchema = new mongoose.Schema({
         enum: ['Active', 'Draft', 'Closed', 'Coming Soon', 'Inactive'],
         default: 'Active'
     },
+    isApproved: {
+        type: Boolean,
+        default: false
+    },
     // Configuration for specific types
     config: {
         // For Quiz

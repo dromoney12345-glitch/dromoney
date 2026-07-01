@@ -164,13 +164,11 @@ const UserSchema = new mongoose.Schema({
         default: 0
     },
     completedTasks: [{
-        type: mongoose.Schema.ObjectId,
-        ref: 'Task'
+        type: String // Changed from ObjectId to String to support mock IDs like "1", "2"
     }],
     dailyTaskCompletions: [{
         taskId: {
-            type: mongoose.Schema.ObjectId,
-            ref: 'Task'
+            type: String // Changed from ObjectId to String
         },
         completedAt: {
             type: Date,

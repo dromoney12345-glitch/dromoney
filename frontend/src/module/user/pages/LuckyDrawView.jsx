@@ -27,6 +27,7 @@ const LuckyDrawView = () => {
     const [fixedWinnerIdx, setFixedWinnerIdx] = useState(null);
     const [loading, setLoading] = useState(true);
     const [taskReward, setTaskReward] = useState(null);
+    const [taskTitle, setTaskTitle] = useState('Lucky Draw');
     const [step, setStep] = useState(0);
     const [prizeIndex, setPrizeIndex] = useState(null);
     const [rotationDeg, setRotationDeg] = useState(0);
@@ -51,11 +52,18 @@ const LuckyDrawView = () => {
                 if (err.message && err.message.includes('Event not found')) {
                     // Ignore, it's a task ID not an event ID
                     try {
-                        const taskRes = await api.get('/user/data/tasks');
-                        if (taskRes.success) {
-                            const currentTask = taskRes.data.find(t => String(t._id) === String(id) || String(t.id) === String(id));
-                            if (currentTask && currentTask.reward) {
-                                setTaskReward(currentTask.reward);
+                        const currentTask = taskStorage.getTasks().find(t => String(t._id) === String(id) || String(t.id) === String(id));
+                        if (currentTask) {
+                            if (currentTask.reward) setTaskReward(currentTask.reward);
+                            if (currentTask.title) setTaskTitle(currentTask.title);
+                        } else {
+                            const taskRes = await api.get('/user/data/tasks');
+                            if (taskRes.success) {
+                                const dbTask = taskRes.data.find(t => String(t._id) === String(id) || String(t.id) === String(id));
+                                if (dbTask) {
+                                    if (dbTask.reward) setTaskReward(dbTask.reward);
+                                    if (dbTask.title) setTaskTitle(dbTask.title);
+                                }
                             }
                         }
                     } catch(e) {}
@@ -154,7 +162,7 @@ const LuckyDrawView = () => {
                         <ChevronLeft size={24} className="text-white" />
                     </button>
                     <h1 className="text-xl font-medium tracking-tight uppercase flex items-center gap-2">
-                        🎟️ Lucky Draw
+                        🎟️ {taskTitle}
                         {isSupportBoosterActive && (
                             <span className="bg-amber-400 text-indigo-900 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-widest flex items-center gap-1 shadow-[0_0_15px_rgba(251,191,36,0.5)]">
                                 <Sparkles size={10} /> GOLDEN TICKET

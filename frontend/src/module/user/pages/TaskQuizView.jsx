@@ -56,17 +56,18 @@ const TaskQuizView = () => {
             newScore = score + 1;
             setScore(newScore);
         }
-        setTimeout(() => { handleNext(); }, 1000);
+        setTimeout(() => { handleNext(newScore); }, 1000);
     };
 
-    const handleNext = () => {
+    const handleNext = (latestScore) => {
+        const currentScore = latestScore !== undefined ? latestScore : score;
         if (currentQuestion < QUESTIONS.length - 1) {
             setCurrentQuestion(prev => prev + 1);
             setSelectedOption(null);
             setIsAnswered(false);
             setTimeLeft(isSupportBoosterActive ? 13 : 10);
         } else {
-            handleFinish(score);
+            handleFinish(currentScore);
         }
     };
 
@@ -84,7 +85,7 @@ const TaskQuizView = () => {
                     alert(res?.message || 'Failed to add coins. Please try again later.');
                 }
             } else {
-                taskStorage.markComplete(id); // Mark complete even if lost so they can't retry today
+                taskStorage.markComplete(id);
             }
         }
     };

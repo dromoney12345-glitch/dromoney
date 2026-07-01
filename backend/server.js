@@ -72,7 +72,7 @@ app.use('/api/', limiter);
 const userAuth = require('./routes/userAuthRoutes');
 const userWallet = require('./routes/userWalletRoutes');
 const userData = require('./routes/userDataRoutes');
-const public = require('./routes/publicRoutes');
+const publicRoutes = require('./routes/publicRoutes');
 const admin = require('./routes/adminRoutes');
 const chat = require('./routes/chatRoutes');
 const fcm = require('./routes/fcmRoutes');
@@ -84,7 +84,7 @@ const errorHandler = require('./middleware/error');
 app.use('/api/user/auth', userAuth);
 app.use('/api/user/wallet', userWallet);
 app.use('/api/user/data', userData);
-app.use('/api/public', public);
+app.use('/api/public', publicRoutes);
 app.use('/api/admin', admin);
 app.use('/api/chat', chat);
 app.use('/api/fcm-tokens', fcm);
@@ -123,15 +123,24 @@ io.on('connection', (socket) => {
 
 // Initialize Cron Jobs
 const { startFutureFundCron } = require('./cron/futureFundCron');
-startFutureFundCron();
+const { startWeeklySeasonCron } = require('./cron/weeklySeasonCron');
 
-server.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+    startFutureFundCron();
+    startWeeklySeasonCron();
+
+    server.listen(PORT, () => {
+        console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+    });
+}
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
     console.log(`Error: ${err.message}`);
-    // Close server & exit process
-    server.close(() => process.exit(1));
+    if (process.env.NODE_ENV !== 'test') {
+        // Close server & exit process
+        server.close(() => process.exit(1));
+    }
 });
+
+module.exports = { app, server };

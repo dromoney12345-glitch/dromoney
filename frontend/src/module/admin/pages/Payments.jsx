@@ -55,6 +55,10 @@ const Payments = () => {
         }
     };
 
+    useEffect(() => {
+        fetchPayments();
+    }, []);
+
     const handleStatusUpdate = async (id, newStatus) => {
         try {
             const response = await api.put(`/admin/payments/${id}`, { status: newStatus });
@@ -143,10 +147,10 @@ const Payments = () => {
                             {t}
                         </button>
                     ))}
+                    </div>
                 </div>
-            </div>
 
-            {/* Table */}
+                {/* Table */}
             <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden mb-6 min-h-[400px]">
                 <div className="overflow-x-auto scrollbar-hide">
                     <table className="w-full text-sm">

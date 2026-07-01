@@ -23,7 +23,15 @@ const navItems = [
             { path: '/admin/future-fund/report', label: 'Activity Report' }
         ]
     },
-    { path: '/admin/events', label: 'Events', icon: (props) => <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></svg> },
+    { 
+        path: '/admin/events-group', 
+        label: 'Events', 
+        icon: (props) => <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></svg>,
+        subMenus: [
+            { path: '/admin/events', label: 'Create Event' },
+            { path: '/admin/events/report', label: 'Activity Report' }
+        ]
+    },
     { path: '/admin/business-content', label: 'Business Content', icon: (props) => <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg> },
     { path: '/admin/withdrawals', label: 'Wallet & Withdrawals', icon: (props) => <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" /><path d="M3 5v14a2 2 0 0 0 2 2h16v-5" /><path d="M18 12a2 2 0 0 0 0 4h4v-4Z" /></svg> },
     { path: '/admin/notifications', label: 'Notifications', icon: (props) => <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg> },
@@ -222,6 +230,7 @@ const AdminLayout = () => {
                                                     <NavLink
                                                         key={sub.path}
                                                         to={sub.path}
+                                                        end
                                                         className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive ? 'bg-[#FDF2D0] text-[#856404] shadow-sm' : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'}`}
                                                     >
                                                         <span className="text-[11px] font-medium tracking-tight whitespace-nowrap uppercase">{sub.label}</span>
@@ -233,6 +242,7 @@ const AdminLayout = () => {
                                 ) : (
                                     <NavLink
                                         to={item.path}
+                                        end
                                         className={({ isActive }) => `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group relative ${isActive ? 'bg-[#FDF2D0] text-[#856404] shadow-lg shadow-black/20 border border-[#F9E9B8]' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}
                                     >
                                         <item.icon className={`w-5 h-5 shrink-0 ${sidebarOpen ? 'mr-1' : ''}`} />

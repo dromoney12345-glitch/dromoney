@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     IndianRupee, Coins, Users, CreditCard, ChevronRight, Zap,
-    Wallet, Sparkles, Send, Trophy, Gift, Shield, Rocket, CheckCircle2, BarChart2, ClipboardList, ChevronDown, Share2, TrendingUp,
+    Wallet, Sparkles, Send, Trophy, Gift, Shield, Rocket, CheckCircle2, BarChart2, ClipboardList, ChevronDown, Share2, TrendingUp, Timer,
     Video, X, ArrowUp, RotateCcw, QrCode, Smartphone, Receipt, Building, Clock, Lightbulb, Film, PlusSquare, MoreHorizontal
 } from 'lucide-react';
 import PaymentModal from '../components/PaymentModal';
@@ -184,6 +184,43 @@ const Home = () => {
     const [isVideoPlaying, setIsVideoPlaying] = useState(false);
     const [paymentConfig, setPaymentConfig] = useState({ isOpen: false, plan: '', amount: 0, type: 'PLATFORM_UNLOCK' });
     const [isFcmLoading, setIsFcmLoading] = useState(false);
+    
+    // Season Countdown Timer Logic
+    const [seasonCountdown, setSeasonCountdown] = useState('');
+
+    useEffect(() => {
+        const calculateTimeRemaining = () => {
+            const now = new Date();
+            const nextSunday = new Date();
+            
+            // Calculate days to next Sunday
+            // 0 is Sunday. If today is Sunday (0), next Sunday is either today (if before 23:59) or next week
+            let daysUntilSunday = 7 - now.getDay();
+            if (daysUntilSunday === 7) {
+                // It's Sunday. Have we passed 23:59? (Practically never, but let's be safe)
+                daysUntilSunday = 0;
+            }
+
+            nextSunday.setDate(now.getDate() + daysUntilSunday);
+            nextSunday.setHours(23, 59, 59, 999);
+
+            const diff = nextSunday - now;
+            if (diff <= 0) return '0D 0H 0M';
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / 1000 / 60) % 60);
+
+            return `${days}D ${hours}H ${minutes}M`;
+        };
+
+        setSeasonCountdown(calculateTimeRemaining());
+        const timer = setInterval(() => {
+            setSeasonCountdown(calculateTimeRemaining());
+        }, 60000); // update every minute
+
+        return () => clearInterval(timer);
+    }, []);
 
     // FCM Registration & Foreground Handling
     useEffect(() => {
@@ -374,6 +411,13 @@ const Home = () => {
 
     return (
         <div className="flex flex-col animate-in fade-in duration-700 min-h-full">
+            {/* --- Season Countdown Timer --- */}
+            <div className="bg-slate-900 text-white text-center py-2 px-4 flex items-center justify-center gap-2 border-b border-slate-800">
+                <Timer size={14} className="text-amber-400" />
+                <span className="text-[10px] font-medium uppercase tracking-widest text-slate-300">Season Ends In:</span>
+                <span className="text-xs font-semibold tracking-wider text-amber-400">{seasonCountdown}</span>
+            </div>
+
             {/* --- 1. Platform Intro Video Card (Moved to Top) --- */}
             {introConfig && introConfig.isActive && (
                 <div

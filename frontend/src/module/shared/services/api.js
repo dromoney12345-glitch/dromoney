@@ -74,25 +74,21 @@ api.interceptors.response.use(
         console.error('API Error:', message);
 
         // Auto-logout on 401 Unauthorized — token is expired or invalid
-        // Only trigger on core auth endpoints to avoid redirecting mid-task
         if (status === 401) {
             const url = error.config?.url || '';
-            const isAuthEndpoint = url.includes('/auth/') || url.includes('/reward/') || url.includes('/admin/');
-            if (isAuthEndpoint) {
-                const isAdminApi = url.includes('/admin/');
-                const isUserApi = url.includes('/user/') || url.includes('/reward/');
-                const isAdminPath = window.location.pathname.startsWith('/admin');
+            const isAdminApi = url.includes('/admin/');
+            const isUserApi = url.includes('/user/') || url.includes('/reward/');
+            const isAdminPath = window.location.pathname.startsWith('/admin');
 
-                if (isAdminApi) {
-                    localStorage.removeItem('dromoney_admin_token');
-                    if (isAdminPath && !window.location.pathname.includes('/admin/login')) {
-                        window.location.href = '/admin/login';
-                    }
-                } else if (isUserApi) {
-                    localStorage.removeItem('dromoney_token');
-                    if (!isAdminPath && !window.location.pathname.includes('/user/auth/login')) {
-                        window.location.href = '/user/auth/login';
-                    }
+            if (isAdminApi || (isAdminPath && !isUserApi)) {
+                localStorage.removeItem('dromoney_admin_token');
+                if (isAdminPath && !window.location.pathname.includes('/admin/login')) {
+                    window.location.href = '/admin/login';
+                }
+            } else {
+                localStorage.removeItem('dromoney_token');
+                if (!isAdminPath && !window.location.pathname.includes('/user/auth/login')) {
+                    window.location.href = '/user/auth/login';
                 }
             }
         }

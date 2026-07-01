@@ -286,7 +286,7 @@ exports.updateParticipantStatus = asyncHandler(async (req, res, next) => {
                 await Transaction.create({
                     user: user._id,
                     type: 'credit',
-                    currency: 'CASH',
+                    currency: 'INR',
                     amount: cashToAdd,
                     source: `Event Reward: ${participant.event.title}`
                 });
@@ -316,3 +316,141 @@ exports.updateParticipantStatus = asyncHandler(async (req, res, next) => {
         data: participant
     });
 });
+
+// @desc    Auto-Approve and Distribute Prizes
+// @route   POST /api/admin/events/:id/approve-winners
+// @access  Private/Admin
+exports.approveWinners = asyncHandler(async (req, res, next) => {
+    const event = await Event.findById(req.params.id);
+    if (!event) {
+        return next(new ErrorResponse(`Event not found`, 404));
+    }
+
+    if (event.isApproved) {
+        return next(new ErrorResponse('Prizes for this event have already been distributed', 400));
+    }
+
+    const participants = await EventParticipant.find({ event: event._id }).populate('user');
+    
+    if (participants.length === 0) {
+        event.isApproved = true;
+        await event.save();
+        return res.status(200).json({ success: true, message: 'No participants to reward.' });
+    }
+
+    const Settings = require('../models/Settings');
+    let settings = await Settings.findOne();
+    const coinRate = settings?.coinRate || 0.10;
+
+    // Total Entry Pool in Coins
+    const totalCoinsPool = participants.length * event.fee;
+    const totalCashPool = totalCoinsPool * coinRate;
+
+    const adminProfit = totalCashPool * 0.20;
+    const prizePool = totalCashPool * 0.50;
+    const cashbackPool = totalCashPool * 0.30;
+
+    // Sort participants by score (descending) and timeTaken (ascending)
+    participants.sort((a, b) => {
+        if (b.score !== a.score) return (b.score || 0) - (a.score || 0);
+        return (a.timeTaken || Infinity) - (b.timeTaken || Infinity);
+    });
+
+    const top3 = participants.slice(0, 3);
+    const rest = participants.slice(3);
+
+    const Transaction = require('../models/Transaction');
+    const { sendNotificationToUser } = require('./fcmController');
+
+    // 1st gets 50%, 2nd gets 30%, 3rd gets 20% of the prize pool
+    const prizeSplits = [0.50, 0.30, 0.20];
+    
+    for (let i = 0; i < top3.length; i++) {
+        const p = top3[i];
+        const user = p.user;
+        if (!user) continue;
+
+        const rewardCash = prizePool * prizeSplits[i];
+        
+        user.wallet.balance += rewardCash;
+        user.wallet.totalEarned += rewardCash;
+        await user.save();
+
+        p.prizeStatus = 'Awarded';
+        p.prizeNote = `Top ${i + 1} Winner Prize: ₹${rewardCash.toFixed(2)}`;
+        await p.save();
+
+        await Transaction.create({
+            user: user._id,
+            type: 'credit',
+            currency: 'INR',
+            amount: rewardCash,
+            source: `Event Winner (${i + 1} Place): ${event.title}`
+        });
+
+        try {
+            await sendNotificationToUser(user._id, {
+                title: '🏆 You Won the Event!',
+                body: `Congratulations! You placed ${i + 1} in ${event.title} and won ₹${rewardCash.toFixed(2)}`,
+                data: { type: 'reward', link: '/user/wallet' }
+            });
+        } catch(e) {}
+    }
+
+    // Cashback distribution
+    let cashbackPerUser = 0;
+    if (rest.length > 0) {
+        cashbackPerUser = cashbackPool / rest.length;
+        
+        for (const p of rest) {
+            const user = p.user;
+            if (!user) continue;
+
+            user.wallet.balance += cashbackPerUser;
+            user.wallet.totalEarned += cashbackPerUser;
+            await user.save();
+
+            p.prizeStatus = 'Awarded';
+            p.prizeNote = `Participation Cashback: ₹${cashbackPerUser.toFixed(2)}`;
+            await p.save();
+
+            await Transaction.create({
+                user: user._id,
+                type: 'credit',
+                currency: 'INR',
+                amount: cashbackPerUser,
+                source: `Event Cashback: ${event.title}`
+            });
+
+            try {
+                await sendNotificationToUser(user._id, {
+                    title: '🎁 Event Cashback',
+                    body: `You received ₹${cashbackPerUser.toFixed(2)} as participation cashback for ${event.title}.`,
+                    data: { type: 'reward', link: '/user/wallet' }
+                });
+            } catch(e) {}
+        }
+    }
+
+    const AdminProfit = require('../models/AdminProfit');
+    await AdminProfit.create({
+        event: event._id,
+        amount: adminProfit,
+        source: `Prize Distribution: ${event.title}`
+    });
+
+    event.isApproved = true;
+    await event.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Prizes and cashback distributed successfully',
+        data: {
+            totalCashPool,
+            adminProfit,
+            prizePool,
+            cashbackPool
+        }
+    });
+});
+

@@ -46,11 +46,112 @@ const Toast = ({ msg, type }) => (
     </div>
 );
 
+const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }) => {
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center animate-in fade-in duration-200">
+            <div className="bg-white rounded-2xl w-full max-w-sm mx-4 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 font-['Poppins']">
+                <div className="p-6">
+                    <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-4">
+                        <Gift size={24} />
+                    </div>
+                    <h3 className="text-lg font-medium text-slate-800 mb-2">{title}</h3>
+                    <p className="text-sm font-medium text-slate-500 mb-6">{message}</p>
+                    <div className="flex items-center gap-3">
+                        <button onClick={onCancel} className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium text-xs uppercase tracking-normal transition-all">Cancel</button>
+                        <button onClick={onConfirm} className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-medium text-xs uppercase tracking-normal shadow-md shadow-amber-500/20 transition-all">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const ParticipantsModal = ({ isOpen, eventId, onClose }) => {
+    const [participants, setParticipants] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (isOpen && eventId) {
+            fetchParticipants();
+        }
+    }, [isOpen, eventId]);
+
+    const fetchParticipants = async () => {
+        setLoading(true);
+        try {
+            const res = await api.get(`/admin/events/${eventId}/participants`);
+            if (res.success) setParticipants(res.data);
+        } catch (err) {
+            console.error('Failed to fetch participants', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl overflow-hidden font-['Poppins']">
+                <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+                        <Users size={18} className="text-sky-500" /> Event Participants
+                    </h3>
+                    <button onClick={onClose} className="p-1 text-slate-400 hover:bg-slate-200 rounded-lg transition-colors">
+                        <X size={18} />
+                    </button>
+                </div>
+                <div className="p-4 overflow-y-auto flex-1">
+                    {loading ? (
+                        <div className="text-center py-10 text-slate-500 text-sm">Loading participants...</div>
+                    ) : participants.length === 0 ? (
+                        <div className="text-center py-10 text-slate-500 text-sm">No participants yet.</div>
+                    ) : (
+                        <table className="w-full text-left text-sm">
+                            <thead>
+                                <tr className="border-b border-slate-100 text-slate-400 text-xs">
+                                    <th className="pb-2 font-medium">User</th>
+                                    <th className="pb-2 font-medium">Score</th>
+                                    <th className="pb-2 font-medium">Time (s)</th>
+                                    <th className="pb-2 font-medium">Prize Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {participants.map(p => (
+                                    <tr key={p._id} className="border-b border-slate-50 last:border-0">
+                                        <td className="py-3">
+                                            <div className="font-medium text-slate-700">{p.user?.name || 'Deleted User'}</div>
+                                            <div className="text-[10px] text-slate-400">{p.user?.email || ''}</div>
+                                        </td>
+                                        <td className="py-3 text-sky-600 font-semibold">{p.score || 0}</td>
+                                        <td className="py-3 text-slate-500">{p.timeTaken || '-'}</td>
+                                        <td className="py-3">
+                                            <span className={`text-[10px] px-2 py-1 rounded-full uppercase tracking-wider font-semibold ${
+                                                p.prizeStatus === 'Awarded' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'
+                                            }`}>
+                                                {p.prizeStatus || 'Pending'}
+                                            </span>
+                                            {p.prizeNote && <div className="text-[9px] text-slate-400 mt-1">{p.prizeNote}</div>}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
 // ─── Tab 1: Events Overview ───────────────────────────────
 
-const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast }) => {
+const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast, onRefreshEvents }) => {
     const [editingId, setEditingId] = useState(null);
     const [editData, setEditData] = useState({});
+    const [confirmModal, setConfirmModal] = useState({ isOpen: false, event: null });
+    const [participantsModal, setParticipantsModal] = useState({ isOpen: false, eventId: null });
 
     const startEdit = (event) => {
         setEditingId(event.id);
@@ -142,7 +243,7 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast }) => {
                         <div className="grid grid-cols-4 gap-2 mb-4">
                             {[
                                 { label: 'Entry', value: isEditing ? null : `${Math.max(0, event.fee)} Coins`, edit: <input type="number" min="0" value={editData.fee} onChange={e => setEditData(p => ({ ...p, fee: Math.max(0, +e.target.value) }))} className="w-14 border-b border-sky-300 text-center text-sm font-medium outline-none bg-transparent" /> },
-                                { label: 'Prize', value: isEditing ? null : event.prize, edit: <input value={editData.prize} onChange={e => setEditData(p => ({ ...p, prize: e.target.value }))} className="w-16 border-b border-sky-300 text-center text-sm font-medium outline-none bg-transparent" /> },
+                                { label: 'Pool', value: isEditing ? <span className="text-sm font-medium text-slate-500">Auto (80%)</span> : `${Math.floor((event.fee || 0) * (event.participantsCount || 0) * 0.8)} Coins` },
                                 { label: 'Joined', value: event.participantsCount || 0 },
                                 { label: 'Awarded', value: event.awardedCount || 0 },
                             ].map((stat, i) => (
@@ -186,15 +287,61 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast }) => {
                                     <button onClick={() => startEdit(event)} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-[11px] uppercase tracking-normal bg-sky-50 text-sky-600 hover:bg-sky-100 transition-all font-['Poppins']">
                                         <Edit3 size={13} /> Edit
                                     </button>
+                                    <button onClick={() => setParticipantsModal({ isOpen: true, eventId: event.id || event._id })} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-[11px] uppercase tracking-normal bg-purple-50 text-purple-600 hover:bg-purple-100 transition-all font-['Poppins']">
+                                        <Users size={13} /> Users
+                                    </button>
                                     <button onClick={() => toggleStatus(event)} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-[11px] uppercase tracking-normal transition-all font-['Poppins'] ${event.status === 'Active' ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}>
                                         {event.status === 'Active' ? <><Square size={13} /> Stop</> : <><Play size={13} /> Activate</>}
                                     </button>
                                 </>
                             )}
                         </div>
+                        {!isEditing && event.status !== 'Active' && !event.isApproved && (
+                            <div className="mt-2">
+                                <button
+                                    onClick={() => setConfirmModal({ isOpen: true, event })}
+                                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-[11px] uppercase tracking-normal bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-md active:scale-95 transition-all font-['Poppins']"
+                                >
+                                    <Gift size={13} /> Distribute Prizes (50/30)
+                                </button>
+                            </div>
+                        )}
+                        {!isEditing && event.isApproved && (
+                            <div className="mt-2">
+                                <div className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-[11px] uppercase tracking-normal bg-emerald-50 text-emerald-600 border border-emerald-100 font-['Poppins']">
+                                    <Check size={13} /> Prizes Distributed
+                                </div>
+                            </div>
+                        )}
                     </div>
                 );
             })}
+            <ConfirmModal 
+                isOpen={confirmModal.isOpen}
+                title={`Distribute Prizes`}
+                message={`Are you sure you want to distribute prizes for ${confirmModal.event?.title}? This will process all winners and cashback. This cannot be undone.`}
+                onCancel={() => setConfirmModal({ isOpen: false, event: null })}
+                onConfirm={async () => {
+                    const event = confirmModal.event;
+                    setConfirmModal({ isOpen: false, event: null });
+                    try {
+                        const res = await api.post(`/admin/events/${event.id || event._id}/approve-winners`);
+                        if (res.success) {
+                            onShowToast('Prizes and Cashback distributed successfully!', 'success');
+                            if (onRefreshEvents) onRefreshEvents();
+                        } else {
+                            onShowToast(res.message || 'Failed to distribute prizes', 'error');
+                        }
+                    } catch (err) {
+                        onShowToast(err.message || 'Error occurred', 'error');
+                    }
+                }}
+            />
+            <ParticipantsModal 
+                isOpen={participantsModal.isOpen} 
+                eventId={participantsModal.eventId} 
+                onClose={() => setParticipantsModal({ isOpen: false, eventId: null })} 
+            />
         </div>
     );
 };
@@ -600,6 +747,8 @@ const ParticipantsTab = ({ events, onShowToast }) => {
     const totalJoined = participants.length;
     const prizesAwarded = participants.filter(p => p.prizeStatus === 'Awarded').length;
     const topScore = participants.length > 0 ? Math.max(...participants.map(p => p.score || 0)) : 0;
+    const selectedEvent = events.find(e => e.id === selectedEventId);
+    const dynamicPrize = selectedEvent ? Math.floor(Math.max(0, selectedEvent.fee || 0) * participants.length * 0.8) : 0;
 
     return (
         <div className="space-y-6">
@@ -711,7 +860,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                             <button
                                 onClick={() => { 
                                     setAwardingId(fastestParticipant.id); 
-                                    setAwardNote(`Winner with record-breaking speed of ${fastestParticipant.timeTaken} seconds! 🎉`); 
+                                    setAwardNote(`${dynamicPrize} Coins (Winner with record-breaking speed of ${fastestParticipant.timeTaken}s)`); 
                                 }}
                                 className="bg-white text-orange-600 hover:bg-orange-50 px-4.5 py-2.5 rounded-xl text-[9px] font-medium uppercase tracking-normal active:scale-95 transition-all shadow-md cursor-pointer"
                             >
@@ -778,60 +927,64 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                 <div key={p.id}>
                                     <div 
                                         onClick={() => setViewingParticipant(p)}
-                                        className={`flex items-center p-4 hover:bg-slate-50 cursor-pointer transition-colors ${p.prizeStatus === 'Awarded' ? 'bg-emerald-50/10' : ''}`}
+                                        className={`flex items-center p-2.5 hover:bg-slate-50 cursor-pointer transition-colors ${p.prizeStatus === 'Awarded' ? 'bg-emerald-50/10' : ''}`}
                                     >
                                         {/* Avatar */}
-                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white font-medium text-sm mr-4 shrink-0 shadow-sm ${p.prizeStatus === 'Awarded' ? 'bg-gradient-to-br from-amber-400 to-orange-500' : isFastest ? 'bg-gradient-to-br from-rose-500 to-amber-500 animate-pulse' : 'bg-gradient-to-br from-slate-400 to-slate-600'}`}>
-                                            {p.prizeStatus === 'Awarded' ? <Award size={18} /> : isFastest ? <Trophy size={18} className="text-white fill-white" /> : (p.name || 'U')[0].toUpperCase()}
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-medium text-xs mr-3 shrink-0 shadow-sm ${p.prizeStatus === 'Awarded' ? 'bg-gradient-to-br from-amber-400 to-orange-500' : isFastest ? 'bg-gradient-to-br from-rose-500 to-amber-500 animate-pulse' : 'bg-gradient-to-br from-slate-400 to-slate-600'}`}>
+                                            {p.prizeStatus === 'Awarded' ? <Award size={14} /> : isFastest ? <Trophy size={14} className="text-white fill-white" /> : (p.name || 'U')[0].toUpperCase()}
                                         </div>
                                         
                                         {/* Name & Details */}
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 flex-wrap">
-                                                <p className="font-medium text-slate-800 text-[13px] truncate">{p.name || 'Anonymous User'}</p>
+                                            <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                                                <p className="font-semibold text-slate-800 text-[12px] truncate">{p.name || 'Anonymous User'}</p>
                                                 {p.prizeStatus === 'Awarded' && (
-                                                    <span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-md text-[8px] font-medium uppercase tracking-normal border border-amber-200">WINNER</span>
+                                                    <span className="bg-amber-100 text-amber-700 px-1 py-0.5 rounded text-[8px] font-bold uppercase tracking-normal border border-amber-200">WINNER</span>
                                                 )}
                                                 {isFastest && (
-                                                    <span className="bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded-md text-[8px] font-medium uppercase tracking-normal border border-rose-200 flex items-center gap-1 animate-pulse">⚡ FASTEST COMPLETION</span>
+                                                    <span className="bg-rose-100 text-rose-700 px-1 py-0.5 rounded text-[8px] font-bold uppercase tracking-normal border border-rose-200 flex items-center gap-0.5 animate-pulse">⚡ FASTEST</span>
                                                 )}
                                             </div>
-                                            <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                                                <div className="flex items-center gap-1 bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">
-                                                    <Zap size={10} className="text-slate-500" />
-                                                    <span className="text-[10px] font-medium">{p.result || '—'}</span>
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <div className="flex items-center gap-0.5 bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[9px] font-medium">
+                                                    <Zap size={9} className="text-slate-500" />
+                                                    {p.result || '—'}
                                                 </div>
                                                 {p.timeTaken !== undefined && p.timeTaken !== null && (
-                                                    <div className="flex items-center gap-1 bg-sky-50 text-sky-700 px-2 py-0.5 rounded-md border border-sky-100">
-                                                        <Clock size={10} className="text-sky-500" />
-                                                        <span className="text-[10px] font-medium">Completed in {p.timeTaken}s</span>
+                                                    <div className="flex items-center gap-0.5 bg-sky-50 text-sky-700 px-1.5 py-0.5 rounded text-[9px] font-medium border border-sky-100">
+                                                        <Clock size={9} className="text-sky-500" />
+                                                        {p.timeTaken}s
                                                     </div>
                                                 )}
-                                                <span className="text-[10px] text-slate-300 hidden sm:inline">|</span>
-                                                <div className="flex items-center gap-1.5">
-                                                    <Clock size={10} className="text-slate-400" />
-                                                    <span className="text-[10px] font-medium text-slate-500">{p.joinedAt}</span>
+                                                <span className="text-[9px] text-slate-300 hidden sm:inline">|</span>
+                                                <div className="flex items-center gap-1">
+                                                    <Clock size={9} className="text-slate-400" />
+                                                    <span className="text-[9px] font-medium text-slate-500">{p.joinedAt}</span>
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/* Prize & Status */}
-                                        <div className="flex items-center gap-4 pr-2">
+                                        <div className="flex items-center gap-3 pr-2">
                                             <div className="text-right hidden sm:block">
-                                                <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mb-0.5">Prize Won</p>
-                                                <p className="text-[13px] font-medium text-amber-600">{p.prize || 'No Prize'}</p>
+                                                <p className="text-[8px] font-medium text-slate-400 uppercase tracking-normal mb-0.5">Prize Won</p>
+                                                <p className="text-[11px] font-bold text-amber-600">{p.prizeStatus === 'Awarded' ? (p.prize || `${dynamicPrize} Coins`) : 'No Prize'}</p>
                                             </div>
-                                            <div className="flex flex-col items-end gap-1.5">
-                                                <span className={`px-2.5 py-1 rounded-xl text-[9px] font-medium uppercase tracking-normal border flex items-center gap-1.5 ${p.prizeStatus === 'Awarded' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
-                                                    {p.prizeStatus === 'Awarded' ? <CheckCircle size={10} /> : <AlertCircle size={10} />}
+                                            <div className="flex flex-col items-end gap-1">
+                                                <span className={`px-2 py-0.5 rounded-lg text-[9px] font-semibold uppercase tracking-normal border flex items-center gap-1 ${p.prizeStatus === 'Awarded' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                                                    {p.prizeStatus === 'Awarded' ? <CheckCircle size={9} /> : <AlertCircle size={9} />}
                                                     {p.prizeStatus}
                                                 </span>
                                                 {p.prizeStatus !== 'Awarded' && (
                                                     <button
-                                                        onClick={(e) => { e.stopPropagation(); setAwardingId(awardingId === p.id ? null : p.id); }}
-                                                        className="flex items-center gap-1 px-2.5 py-1.5 bg-sky-50 text-sky-600 rounded-xl text-[9px] font-medium uppercase tracking-normal hover:bg-sky-100 active:scale-95 transition-all border border-sky-100"
+                                                        onClick={(e) => { 
+                                                            e.stopPropagation(); 
+                                                            setAwardingId(awardingId === p.id ? null : p.id); 
+                                                            setAwardNote(`${dynamicPrize} Coins (Admin Awarded)`);
+                                                        }}
+                                                        className="flex items-center gap-1 px-2 py-1 bg-sky-50 text-sky-600 rounded-lg text-[8px] font-bold uppercase tracking-normal hover:bg-sky-100 active:scale-95 transition-all border border-sky-100"
                                                     >
-                                                        <Award size={11} /> Give Prize
+                                                        <Award size={10} /> Give Prize
                                                     </button>
                                                 )}
                                             </div>
@@ -1062,7 +1215,7 @@ const EventsAdmin = () => {
                     title: '',
                     tag: 'Quiz',
                     fee: 10,
-                    prize: '₹500',
+                    prize: 'Dynamic',
                     startTime: 'Live Now',
                     status: 'Active'
                 });
@@ -1109,7 +1262,13 @@ const EventsAdmin = () => {
             ) : (
                 <>
                     {activeTab === 'overview' && (
-                        <OverviewTab events={events} onUpdateEvent={handleUpdateEvent} onDeleteEvent={handleDeleteEvent} onShowToast={showToast} />
+                        <OverviewTab 
+                            events={events} 
+                            onUpdateEvent={handleUpdateEvent} 
+                            onDeleteEvent={handleDeleteEvent}
+                            onShowToast={showToast}
+                            onRefreshEvents={fetchEvents}
+                        />
                     )}
                     {activeTab === 'content' && (
                         <ContentTab events={events} onRefreshEvents={fetchEvents} onShowToast={showToast} />
