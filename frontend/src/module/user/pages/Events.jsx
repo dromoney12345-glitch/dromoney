@@ -173,27 +173,36 @@ const Events = () => {
         }
     };
 
-    // Pastel palette styles configuration per event tag
-    const getPastelTheme = (tag) => {
+    const getPastelTheme = (tag, isMega) => {
+        if (isMega) {
+            return {
+                cardBg: 'bg-gradient-to-br from-[#FFFBEB] via-[#FFF9E6] to-[#FEF3C7]', // Golden theme
+                border: 'border-amber-300/60',
+                tagBadge: 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border border-amber-400 font-bold',
+                statsBg: 'bg-white/70 border border-amber-200/40',
+                button: 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-amber-100 font-bold',
+                accentIcon: <Trophy size={14} className="text-amber-500 fill-amber-500" />
+            };
+        }
         const normalizedTag = (tag || '').toUpperCase();
         switch (normalizedTag) {
             case 'QUIZ':
                 return {
-                    cardBg: 'bg-gradient-to-br from-[#F5F3FF] via-[#FAF9FF] to-[#EEF2FF]', // Soft Lavender-Indigo
-                    border: 'border-purple-100/80',
-                    tagBadge: 'bg-purple-100/60 text-purple-600 border border-purple-200/40',
-                    statsBg: 'bg-white/60 border border-purple-100/40',
+                    cardBg: 'bg-gradient-to-br from-[#EEF2FF] via-[#F5F7FF] to-[#E0E7FF]', // Soft Indigo-Blue
+                    border: 'border-indigo-100/80',
+                    tagBadge: 'bg-indigo-100/60 text-indigo-700 border border-indigo-200/40',
+                    statsBg: 'bg-white/60 border border-indigo-100/40',
                     button: 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-100',
-                    accentIcon: <Trophy size={14} className="text-indigo-500" />
+                    accentIcon: <Sparkles size={14} className="text-indigo-500" />
                 };
             case 'DRAW':
                 return {
-                    cardBg: 'bg-gradient-to-br from-[#FFF1F2] via-[#FFF8F8] to-[#FFF5F5]', // Soft Rose-Pink
-                    border: 'border-rose-100/80',
-                    tagBadge: 'bg-rose-100/60 text-rose-600 border border-rose-200/40',
-                    statsBg: 'bg-white/60 border border-rose-100/40',
-                    button: 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-100',
-                    accentIcon: <Sparkles size={14} className="text-rose-500" />
+                    cardBg: 'bg-gradient-to-br from-[#FAF5FF] via-[#FDFBFF] to-[#F3E8FF]', // Soft Lavender-Purple
+                    border: 'border-purple-100/80',
+                    tagBadge: 'bg-purple-100/60 text-purple-700 border border-purple-200/40',
+                    statsBg: 'bg-white/60 border border-purple-100/40',
+                    button: 'bg-purple-600 hover:bg-purple-700 text-white shadow-purple-100',
+                    accentIcon: <Gift size={14} className="text-purple-600" />
                 };
             case 'BRAIN':
                 return {
@@ -270,97 +279,216 @@ const Events = () => {
                 </div>
             </div>
 
-            <div className="p-3 space-y-3 w-full">
-                {/* Live badge */}
-                <div className="flex justify-between items-center px-1">
-                    <h2 className="text-[10px] text-slate-400 uppercase tracking-[0.2em]">Active Live Events</h2>
-                    <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full text-[8px] uppercase tracking-wider border border-emerald-100 animate-pulse">Live</span>
+            {/* Eligibility Progress Bar */}
+            <div className="px-3 pt-3 w-full">
+                <div className="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 shadow-xl">
+                    <div className="flex justify-between items-center mb-2">
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Mega Event Eligibility</span>
+                        <span className="text-[10px] font-extrabold text-amber-400 font-['Poppins']">
+                            {userData?.coins?.balance || 0} / 500 Coins Collected
+                        </span>
+                    </div>
+                    <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-700/50">
+                        <div 
+                            className="bg-gradient-to-r from-amber-500 to-yellow-400 h-full rounded-full transition-all duration-500" 
+                            style={{ width: `${Math.min(100, ((userData?.coins?.balance || 0) / 500) * 100)}%` }}
+                        ></div>
+                    </div>
+                    <p className="text-[8.5px] text-slate-400 font-semibold mt-2 leading-tight uppercase tracking-wider">
+                        {userData?.coins?.balance >= 500 
+                            ? '🎉 Eligible! You have enough coins to enter Sunday Mega Event.' 
+                            : `⚠️ Need ${500 - (userData?.coins?.balance || 0)} more Coins to unlock Sunday Mega Event.`
+                        }
+                    </p>
                 </div>
-                
-                {/* Event Cards */}
-                <div className="flex flex-col gap-2.5">
-                    {eventList.length === 0 ? (
-                        <div className="bg-white border border-slate-100 rounded-2xl p-8 text-center shadow-sm">
-                            <Trophy size={28} className="text-slate-200 mx-auto mb-2" />
-                            <h3 className="text-[12px] text-slate-600 mb-1">No Live Events</h3>
-                            <p className="text-[9px] text-slate-400 uppercase tracking-wider">Check back soon!</p>
-                        </div>
-                    ) : eventList.map((event) => {
-                        const id = event._id?.toString() || event.id?.toString();
-                        const isJoined = joinedEvents.includes(id);
-                        const isComingSoon = event.status !== 'Active';
-                        const theme = getPastelTheme(event.tag);
-                        // Ensure fee is always shown as positive
-                        const feeDisplay = Math.abs(Number(event.fee) || 0);
+            </div>
 
-                        return (
-                            <div
-                                key={id}
-                                className={`border rounded-2xl overflow-hidden shadow-sm ${theme.cardBg} ${theme.border}`}
-                            >
-                                {/* Card top: title + join button */}
-                                <div className="flex items-center justify-between px-3.5 pt-3 pb-2">
-                                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                                        {theme.accentIcon}
-                                        <div className="min-w-0">
-                                            <h3 className="text-[13px] text-slate-800 leading-tight truncate">{event.title}</h3>
-                                            <span className={`inline-block text-[7px] tracking-widest px-1.5 py-0.5 rounded mt-0.5 uppercase ${theme.tagBadge}`}>
-                                                {event.tag}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (isJoined) navigateToEvent(event);
-                                            else handleJoinEvent(event);
-                                        }}
-                                        disabled={(isComingSoon && !isJoined) || isJoining}
-                                        className={`ml-2 px-3 py-2 rounded-xl text-[9px] tracking-widest uppercase transition-all active:scale-95 shrink-0 cursor-pointer ${
-                                            isJoined
-                                                ? 'bg-emerald-500 text-white'
-                                                : isComingSoon
-                                                ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                                                : theme.button
-                                        }`}
-                                    >
-                                        {isJoined ? '✓ Joined' : isComingSoon ? 'Soon' : 'Join'}
-                                    </button>
-                                </div>
-
-                                {/* Stats row */}
-                                <div className={`mx-3 mb-3 grid grid-cols-4 gap-0 rounded-xl overflow-hidden border ${theme.statsBg}`}>
-                                    <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
-                                        <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Entry</p>
-                                        <div className="flex items-center gap-0.5">
-                                            <Coins size={9} className="text-amber-500 fill-amber-500" />
-                                            <span className="text-[10px] text-slate-700">{feeDisplay}</span>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
-                                        <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Pool</p>
-                                        <span className="text-[10px] text-emerald-600">50% Auto</span>
-                                    </div>
-                                    <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
-                                        <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Time</p>
-                                        <div className="flex items-center gap-0.5">
-                                            <Clock size={9} className="text-slate-400" />
-                                            <span className="text-[9px] text-slate-500 truncate max-w-[40px]">{event.startTime || 'Live'}</span>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col items-center justify-center py-2 px-1">
-                                        <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Joined</p>
-                                        <div className="flex items-center gap-0.5">
-                                            <Users size={9} className="text-slate-400" />
-                                            <span className="text-[10px] text-slate-500">{event.participantsCount || event.participants || 0}</span>
-                                        </div>
-                                    </div>
-                                </div>
+            <div className="p-3 pt-0 space-y-4 w-full">
+                {/* Mega Events Section */}
+                {(() => {
+                    const megaEvents = eventList.filter(e => e.isMega);
+                    if (megaEvents.length === 0) return null;
+                    return (
+                        <div className="space-y-2.5">
+                            <div className="flex justify-between items-center px-1">
+                                <h2 className="text-[10px] text-amber-600 font-bold uppercase tracking-[0.2em] flex items-center gap-1">👑 Sunday Mega Event</h2>
+                                <span className="bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider border border-amber-200 animate-pulse">Sunday 8:00 PM</span>
                             </div>
-                        );
-                    })}
-                </div>
+                            <div className="flex flex-col gap-2.5">
+                                {megaEvents.map((event) => {
+                                    const id = event._id?.toString() || event.id?.toString();
+                                    const isJoined = joinedEvents.includes(id);
+                                    const isComingSoon = event.status !== 'Active';
+                                    const theme = getPastelTheme(event.tag, true);
+                                    const feeDisplay = Math.abs(Number(event.fee) || 0);
+
+                                    return (
+                                        <div
+                                            key={id}
+                                            className={`border rounded-2xl overflow-hidden shadow-sm ${theme.cardBg} ${theme.border}`}
+                                        >
+                                            {/* Card top */}
+                                            <div className="flex items-center justify-between px-3.5 pt-3 pb-2">
+                                                <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                    {theme.accentIcon}
+                                                    <div className="min-w-0">
+                                                        <h3 className="text-[13px] text-slate-800 font-bold leading-tight truncate">{event.title}</h3>
+                                                        <span className={`inline-block text-[7px] tracking-widest px-1.5 py-0.5 rounded mt-0.5 uppercase ${theme.tagBadge}`}>
+                                                            {event.tag}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (isJoined) navigateToEvent(event);
+                                                        else handleJoinEvent(event);
+                                                    }}
+                                                    disabled={(isComingSoon && !isJoined) || isJoining}
+                                                    className={`ml-2 px-3 py-2 rounded-xl text-[9px] tracking-widest uppercase transition-all active:scale-95 shrink-0 cursor-pointer ${
+                                                        isJoined
+                                                            ? 'bg-emerald-500 text-white'
+                                                            : isComingSoon
+                                                            ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                                                            : theme.button
+                                                    }`}
+                                                >
+                                                    {isJoined ? '✓ Joined' : isComingSoon ? 'Soon' : 'Join'}
+                                                </button>
+                                            </div>
+
+                                            {/* Stats row */}
+                                            <div className={`mx-3 mb-3 grid grid-cols-4 gap-0 rounded-xl overflow-hidden border ${theme.statsBg}`}>
+                                                <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
+                                                    <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Entry</p>
+                                                    <div className="flex items-center gap-0.5">
+                                                        <Coins size={9} className="text-amber-500 fill-amber-500" />
+                                                        <span className="text-[10px] text-slate-700">{feeDisplay}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
+                                                    <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Pool</p>
+                                                    <span className="text-[10px] text-emerald-600 font-bold">50%</span>
+                                                </div>
+                                                <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
+                                                    <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Time</p>
+                                                    <div className="flex items-center gap-0.5">
+                                                        <Clock size={9} className="text-slate-400" />
+                                                        <span className="text-[9px] text-slate-500 truncate max-w-[40px]">{event.startTime || 'Live'}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-col items-center justify-center py-2 px-1">
+                                                    <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Joined</p>
+                                                    <div className="flex items-center gap-0.5">
+                                                        <Users size={9} className="text-slate-400" />
+                                                        <span className="text-[10px] text-slate-500">{event.participantsCount || event.participants || 0}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    );
+                })()}
+
+                {/* Normal Live Events Section */}
+                <div className="space-y-2.5">
+                    <div className="flex justify-between items-center px-1">
+                        <h2 className="text-[10px] text-slate-400 uppercase tracking-[0.2em]">Active Live Events</h2>
+                        <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full text-[8px] uppercase tracking-wider border border-emerald-100 animate-pulse">Live</span>
+                    </div>
+                    
+                    <div className="flex flex-col gap-2.5">
+                        {(() => {
+                            const normalEvents = eventList.filter(e => !e.isMega);
+                            if (normalEvents.length === 0) {
+                                return (
+                                    <div className="bg-white border border-slate-100 rounded-2xl p-8 text-center shadow-sm">
+                                        <Trophy size={28} className="text-slate-200 mx-auto mb-2" />
+                                        <h3 className="text-[12px] text-slate-600 mb-1">No Live Events</h3>
+                                        <p className="text-[9px] text-slate-400 uppercase tracking-wider">Check back soon!</p>
+                                    </div>
+                                );
+                            }
+                            return normalEvents.map((event) => {
+                                const id = event._id?.toString() || event.id?.toString();
+                                const isJoined = joinedEvents.includes(id);
+                                const isComingSoon = event.status !== 'Active';
+                                const theme = getPastelTheme(event.tag, false);
+                                const feeDisplay = Math.abs(Number(event.fee) || 0);
+
+                                return (
+                                    <div
+                                        key={id}
+                                        className={`border rounded-2xl overflow-hidden shadow-sm ${theme.cardBg} ${theme.border}`}
+                                    >
+                                        {/* Card top */}
+                                        <div className="flex items-center justify-between px-3.5 pt-3 pb-2">
+                                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                {theme.accentIcon}
+                                                <div className="min-w-0">
+                                                    <h3 className="text-[13px] text-slate-800 leading-tight truncate">{event.title}</h3>
+                                                    <span className={`inline-block text-[7px] tracking-widest px-1.5 py-0.5 rounded mt-0.5 uppercase ${theme.tagBadge}`}>
+                                                        {event.tag}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (isJoined) navigateToEvent(event);
+                                                    else handleJoinEvent(event);
+                                                }}
+                                                disabled={(isComingSoon && !isJoined) || isJoining}
+                                                className={`ml-2 px-3 py-2 rounded-xl text-[9px] tracking-widest uppercase transition-all active:scale-95 shrink-0 cursor-pointer ${
+                                                    isJoined
+                                                        ? 'bg-emerald-500 text-white'
+                                                        : isComingSoon
+                                                        ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                                                        : theme.button
+                                                }`}
+                                            >
+                                                {isJoined ? '✓ Joined' : isComingSoon ? 'Soon' : 'Join'}
+                                            </button>
+                                        </div>
+
+                                        {/* Stats row */}
+                                        <div className={`mx-3 mb-3 grid grid-cols-4 gap-0 rounded-xl overflow-hidden border ${theme.statsBg}`}>
+                                            <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
+                                                <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Entry</p>
+                                                <div className="flex items-center gap-0.5">
+                                                    <Coins size={9} className="text-amber-500 fill-amber-500" />
+                                                    <span className="text-[10px] text-slate-700">{feeDisplay}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
+                                                <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Pool</p>
+                                                <span className="text-[10px] text-emerald-600 font-bold">50%</span>
+                                            </div>
+                                            <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
+                                                <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Time</p>
+                                                <div className="flex items-center gap-0.5">
+                                                    <Clock size={9} className="text-slate-400" />
+                                                    <span className="text-[9px] text-slate-500 truncate max-w-[40px]">{event.startTime || 'Live'}</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col items-center justify-center py-2 px-1">
+                                                <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Joined</p>
+                                                <div className="flex items-center gap-0.5">
+                                                    <Users size={9} className="text-slate-400" />
+                                                    <span className="text-[10px] text-slate-500">{event.participantsCount || event.participants || 0}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            });
+                        })()}
+                    </div>
 
                 {/* Support Booster */}
                 <div className="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-lg">

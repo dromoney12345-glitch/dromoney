@@ -26,7 +26,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => {
         { 
             $set: { 
                 benefits: [
-                    '3X Coins on Tasks',
+                    '12X Coins on Tasks & Ads',
                     'Fast Rewards Processing',
                     'Priority Task Verification'
                 ],

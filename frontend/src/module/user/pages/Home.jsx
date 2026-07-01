@@ -188,6 +188,61 @@ const Home = () => {
     // Season Countdown Timer Logic
     const [seasonCountdown, setSeasonCountdown] = useState('');
 
+    // Booster Active Countdown Timer
+    const [taskBoosterTimeLeft, setTaskBoosterTimeLeft] = useState('');
+
+    useEffect(() => {
+        if (!isTaskBoosterActive || !userData?.taskBoosterExpiry) {
+            setTaskBoosterTimeLeft('');
+            return;
+        }
+
+        const updateTimer = () => {
+            const expiry = new Date(userData.taskBoosterExpiry).getTime();
+            const diff = expiry - Date.now();
+            if (diff <= 0) {
+                setTaskBoosterTimeLeft('Expired');
+                return;
+            }
+
+            const hrs = Math.floor(diff / (1000 * 60 * 60));
+            const mins = Math.floor((diff / (1000 * 60)) % 60);
+            const secs = Math.floor((diff / 1000) % 60);
+
+            setTaskBoosterTimeLeft(`${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
+        };
+
+        updateTimer();
+        const interval = setInterval(updateTimer, 1000);
+        return () => clearInterval(interval);
+    }, [isTaskBoosterActive, userData?.taskBoosterExpiry]);
+
+    // Weekly Season Reset Animation Hook
+    const [showResetAnimation, setShowResetAnimation] = useState(false);
+
+    useEffect(() => {
+        const getMostRecentMonday = () => {
+            const d = new Date();
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            const monday = new Date(d.setDate(diff));
+            monday.setHours(0, 0, 0, 0);
+            return monday.getTime();
+        };
+
+        const lastSeen = localStorage.getItem('dromoney_season_reset_seen');
+        const recentMonday = getMostRecentMonday();
+
+        if (!lastSeen || Number(lastSeen) < recentMonday) {
+            setShowResetAnimation(true);
+        }
+    }, []);
+
+    const dismissResetAnimation = () => {
+        localStorage.setItem('dromoney_season_reset_seen', Date.now().toString());
+        setShowResetAnimation(false);
+    };
+
     useEffect(() => {
         const calculateTimeRemaining = () => {
             const now = new Date();
@@ -281,8 +336,8 @@ const Home = () => {
     };
     const [lifetimePromo, setLifetimePromo] = useState(null);
     const [boosters, setBoosters] = useState({
-        support: { title: '₹21 Event Support Kit', subtitle: 'Get guided assistance in events!', price: 21, validity: '30 Days', benefits: [] },
-        task: { title: '₹49 Daily Boost Pass', subtitle: 'Boost performance & processing!', price: 49, validity: '30 Days', benefits: [] }
+        support: { title: '₹21 Event Booster', subtitle: 'Guided assistance in events!', price: 21, validity: 'Event Duration', benefits: [] },
+        task: { title: '₹49 Power Booster', subtitle: 'Get 12x earning speed!', price: 49, validity: '24 Hours', benefits: [] }
     });
     const [footerPolicies, setFooterPolicies] = useState([
         { label: 'Privacy Policy', path: 'privacy' },
@@ -593,6 +648,13 @@ const Home = () => {
                                             <Clock size={10} /> {boosters.task.validity || '30 Days'}
                                         </p>
                                     </div>
+                                    {isTaskBoosterActive && (
+                                        <div className="mt-1.5 flex items-center gap-1 bg-sky-100/80 px-2 py-0.5 rounded-lg border border-sky-200 w-fit">
+                                            <span className="text-[8.5px] font-bold text-sky-700 uppercase animate-pulse">
+                                                Booster Active! Expires in: {taskBoosterTimeLeft || '24:00:00'}
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <div className="flex flex-col items-end gap-2 shrink-0">
@@ -621,7 +683,7 @@ const Home = () => {
                                 <ul className="space-y-1.5 border-t border-sky-100/50 pt-3">
                                     {(boosters.task.benefits && boosters.task.benefits.length > 0 
                                         ? boosters.task.benefits 
-                                        : ['3X Coins on Tasks', 'Fast Rewards Processing', 'Priority Task Verification']
+                                        : ['12X Coins on Tasks & Ads', 'Fast Rewards Processing', 'Priority Task Verification']
                                     ).map((benefit, i) => (
                                         <li key={i} className="flex items-center gap-2">
                                             <div className="w-3 h-3 bg-sky-100 rounded-full flex items-center justify-center shrink-0">
@@ -809,6 +871,41 @@ const Home = () => {
                             autoPlay={true}
                         />
                     </div>
+                </div>
+            )}
+
+            {/* Season Reset Animation Overlay */}
+            {showResetAnimation && (
+                <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/95 backdrop-blur-md p-6 text-center animate-in fade-in zoom-in-95 duration-500">
+                    {/* Animated Golden Trophy/Stars */}
+                    <div className="relative mb-6">
+                        <div className="w-24 h-24 bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 rounded-full flex items-center justify-center shadow-2xl shadow-amber-500/50 animate-bounce">
+                            <Trophy size={48} className="text-slate-900 fill-amber-100" />
+                        </div>
+                        <div className="absolute top-0 -right-2 w-4 h-4 bg-sky-400 rounded-full animate-ping"></div>
+                        <div className="absolute -bottom-1 -left-2 w-3 h-3 bg-emerald-400 rounded-full animate-ping delay-300"></div>
+                    </div>
+
+                    <h2 className="text-3xl font-extrabold text-white tracking-tight uppercase font-poppins mb-3 animate-pulse">
+                        Fresh Start! 🌟
+                    </h2>
+                    <p className="text-[10px] text-amber-400 font-bold uppercase tracking-[0.25em] mb-4">
+                        Weekly Season Restarted
+                    </p>
+
+                    <div className="max-w-[320px] bg-white/5 border border-white/10 rounded-2xl p-4 mb-8">
+                        <p className="text-xs text-slate-300 leading-relaxed font-poppins">
+                            All Coins and Boosters have been automatically reset to <span className="text-amber-400 font-bold">Zero</span> for the new week. 
+                            Start completing tasks to climb the new weekly leaderboard!
+                        </p>
+                    </div>
+
+                    <button
+                        onClick={dismissResetAnimation}
+                        className="bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-slate-950 px-8 py-3.5 rounded-xl font-bold uppercase text-xs tracking-widest shadow-xl shadow-amber-500/25 active:scale-95 transition-all w-fit"
+                    >
+                        Start Earning
+                    </button>
                 </div>
             )}
         </div>

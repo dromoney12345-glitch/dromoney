@@ -135,7 +135,7 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         }
 
         if (isApplicable) {
-            factor = 3;
+            factor = 12;
         }
     }
     const totalAwardedCoins = amount * factor;

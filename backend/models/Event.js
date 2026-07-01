@@ -39,6 +39,14 @@ const EventSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    isMega: {
+        type: Boolean,
+        default: false
+    },
+    totalCashPoolINR: {
+        type: Number,
+        default: 0
+    },
     // Configuration for specific types
     config: {
         // For Quiz

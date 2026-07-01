@@ -229,7 +229,7 @@ async function handlePaymentSuccess(payment) {
         // Example logic for booster activation
         await User.findByIdAndUpdate(user._id, {
             isTaskBoosterActive: true,
-            taskBoosterExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+            taskBoosterExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 Hours / 1 Day
         });
     }
 }

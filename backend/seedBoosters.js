@@ -5,18 +5,18 @@ require('dotenv').config();
 const INITIAL_BOOSTERS = [
     {
         type: 'support',
-        title: '₹21 Event Support Kit',
-        subtitle: 'Get guided assistance in events!',
+        title: '₹21 Event Booster',
+        subtitle: 'Event-specific booster (expires when event ends)',
         price: 21,
-        benefits: ['Guided Assistance', 'Performance Support', 'Success Edge'],
+        benefits: ['Extra 3 Seconds in Games', 'Guided Assistance in Events', 'Priority Event Access'],
         isActive: true
     },
     {
         type: 'task',
-        title: '₹49 Daily Boost Pass',
-        subtitle: 'Boost performance & processing!',
+        title: '₹49 Power Booster',
+        subtitle: '12x speed earning for 24 Hours!',
         price: 49,
-        benefits: ['Task Efficiency (Up to 3X)', 'Fast Rewards', 'Priority Processing'],
+        benefits: ['12X Coins on Tasks & Ads', 'Fast Rewards Processing', 'Priority Task Verification'],
         isActive: true
     }
 ];

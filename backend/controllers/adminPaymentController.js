@@ -66,12 +66,12 @@ exports.updatePaymentStatus = async (req, res) => {
                     }
 
                     const expiryDate = new Date();
-                    expiryDate.setDate(expiryDate.getDate() + 30);
-
                     if (isSupport) {
+                        expiryDate.setDate(expiryDate.getDate() + 30); // Fallback: Event Booster expires when event ends or weekly reset
                         user.isSupportBoosterActive = true;
                         user.supportBoosterExpiry = expiryDate;
                     } else {
+                        expiryDate.setHours(expiryDate.getHours() + 24); // 24 Hours validity for ₹49 Power Booster
                         user.isTaskBoosterActive = true;
                         user.taskBoosterExpiry = expiryDate;
                     }
@@ -81,7 +81,7 @@ exports.updatePaymentStatus = async (req, res) => {
                     user.notifications = user.notifications || [];
                     user.notifications.push({
                         title: 'Booster Activated! ⚡',
-                        message: `Your ${isSupport ? 'Support Booster' : 'Task Booster'} is now active! Enjoy 3X coin earnings for 30 days.`,
+                        message: `Your ${isSupport ? 'Event Booster' : 'Power Booster'} is now active! Enjoy ${isSupport ? 'event support benefits' : '12x coin earnings for 24 hours'}.`,
                         type: 'success',
                         isRead: false
                     });

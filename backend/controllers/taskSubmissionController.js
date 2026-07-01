@@ -126,16 +126,16 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('Task not found', 404));
     }
 
-    // Calculate coins to add (apply 3X Booster if active)
+    // Calculate coins to add (apply 12X Booster if active)
     let factor = 1;
     if (user.isBoosterActive || user.isTaskBoosterActive) {
         const Booster = require('../models/Booster');
         const taskBooster = await Booster.findOne({ type: 'task' });
         if (!taskBooster || !taskBooster.applicableTasks || taskBooster.applicableTasks.length === 0 || taskBooster.applicableTasks.includes('General Tasks') || taskBooster.applicableTasks.includes(task.type)) {
-            factor = 3;
+            factor = 12;
         }
     }
-    const baseCoins = submission.coinsReward || task.coinsReward || 1;
+    const baseCoins = submission.coinsReward || task.coinsReward || 2;
     const coinsToAdd = baseCoins * factor;
 
     // Remove conversion logic

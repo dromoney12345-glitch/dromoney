@@ -271,6 +271,17 @@ const AdminLayout = () => {
                     </button>
 
                     <div className="flex items-center gap-3">
+                        <button 
+                            onClick={() => window.location.reload()} 
+                            className="w-9 h-9 bg-slate-50 hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 border border-slate-100 relative transition-all active:scale-95 hover:text-indigo-600 hover:border-indigo-100 shadow-sm"
+                            title="Refresh Page"
+                        >
+                            <svg className="w-[16px] h-[16px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.72 2.78L21 8" />
+                                <polyline points="21 3 21 8 16 8" />
+                            </svg>
+                        </button>
+
                         <button onClick={() => setIsNotifOpen(true)} className="w-9 h-9 bg-slate-50 hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 border border-slate-100 relative transition-transform active:scale-95">
                             <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
                             <span className="absolute top-2 right-2.5 w-1.5 h-1.5 bg-sky-500 rounded-full"></span>

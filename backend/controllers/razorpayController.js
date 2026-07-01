@@ -184,12 +184,13 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
             console.log(`[PAYMENT] Activating Booster ${payment.paymentType} for user ${user._id}`);
             
             const expiryDate = new Date();
-            expiryDate.setDate(expiryDate.getDate() + 30); // 30 Days expiry
 
             if (payment.paymentType === 'SUPPORT_BOOSTER') {
+                expiryDate.setDate(expiryDate.getDate() + 30); // Support booster legacy fallback, but event reset clears it
                 user.isSupportBoosterActive = true;
                 user.supportBoosterExpiry = expiryDate;
             } else {
+                expiryDate.setHours(expiryDate.getHours() + 24); // 24 Hours validity for ₹49 Power Booster
                 user.isTaskBoosterActive = true;
                 user.taskBoosterExpiry = expiryDate;
             }

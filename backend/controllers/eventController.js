@@ -165,8 +165,8 @@ exports.createEvent = asyncHandler(async (req, res, next) => {
         try {
             const { sendBroadcastNotification } = require('./fcmController');
             await sendBroadcastNotification({
-                title: `New Event: ${event.title}`,
-                body: `A new ${event.tag} event is live! Join now to win ${event.prize || 'rewards'}.`,
+                title: 'नया चैलेंज लाइव है! 🏆',
+                body: 'नया चैलेंज लाइव है! अभी भाग लें और इनाम जीतें।',
                 data: {
                     type: 'event',
                     link: '/user/events'
@@ -193,10 +193,28 @@ exports.updateEvent = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse(`Event not found with id of ${req.params.id}`, 404));
     }
 
+    const oldStatus = event.status;
+
     event = await Event.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true
     });
+
+    if (req.body.status === 'Active' && oldStatus !== 'Active') {
+        try {
+            const { sendBroadcastNotification } = require('./fcmController');
+            await sendBroadcastNotification({
+                title: 'नया चैलेंज लाइव है! 🏆',
+                body: 'नया चैलेंज लाइव है! अभी भाग लें और इनाम जीतें।',
+                data: {
+                    type: 'event',
+                    link: '/user/events'
+                }
+            });
+        } catch (pushErr) {
+            console.error('Push broadcast failed on update:', pushErr.message);
+        }
+    }
 
     res.status(200).json({
         success: true,
@@ -342,13 +360,15 @@ exports.approveWinners = asyncHandler(async (req, res, next) => {
     let settings = await Settings.findOne();
     const coinRate = settings?.coinRate || 0.10;
 
-    // Total Entry Pool in Coins
     const totalCoinsPool = participants.length * event.fee;
-    const totalCashPool = totalCoinsPool * coinRate;
+    const totalCashPoolFallback = totalCoinsPool * coinRate;
+    
+    // Admin configured single total pool amount, fallback to coin-based pool conversion
+    const totalPool = event.totalCashPoolINR > 0 ? event.totalCashPoolINR : totalCashPoolFallback;
 
-    const adminProfit = totalCashPool * 0.20;
-    const prizePool = totalCashPool * 0.50;
-    const cashbackPool = totalCashPool * 0.30;
+    const prizePool = totalPool * 0.50; // 50% Prize for Top 3 winners
+    const adminProfit = totalPool * 0.20; // 20% for Admin
+    const cashbackPool = totalPool * 0.30; // 30% for Remaining participants (Cashback)
 
     // Sort participants by score (descending) and timeTaken (ascending)
     participants.sort((a, b) => {

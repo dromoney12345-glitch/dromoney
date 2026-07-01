@@ -60,7 +60,7 @@ router.get('/status', async (req, res) => {
             nextAdIn, // in seconds
             remainingAds,
             maxDailyLimit: MAX_DAILY_ADS,
-            rewardAmount: settings.adRewardCoins || 5
+            rewardAmount: settings.adRewardCoins || 2
         });
     } catch (err) {
         console.error(err);
@@ -79,7 +79,7 @@ router.post('/claim', async (req, res) => {
         const settings = await Settings.findOne() || {};
         const MAX_DAILY_ADS = settings.adMaxDailyLimit || 10;
         const COOLDOWN_SECONDS = settings.adCooldownSeconds || 30;
-        const BASE_REWARD = settings.adRewardCoins || 5;
+        const BASE_REWARD = settings.adRewardCoins || 2;
 
         await checkAndResetDailyLimit(user);
 
@@ -103,7 +103,7 @@ router.post('/claim', async (req, res) => {
             const Booster = require('../models/Booster');
             const taskBooster = await Booster.findOne({ type: 'task' });
             if (taskBooster && taskBooster.applicableTasks && (taskBooster.applicableTasks.includes('General Tasks') || taskBooster.applicableTasks.includes('Watch Video') || taskBooster.applicableTasks.includes('Rewarded Ad'))) {
-                factor = 3;
+                factor = 12;
             }
         }
         

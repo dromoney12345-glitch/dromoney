@@ -157,7 +157,8 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast, onRefr
         setEditingId(event.id);
         setEditData({ 
             ...event, 
-            fee: Math.max(0, event.fee) // Ensure fee is never negative
+            fee: Math.max(0, event.fee),
+            totalCashPoolINR: event.totalCashPoolINR || 0
         });
     };
 
@@ -168,7 +169,9 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast, onRefr
             fee: +editData.fee,
             prize: editData.prize,
             startTime: editData.startTime,
-            status: editData.status
+            status: editData.status,
+            isMega: !!editData.isMega,
+            totalCashPoolINR: +editData.totalCashPoolINR || 0
         });
         setEditingId(null);
         onShowToast('Event updated successfully!', 'success');
@@ -219,6 +222,11 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast, onRefr
                                     <span className={`inline-block mt-1 px-2 py-0.5 rounded-md text-[9px] font-medium uppercase tracking-normal border font-['Poppins'] ${TAG_COLORS[event.tag] || 'bg-slate-50 border-slate-100'}`}>
                                         {event.tag}
                                     </span>
+                                    {event.isMega && (
+                                        <span className="inline-block mt-1 ml-1.5 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-normal border bg-gradient-to-r from-amber-500 to-orange-600 text-white border-amber-600 font-['Poppins'] shadow-sm animate-pulse">
+                                            🔥 MEGA
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                             {isEditing ? (
@@ -240,7 +248,7 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast, onRefr
                         </div>
 
                         {/* Stats */}
-                        <div className="grid grid-cols-4 gap-2 mb-4">
+                        <div className="grid grid-cols-4 gap-2 mb-3">
                             {[
                                 { label: 'Entry', value: isEditing ? null : `${Math.max(0, event.fee)} Coins`, edit: <input type="number" min="0" value={editData.fee} onChange={e => setEditData(p => ({ ...p, fee: Math.max(0, +e.target.value) }))} className="w-14 border-b border-sky-300 text-center text-sm font-medium outline-none bg-transparent" /> },
                                 { label: 'Pool', value: isEditing ? <span className="text-sm font-medium text-slate-500">Auto (80%)</span> : `${Math.floor((event.fee || 0) * (event.participantsCount || 0) * 0.8)} Coins` },
@@ -257,15 +265,53 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast, onRefr
                             ))}
                         </div>
 
+                        {/* Static INR Pools Configuration */}
+                        <div className="mt-3 pt-3 border-t border-slate-100/60 mb-4">
+                            <div className="bg-slate-50/50 rounded-xl p-2.5 border border-slate-100/50 text-center font-['Poppins']">
+                                <p className="text-[8px] font-semibold text-slate-400 uppercase tracking-normal mb-1 font-['Poppins']">Total Event Pool (₹)</p>
+                                {isEditing ? (
+                                    <div className="flex justify-center">
+                                        <input 
+                                            type="number" 
+                                            min="0" 
+                                            value={editData.totalCashPoolINR} 
+                                            onChange={e => setEditData(p => ({ ...p, totalCashPoolINR: Math.max(0, +e.target.value) }))} 
+                                            className="w-24 border-b border-sky-300 text-center text-sm font-medium outline-none bg-transparent" 
+                                        />
+                                    </div>
+                                ) : (
+                                    <p className="text-sm font-bold text-sky-600 font-['Poppins']">₹{event.totalCashPoolINR || 0}</p>
+                                )}
+                            </div>
+                        </div>
+
                         {/* Start Time */}
                         <div className="mb-4 font-['Poppins']">
                             <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mb-1 font-['Poppins']">Start Time</p>
                             {isEditing ? (
-                                <input
-                                    value={editData.startTime}
-                                    onChange={e => setEditData(p => ({ ...p, startTime: e.target.value }))}
-                                    className="text-sm font-medium text-slate-700 border-b border-sky-300 outline-none bg-transparent w-full font-['Poppins']"
-                                />
+                                <div className="space-y-2">
+                                    <input
+                                        value={editData.startTime}
+                                        onChange={e => setEditData(p => ({ ...p, startTime: e.target.value }))}
+                                        className="text-sm font-medium text-slate-700 border-b border-sky-300 outline-none bg-transparent w-full font-['Poppins']"
+                                    />
+                                    <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={!!editData.isMega}
+                                            onChange={e => {
+                                                const isMega = e.target.checked;
+                                                setEditData(p => ({ 
+                                                    ...p, 
+                                                    isMega, 
+                                                    startTime: isMega ? 'Sunday 8:00 PM' : p.startTime
+                                                }));
+                                            }}
+                                            className="rounded text-sky-500 focus:ring-sky-400"
+                                        />
+                                        Is Mega Event? (Sunday 8 PM)
+                                    </label>
+                                </div>
                             ) : (
                                 <p className="text-sm font-medium text-slate-700 font-['Poppins']">{event.startTime}</p>
                             )}
@@ -635,6 +681,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
     const [sortBy, setSortBy] = useState('timeTaken');
     const [searchQuery, setSearchQuery] = useState('');
     const [participants, setParticipants] = useState([]);
+    const [coinRate, setCoinRate] = useState(0.10);
     const [awardNote, setAwardNote] = useState('');
     const [awardingId, setAwardingId] = useState(null);
     const [viewingParticipant, setViewingParticipant] = useState(null);
@@ -648,7 +695,13 @@ const ParticipantsTab = ({ events, onShowToast }) => {
     const fetchParticipants = async () => {
         if (!selectedEventId) return;
         try {
-            const res = await api.get(`/admin/events/${selectedEventId}/participants`);
+            const [res, settingsRes] = await Promise.all([
+                api.get(`/admin/events/${selectedEventId}/participants`),
+                api.get('/admin/settings')
+            ]);
+            if (settingsRes.success && settingsRes.data) {
+                setCoinRate(settingsRes.data.coinRate || 0.10);
+            }
             if (res.success && res.data) {
                 setParticipants(res.data.map(p => ({
                     ...p,
@@ -860,7 +913,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                             <button
                                 onClick={() => { 
                                     setAwardingId(fastestParticipant.id); 
-                                    setAwardNote(`${dynamicPrize} Coins (Winner with record-breaking speed of ${fastestParticipant.timeTaken}s)`); 
+                                    setAwardNote(`₹${(dynamicPrize * coinRate).toFixed(2)} (Winner with speed of ${fastestParticipant.timeTaken}s)`); 
                                 }}
                                 className="bg-white text-orange-600 hover:bg-orange-50 px-4.5 py-2.5 rounded-xl text-[9px] font-medium uppercase tracking-normal active:scale-95 transition-all shadow-md cursor-pointer"
                             >
@@ -968,7 +1021,21 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                         <div className="flex items-center gap-3 pr-2">
                                             <div className="text-right hidden sm:block">
                                                 <p className="text-[8px] font-medium text-slate-400 uppercase tracking-normal mb-0.5">Prize Won</p>
-                                                <p className="text-[11px] font-bold text-amber-600">{p.prizeStatus === 'Awarded' ? (p.prize || `${dynamicPrize} Coins`) : 'No Prize'}</p>
+                                                <p className="text-[11px] font-bold text-amber-600">
+                                                    {p.prizeStatus === 'Awarded' ? (() => {
+                                                        if (p.prizeNote && p.prizeNote.includes('₹')) {
+                                                            const match = p.prizeNote.match(/₹\d+(\.\d+)?/);
+                                                            if (match) return match[0];
+                                                        }
+                                                        if (p.prize) {
+                                                            if (p.prize.includes('₹')) return p.prize;
+                                                            const num = parseFloat(p.prize.replace(/[^\d.]/g, ''));
+                                                            if (!isNaN(num)) return `₹${(num * coinRate).toFixed(2)}`;
+                                                            return p.prize;
+                                                        }
+                                                        return `₹${(dynamicPrize * coinRate).toFixed(2)}`;
+                                                    })() : 'No Prize'}
+                                                </p>
                                             </div>
                                             <div className="flex flex-col items-end gap-1">
                                                 <span className={`px-2 py-0.5 rounded-lg text-[9px] font-semibold uppercase tracking-normal border flex items-center gap-1 ${p.prizeStatus === 'Awarded' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
@@ -980,7 +1047,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                                         onClick={(e) => { 
                                                             e.stopPropagation(); 
                                                             setAwardingId(awardingId === p.id ? null : p.id); 
-                                                            setAwardNote(`${dynamicPrize} Coins (Admin Awarded)`);
+                                                            setAwardNote(`₹${(dynamicPrize * coinRate).toFixed(2)} (Admin Awarded)`);
                                                         }}
                                                         className="flex items-center gap-1 px-2 py-1 bg-sky-50 text-sky-600 rounded-lg text-[8px] font-bold uppercase tracking-normal hover:bg-sky-100 active:scale-95 transition-all border border-sky-100"
                                                     >
@@ -1057,8 +1124,22 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                     </p>
                                 </div>
                                 <div className="bg-amber-50 p-3 rounded-lg border border-amber-100 flex flex-col justify-center">
-                                    <p className="text-[9px] font-medium text-amber-500 uppercase tracking-normal mb-1 text-center">Reward Status</p>
-                                    <p className="text-sm font-medium text-amber-700 text-center">{viewingParticipant.prize || 'Claimable'}</p>
+                                    <p className="text-[9px] font-medium text-amber-500 uppercase tracking-normal mb-1 text-center">Prize Won</p>
+                                    <p className="text-sm font-medium text-amber-700 text-center">
+                                        {viewingParticipant.prizeStatus === 'Awarded' ? (() => {
+                                            if (viewingParticipant.prizeNote && viewingParticipant.prizeNote.includes('₹')) {
+                                                const match = viewingParticipant.prizeNote.match(/₹\d+(\.\d+)?/);
+                                                if (match) return match[0];
+                                            }
+                                            if (viewingParticipant.prize) {
+                                                if (viewingParticipant.prize.includes('₹')) return viewingParticipant.prize;
+                                                const num = parseFloat(viewingParticipant.prize.replace(/[^\d.]/g, ''));
+                                                if (!isNaN(num)) return `₹${(num * coinRate).toFixed(2)}`;
+                                                return viewingParticipant.prize;
+                                            }
+                                            return `₹${(dynamicPrize * coinRate).toFixed(2)}`;
+                                        })() : 'No Prize'}
+                                    </p>
                                 </div>
                             </div>
 
@@ -1116,10 +1197,12 @@ const EventsAdmin = () => {
     const [newEventData, setNewEventData] = useState({
         title: '',
         tag: 'Quiz',
-        fee: 10,
-        prize: '₹500',
+        fee: 500,
+        prize: 'Dynamic',
         startTime: 'Live Now',
-        status: 'Active'
+        status: 'Active',
+        isMega: false,
+        totalCashPoolINR: 0
     });
 
     const fetchEvents = async () => {
@@ -1214,10 +1297,12 @@ const EventsAdmin = () => {
                 setNewEventData({
                     title: '',
                     tag: 'Quiz',
-                    fee: 10,
+                    fee: 500,
                     prize: 'Dynamic',
                     startTime: 'Live Now',
-                    status: 'Active'
+                    status: 'Active',
+                    isMega: false,
+                    totalCashPoolINR: 0
                 });
                 await fetchEvents();
             }
@@ -1355,18 +1440,52 @@ const EventsAdmin = () => {
                                     </div>
                                 </div>
 
+                                {/* Static Cash Pools Config (INR) */}
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal font-['Poppins']">Status</label>
-                                    <select
-                                        value={newEventData.status}
-                                        onChange={e => setNewEventData(p => ({ ...p, status: e.target.value }))}
+                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal font-['Poppins']">Total Event Pool (₹)</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        required
+                                        value={newEventData.totalCashPoolINR}
+                                        onChange={e => setNewEventData(p => ({ ...p, totalCashPoolINR: Math.max(0, +e.target.value) }))}
+                                        placeholder="e.g. 1000"
                                         className="w-full text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white font-['Poppins']"
-                                    >
-                                        <option value="Active">Active</option>
-                                        <option value="Inactive">Inactive</option>
-                                        <option value="Draft">Draft</option>
-                                        <option value="Coming Soon">Coming Soon</option>
-                                    </select>
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal font-['Poppins']">Status</label>
+                                        <select
+                                            value={newEventData.status}
+                                            onChange={e => setNewEventData(p => ({ ...p, status: e.target.value }))}
+                                            className="w-full text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white font-['Poppins']"
+                                        >
+                                            <option value="Active">Active</option>
+                                            <option value="Inactive">Inactive</option>
+                                            <option value="Draft">Draft</option>
+                                            <option value="Coming Soon">Coming Soon</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal font-['Poppins']">Event Type</label>
+                                        <select
+                                            value={newEventData.isMega ? 'mega' : 'normal'}
+                                            onChange={e => {
+                                                const isMega = e.target.value === 'mega';
+                                                setNewEventData(p => ({ 
+                                                    ...p, 
+                                                    isMega, 
+                                                    startTime: isMega ? 'Sunday 8:00 PM' : 'Live Now'
+                                                }));
+                                            }}
+                                            className="w-full text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-sky-400 focus:bg-white font-['Poppins'] select-none"
+                                        >
+                                            <option value="normal">Normal Event</option>
+                                            <option value="mega">Mega Event (Sunday 8 PM)</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
 
