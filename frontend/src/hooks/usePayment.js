@@ -27,9 +27,15 @@ export const usePayment = () => {
                 // Store orderId in local storage so we can verify it upon return if needed
                 localStorage.setItem('pending_payment_order_id', orderId);
 
+                // Detect if user is on a mobile device
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
                 // Handle Gateway Redirects
-                if (paymentUrl) {
-                    console.log('Redirecting to paymentUrl:', paymentUrl);
+                if (isMobile && upiIntent && upiIntent !== paymentUrl) {
+                    console.log('Redirecting to Native UPI Intent (Mobile):', upiIntent);
+                    window.location.href = upiIntent;
+                } else if (paymentUrl) {
+                    console.log('Redirecting to Gateway URL (Desktop/Fallback):', paymentUrl);
                     window.location.href = paymentUrl;
                 } else if (upiIntent) {
                     console.log('Redirecting to upiIntent:', upiIntent);

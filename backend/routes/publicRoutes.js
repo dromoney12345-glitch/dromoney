@@ -27,20 +27,22 @@ router.get('/events/:id', getOptionalUser, getEvent);
 router.get('/tasks', getTasks);
 router.get('/settings', getPublicSettings);
 router.get('/referrer/:code', getReferrerName);
-
 // --- TEST ROUTE FOR DEBUGGING UPIGATEWAY ---
 router.get('/test-payment', async (req, res) => {
     try {
-        const UpigatewayService = require('../services/upigateway.service');
-        const testOrderData = {
-            orderId: `TEST_${Date.now()}`,
-            amount: 10,
-            userName: 'Test User',
-            userEmail: 'test@example.com',
-            userPhone: '9999999999'
+        const axios = require('axios');
+        const payload = {
+            key: process.env.UPIGATEWAY_API_KEY,
+            client_txn_id: `TEST_${Date.now()}`,
+            amount: "10",
+            p_info: "Test",
+            customer_name: "Test User",
+            customer_email: "test@example.com",
+            customer_mobile: "9999999999",
+            redirect_url: "https://dromoney.com/payment-success"
         };
-        const response = await UpigatewayService.createPaymentLink(testOrderData);
-        res.json({ success: true, serviceResponse: response });
+        const response = await axios.post(`${process.env.UPIGATEWAY_BASE_URL}/create_order`, payload);
+        res.json({ success: true, rawResponse: response.data });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message, stack: err.stack });
     }

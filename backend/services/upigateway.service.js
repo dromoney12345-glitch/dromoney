@@ -50,6 +50,9 @@ class UpigatewayService {
             }
 
             const paymentUrl = responseData.data?.payment_url || responseData.payment_url || responseData.data?.payment_link || responseData.payment_link;
+            
+            // Extract native UPI intent links (bhim_link usually maps to upi://pay)
+            const upiIntent = responseData.data?.upi_intent?.bhim_link || responseData.upi_intent?.bhim_link;
 
             if (!paymentUrl) {
                 throw new Error('Payment URL not found in gateway response');
@@ -59,7 +62,7 @@ class UpigatewayService {
                 status: 'success',
                 data: {
                     paymentLinkString: paymentUrl,
-                    deepLinkString: paymentUrl, // UPIGateway handles Intent inside this URL natively
+                    deepLinkString: upiIntent || paymentUrl,
                     orderCode: responseData.data?.client_txn_id || responseData.client_txn_id || orderData.orderId
                 }
             };
@@ -73,13 +76,36 @@ class UpigatewayService {
 
     /**
      * Verify Webhook Payload
+     * UPIGateway uses server-to-server validation via check_order_status
      */
     verifyWebhookSignature(payload) {
-        if (UPIGATEWAY_API_KEY === 'dummy_api_key') return true;
-        // UPIGateway often doesn't use HMAC for webhooks, they send the payload and you verify by checking status API
-        // For basic verification, we just accept the payload structure.
-        // It's highly recommended to call the check_order_status API here for strict validation.
         return true; 
+    }
+
+    /**
+     * Strictly Validate Order Status with Gateway
+     * This prevents anyone from spoofing webhooks!
+     */
+    async checkOrderStatus(clientTxnId, txnDate = null) {
+        if (UPIGATEWAY_API_KEY === 'dummy_api_key') return { status: 'success' };
+        
+        try {
+            const payload = {
+                key: UPIGATEWAY_API_KEY,
+                client_txn_id: clientTxnId
+            };
+            
+            if (txnDate) payload.txn_date = txnDate; // Required by some versions
+
+            const response = await axios.post(`${UPIGATEWAY_BASE_URL}/check_order_status`, payload, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            return response.data;
+        } catch (error) {
+            console.error('[UPIGateway Status Check Error]:', error.message);
+            return { status: false, msg: error.message };
+        }
     }
 }
 

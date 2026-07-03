@@ -166,8 +166,9 @@ exports.paymentWebhook = asyncHandler(async (req, res, next) => {
 
     // UPIGateway typical format: { client_txn_id, status, upi_txn_id }
     const order_id = payloadData.client_txn_id || payloadData.orderCode || req.body.orderCode || req.body.order_id;
-    const status = payloadData.status || req.body.status;
+    const incoming_status = payloadData.status || req.body.status;
     const transaction_id = payloadData.upi_txn_id || payloadData.txn_id || payloadData.transactionId || req.body.transaction_id;
+    const txn_date = payloadData.txn_date || req.body.txn_date;
     
     if (!order_id) return res.status(400).send('Missing order_id or orderCode');
 
@@ -179,21 +180,47 @@ exports.paymentWebhook = asyncHandler(async (req, res, next) => {
         return res.status(200).send('Already processed');
     }
 
-    if (status === 'PAID' || status === 'SUCCESS' || status === 'success') {
+    // STRICT SERVER-TO-SERVER SECURITY VALIDATION
+    // We do NOT trust the incoming webhook blindly. We check with the Gateway directly!
+    const gatewayVerification = await UpigatewayService.checkOrderStatus(order_id, txn_date);
+    
+    // Check if the gateway actually confirms this order was paid successfully
+    const isValidPayment = 
+        gatewayVerification && 
+        (gatewayVerification.status === true || gatewayVerification.status === 'success' || gatewayVerification.status === 'SUCCESS') &&
+        (gatewayVerification.data?.status === 'success' || gatewayVerification.data?.status === 'SUCCESS' || gatewayVerification.data?.status === 'PAID');
+
+    // Also compare amount as an extra security check if provided in verification
+    if (isValidPayment && gatewayVerification.data && gatewayVerification.data.amount) {
+        const paidAmount = Number(gatewayVerification.data.amount);
+        if (paidAmount < payment.amount) {
+            payment.status = 'Failed';
+            payment.remarks = 'Amount mismatch detected during secure validation';
+            await payment.save();
+            return res.status(400).send('Amount mismatch');
+        }
+    }
+
+    if (isValidPayment || incoming_status === 'PAID' || incoming_status === 'SUCCESS' || incoming_status === 'success') {
+        // If strictly valid OR if in dev mode
+        if (!isValidPayment && process.env.NODE_ENV !== 'development') {
+            return res.status(403).send('Gateway validation failed');
+        }
+
         payment.status = 'Success';
         payment.verified = true;
-        payment.transactionId = transaction_id || payment.transactionId;
-        payment.gatewayResponse = req.body;
+        payment.transactionId = transaction_id || gatewayVerification?.data?.upi_txn_id || payment.transactionId;
+        payment.gatewayResponse = gatewayVerification || req.body;
         await payment.save();
 
         await handlePaymentSuccess(payment);
-    } else if (status === 'FAILED' || status === 'failed' || status === 'CANCELLED') {
+    } else if (incoming_status === 'FAILED' || incoming_status === 'failed' || incoming_status === 'CANCELLED') {
         payment.status = 'Failed';
         payment.gatewayResponse = req.body;
         await payment.save();
     }
 
-    res.status(200).send('Webhook processed');
+    res.status(200).send('Webhook securely processed');
 });
 
 /**
