@@ -251,7 +251,7 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast, onRefr
                         <div className="grid grid-cols-4 gap-2 mb-3">
                             {[
                                 { label: 'Entry', value: isEditing ? null : `${Math.max(0, event.fee)} Coins`, edit: <input type="number" min="0" value={editData.fee} onChange={e => setEditData(p => ({ ...p, fee: Math.max(0, +e.target.value) }))} className="w-14 border-b border-sky-300 text-center text-sm font-medium outline-none bg-transparent" /> },
-                                { label: 'Pool', value: isEditing ? <span className="text-sm font-medium text-slate-500">Auto (80%)</span> : `${Math.floor((event.fee || 0) * (event.participantsCount || 0) * 0.8)} Coins` },
+                                { label: 'Pool', value: '50%' },
                                 { label: 'Joined', value: event.participantsCount || 0 },
                                 { label: 'Awarded', value: event.awardedCount || 0 },
                             ].map((stat, i) => (

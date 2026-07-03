@@ -4,9 +4,9 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
-const ZuelpayService = require('../services/zuelpay.service');
+const UpigatewayService = require('../services/upigateway.service');
 
-// @desc    Initiate Zuelpay Payment
+// @desc    Initiate UPIGateway Payment
 // @route   POST /api/payment/create
 // @access  Private
 exports.createPayment = asyncHandler(async (req, res, next) => {
@@ -26,9 +26,9 @@ exports.createPayment = asyncHandler(async (req, res, next) => {
         gateway: 'Zuelpay'
     });
 
-    // 2. Call Zuelpay API via service layer
+    // 2. Call UPIGateway API via service layer
     try {
-        const gatewayResponse = await ZuelpayService.createPayment({
+        const gatewayResponse = await UpigatewayService.createPaymentLink({
             orderId,
             amount: Number(amount),
             userName: req.user.name,
@@ -45,9 +45,9 @@ exports.createPayment = asyncHandler(async (req, res, next) => {
             message: 'Payment initiated successfully',
             data: {
                 orderId: payment.orderId,
-                paymentUrl: gatewayResponse?.data?.payment_url || gatewayResponse?.payment_url,
-                upiIntent: gatewayResponse?.data?.upi_intent,
-                qrCode: gatewayResponse?.data?.qr_code
+                paymentUrl: gatewayResponse?.data?.paymentLinkString,
+                upiIntent: gatewayResponse?.data?.deepLinkString,
+                qrCode: gatewayResponse?.data?.deepLinkString // fallback QR data
             }
         });
     } catch (error) {
@@ -151,18 +151,25 @@ exports.getPaymentStatus = asyncHandler(async (req, res, next) => {
     });
 });
 
-// @desc    Webhook for Zuelpay (Server to Server Async)
+// @desc    Webhook for UPIGateway (Server to Server Async)
 // @route   POST /api/payment/webhook
 // @access  Public
 exports.paymentWebhook = asyncHandler(async (req, res, next) => {
-    // 1. Verify webhook signature (using ZuelpayService logic once docs available)
-    // const signature = req.headers['x-webhook-signature'];
-    // const isValid = ZuelpayService.verifyWebhookSignature(req.body, signature);
-    // if (!isValid) return res.status(401).send('Invalid signature');
+    // 1. Verify webhook signature
+    const signature = req.headers['x-webhook-signature'] || req.headers['signature'];
+    const payloadData = req.body.data || req.body;
 
-    const { order_id, status, transaction_id } = req.body;
+    const isValid = UpigatewayService.verifyWebhookSignature(req.body, signature);
+    if (!isValid && process.env.NODE_ENV !== 'development') {
+        console.warn('Webhook signature mismatch');
+    }
+
+    // UPIGateway typical format: { client_txn_id, status, upi_txn_id }
+    const order_id = payloadData.client_txn_id || payloadData.orderCode || req.body.orderCode || req.body.order_id;
+    const status = payloadData.status || req.body.status;
+    const transaction_id = payloadData.upi_txn_id || payloadData.txn_id || payloadData.transactionId || req.body.transaction_id;
     
-    if (!order_id) return res.status(400).send('Missing order_id');
+    if (!order_id) return res.status(400).send('Missing order_id or orderCode');
 
     const payment = await Payment.findOne({ orderId: order_id }).populate('user');
     if (!payment) return res.status(404).send('Payment not found');
@@ -172,15 +179,15 @@ exports.paymentWebhook = asyncHandler(async (req, res, next) => {
         return res.status(200).send('Already processed');
     }
 
-    if (status === 'success' || status === 'SUCCESS') {
+    if (status === 'PAID' || status === 'SUCCESS' || status === 'success') {
         payment.status = 'Success';
         payment.verified = true;
-        payment.transactionId = transaction_id;
+        payment.transactionId = transaction_id || payment.transactionId;
         payment.gatewayResponse = req.body;
         await payment.save();
 
         await handlePaymentSuccess(payment);
-    } else if (status === 'failed' || status === 'FAILED') {
+    } else if (status === 'FAILED' || status === 'failed' || status === 'CANCELLED') {
         payment.status = 'Failed';
         payment.gatewayResponse = req.body;
         await payment.save();

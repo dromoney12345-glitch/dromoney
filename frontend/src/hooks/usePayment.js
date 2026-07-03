@@ -19,21 +19,27 @@ export const usePayment = () => {
             
             const response = await api.post('/payment/create', { amount, orderType, remarks });
             
-            if (response.data.success) {
-                const { paymentUrl, upiIntent, qrCode, orderId } = response.data.data;
+            // api interceptor already returns response.data directly
+            if (response.success) {
+                const { paymentUrl, upiIntent, qrCode, orderId } = response.data;
+                console.log('[Frontend Payment Response]:', response.data);
                 
                 // Store orderId in local storage so we can verify it upon return if needed
                 localStorage.setItem('pending_payment_order_id', orderId);
 
                 // Handle Gateway Redirects
                 if (paymentUrl) {
+                    console.log('Redirecting to paymentUrl:', paymentUrl);
                     window.location.href = paymentUrl;
                 } else if (upiIntent) {
+                    console.log('Redirecting to upiIntent:', upiIntent);
                     window.location.href = upiIntent;
                 } else if (qrCode) {
+                    console.log('Returning qrCode:', qrCode);
                     // Consumer component can render this QR code
                     return { success: true, qrCode, orderId };
                 } else {
+                    console.error("No valid URL found in response data:", response.data);
                     alert("Invalid response from payment gateway");
                 }
                 

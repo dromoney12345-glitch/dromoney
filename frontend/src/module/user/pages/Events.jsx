@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import {
-    ChevronLeft, ChevronDown, Trophy, Users,
+    ChevronLeft, ChevronDown, Trophy, Users, Gift,
     Sparkles, Zap, Coins, Clock, Lightbulb, Rocket, Award, CheckCircle2, AlertCircle, RefreshCw
 } from 'lucide-react';
 import UnlockModal from '../components/UnlockModal';
@@ -489,6 +489,7 @@ const Events = () => {
                             });
                         })()}
                     </div>
+                </div>
 
                 {/* Support Booster */}
                 <div className="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-lg">

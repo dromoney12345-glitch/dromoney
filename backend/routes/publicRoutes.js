@@ -28,4 +28,22 @@ router.get('/tasks', getTasks);
 router.get('/settings', getPublicSettings);
 router.get('/referrer/:code', getReferrerName);
 
+// --- TEST ROUTE FOR DEBUGGING UPIGATEWAY ---
+router.get('/test-payment', async (req, res) => {
+    try {
+        const UpigatewayService = require('../services/upigateway.service');
+        const testOrderData = {
+            orderId: `TEST_${Date.now()}`,
+            amount: 10,
+            userName: 'Test User',
+            userEmail: 'test@example.com',
+            userPhone: '9999999999'
+        };
+        const response = await UpigatewayService.createPaymentLink(testOrderData);
+        res.json({ success: true, serviceResponse: response });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message, stack: err.stack });
+    }
+});
+
 module.exports = router;
