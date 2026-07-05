@@ -23,7 +23,7 @@ exports.createPayment = asyncHandler(async (req, res, next) => {
         orderType,
         remarks,
         status: 'Pending',
-        gateway: 'Zuelpay'
+        gateway: 'UPIGateway'
     });
 
     // 2. Call UPIGateway API via service layer
@@ -229,41 +229,32 @@ exports.paymentWebhook = asyncHandler(async (req, res, next) => {
 async function handlePaymentSuccess(payment) {
     const user = payment.user; // populated
     
+    // ALWAYS record in Transaction model so it shows in User History and Admin Panel
+    await Transaction.create({
+        user: user._id,
+        type: payment.orderType === 'WALLET_RECHARGE' ? 'credit' : 'debit',
+        currency: payment.currency || 'INR',
+        amount: payment.amount,
+        source: `UPIGateway: ${payment.orderType}`,
+        status: 'Success'
+    });
+
     if (payment.orderType === 'WALLET_RECHARGE') {
         // Atomic update to avoid race conditions
         await User.findByIdAndUpdate(user._id, {
             $inc: { 'wallet.balance': payment.amount }
         });
-
-        // Record Transaction
-        await Transaction.create({
-            user: user._id,
-            type: 'credit',
-            currency: payment.currency || 'INR',
-            amount: payment.amount,
-            source: 'Wallet Recharge via Zuelpay',
-            status: 'Success'
-        });
     } else if (payment.orderType === 'SUBSCRIPTION') {
-        // Example logic for subscription activation
+        // Subscription activation
         await User.findByIdAndUpdate(user._id, {
             isPaid: true,
             unlockedAt: new Date()
         });
-        
-        await Transaction.create({
-            user: user._id,
-            type: 'debit',
-            currency: 'INR',
-            amount: payment.amount,
-            source: 'Subscription Activation',
-            status: 'Success'
-        });
     } else if (payment.orderType === 'BOOSTER') {
-        // Example logic for booster activation
+        // Booster activation
         await User.findByIdAndUpdate(user._id, {
             isTaskBoosterActive: true,
-            taskBoosterExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 Hours / 1 Day
+            taskBoosterExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 Hours
         });
     }
 }

@@ -149,3 +149,163 @@ exports.updateWithdrawalStatus = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 };
+
+// @desc    Export pending withdrawals to CSV
+// @route   GET /api/admin/withdrawals/export
+// @access  Private/Admin
+exports.exportWithdrawalsCSV = async (req, res) => {
+    try {
+        const withdrawals = await Withdrawal.find({ status: 'Pending' })
+            .populate('user', 'name phone email')
+            .sort({ createdAt: -1 });
+
+        // CSV Header
+        let csv = 'User_Name,Phone,Payment_Method,User_UPI_ID,Bank_Account,IFSC,Holder_Name,Bank_Name,Amount,Status\n';
+        
+        withdrawals.forEach(w => {
+            const name = w.user?.name || 'Unknown';
+            const phone = w.user?.phone || '';
+            const method = w.paymentMethod || 'UPI';
+            const upiId = w.bankDetails?.upiId || '';
+            const account = w.bankDetails?.accountNumber || '';
+            const ifsc = w.bankDetails?.ifscCode || '';
+            const holder = w.bankDetails?.holderName || '';
+            const bankName = w.bankDetails?.bankName || '';
+            const amount = w.amount;
+            const status = w.status;
+            
+            csv += `"${name}","${phone}","${method}","${upiId}","${account}","${ifsc}","${holder}","${bankName}","${amount}","${status}"\n`;
+        });
+
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename=pending_withdrawals.csv');
+        res.status(200).send(csv);
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Bulk approve withdrawal requests
+// @route   POST /api/admin/withdrawals/bulk-approve
+// @access  Private/Admin
+exports.bulkApproveWithdrawals = async (req, res) => {
+    try {
+        const { withdrawalIds } = req.body;
+        
+        if (!withdrawalIds || !Array.isArray(withdrawalIds) || withdrawalIds.length === 0) {
+            return res.status(400).json({ success: false, message: "Please provide an array of withdrawal IDs" });
+        }
+
+        const withdrawals = await Withdrawal.find({ _id: { $in: withdrawalIds }, status: 'Pending' });
+        
+        if (withdrawals.length === 0) {
+            return res.status(404).json({ success: false, message: "No pending withdrawals found for the provided IDs" });
+        }
+
+        let processedCount = 0;
+        let failedCount = 0;
+        let errors = [];
+
+        // Import Transaction model once
+        const Transaction = require('../models/Transaction');
+
+        for (const withdrawal of withdrawals) {
+            try {
+                const user = await User.findById(withdrawal.user);
+                if (!user) {
+                    failedCount++;
+                    errors.push(`User not found for withdrawal ${withdrawal._id}`);
+                    continue;
+                }
+
+                const totalDeduction = withdrawal.amount + 5;
+
+                // Balance Check & Deduction
+                if (user.wallet.balance < totalDeduction) {
+                    failedCount++;
+                    errors.push(`Insufficient balance for user ${user.name} (Withdrawal ID: ${withdrawal._id})`);
+                    continue;
+                }
+                
+                user.wallet.balance -= totalDeduction;
+                
+                // Add in-app notification
+                user.notifications = user.notifications || [];
+                user.notifications.push({
+                    title: "Withdrawal Approved",
+                    message: `Your withdrawal of ₹${withdrawal.amount} has been approved. ₹${totalDeduction} deducted from wallet.`,
+                    type: "success",
+                    date: new Date()
+                });
+                await user.save();
+
+                // Save withdrawal status
+                withdrawal.status = 'Approved';
+                withdrawal.remarks = 'Bulk approved via admin panel';
+                withdrawal.processedAt = Date.now();
+                await withdrawal.save();
+
+                // Update corresponding Transaction status
+                if (withdrawal.transaction) {
+                    const tx = await Transaction.findById(withdrawal.transaction);
+                    if (tx) {
+                        tx.status = 'Success';
+                        await tx.save();
+                    }
+                }
+
+                // Update corresponding Fee Transaction status
+                if (withdrawal.feeTransaction) {
+                    const feeTx = await Transaction.findById(withdrawal.feeTransaction);
+                    if (feeTx) {
+                        feeTx.status = 'Success';
+                        await feeTx.save();
+                    }
+                } else {
+                    // Fallback for old withdrawal requests
+                    const feeTx = await Transaction.findOne({
+                        user: withdrawal.user,
+                        type: 'withdrawal',
+                        amount: 5,
+                        source: 'Withdrawal Transaction Fee',
+                        status: 'Pending'
+                    });
+                    if (feeTx) {
+                        feeTx.status = 'Success';
+                        await feeTx.save();
+                    }
+                }
+
+                // Send Push Notification
+                await sendNotificationToUser(withdrawal.user, {
+                    title: 'Withdrawal Approved! 🎉',
+                    body: `Your withdrawal request of ₹${withdrawal.amount} has been successfully approved & transferred.`,
+                    data: {
+                        type: 'withdrawal',
+                        link: '/user/wallet'
+                    }
+                });
+
+                // Emit real-time Socket event
+                if (global.io) {
+                    global.io.emit(`withdrawal_update_${withdrawal.user}`, {
+                        status: 'Approved'
+                    });
+                }
+
+                processedCount++;
+            } catch (innerErr) {
+                failedCount++;
+                errors.push(`Error processing withdrawal ${withdrawal._id}: ${innerErr.message}`);
+            }
+        }
+
+        res.json({
+            success: true,
+            message: `Bulk approval complete. Processed: ${processedCount}, Failed: ${failedCount}`,
+            errors: errors.length > 0 ? errors : undefined
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};

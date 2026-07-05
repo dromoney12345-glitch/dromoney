@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Eye, X } from 'lucide-react';
+import { CheckCircle, XCircle, Eye, X, Download } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import StatusBadge from '../components/StatusBadge';
 import AdminStatCard from '../components/AdminStatCard';
@@ -69,18 +69,63 @@ const Wallets = () => {
         }
     };
 
-    const handleAction = async (id, status) => {
+    const handleAction = async (id, status, isBulk = false, ids = []) => {
+        setLoading(true);
         try {
-            const response = await api.put(`/admin/withdrawals/${id}`, { status });
-            if (response.success) {
-                showToast(`Withdrawal ${status} successfully!`, 'success');
-                setConfirmAction(null);
-                setShowDetailModal(false);
-                fetchWithdrawals();
+            if (isBulk) {
+                const response = await api.post('/admin/withdrawals/bulk-approve', { withdrawalIds: ids });
+                if (response.success) {
+                    showToast(response.message || `Bulk approval complete!`, 'success');
+                }
+            } else {
+                const response = await api.put(`/admin/withdrawals/${id}`, { status });
+                if (response.success) {
+                    showToast(`Withdrawal ${status} successfully!`, 'success');
+                }
             }
         } catch (err) {
             showToast(err.message || 'Something went wrong', 'error');
+        } finally {
+            setConfirmAction(null);
+            setShowDetailModal(false);
+            setLoading(false);
+            fetchWithdrawals();
         }
+    };
+
+    const handleExportCSV = async () => {
+        setLoading(true);
+        try {
+            const blob = await api.get('/admin/withdrawals/export', { responseType: 'blob' });
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'pending_withdrawals.csv');
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+            showToast('CSV downloaded successfully!', 'success');
+        } catch (err) {
+            showToast(err.message || 'Failed to download CSV', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleBulkApprove = () => {
+        const pendingIds = list.filter(w => w.status === 'Pending').map(w => w.id);
+        if (pendingIds.length === 0) {
+            showToast('No pending withdrawals to approve', 'error');
+            return;
+        }
+
+        setConfirmAction({
+            isBulk: true,
+            ids: pendingIds,
+            status: 'Approved',
+            name: `${pendingIds.length} Requests`,
+            amount: 'Bulk Processing'
+        });
     };
 
     const openDetail = (w) => {
@@ -117,8 +162,25 @@ const Wallets = () => {
                 </div>
             )}
 
-            <PageHeader title="Wallet & Withdrawals" subtitle="Review and process withdrawal requests" />
-
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                <PageHeader title="Wallet & Withdrawals" subtitle="Review and process withdrawal requests" />
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={handleExportCSV}
+                        disabled={loading}
+                        className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-[12px] font-medium rounded-xl flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                    >
+                        <Download size={14} /> Download CSV
+                    </button>
+                    <button
+                        onClick={handleBulkApprove}
+                        disabled={loading}
+                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[12px] font-medium rounded-xl flex items-center gap-2 transition-all cursor-pointer shadow-sm disabled:opacity-50"
+                    >
+                        <CheckCircle size={14} /> Mark All As Paid
+                    </button>
+                </div>
+            </div>
             {/* Stat Cards */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
                 <AdminStatCard label="Total Value"  value={`₹${stats.total}`}    change={`${list.length} requests`} icon={Wallet}       color="bg-slate-700"   />
@@ -235,7 +297,7 @@ const Wallets = () => {
                                 Cancel
                             </button>
                             <button
-                                onClick={() => handleAction(confirmAction.id, confirmAction.status)}
+                                onClick={() => handleAction(confirmAction.id, confirmAction.status, confirmAction.isBulk, confirmAction.ids)}
                                 className={`flex-1 py-2.5 rounded-xl text-[11px] text-white transition-all cursor-pointer ${
                                     confirmAction.status === 'Approved'
                                         ? 'bg-emerald-500 hover:bg-emerald-600'

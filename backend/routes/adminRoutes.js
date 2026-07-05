@@ -11,7 +11,7 @@ const {
 const { 
     createAd, getAdminAds, updateAd, deleteAd 
 } = require('../controllers/adController');
-const { getWithdrawals, updateWithdrawalStatus } = require('../controllers/adminWithdrawalController');
+const { getWithdrawals, updateWithdrawalStatus, exportWithdrawalsCSV, bulkApproveWithdrawals } = require('../controllers/adminWithdrawalController');
 const { getPayments, updatePaymentStatus } = require('../controllers/adminPaymentController');
 const { getPromotions, updatePromotionStatus } = require('../controllers/adminPromotionController');
 const { getAllFeedbacks, markAsRead } = require('../controllers/feedbackController');
@@ -81,6 +81,8 @@ router.route('/ads/:id')
 router.delete('/content/:type/:id', protectAdmin, deleteContent);
 
 // Withdrawal Routes
+router.get('/withdrawals/export', protectAdmin, exportWithdrawalsCSV);
+router.post('/withdrawals/bulk-approve', protectAdmin, bulkApproveWithdrawals);
 router.get('/withdrawals', protectAdmin, getWithdrawals);
 router.put('/withdrawals/:id', protectAdmin, updateWithdrawalStatus);
 
