@@ -47,7 +47,7 @@ const PaymentSchema = new mongoose.Schema({
     orderId: { type: String, unique: true, sparse: true }, // Generic order ID
     merchantOrderId: { type: String },
     transactionId: { type: String },
-    gateway: { type: String, enum: ['Razorpay', 'Manual', 'Zuelpay'], default: 'Razorpay' },
+    gateway: { type: String, enum: ['Razorpay', 'Manual', 'Zuelpay', 'UPIGateway'], default: 'Razorpay' },
     gatewayResponse: { type: mongoose.Schema.Types.Mixed }, // Store raw Zuelpay response
     verified: { type: Boolean, default: false }, // S2S Verification flag
     // Legacy UTR (for old manual payments)
