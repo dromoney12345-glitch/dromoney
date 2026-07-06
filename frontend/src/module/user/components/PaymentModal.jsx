@@ -13,6 +13,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
     const [dynamicIntent, setDynamicIntent] = useState(null);
     const [dynamicOrderId, setDynamicOrderId] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
+    const [showQR, setShowQR] = useState(false);
     
     const { createPayment, loading: automatedLoading } = usePayment();
 
@@ -178,11 +179,20 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                                 Pay Now (Direct)
                                             </a>
 
-                                            <p className="text-[10px] text-slate-400 font-semibold my-2.5 uppercase tracking-wider">OR SCAN QR CODE</p>
-                                            
-                                            <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-100 mx-auto w-fit mb-4">
-                                                <QRCode value={dynamicIntent} size={130} className="rounded-xl" />
-                                            </div>
+                                            {!showQR ? (
+                                                <button onClick={() => setShowQR(true)} className="text-[11px] text-blue-600 font-semibold my-2 uppercase tracking-wider hover:underline flex items-center justify-center w-full">
+                                                    Show QR Code / Share Link
+                                                </button>
+                                            ) : (
+                                                <div className="animate-in fade-in zoom-in-95 duration-300">
+                                                    <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-100 mx-auto w-fit mb-3">
+                                                        <QRCode value={dynamicIntent} size={130} className="rounded-xl" />
+                                                    </div>
+                                                    <button onClick={() => { navigator.clipboard.writeText(dynamicIntent); alert('Payment link copied!'); }} className="text-[11px] text-slate-600 font-medium mb-3 bg-slate-100 px-3 py-1.5 rounded-lg active:scale-95 transition-all">
+                                                        Copy Payment Link
+                                                    </button>
+                                                </div>
+                                            )}
 
                                             <div className="flex items-center justify-center gap-2 text-emerald-600 bg-emerald-50 py-2 px-4 rounded-full w-fit mx-auto animate-pulse">
                                                 <Loader2 size={14} className="animate-spin" />
