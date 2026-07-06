@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Megaphone, Trash2, CheckCircle2, MessageSquare, Clock, User, Phone, Globe, DollarSign, Users, X, Send, AlertCircle } from 'lucide-react';
+import { Megaphone, Trash2, CheckCircle2, MessageSquare, Clock, User, Phone, Globe, DollarSign, Users, X, Send, AlertCircle, Copy } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import api from '../../shared/services/api';
 
@@ -177,8 +177,8 @@ const Promotions = () => {
                                                 <a href={promo.link} target="_blank" rel="noreferrer" className="text-xs font-medium text-blue-500 hover:underline flex items-center gap-1.5 truncate max-w-[100px]">
                                                     <Globe size={12} /> Visit
                                                 </a>
-                                                <button onClick={() => { navigator.clipboard.writeText(promo.link); showToast('Link Copied!', 'success'); }} className="text-[10px] text-slate-500 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded cursor-pointer transition-all active:scale-95">
-                                                    Copy
+                                                <button onClick={() => { navigator.clipboard.writeText(promo.link); showToast('Link Copied!', 'success'); }} className="text-[10px] text-sky-600 hover:text-white bg-sky-50 hover:bg-sky-500 font-medium px-2.5 py-1.5 rounded flex items-center gap-1 cursor-pointer transition-all active:scale-95">
+                                                    <Copy size={12} /> Copy URL
                                                 </button>
                                             </div>
                                         </div>

@@ -172,11 +172,17 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                             
                                             <a
                                                 href={dynamicIntent}
-                                                className="w-full py-4 rounded-xl text-[14px] font-bold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] text-white shadow-xl shadow-blue-600/30 mb-4"
+                                                className="w-full py-3.5 rounded-xl text-[14px] font-bold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] text-white shadow-xl shadow-blue-600/30 mb-3"
                                             >
                                                 <ShieldCheck size={20} className="text-blue-200" />
                                                 Pay Now (Direct)
                                             </a>
+
+                                            <p className="text-[10px] text-slate-400 font-semibold my-2.5 uppercase tracking-wider">OR SCAN QR CODE</p>
+                                            
+                                            <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-100 mx-auto w-fit mb-4">
+                                                <QRCode value={dynamicIntent} size={130} className="rounded-xl" />
+                                            </div>
 
                                             <div className="flex items-center justify-center gap-2 text-emerald-600 bg-emerald-50 py-2 px-4 rounded-full w-fit mx-auto animate-pulse">
                                                 <Loader2 size={14} className="animate-spin" />

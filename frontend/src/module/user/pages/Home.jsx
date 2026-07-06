@@ -571,7 +571,7 @@ const Home = () => {
 
 
                 {/* --- 6. Booster Sections --- */}
-                <div className="space-y-4 mx-[-12px]">
+                <div className="space-y-4">
                     <h3 className="text-[11px] font-medium text-slate-400 uppercase tracking-widest ml-4 mb-1">Premium Boosters</h3>
                     {/* Support Booster */}
                     <div className="bg-[#FFFBEB] border border-amber-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">

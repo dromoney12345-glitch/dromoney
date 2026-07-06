@@ -177,7 +177,7 @@ const Marketing = () => {
 
                 {/* Share Modal */}
                 {showShareModal && (
-                    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
+                    <div className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/50 sm:items-center">
                         <div className="bg-white w-full sm:w-96 rounded-t-2xl sm:rounded-2xl p-5 animate-in slide-in-from-bottom-full duration-300">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="font-medium text-slate-800">Share via</h3>
