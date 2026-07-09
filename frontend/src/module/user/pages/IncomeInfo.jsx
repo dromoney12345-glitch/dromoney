@@ -136,7 +136,7 @@ const IncomeInfo = () => {
                                     { title: "Share Your Link", desc: "Share your link with friends to start earning." },
                                     { title: "Earn ₹200 Instant", desc: "Get ₹200 instant reward for every registration." },
                                     { title: "Direct Wallet Credit", desc: "Rewards credited directly to your wallet." }
-                                ]).map((step, i) => (
+                                ]).slice(0, 3).map((step, i) => (
                                     <div key={i} className="flex gap-4 group/step items-center">
                                         <div className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-[#6610F2] font-medium text-[11px] border border-slate-100 shrink-0 group-hover/step:bg-[#6610F2] group-hover/step:text-white transition-all duration-300 shadow-sm">
                                             {i + 1}
@@ -182,7 +182,7 @@ const IncomeInfo = () => {
                                     { title: "Complete Tasks", desc: "Complete daily simple tasks to earn reward coins." },
                                     { title: "Redeem for Cash", desc: "Convert your earned coins into real cash balance." },
                                     { title: "3X Booster Benefit", desc: "Activate Booster to multiply your earnings up to 300%." }
-                                ]).map((step, i) => (
+                                ]).slice(0, 3).map((step, i) => (
                                     <div key={i} className="flex gap-4 group/step items-center">
                                         <div className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-[#856404] font-medium text-[11px] border border-slate-100 shrink-0 group-hover/step:bg-[#856404] group-hover/step:text-white transition-all duration-300 shadow-sm">
                                             {i + 1}
@@ -228,7 +228,7 @@ const IncomeInfo = () => {
                                     { title: "Platform Stake", desc: "Get a permanent share in platform profits." },
                                     { title: "Monthly Payouts", desc: "Passive income auto-credited every month." },
                                     { title: "Growth Scalability", desc: "Income scales with ecosystem expansion." }
-                                ]).map((step, i) => (
+                                ]).slice(0, 3).map((step, i) => (
                                     <div key={i} className="flex gap-4 group/step items-center">
                                         <div className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-[#084298] font-medium text-[11px] border border-slate-100 shrink-0 group-hover/step:bg-[#084298] group-hover/step:text-white transition-all duration-300 shadow-sm">
                                             {i + 1}

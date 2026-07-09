@@ -3,7 +3,21 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
-import { ChevronLeft, CheckCircle2, Play, UploadCloud, Link as LinkIcon, Loader2, Image as ImageIcon, Coins, Camera, XCircle } from 'lucide-react';
+import { ChevronLeft, CheckCircle2, Play, UploadCloud, Link as LinkIcon, Loader2, Image as ImageIcon, Coins, Camera, XCircle, MessageCircle, Send, Copy, Share2 } from 'lucide-react';
+
+const Facebook = ({ size, className }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+    </svg>
+);
+
+const Instagram = ({ size, className }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+    </svg>
+);
 
 const TaskRunner = () => {
     const { id } = useParams();
@@ -243,7 +257,7 @@ const TaskRunner = () => {
             <div className="flex-1 p-5 flex flex-col">
                 
                 {/* LINK / WEB / JOIN / SOCIAL / VIDEO TASKS */}
-                {(task.type === 'Web' || task.type === 'Join' || task.type === 'Social' || task.type === 'Survey' || task.type === 'Watch' || task.type === 'Bonus' || task.type === 'Video') && (
+                {(task.type === 'Web' || task.type === 'Join' || (task.type === 'Social' && !(task.title || '').toLowerCase().includes('share')) || task.type === 'Survey' || task.type === 'Watch' || task.type === 'Bonus' || task.type === 'Video') && (
                     <div className="flex-1 flex flex-col justify-center">
                         <div className="w-full flex-1 min-h-[400px] bg-slate-900 border border-slate-800 rounded-3xl flex flex-col overflow-hidden relative shadow-lg items-center justify-center p-6 text-center">
                             
@@ -405,37 +419,50 @@ const TaskRunner = () => {
                     );
                 })()}
                 {/* SHARE TASK */}
-                {task.type === 'Share' && (
-                    <div className="flex-1 flex flex-col gap-5 justify-center py-10">
-                        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-lg relative overflow-hidden">
+                {(task.type === 'Share' || (task.type === 'Social' && (task.title || '').toLowerCase().includes('share'))) && (
+                    <div className="flex-1 flex flex-col gap-5 justify-center py-6 overflow-y-auto">
+                        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center shadow-lg relative overflow-hidden">
                             <div className="absolute -top-10 -left-10 w-32 h-32 bg-sky-500/10 rounded-full blur-[40px]"></div>
-                            <div className="w-20 h-20 bg-sky-500/10 rounded-3xl mx-auto flex items-center justify-center mb-6 border border-sky-500/30">
-                                <LinkIcon size={32} className="text-sky-400" />
+                            <div className="w-16 h-16 bg-sky-500/10 rounded-3xl mx-auto flex items-center justify-center mb-4 border border-sky-500/30">
+                                <Share2 size={28} className="text-sky-400" />
                             </div>
-                            <h2 className="text-white font-medium text-xl mb-3">Share & Earn</h2>
-                            <p className="text-[11px] text-slate-400 font-medium mb-8 px-4 leading-relaxed">
+                            <h2 className="text-white font-medium text-lg mb-2">Share & Earn</h2>
+                            <p className="text-[11px] text-slate-400 font-medium mb-6 px-2 leading-relaxed">
                                 {task.description} <br/> 
-                                Spread the word to your friends!
+                                Choose a platform below to share and complete this task!
                             </p>
-                            
-                            <button 
-                                onClick={() => {
-                                    if (navigator.share) {
-                                        navigator.share({
-                                            title: 'Join Dromoney',
-                                            text: task.config?.text || 'Check out this awesome earning app!',
-                                            url: task.config?.url || window.location.origin
-                                        }).then(() => setStatus('verify'))
-                                          .catch(err => console.log('Share failed', err));
-                                    } else {
-                                        window.open(`https://wa.me/?text=${encodeURIComponent((task.config?.text || '') + ' ' + (task.config?.url || ''))}`, '_blank');
-                                        setStatus('verify');
-                                    }
-                                }}
-                                className="w-full bg-sky-500 text-slate-950 font-medium uppercase tracking-widest py-4 rounded-xl shadow-xl shadow-sky-500/20 active:scale-95 transition-all text-xs flex justify-center items-center gap-2"
-                            >
-                                Share Now <Play size={14} className="fill-current" />
-                            </button>
+
+                            <div className="grid grid-cols-2 gap-3 mb-4">
+                                <button onClick={() => { window.open(`https://wa.me/?text=${encodeURIComponent((task.config?.text || '') + ' ' + (task.config?.url || window.location.origin))}`, '_blank'); setStatus('verify'); }} className="flex flex-col items-center justify-center gap-2 p-3 bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 rounded-2xl transition-all">
+                                    <MessageCircle size={24} className="text-green-500" />
+                                    <span className="text-[10px] text-green-400 font-medium uppercase tracking-widest">WhatsApp</span>
+                                </button>
+                                <button onClick={() => { navigator.clipboard.writeText(`${task.config?.text || ''} ${task.config?.url || window.location.origin}`); window.open('https://instagram.com/', '_blank'); setStatus('verify'); showToast("Link copied! Paste in Instagram.", "success"); }} className="flex flex-col items-center justify-center gap-2 p-3 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/20 rounded-2xl transition-all">
+                                    <Instagram size={24} className="text-pink-500" />
+                                    <span className="text-[10px] text-pink-400 font-medium uppercase tracking-widest">Instagram</span>
+                                </button>
+                                <button onClick={() => { window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(task.config?.url || window.location.origin)}`, '_blank'); setStatus('verify'); }} className="flex flex-col items-center justify-center gap-2 p-3 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-2xl transition-all">
+                                    <Facebook size={24} className="text-blue-500" />
+                                    <span className="text-[10px] text-blue-400 font-medium uppercase tracking-widest">Facebook</span>
+                                </button>
+                                <button onClick={() => { window.open(`https://t.me/share/url?url=${encodeURIComponent(task.config?.url || window.location.origin)}&text=${encodeURIComponent(task.config?.text || '')}`, '_blank'); setStatus('verify'); }} className="flex flex-col items-center justify-center gap-2 p-3 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/20 rounded-2xl transition-all">
+                                    <Send size={24} className="text-sky-500" />
+                                    <span className="text-[10px] text-sky-400 font-medium uppercase tracking-widest">Telegram</span>
+                                </button>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button onClick={() => { navigator.clipboard.writeText(`${task.config?.text || ''} ${task.config?.url || window.location.origin}`); setStatus('verify'); showToast("Link copied to clipboard!", "success"); }} className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition-all">
+                                    <Copy size={16} className="text-slate-300" />
+                                    <span className="text-[10px] text-slate-300 font-medium uppercase tracking-widest">Copy Link</span>
+                                </button>
+                                {navigator.share && (
+                                    <button onClick={() => { navigator.share({ title: 'Join Dromoney', text: task.config?.text || 'Check out this app!', url: task.config?.url || window.location.origin }).then(() => setStatus('verify')).catch(err => console.log('Share failed', err)); }} className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition-all">
+                                        <Share2 size={16} className="text-slate-300" />
+                                        <span className="text-[10px] text-slate-300 font-medium uppercase tracking-widest">More</span>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}

@@ -120,7 +120,7 @@ exports.deleteNotification = async (req, res, next) => {
 };
 
 // @desc    Clear all broadcast history
-// @route   DELETE /api/admin/notifications/clear
+// @route   DELETE /api/admin/notifications/bulk/clear
 // @access  Private/Admin
 exports.clearAllNotifications = async (req, res, next) => {
     try {
@@ -128,6 +128,31 @@ exports.clearAllNotifications = async (req, res, next) => {
         res.status(200).json({
             success: true,
             data: {}
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// @desc    Update a notification
+// @route   PUT /api/admin/notifications/:id
+// @access  Private/Admin
+exports.updateNotification = async (req, res, next) => {
+    try {
+        const notification = await Notification.findById(req.params.id);
+
+        if (!notification) {
+            return next(new ErrorResponse('Notification not found', 404));
+        }
+
+        notification.title = req.body.title || notification.title;
+        notification.message = req.body.message || notification.message;
+        
+        await notification.save();
+
+        res.status(200).json({
+            success: true,
+            data: notification
         });
     } catch (err) {
         next(err);

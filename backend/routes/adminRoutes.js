@@ -16,7 +16,7 @@ const { getPayments, updatePaymentStatus } = require('../controllers/adminPaymen
 const { getPromotions, updatePromotionStatus } = require('../controllers/adminPromotionController');
 const { getAllFeedbacks, markAsRead } = require('../controllers/feedbackController');
 const { getAllReports, updateReportStatus } = require('../controllers/reportController');
-const { sendBroadcast, getNotifications, deleteNotification, clearAllNotifications } = require('../controllers/notificationController');
+const { sendBroadcast, getNotifications, deleteNotification, clearAllNotifications, updateNotification } = require('../controllers/notificationController');
 const { 
     adminGetBusinessIdeas, 
     createBusinessIdea, 
@@ -124,6 +124,13 @@ router.patch('/reports/:id/status', protectAdmin, updateReportStatus);
 router.route('/notifications')
     .get(protectAdmin, getNotifications)
     .post(protectAdmin, sendBroadcast);
+
+router.route('/notifications/bulk/clear')
+    .delete(protectAdmin, clearAllNotifications);
+
+router.route('/notifications/:id')
+    .delete(protectAdmin, deleteNotification)
+    .put(protectAdmin, updateNotification);
 
 router.route('/business-ideas')
     .get(protectAdmin, adminGetBusinessIdeas)

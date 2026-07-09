@@ -10,6 +10,7 @@ const Notifications = () => {
     const [loading, setLoading] = useState(false);
     const [history, setHistory] = useState([]);
     const [userStats, setUserStats] = useState({ totalActive: 0 });
+    const [editingId, setEditingId] = useState(null);
 
     // Toast state
     const [toast, setToast] = useState(null); // { message: '', type: 'success' | 'error' }
@@ -51,20 +52,46 @@ const Notifications = () => {
         if (!title || !message) return;
         setLoading(true);
         try {
-            const res = await api.post('/admin/notifications', { title, message });
-            if (res.success) {
-                setSent(true);
-                setTimeout(() => setSent(false), 3000);
-                setTitle('');
-                setMessage('');
-                showToast("Broadcast message sent successfully!", "success");
-                fetchHistory();
+            if (editingId) {
+                const res = await api.put(`/admin/notifications/${editingId}`, { title, message });
+                if (res.success) {
+                    setSent(true);
+                    setTimeout(() => setSent(false), 3000);
+                    setTitle('');
+                    setMessage('');
+                    setEditingId(null);
+                    showToast("Notification updated successfully!", "success");
+                    fetchHistory();
+                }
+            } else {
+                const res = await api.post('/admin/notifications', { title, message });
+                if (res.success) {
+                    setSent(true);
+                    setTimeout(() => setSent(false), 3000);
+                    setTitle('');
+                    setMessage('');
+                    showToast("Broadcast message sent successfully!", "success");
+                    fetchHistory();
+                }
             }
         } catch (err) {
-            showToast("Failed to send broadcast", "error");
+            showToast(editingId ? "Failed to update notification" : "Failed to send broadcast", "error");
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleEdit = (notification) => {
+        setEditingId(notification._id);
+        setTitle(notification.title);
+        setMessage(notification.message);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const cancelEdit = () => {
+        setEditingId(null);
+        setTitle('');
+        setMessage('');
     };
 
     const handleDelete = async (id) => {
@@ -112,11 +139,21 @@ const Notifications = () => {
             <PageHeader title="Notifications" subtitle="Broadcast messages to all platform users" />
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                {/* Compose */}
+                {/* Compose / Edit */}
                 <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-4">
-                    <h2 className="text-sm font-medium text-slate-800 uppercase tracking-normal mb-5 flex items-center gap-2">
-                        <Bell size={16} className="text-sky-500" /> Compose Message
-                    </h2>
+                    <div className="flex items-center justify-between mb-5">
+                        <h2 className="text-sm font-medium text-slate-800 uppercase tracking-normal flex items-center gap-2">
+                            <Bell size={16} className="text-sky-500" /> {editingId ? "Edit Message" : "Compose Message"}
+                        </h2>
+                        {editingId && (
+                            <button 
+                                onClick={cancelEdit}
+                                className="text-[10px] uppercase font-medium text-slate-400 hover:text-slate-600 transition-colors"
+                            >
+                                Cancel Edit
+                            </button>
+                        )}
+                    </div>
                     <div className="space-y-4">
                         <div>
                             <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal">Title</label>
@@ -139,7 +176,7 @@ const Notifications = () => {
                             disabled={loading}
                             onClick={handleSend}
                             className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-medium text-[12px] uppercase tracking-normal transition-all active:scale-95 shadow-md ${sent ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-slate-900 hover:bg-black text-white shadow-sky-100'}`}>
-                            {loading ? <Loader2 size={15} className="animate-spin" /> : sent ? '✓ Sent Successfully!' : <><Send size={15} /> Send Broadcast</>}
+                            {loading ? <Loader2 size={15} className="animate-spin" /> : sent ? '✓ Success!' : <><Send size={15} /> {editingId ? 'Update Notification' : 'Send Broadcast'}</>}
                         </button>
                     </div>
                 </div>
@@ -173,12 +210,22 @@ const Notifications = () => {
                                             </span>
                                         </div>
                                     </div>
-                                    <button 
-                                        onClick={() => handleDelete(n._id)}
-                                        className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition-all opacity-0 group-hover/item:opacity-100"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        <button 
+                                            onClick={() => handleEdit(n)}
+                                            className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-sky-500 hover:bg-sky-50 transition-all bg-slate-50 border border-slate-100"
+                                            title="Edit Notification"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
+                                        </button>
+                                        <button 
+                                            onClick={() => handleDelete(n._id)}
+                                            className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-all bg-slate-50 border border-slate-100"
+                                            title="Delete Notification"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
                                 </div>
                                 <p className="text-[16px] text-slate-700 font-medium leading-relaxed pr-4 mb-5 line-height-loose">{n.message}</p>
                                 <div className="mt-5 flex items-center justify-between">

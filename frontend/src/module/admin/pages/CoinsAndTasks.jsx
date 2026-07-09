@@ -97,7 +97,7 @@ const CoinsAndTasks = () => {
     };
 
     const handleSaveTask = async () => {
-        if (!newTaskData.title || !newTaskData.link) return alert("Title and Link are required");
+        if (!newTaskData.title || !newTaskData.link || !newTaskData.description) return alert("Title, Description, and Link are required");
         
         const payload = {
             type: newTaskType,
@@ -131,8 +131,8 @@ const CoinsAndTasks = () => {
         setSaveLoading(true);
         try {
             const response = await api.put('/admin/settings', {
-                coinRate: Number(coinValue),
-                maxCoinsPerDay: Number(dailyLimit),
+                coinRate: Math.max(0, Number(coinValue) || 0),
+                maxCoinsPerDay: Math.max(0, Number(dailyLimit) || 0),
                 taskWindowStart,
                 taskWindowEnd,
                 kycWindowStart,
@@ -220,7 +220,7 @@ const CoinsAndTasks = () => {
                             <div>
                                 <label className="text-[11px] font-medium text-slate-500 uppercase tracking-normal">1 Coin = ₹</label>
                                 <div className="flex items-center gap-3 mt-2">
-                                    <input type="number" step="0.01" min="0" value={coinValue} onChange={e => setCoinValue(Math.max(0, e.target.value))}
+                                    <input type="number" step="0.01" min="0" value={coinValue} onChange={e => setCoinValue(e.target.value)}
                                         className="w-32 border border-slate-200 rounded-xl px-4 py-2.5 text-lg font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
                                     <span className="text-sm font-medium text-slate-400">rupees per coin</span>
                                 </div>
@@ -228,7 +228,7 @@ const CoinsAndTasks = () => {
                             <div>
                                 <label className="text-[11px] font-medium text-slate-500 uppercase tracking-normal">Max Coins Per Day</label>
                                 <div className="flex items-center gap-3 mt-2">
-                                    <input type="number" min="0" value={dailyLimit} onChange={e => setDailyLimit(Math.max(0, e.target.value))}
+                                    <input type="number" min="0" value={dailyLimit} onChange={e => setDailyLimit(e.target.value)}
                                         className="w-32 border border-slate-200 rounded-xl px-4 py-2.5 text-lg font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
                                     <span className="text-sm font-medium text-slate-400">coins/day limit per user</span>
                                 </div>
@@ -306,7 +306,7 @@ const CoinsAndTasks = () => {
                             <div>
                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-3 block">1. Select Task Type</label>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                    {['Social', 'Survey', 'Watch', 'Join', 'Bonus', 'Sponsored', 'Video', 'Web', 'Quiz', 'Spin', 'Scratch', 'Tapper', 'Treasure'].map(type => (
+                                    {['Social', 'Survey', 'Watch', 'Join', 'Bonus', 'Sponsored', 'Video', 'Web', 'Quiz', 'Spin', 'Scratch', 'Tapper', 'Treasure', 'Memory', 'Proof', 'Download'].map(type => (
                                         <button 
                                             key={type}
                                             onClick={() => { setNewTaskType(type); setNewTaskData({...newTaskData, config: {}}); }}
@@ -343,7 +343,7 @@ const CoinsAndTasks = () => {
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-medium text-slate-600 block mb-1">Short Description</label>
+                                    <label className="text-xs font-medium text-slate-600 block mb-1">Short Description <span className="text-rose-500">*</span></label>
                                     <input type="text" placeholder="Describe what the user has to do" value={newTaskData.description} onChange={e => setNewTaskData({...newTaskData, description: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 placeholder-slate-300 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
                                 </div>
 

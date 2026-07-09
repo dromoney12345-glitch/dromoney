@@ -3,7 +3,7 @@ import { useUser } from '../context/UserContext';
 import api from '../../shared/services/api';
 import {
     Users, Copy, Send, ChevronLeft,
-    History, CheckCircle2, Share2, ArrowUpRight, Wallet, TrendingUp, Trophy, Shield
+    History, CheckCircle2, Share2, ArrowUpRight, Wallet, TrendingUp, Trophy, Shield, Mail
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -67,6 +67,12 @@ const Marketing = () => {
                 break;
             case 'facebook':
                 window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+                break;
+            case 'twitter':
+                window.open(`https://twitter.com/intent/tweet?text=${message}`, '_blank');
+                break;
+            case 'email':
+                window.open(`mailto:?subject=Join Dromoney&body=${message}`, '_self');
                 break;
             default:
                 break;
@@ -183,7 +189,7 @@ const Marketing = () => {
                                 <h3 className="font-medium text-slate-800">Share via</h3>
                                 <button onClick={() => setShowShareModal(false)} className="text-slate-400 hover:text-slate-600">✕</button>
                             </div>
-                            <div className="grid grid-cols-4 gap-4 mb-4">
+                            <div className="grid grid-cols-4 gap-y-6 gap-x-4 mb-4">
                                 <button onClick={() => shareOnSocial('whatsapp')} className="flex flex-col items-center gap-2">
                                     <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
                                         <Share2 size={20} />
@@ -201,6 +207,18 @@ const Marketing = () => {
                                         <Users size={20} />
                                     </div>
                                     <span className="text-[10px] font-medium text-slate-600">Facebook</span>
+                                </button>
+                                <button onClick={() => shareOnSocial('twitter')} className="flex flex-col items-center gap-2">
+                                    <div className="w-12 h-12 bg-slate-800 text-white rounded-full flex items-center justify-center">
+                                        <span className="font-bold text-[16px] font-serif">X</span>
+                                    </div>
+                                    <span className="text-[10px] font-medium text-slate-600">Twitter</span>
+                                </button>
+                                <button onClick={() => shareOnSocial('email')} className="flex flex-col items-center gap-2">
+                                    <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
+                                        <Mail size={20} />
+                                    </div>
+                                    <span className="text-[10px] font-medium text-slate-600">Email</span>
                                 </button>
                                 <button onClick={() => { handleCopy(); setShowShareModal(false); }} className="flex flex-col items-center gap-2">
                                     <div className="w-12 h-12 bg-slate-100 text-slate-600 rounded-full flex items-center justify-center">

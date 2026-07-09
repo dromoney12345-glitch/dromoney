@@ -575,9 +575,9 @@ const Home = () => {
                     <h3 className="text-[11px] font-medium text-slate-400 uppercase tracking-widest ml-4 mb-1">Premium Boosters</h3>
                     {/* Support Booster */}
                     <div className="bg-[#FFFBEB] border border-amber-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
-                        <div className="p-4 flex flex-row items-center justify-between gap-3">
-                            <div className="flex items-center gap-3 shrink-0 min-w-0">
-                                <div className="w-11 h-11 bg-white rounded-xl flex items-center justify-center shadow-sm border border-amber-50 shrink-0">
+                        <div className="p-4 flex flex-row items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-amber-50 shrink-0">
                                     <Coins className="text-amber-500" size={24} />
                                 </div>
                                 <div className="min-w-0">
@@ -634,9 +634,9 @@ const Home = () => {
 
                     {/* Task Booster */}
                     <div className="bg-sky-50 border border-sky-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
-                        <div className="p-4 flex flex-row items-center justify-between gap-3">
-                            <div className="flex items-center gap-3 shrink-0 min-w-0">
-                                <div className="w-11 h-11 bg-white rounded-xl flex items-center justify-center shadow-sm border border-sky-50 shrink-0">
+                        <div className="p-4 flex flex-row items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-sky-50 shrink-0">
                                     <Zap className="text-sky-500" size={24} />
                                 </div>
                                 <div className="min-w-0">

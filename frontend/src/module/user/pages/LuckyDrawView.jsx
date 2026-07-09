@@ -54,14 +54,16 @@ const LuckyDrawView = () => {
                     try {
                         const currentTask = taskStorage.getTasks().find(t => String(t._id) === String(id) || String(t.id) === String(id));
                         if (currentTask) {
-                            if (currentTask.reward) setTaskReward(currentTask.reward);
+                            const currentReward = currentTask.coinsReward || currentTask.reward;
+                            if (currentReward) setTaskReward(currentReward);
                             if (currentTask.title) setTaskTitle(currentTask.title);
                         } else {
                             const taskRes = await api.get('/user/data/tasks');
                             if (taskRes.success) {
                                 const dbTask = taskRes.data.find(t => String(t._id) === String(id) || String(t.id) === String(id));
                                 if (dbTask) {
-                                    if (dbTask.reward) setTaskReward(dbTask.reward);
+                                    const dbReward = dbTask.coinsReward || dbTask.reward;
+                                    if (dbReward) setTaskReward(dbReward);
                                     if (dbTask.title) setTaskTitle(dbTask.title);
                                 }
                             }

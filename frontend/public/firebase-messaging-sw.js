@@ -14,13 +14,16 @@ const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
   console.log('Received background message ', payload);
-  const notificationTitle = payload.notification?.title || 'DroMoney Notification';
-  const notificationOptions = {
-    body: payload.notification?.body || 'You have a new message',
-    icon: '/logo.png',
-    badge: '/logo.png',
-    data: payload.data
-  };
-
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  // Firebase SDK automatically shows notifications if payload.notification exists.
+  // Only manually show notification if it's a data-only payload.
+  if (!payload.notification) {
+    const notificationTitle = payload.data?.title || 'DroMoney Notification';
+    const notificationOptions = {
+      body: payload.data?.body || 'You have a new message',
+      icon: '/logo.png',
+      badge: '/logo.png',
+      data: payload.data
+    };
+    self.registration.showNotification(notificationTitle, notificationOptions);
+  }
 });

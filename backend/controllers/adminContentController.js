@@ -165,13 +165,17 @@ const defaultTasks = [
 
 exports.getTasks = async (req, res, next) => {
     try {
-        // Auto-seed and always ensure dummy tasks are set to isDaily: true
-        for (const dt of defaultTasks) {
-            await Task.updateOne(
-                { title: dt.title },
-                { $set: { isDaily: true }, $setOnInsert: dt },
-                { upsert: true }
-            );
+        // Check if DB is empty, only seed if empty to avoid slow queries on every GET
+        const count = await Task.countDocuments();
+        if (count === 0) {
+            const bulkOps = defaultTasks.map(dt => ({
+                updateOne: {
+                    filter: { title: dt.title },
+                    update: { $set: { isDaily: true }, $setOnInsert: dt },
+                    upsert: true
+                }
+            }));
+            await Task.bulkWrite(bulkOps);
         }
         
         const tasks = await Task.find();

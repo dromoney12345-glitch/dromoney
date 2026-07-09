@@ -45,7 +45,35 @@ const Earn = () => {
     const handleRefreshCoins = async () => {
         setIsRefreshingCoins(true);
         await refreshUserProfile(false);
+        await loadTasks();
+        await loadSettings();
         setIsRefreshingCoins(false);
+    };
+
+    const checkWindow = (startStr, endStr) => {
+        if (!startStr || !endStr) return;
+        const now = new Date();
+        const currentMins = now.getHours() * 60 + now.getMinutes();
+        const [sh, sm] = startStr.split(':').map(Number);
+        const startMins = (sh || 0) * 60 + (sm || 0);
+        const [eh, em] = endStr.split(':').map(Number);
+        const endMins = (eh || 0) * 60 + (em || 0);
+        if (startMins < endMins) {
+            setIsWithinWindow(currentMins >= startMins && currentMins <= endMins);
+        } else {
+            // handle case where window crosses midnight or is invalid
+            setIsWithinWindow(currentMins >= startMins || currentMins <= endMins);
+        }
+    };
+
+    const loadSettings = async () => {
+        try {
+            const res = await api.get('/public/settings');
+            if (res.success && res.data) {
+                setSettings(res.data);
+                checkWindow(res.data.taskWindowStart, res.data.taskWindowEnd);
+            }
+        } catch (err) {}
     };
 
     useEffect(() => {
@@ -60,25 +88,27 @@ const Earn = () => {
     const [isWithinWindow, setIsWithinWindow] = useState(true);
     const [boosterData, setBoosterData] = useState({ title: '₹49 Daily Boost Pass', subtitle: 'Priority Enabled', price: 49, benefits: [] });
 
-    useEffect(() => {
-        const loadTasks = async () => {
-            try {
-                const res = await api.get('/public/tasks');
-                console.log("Earn: Fetched tasks from server:", res.data);
-                if (res.success && res.data && res.data.length > 0) {
-                    setTasks(res.data);
-                    taskStorage.syncTasks(res.data);
-                } else {
-                    console.log("Earn: Using local tasks fallback");
-                    setTasks(taskStorage.getTasks());
-                }
-            } catch (err) {
+    const loadTasks = async () => {
+        try {
+            const res = await api.get('/public/tasks');
+            console.log("Earn: Fetched tasks from server:", res.data);
+            if (res.success && res.data && res.data.length > 0) {
+                setTasks(res.data);
+                taskStorage.syncTasks(res.data);
+            } else {
+                console.log("Earn: Using local tasks fallback");
                 setTasks(taskStorage.getTasks());
-            } finally {
-                setLoading(false);
             }
-        };
+        } catch (err) {
+            setTasks(taskStorage.getTasks());
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
+        loadTasks();
+        
         const loadBoosters = async () => {
             try {
                 const res = await api.get('/public/boosters');
@@ -100,30 +130,6 @@ const Earn = () => {
             } catch (err) {}
         };
 
-        const loadSettings = async () => {
-            try {
-                const res = await api.get('/public/settings');
-                if (res.success && res.data) {
-                    setSettings(res.data);
-                    checkWindow(res.data.taskWindowStart, res.data.taskWindowEnd);
-                }
-            } catch (err) {}
-        };
-
-        const checkWindow = (startStr, endStr) => {
-            if (!startStr || !endStr) return;
-            const now = new Date();
-            const currentMins = now.getHours() * 60 + now.getMinutes();
-            const [sh, sm] = startStr.split(':').map(Number);
-            const startMins = (sh || 0) * 60 + (sm || 0);
-            const [eh, em] = endStr.split(':').map(Number);
-            const endMins = (eh || 0) * 60 + (em || 0);
-            if (startMins < endMins) {
-                setIsWithinWindow(currentMins >= startMins && currentMins <= endMins);
-            }
-        };
-
-        loadTasks();
         loadBoosters();
         loadSettings();
     }, []);

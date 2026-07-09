@@ -273,7 +273,7 @@ const Settings = () => {
                                                                 type="number" 
                                                                 step={item.step || 1}
                                                                 value={config[item.field]}
-                                                                onChange={(e) => handleChange(item.field, parseFloat(e.target.value))}
+                                                                onChange={(e) => handleChange(item.field, e.target.value)}
                                                                 className="w-full bg-white border border-slate-200 rounded-lg pl-10 pr-5 py-4 text-lg font-medium text-emerald-600 focus:outline-none focus:border-emerald-500 transition-all" 
                                                             />
                                                         </>
@@ -283,7 +283,7 @@ const Settings = () => {
                                                                 type="number" 
                                                                 step={item.step || 1}
                                                                 value={config[item.field]}
-                                                                onChange={(e) => handleChange(item.field, parseFloat(e.target.value))}
+                                                                onChange={(e) => handleChange(item.field, e.target.value)}
                                                                 className={`w-full bg-white border border-slate-200 rounded-lg pl-5 ${item.unit.length > 2 ? 'pr-16' : 'pr-10'} py-4 text-lg font-medium text-emerald-600 focus:outline-none focus:border-emerald-500 transition-all`} 
                                                             />
                                                             <span className="absolute right-5 top-1/2 -translate-y-1/2 font-medium text-slate-400">{item.unit}</span>

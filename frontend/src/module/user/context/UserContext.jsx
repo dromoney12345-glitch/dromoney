@@ -373,7 +373,12 @@ export const UserProvider = ({ children }) => {
     };
 
     const addNotification = (title, message, type) => {
-        setNotifications(prev => [{ id: Date.now(), title, message, time: "Just now", type, isRead: false }, ...prev]);
+        setNotifications(prev => {
+            // Prevent duplicate notifications in the UI 
+            const isDuplicate = prev.some(n => n.title === title && n.message === message);
+            if (isDuplicate) return prev;
+            return [{ id: Date.now(), title, message, time: "Just now", type, isRead: false }, ...prev];
+        });
     };
 
     const value = useMemo(() => ({
