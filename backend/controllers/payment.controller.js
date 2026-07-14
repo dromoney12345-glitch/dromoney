@@ -174,7 +174,10 @@ exports.paymentWebhook = asyncHandler(async (req, res, next) => {
     }
 
     const payment = await Payment.findOne({ orderId: order_id }).populate('user');
-    if (!payment) return res.status(404).send('Payment not found');
+    if (!payment) {
+        console.warn(`[Webhook] Payment not found for order_id: ${order_id}. Might be a test webhook.`);
+        return res.status(200).send('Payment not found or test webhook received');
+    }
 
     // IDEMPOTENCY CHECK
     if (payment.verified || payment.status === 'Success') {
