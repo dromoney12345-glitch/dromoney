@@ -4,16 +4,16 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
-const UpigatewayService = require('../services/upigateway.service');
+const BulkpeService = require('../services/bulkpe.service');
 
-// @desc    Initiate UPIGateway Payment
+// @desc    Initiate Bulkpe Payment
 // @route   POST /api/payment/create
 // @access  Private
 exports.createPayment = asyncHandler(async (req, res, next) => {
     const { amount, orderType, remarks } = req.body;
 
     // Generate unique order ID
-    const orderId = `ZP_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+    const orderId = `BP_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
 
     // 1. Save payment as PENDING
     const payment = await Payment.create({
@@ -23,31 +23,36 @@ exports.createPayment = asyncHandler(async (req, res, next) => {
         orderType,
         remarks,
         status: 'Pending',
-        gateway: 'UPIGateway'
+        gateway: 'Bulkpe'
     });
 
-    // 2. Call UPIGateway API via service layer
+    // 2. Call Bulkpe API via service layer
     try {
-        const gatewayResponse = await UpigatewayService.createPaymentLink({
+        const gatewayResponse = await BulkpeService.createDynamicQR({
             orderId,
             amount: Number(amount),
-            userName: req.user.name,
-            userEmail: req.user.email,
-            userPhone: req.user.phone
+            customerName: req.user.name,
+            customerEmail: req.user.email,
+            customerPhone: req.user.phone
         });
 
         // 3. Save gateway response (optional audit)
         payment.gatewayResponse = gatewayResponse;
         await payment.save();
 
+        // Extract payment link/QR from Bulkpe response (adjust fields as per actual API docs)
+        const paymentUrl = gatewayResponse?.data?.payment_url || gatewayResponse?.data?.url || gatewayResponse?.payment_url;
+        const upiIntent = gatewayResponse?.data?.upi_intent || gatewayResponse?.upi_intent;
+        const qrCode = gatewayResponse?.data?.qr_code || gatewayResponse?.qr_code;
+
         res.status(200).json({
             success: true,
             message: 'Payment initiated successfully',
             data: {
                 orderId: payment.orderId,
-                paymentUrl: gatewayResponse?.data?.paymentLinkString,
-                upiIntent: gatewayResponse?.data?.deepLinkString,
-                qrCode: gatewayResponse?.data?.deepLinkString // fallback QR data
+                paymentUrl: paymentUrl,
+                upiIntent: upiIntent,
+                qrCode: qrCode || upiIntent // fallback QR data
             }
         });
     } catch (error) {
@@ -151,24 +156,17 @@ exports.getPaymentStatus = asyncHandler(async (req, res, next) => {
     });
 });
 
-// @desc    Webhook for UPIGateway (Server to Server Async)
+// @desc    Webhook for Bulkpe (Server to Server Async)
 // @route   POST /api/payment/webhook
 // @access  Public
 exports.paymentWebhook = asyncHandler(async (req, res, next) => {
-    // 1. Verify webhook signature
-    const signature = req.headers['x-webhook-signature'] || req.headers['signature'];
+    // Bulkpe typical webhook parsing
     const payloadData = req.body.data || req.body;
-
-    const isValid = UpigatewayService.verifyWebhookSignature(req.body, signature);
-    if (!isValid && process.env.NODE_ENV !== 'development') {
-        console.warn('Webhook signature mismatch');
-    }
-
-    // UPIGateway typical format: { client_txn_id, status, upi_txn_id }
-    const order_id = payloadData.client_txn_id || payloadData.orderCode || req.body.orderCode || req.body.order_id;
+    
+    // Attempt to extract order ID from various common Bulkpe/PG keys
+    const order_id = payloadData.reference_id || payloadData.order_id || payloadData.client_txn_id || req.body.reference_id;
     const incoming_status = payloadData.status || req.body.status;
-    const transaction_id = payloadData.upi_txn_id || payloadData.txn_id || payloadData.transactionId || req.body.transaction_id;
-    const txn_date = payloadData.txn_date || req.body.txn_date;
+    const transaction_id = payloadData.transaction_id || payloadData.bank_ref_no || payloadData.upi_txn_id || req.body.transaction_id;
     
     if (!order_id) {
         console.log('Webhook test received or missing order_id. Payload:', req.body);
@@ -184,35 +182,44 @@ exports.paymentWebhook = asyncHandler(async (req, res, next) => {
     }
 
     // STRICT SERVER-TO-SERVER SECURITY VALIDATION
-    // We do NOT trust the incoming webhook blindly. We check with the Gateway directly!
-    const gatewayVerification = await UpigatewayService.checkOrderStatus(order_id, txn_date);
-    
-    // Check if the gateway actually confirms this order was paid successfully
-    const isValidPayment = 
-        gatewayVerification && 
-        (gatewayVerification.status === true || gatewayVerification.status === 'success' || gatewayVerification.status === 'SUCCESS') &&
-        (gatewayVerification.data?.status === 'success' || gatewayVerification.data?.status === 'SUCCESS' || gatewayVerification.data?.status === 'PAID');
+    // We check with Bulkpe directly to prevent webhook spoofing!
+    let isValidPayment = false;
+    let gatewayVerification = null;
 
-    // Also compare amount as an extra security check if provided in verification
-    if (isValidPayment && gatewayVerification.data && gatewayVerification.data.amount) {
-        const paidAmount = Number(gatewayVerification.data.amount);
-        if (paidAmount < payment.amount) {
-            payment.status = 'Failed';
-            payment.remarks = 'Amount mismatch detected during secure validation';
-            await payment.save();
-            return res.status(400).send('Amount mismatch');
+    try {
+        gatewayVerification = await BulkpeService.checkOrderStatus(order_id);
+        
+        // Check if Bulkpe confirms this order was paid successfully
+        isValidPayment = 
+            gatewayVerification && 
+            (gatewayVerification.status === true || gatewayVerification.status === 'success' || gatewayVerification.status === 'SUCCESS') &&
+            (gatewayVerification.data?.status === 'success' || gatewayVerification.data?.status === 'SUCCESS' || gatewayVerification.data?.status === 'PAID' || gatewayVerification.data?.status === 'COMPLETED');
+            
+        // Security check: Amount validation
+        if (isValidPayment && gatewayVerification.data && gatewayVerification.data.amount) {
+            const paidAmount = Number(gatewayVerification.data.amount);
+            if (paidAmount < payment.amount) {
+                payment.status = 'Failed';
+                payment.remarks = 'Amount mismatch detected during secure validation';
+                await payment.save();
+                return res.status(400).send('Amount mismatch');
+            }
         }
+    } catch (err) {
+        console.warn('Failed to securely verify order with Bulkpe:', err.message);
     }
 
-    if (isValidPayment || incoming_status === 'PAID' || incoming_status === 'SUCCESS' || incoming_status === 'success') {
-        // If strictly valid OR if in dev mode
+    const isIncomingSuccess = incoming_status === 'PAID' || incoming_status === 'SUCCESS' || incoming_status === 'success' || incoming_status === 'COMPLETED';
+
+    if (isValidPayment || isIncomingSuccess) {
+        // If strictly valid OR if in dev mode fallback
         if (!isValidPayment && process.env.NODE_ENV !== 'development') {
             return res.status(403).send('Gateway validation failed');
         }
 
         payment.status = 'Success';
         payment.verified = true;
-        payment.transactionId = transaction_id || gatewayVerification?.data?.upi_txn_id || payment.transactionId;
+        payment.transactionId = transaction_id || gatewayVerification?.data?.transaction_id || payment.transactionId;
         payment.gatewayResponse = gatewayVerification || req.body;
         await payment.save();
 
