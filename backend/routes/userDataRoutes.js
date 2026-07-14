@@ -24,6 +24,12 @@ const { uploadToCloud, uploadMiddleware } = require('../controllers/adminUploadC
 
 const router = express.Router();
 
+// Public Webhook (Must be before protect)
+router.post('/bank-verification-webhook', (req, res) => {
+    console.log('Bank verification webhook test received:', req.body);
+    res.status(200).send('Bank verification webhook OK');
+});
+
 router.use(protect); // Secure all routes
 
 const { submitFeedback } = require('../controllers/feedbackController');

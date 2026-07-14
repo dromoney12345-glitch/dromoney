@@ -25,4 +25,10 @@ router.get('/status/:orderId', protect, getPaymentStatus);
 // POST /api/payment/webhook (Async Gateway Updates)
 router.post('/webhook', paymentWebhook);
 
+// POST /api/payment/credit-webhook (Async Gateway Updates for Axis Current Account)
+router.post('/credit-webhook', (req, res) => {
+    console.log('Credit webhook test received:', req.body);
+    res.status(200).send('Credit webhook OK');
+});
+
 module.exports = router;
