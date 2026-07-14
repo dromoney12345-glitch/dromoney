@@ -42,7 +42,7 @@ class BulkpeService {
             };
 
             // Assuming standard Bulkpe PG endpoint. Will adjust if needed based on API response.
-            const response = await this.api.post('/pg/create', payload);
+            const response = await this.api.post('/createDynamicVpa', payload);
             
             return response.data;
         } catch (error) {
