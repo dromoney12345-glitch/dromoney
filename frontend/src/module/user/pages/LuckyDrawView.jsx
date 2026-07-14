@@ -6,13 +6,13 @@ import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
 
 const DEFAULT_PRIZES = [
-    { label: '₹50', coins: 0, cash: 50, bg: 'bg-indigo-500/10 text-indigo-400', color: 'text-indigo-400' },
-    { label: '₹200', coins: 0, cash: 200, bg: 'bg-emerald-500/10 text-emerald-400', color: 'text-emerald-400' },
-    { label: '₹100', coins: 0, cash: 100, bg: 'bg-sky-500/10 text-sky-400', color: 'text-sky-400' },
-    { label: '50 Coins', coins: 50, cash: 0, bg: 'bg-amber-500/10 text-amber-400', color: 'text-amber-400' },
-    { label: '₹500', coins: 0, cash: 500, bg: 'bg-rose-500/10 text-rose-400', color: 'text-rose-400' },
+    { label: '10 Coins', coins: 10, cash: 0, bg: 'bg-indigo-500/10 text-indigo-400', color: 'text-indigo-400' },
+    { label: '25 Coins', coins: 25, cash: 0, bg: 'bg-emerald-500/10 text-emerald-400', color: 'text-emerald-400' },
+    { label: '50 Coins', coins: 50, cash: 0, bg: 'bg-sky-500/10 text-sky-400', color: 'text-sky-400' },
+    { label: '15 Coins', coins: 15, cash: 0, bg: 'bg-amber-500/10 text-amber-400', color: 'text-amber-400' },
+    { label: '100 Coins', coins: 100, cash: 0, bg: 'bg-rose-500/10 text-rose-400', color: 'text-rose-400' },
     { label: '20 Coins', coins: 20, cash: 0, bg: 'bg-amber-500/10 text-amber-400', color: 'text-amber-400' },
-    { label: '₹150', coins: 0, cash: 150, bg: 'bg-violet-500/10 text-violet-400', color: 'text-violet-400' },
+    { label: '30 Coins', coins: 30, cash: 0, bg: 'bg-violet-500/10 text-violet-400', color: 'text-violet-400' },
     { label: '75 Coins', coins: 75, cash: 0, bg: 'bg-amber-500/10 text-amber-400', color: 'text-amber-400' }
 ];
 

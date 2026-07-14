@@ -78,7 +78,12 @@ exports.joinEvent = asyncHandler(async (req, res, next) => {
         });
     }
 
-    // Check coins
+    // Check Mega Event eligibility
+    if (event.isMega && user.coins.balance < 500) {
+        return next(new ErrorResponse('You need at least 500 coins to unlock the Mega Event', 400));
+    }
+
+    // Check coins for entry fee
     if (user.coins.balance < event.fee) {
         return next(new ErrorResponse('Not enough coins to join', 400));
     }

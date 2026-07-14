@@ -411,6 +411,20 @@ exports.getMe = async (req, res, next) => {
                 }
             }
 
+            // 3. Check booster expiry
+            if (user.isBoosterActive && user.boosterExpiry && new Date(user.boosterExpiry) <= new Date()) {
+                user.isBoosterActive = false;
+                modified = true;
+            }
+            if (user.isSupportBoosterActive && user.supportBoosterExpiry && new Date(user.supportBoosterExpiry) <= new Date()) {
+                user.isSupportBoosterActive = false;
+                modified = true;
+            }
+            if (user.isTaskBoosterActive && user.taskBoosterExpiry && new Date(user.taskBoosterExpiry) <= new Date()) {
+                user.isTaskBoosterActive = false;
+                modified = true;
+            }
+
             if (modified) {
                 await user.save({ validateBeforeSave: false });
             }

@@ -189,22 +189,9 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast, onRefr
                 const isEditing = editingId === event.id;
 
                 return (
-                    <div key={event.id} className="bg-white rounded-lg border border-slate-100 shadow-sm p-4 hover:shadow-md transition-shadow relative group font-['Poppins']">
-                        {/* Delete Button on Hover */}
-                        <button
-                            onClick={() => {
-                                if (window.confirm(`Are you sure you want to delete the event "${event.title}"?`)) {
-                                    onDeleteEvent(event.id);
-                                }
-                            }}
-                            className="absolute top-5 right-5 p-2 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-xl transition-all opacity-0 group-hover:opacity-100"
-                            title="Delete Event"
-                        >
-                            <Trash2 size={14} />
-                        </button>
-
+                    <div key={event.id} className="bg-white rounded-lg border border-slate-100 shadow-sm p-4 hover:shadow-md transition-shadow group font-['Poppins']">
                         {/* Header */}
-                        <div className="flex items-start justify-between mb-4 pr-8">
+                        <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
                                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center border ${TAG_COLORS[event.tag] || 'bg-slate-50 border-slate-100'}`}>
                                     <Trophy size={20} />
@@ -229,29 +216,42 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast, onRefr
                                     )}
                                 </div>
                             </div>
-                            {isEditing ? (
-                                <select
-                                    value={editData.status}
-                                    onChange={e => setEditData(p => ({ ...p, status: e.target.value }))}
-                                    className="bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-[9px] font-medium text-slate-700 outline-none"
+                            <div className="flex items-center gap-2">
+                                {isEditing ? (
+                                    <select
+                                        value={editData.status}
+                                        onChange={e => setEditData(p => ({ ...p, status: e.target.value }))}
+                                        className="bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 text-[9px] font-medium text-slate-700 outline-none"
+                                    >
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                        <option value="Draft">Draft</option>
+                                        <option value="Coming Soon">Coming Soon</option>
+                                    </select>
+                                ) : (
+                                    <span className={`px-2.5 py-1 rounded-xl text-[9px] font-medium uppercase tracking-normal border font-['Poppins'] ${STATUS_COLORS[event.status] || STATUS_COLORS.Inactive}`}>
+                                        {event.status}
+                                    </span>
+                                )}
+                                <button
+                                    onClick={() => {
+                                        if (window.confirm(`Are you sure you want to delete the event "${event.title}"?`)) {
+                                            onDeleteEvent(event.id);
+                                        }
+                                    }}
+                                    className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                    title="Delete Event"
                                 >
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                    <option value="Draft">Draft</option>
-                                    <option value="Coming Soon">Coming Soon</option>
-                                </select>
-                            ) : (
-                                <span className={`px-2.5 py-1 rounded-xl text-[9px] font-medium uppercase tracking-normal border font-['Poppins'] ${STATUS_COLORS[event.status] || STATUS_COLORS.Inactive}`}>
-                                    {event.status}
-                                </span>
-                            )}
+                                    <Trash2 size={14} />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Stats */}
                         <div className="grid grid-cols-4 gap-2 mb-3">
                             {[
                                 { label: 'Entry', value: isEditing ? null : `${Math.max(0, event.fee)} Coins`, edit: <input type="number" min="0" value={editData.fee} onChange={e => setEditData(p => ({ ...p, fee: Math.max(0, +e.target.value) }))} className="w-14 border-b border-sky-300 text-center text-sm font-medium outline-none bg-transparent" /> },
-                                { label: 'Pool', value: '50%' },
+                                { label: 'Prize', value: isEditing ? null : (event.prize || '50% Pool'), edit: <input type="text" value={editData.prize || ''} onChange={e => setEditData(p => ({ ...p, prize: e.target.value }))} className="w-16 border-b border-sky-300 text-center text-[10px] font-medium outline-none bg-transparent" placeholder="e.g. 50% Pool" /> },
                                 { label: 'Joined', value: event.participantsCount || 0 },
                                 { label: 'Awarded', value: event.awardedCount || 0 },
                             ].map((stat, i) => (
@@ -1198,7 +1198,7 @@ const EventsAdmin = () => {
         title: '',
         tag: 'Quiz',
         fee: 500,
-        prize: 'Dynamic',
+        prize: '50%',
         startTime: 'Live Now',
         status: 'Active',
         isMega: false,

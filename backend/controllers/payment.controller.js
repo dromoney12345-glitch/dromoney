@@ -170,7 +170,10 @@ exports.paymentWebhook = asyncHandler(async (req, res, next) => {
     const transaction_id = payloadData.upi_txn_id || payloadData.txn_id || payloadData.transactionId || req.body.transaction_id;
     const txn_date = payloadData.txn_date || req.body.txn_date;
     
-    if (!order_id) return res.status(400).send('Missing order_id or orderCode');
+    if (!order_id) {
+        console.log('Webhook test received or missing order_id. Payload:', req.body);
+        return res.status(200).send('Test webhook received');
+    }
 
     const payment = await Payment.findOne({ orderId: order_id }).populate('user');
     if (!payment) return res.status(404).send('Payment not found');

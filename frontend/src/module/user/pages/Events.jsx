@@ -285,19 +285,19 @@ const Events = () => {
                     <div className="flex justify-between items-center mb-2">
                         <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Mega Event Eligibility</span>
                         <span className="text-[10px] font-extrabold text-amber-400 font-['Poppins']">
-                            {userData?.coins?.balance || 0} / 500 Coins Collected
+                            {userData?.coins?.total || 0} / 500 Coins Collected
                         </span>
                     </div>
                     <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-700/50">
                         <div 
                             className="bg-gradient-to-r from-amber-500 to-yellow-400 h-full rounded-full transition-all duration-500" 
-                            style={{ width: `${Math.min(100, ((userData?.coins?.balance || 0) / 500) * 100)}%` }}
+                            style={{ width: `${Math.min(100, ((userData?.coins?.total || 0) / 500) * 100)}%` }}
                         ></div>
                     </div>
                     <p className="text-[8.5px] text-slate-400 font-semibold mt-2 leading-tight uppercase tracking-wider">
-                        {userData?.coins?.balance >= 500 
+                        {userData?.coins?.total >= 500 
                             ? '🎉 Eligible! You have enough coins to enter Sunday Mega Event.' 
-                            : `⚠️ Need ${500 - (userData?.coins?.balance || 0)} more Coins to unlock Sunday Mega Event.`
+                            : `⚠️ Need ${500 - (userData?.coins?.total || 0)} more Coins to unlock Sunday Mega Event.`
                         }
                     </p>
                 </div>
@@ -345,16 +345,18 @@ const Events = () => {
                                                         if (isJoined) navigateToEvent(event);
                                                         else handleJoinEvent(event);
                                                     }}
-                                                    disabled={(isComingSoon && !isJoined) || isJoining}
+                                                    disabled={(isComingSoon && !isJoined) || isJoining || (!isJoined && (userData?.coins?.total || 0) < 500)}
                                                     className={`ml-2 px-3 py-2 rounded-xl text-[9px] tracking-widest uppercase transition-all active:scale-95 shrink-0 cursor-pointer ${
                                                         isJoined
                                                             ? 'bg-emerald-500 text-white'
+                                                            : (!isJoined && (userData?.coins?.total || 0) < 500)
+                                                            ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                                                             : isComingSoon
                                                             ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                                                             : theme.button
                                                     }`}
                                                 >
-                                                    {isJoined ? '✓ Joined' : isComingSoon ? 'Soon' : 'Join'}
+                                                    {isJoined ? '✓ Joined' : (!isJoined && (userData?.coins?.total || 0) < 500) ? 'Locked' : isComingSoon ? 'Soon' : 'Join'}
                                                 </button>
                                             </div>
 
@@ -368,8 +370,8 @@ const Events = () => {
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
-                                                    <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Pool</p>
-                                                    <span className="text-[10px] text-emerald-600 font-bold">50%</span>
+                                                    <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Prize</p>
+                                                    <span className="text-[9px] text-emerald-600 font-bold leading-tight text-center px-1 truncate max-w-[55px]">{event.prize || '50% Pool'}</span>
                                                 </div>
                                                 <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
                                                     <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Time</p>
@@ -466,8 +468,8 @@ const Events = () => {
                                                 </div>
                                             </div>
                                             <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
-                                                <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Pool</p>
-                                                <span className="text-[10px] text-emerald-600 font-bold">50%</span>
+                                                <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Prize</p>
+                                                <span className="text-[9px] text-emerald-600 font-bold leading-tight text-center px-1 truncate max-w-[55px]">{event.prize || '50% Pool'}</span>
                                             </div>
                                             <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
                                                 <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Time</p>
