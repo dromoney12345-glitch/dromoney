@@ -58,7 +58,15 @@ exports.updateKyc = asyncHandler(async (req, res, next) => {
         const endTotalMins = (endH || 0) * 60 + (endM || 0);
         if (startTotalMins < endTotalMins) {
             if (currentTotalMins < startTotalMins || currentTotalMins > endTotalMins) {
-                return next(new ErrorResponse(`KYC submissions are only available between ${settings.kycWindowStart} and ${settings.kycWindowEnd}`, 400));
+                const formatTime = (t) => {
+                    const [h, m] = t.split(':');
+                    let hrs = parseInt(h, 10);
+                    const ampm = hrs >= 12 ? 'pm' : 'am';
+                    hrs = hrs % 12 || 12;
+                    const mins = parseInt(m, 10);
+                    return mins > 0 ? `${hrs}:${m}${ampm}` : `${hrs}${ampm}`;
+                };
+                return next(new ErrorResponse(`KYC submissions are only available between ${formatTime(settings.kycWindowStart)} and ${formatTime(settings.kycWindowEnd)}`, 400));
             }
         }
     }
