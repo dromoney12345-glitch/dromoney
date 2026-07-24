@@ -449,7 +449,11 @@ const Home = () => {
         if (isTargetService) {
             const kycStr = (userData?.kycStatus || 'Not Started').toLowerCase();
             if (kycStr === 'verified' || kycStr === 'approved') {
-                navigate('/user/marketing', { state: { showReferral: false } });
+                if (!isPaid) {
+                    setPaymentConfig({ isOpen: true, plan: 'Lifetime Access Plan', amount: 499, type: 'PLATFORM_UNLOCK' });
+                } else {
+                    navigate(path);
+                }
             } else if (kycStr === 'pending' || kycStr === 'rejected') {
                 navigate('/user/auth/pending');
             } else {
