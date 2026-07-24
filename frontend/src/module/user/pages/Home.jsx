@@ -457,7 +457,7 @@ const Home = () => {
             }
         } else {
             if (path === '/user/marketing') {
-                navigate('/user/marketing', { state: { showReferral: true } });
+                navigate('/user/marketing', { state: { showReferral: false } });
             } else {
                 navigate(path);
             }
@@ -503,7 +503,7 @@ const Home = () => {
                 <h3 className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-3 ml-1">Marketplace & Services</h3>
                 <div className="grid grid-cols-4 gap-y-4 gap-x-2 bg-white rounded-2xl p-5 shadow-xl shadow-slate-200/40 border border-slate-50">
                     {[
-                        { icon: Share2, label: 'Refer', color: 'bg-emerald-50 text-emerald-500', path: '/user/income-info' },
+                        { icon: Share2, label: 'Refer', color: 'bg-emerald-50 text-emerald-500', path: '/user/marketing' },
                         { icon: ClipboardList, label: 'Task', color: 'bg-amber-50 text-amber-500', path: '/user/earn' },
                         { icon: TrendingUp, label: 'Fund', color: 'bg-blue-50 text-blue-500', path: '/user/future-fund' },
                         { icon: Sparkles, label: 'Events', color: 'bg-purple-50 text-purple-500', path: '/user/events' }

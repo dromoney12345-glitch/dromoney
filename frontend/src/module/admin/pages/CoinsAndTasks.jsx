@@ -16,6 +16,7 @@ const CoinsAndTasks = () => {
     const [taskWindowEnd, setTaskWindowEnd] = useState('23:59');
     const [kycWindowStart, setKycWindowStart] = useState('07:00');
     const [kycWindowEnd, setKycWindowEnd] = useState('19:00');
+    const [taskRenewalHours, setTaskRenewalHours] = useState(24);
     
     // Modal State
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -46,6 +47,7 @@ const CoinsAndTasks = () => {
                 setTaskWindowEnd(response.data.taskWindowEnd || '23:59');
                 setKycWindowStart(response.data.kycWindowStart || '07:00');
                 setKycWindowEnd(response.data.kycWindowEnd || '19:00');
+                setTaskRenewalHours(response.data.taskRenewalHours || 24);
             }
         } catch (err) {
             console.error("Fetch Settings Error:", err);
@@ -136,7 +138,8 @@ const CoinsAndTasks = () => {
                 taskWindowStart,
                 taskWindowEnd,
                 kycWindowStart,
-                kycWindowEnd
+                kycWindowEnd,
+                taskRenewalHours: Number(taskRenewalHours)
             });
             
             if (response.success) {
@@ -268,6 +271,24 @@ const CoinsAndTasks = () => {
                                         </div>
                                     </div>
                                     <p className="text-[10px] text-slate-500 mt-2">Users can only submit KYC requests during this time window.</p>
+                                </div>
+                            </div>
+                            
+                            <hr className="border-slate-100 my-4" />
+                            <h3 className="text-sm font-medium text-slate-800 uppercase tracking-normal mb-3 flex items-center gap-2">🔄 Task Renewal</h3>
+                            
+                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                <h4 className="text-xs font-semibold text-slate-700 uppercase mb-3">Task Renewal Time</h4>
+                                <div className="flex items-center gap-3">
+                                    <select 
+                                        value={taskRenewalHours} 
+                                        onChange={e => setTaskRenewalHours(e.target.value)}
+                                        className="border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:border-sky-500 bg-white"
+                                    >
+                                        <option value={12}>12 Hours</option>
+                                        <option value={24}>24 Hours</option>
+                                    </select>
+                                    <span className="text-[10px] text-slate-500">Tasks will renew this many hours after completion.</span>
                                 </div>
                             </div>
 

@@ -45,16 +45,17 @@ exports.submitTask = asyncHandler(async (req, res, next) => {
 
     const user = await User.findById(req.user.id);
     
-    // Check if already submitted within the last 24 hours
-    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    // Check if already submitted within the renewal period
+    const renewalHours = settings.taskRenewalHours || 24;
+    const cutoffTime = new Date(Date.now() - renewalHours * 60 * 60 * 1000);
     const alreadySubmitted = await TaskSubmission.findOne({
         user: req.user.id,
         task: taskId,
-        createdAt: { $gte: twentyFourHoursAgo }
+        createdAt: { $gte: cutoffTime }
     });
 
     if (alreadySubmitted) {
-        return next(new ErrorResponse('You have already submitted proof for this task in the last 24 hours. Please wait before submitting again.', 400));
+        return next(new ErrorResponse(`You have already submitted proof for this task recently. Please wait ${renewalHours} hours before submitting again.`, 400));
     }
 
     const submission = await TaskSubmission.create({

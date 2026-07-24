@@ -160,7 +160,7 @@ exports.exportWithdrawalsCSV = async (req, res) => {
             .sort({ createdAt: -1 });
 
         // CSV Header
-        let csv = 'User_Name,Phone,Payment_Method,User_UPI_ID,Bank_Account,IFSC,Holder_Name,Bank_Name,Amount,Status\n';
+        let csv = 'User_Name,Phone,Payment_Method,User_UPI_ID,Bank_Account,IFSC,Holder_Name,Amount,TDS,Admin_Charges,Final_Amount,Request_Date,Request_ID\n';
         
         withdrawals.forEach(w => {
             const name = w.user?.name || 'Unknown';
@@ -170,11 +170,16 @@ exports.exportWithdrawalsCSV = async (req, res) => {
             const account = w.bankDetails?.accountNumber || '';
             const ifsc = w.bankDetails?.ifscCode || '';
             const holder = w.bankDetails?.holderName || '';
-            const bankName = w.bankDetails?.bankName || '';
-            const amount = w.amount;
-            const status = w.status;
             
-            csv += `"${name}","${phone}","${method}","${upiId}","${account}","${ifsc}","${holder}","${bankName}","${amount}","${status}"\n`;
+            const amount = w.amount;
+            const tds = 0; // Currently no TDS is deducted in the system
+            const adminCharges = 5; // Flat ₹5 fee
+            const finalAmount = amount; // User receives the full amount, ₹5 is deducted extra from wallet
+            
+            const requestDate = new Date(w.createdAt).toLocaleDateString('en-GB');
+            const requestId = w._id.toString();
+            
+            csv += `"${name}","${phone}","${method}","${upiId}","${account}","${ifsc}","${holder}","${amount}","${tds}","${adminCharges}","${finalAmount}","${requestDate}","${requestId}"\n`;
         });
 
         res.setHeader('Content-Type', 'text/csv');

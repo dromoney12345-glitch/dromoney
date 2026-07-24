@@ -110,6 +110,9 @@ const SettingsSchema = new mongoose.Schema({
     kycWindowStart: { type: String, default: '07:00' },
     kycWindowEnd: { type: String, default: '19:00' },
 
+    // Task Renewal Setting
+    taskRenewalHours: { type: Number, default: 24 },
+
     // Future Fund Profit Distribution Tiers
     ffTier1TasksLimit: { type: Number, default: 5 },
     ffTier1AdsLimit: { type: Number, default: 5 },

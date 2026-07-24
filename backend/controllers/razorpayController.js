@@ -409,8 +409,8 @@ exports.submitManualPayment = asyncHandler(async (req, res, next) => {
     try {
         const { sendNotificationToAllAdmins } = require('./fcmController');
         await sendNotificationToAllAdmins({
-            title: 'Manual Deposit Auto-Approved 💰',
-            body: `User ${user.name} uploaded a receipt for ₹${finalAmount}. Access was auto-granted.`,
+            title: 'New Manual Deposit 💰',
+            body: `User ${user.name} uploaded a receipt for ₹${finalAmount}. Pending approval.`,
             data: {
                 type: 'deposit_alert',
                 link: '/admin/payments'
@@ -422,6 +422,6 @@ exports.submitManualPayment = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        message: 'Payment proof submitted and access activated successfully!'
+        message: 'Payment proof submitted successfully! Pending admin approval.'
     });
 });

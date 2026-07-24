@@ -398,11 +398,12 @@ exports.getMe = async (req, res, next) => {
                 modified = true;
             }
 
-            // 2. Filter dailyTaskCompletions older than 24 hours
+            // 2. Filter dailyTaskCompletions older than renewal hours
             if (user.dailyTaskCompletions && user.dailyTaskCompletions.length > 0) {
-                const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+                const renewalHours = settings.taskRenewalHours || 24;
+                const cutoffTime = new Date(Date.now() - (renewalHours * 60 * 60 * 1000));
                 const activeCompletions = user.dailyTaskCompletions.filter(
-                    c => new Date(c.completedAt) >= twentyFourHoursAgo
+                    c => new Date(c.completedAt) >= cutoffTime
                 );
                 
                 if (activeCompletions.length !== user.dailyTaskCompletions.length) {

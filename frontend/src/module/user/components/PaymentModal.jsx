@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, ShieldCheck, Loader2, CheckCircle2, AlertCircle, Lock } from 'lucide-react';
+import { X, ShieldCheck, Loader2, CheckCircle2, AlertCircle, Lock, UploadCloud, FileImage, CreditCard } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
 import QRCode from 'react-qr-code';
@@ -15,10 +15,27 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
     const [isMobile, setIsMobile] = useState(false);
     const [showQR, setShowQR] = useState(false);
     
+    const [isManualMode, setIsManualMode] = useState(false);
+    const [qrScannerImage, setQrScannerImage] = useState(null);
+    const [utrNumber, setUtrNumber] = useState('');
+    const [screenshot, setScreenshot] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    
     const { createPayment, loading: automatedLoading } = usePayment();
 
     useEffect(() => {
         setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+        const fetchSettings = async () => {
+            try {
+                const res = await api.get('/public/settings');
+                if (res.success && res.data) {
+                    setQrScannerImage(res.data.qrScannerImage);
+                }
+            } catch (err) {
+                console.error("Failed to fetch settings", err);
+            }
+        };
+        fetchSettings();
     }, []);
 
     useEffect(() => {
@@ -27,6 +44,9 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
             setErrorMsg('');
             setDynamicIntent(null);
             setDynamicOrderId(null);
+            setIsManualMode(false);
+            setUtrNumber('');
+            setScreenshot(null);
             document.body.style.overflow = 'hidden';
             
             initiatePayment();
@@ -77,6 +97,47 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
         } else {
             setStatus('error');
             setErrorMsg(res?.error || 'Failed to initialize payment.');
+        }
+    };
+
+    const handleManualSubmit = async () => {
+        if (!utrNumber || utrNumber.length !== 12) {
+            setErrorMsg('Please enter a valid 12-digit UTR number');
+            return;
+        }
+        if (!screenshot) {
+            setErrorMsg('Please upload a payment screenshot');
+            return;
+        }
+
+        setIsSubmitting(true);
+        setErrorMsg('');
+        
+        try {
+            const formData = new FormData();
+            formData.append('amount', amount);
+            formData.append('type', type);
+            formData.append('planName', plan);
+            formData.append('utrNumber', utrNumber);
+            formData.append('screenshot', screenshot);
+            if (itemId) formData.append('ideaId', itemId);
+
+            const res = await api.post('/user/data/manual-payment', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            if (res.success) {
+                setStatus('success');
+                setTimeout(() => onSuccess(), 2500);
+            } else {
+                setErrorMsg(res.message || 'Failed to submit manual payment');
+            }
+        } catch (err) {
+            setErrorMsg(err.message || 'An error occurred during submission');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -152,8 +213,8 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                             )}
 
                             {/* Dynamic Payment QR or Button */}
-                            {!isPlatformAlreadyUnlocked && dynamicIntent && (
-                                <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 text-center">
+                            {!isPlatformAlreadyUnlocked && dynamicIntent && !isManualMode && (
+                                <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 text-center relative">
                                     {!isMobile ? (
                                         <>
                                             <h4 className="font-semibold text-slate-800 text-[15px] mb-2">Scan QR to Pay</h4>
@@ -162,7 +223,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                             </div>
                                             <p className="text-[12px] text-slate-500 font-medium mb-4">Scan with PhonePe, GPay, or Paytm</p>
                                             
-                                            <div className="flex items-center justify-center gap-2 text-emerald-600 bg-emerald-50 py-2 px-4 rounded-full w-fit mx-auto animate-pulse">
+                                            <div className="flex items-center justify-center gap-2 text-emerald-600 bg-emerald-50 py-2 px-4 rounded-full w-fit mx-auto animate-pulse mb-4">
                                                 <Loader2 size={14} className="animate-spin" />
                                                 <span className="text-[11px] font-bold tracking-wide">Waiting for payment...</span>
                                             </div>
@@ -180,7 +241,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                             </a>
 
                                             {!showQR ? (
-                                                <button onClick={() => setShowQR(true)} className="text-[11px] text-blue-600 font-semibold my-2 uppercase tracking-wider hover:underline flex items-center justify-center w-full">
+                                                <button onClick={() => setShowQR(true)} className="text-[11px] text-blue-600 font-semibold my-2 uppercase tracking-wider hover:underline flex items-center justify-center w-full mb-3">
                                                     Show QR Code / Share Link
                                                 </button>
                                             ) : (
@@ -194,12 +255,82 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                                 </div>
                                             )}
 
-                                            <div className="flex items-center justify-center gap-2 text-emerald-600 bg-emerald-50 py-2 px-4 rounded-full w-fit mx-auto animate-pulse">
+                                            <div className="flex items-center justify-center gap-2 text-emerald-600 bg-emerald-50 py-2 px-4 rounded-full w-fit mx-auto animate-pulse mb-4">
                                                 <Loader2 size={14} className="animate-spin" />
                                                 <span className="text-[11px] font-bold tracking-wide">Waiting for payment...</span>
                                             </div>
                                         </>
                                     )}
+                                </div>
+                            )}
+
+                            {/* Divider and Manual Payment Option (Always show if not already manual) */}
+                            {!isPlatformAlreadyUnlocked && !isManualMode && status !== 'loading' && (
+                                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-center mt-4">
+                                    <button 
+                                        onClick={() => setIsManualMode(true)}
+                                        className="text-[11px] font-medium text-slate-500 hover:text-slate-800 transition-all underline decoration-slate-300 underline-offset-4"
+                                    >
+                                        Payment failed or prefer manual? Try manual transfer
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Manual Payment UI */}
+                            {!isPlatformAlreadyUnlocked && isManualMode && status !== 'loading' && (
+                                <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 animate-in fade-in zoom-in-95 duration-300">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <button onClick={() => setIsManualMode(false)} className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 active:scale-95 transition-all">
+                                            <X size={14} />
+                                        </button>
+                                        <h4 className="font-semibold text-slate-800 text-[14px]">Manual Transfer</h4>
+                                    </div>
+
+                                    {qrScannerImage && (
+                                        <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 mx-auto w-fit mb-5">
+                                            <img src={qrScannerImage} alt="Payment QR" className="w-32 h-32 object-cover rounded-xl" />
+                                        </div>
+                                    )}
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">UTR / Reference No.</label>
+                                            <input 
+                                                type="text" 
+                                                value={utrNumber}
+                                                onChange={(e) => setUtrNumber(e.target.value)}
+                                                placeholder="Enter 12-digit UTR"
+                                                maxLength={12}
+                                                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-[13px] font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Payment Screenshot</label>
+                                            <label className="flex items-center justify-center gap-2 w-full bg-white border border-dashed border-slate-300 rounded-xl px-4 py-3 text-[12px] font-medium text-slate-600 hover:bg-slate-50 cursor-pointer transition-all">
+                                                <UploadCloud size={16} className="text-blue-500" />
+                                                {screenshot ? screenshot.name : 'Upload Receipt Image'}
+                                                <input 
+                                                    type="file" 
+                                                    accept="image/*"
+                                                    onChange={(e) => setScreenshot(e.target.files[0])}
+                                                    className="hidden"
+                                                />
+                                            </label>
+                                        </div>
+
+                                        <button 
+                                            onClick={handleManualSubmit}
+                                            disabled={isSubmitting || !utrNumber || !screenshot}
+                                            className="w-full py-3.5 bg-slate-800 hover:bg-slate-900 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl text-[13px] font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-2 shadow-lg shadow-slate-900/20"
+                                        >
+                                            {isSubmitting ? (
+                                                <><Loader2 size={16} className="animate-spin" /> Submitting...</>
+                                            ) : (
+                                                <><CheckCircle2 size={16} /> Submit Proof</>
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -223,13 +354,17 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                     {/* SUCCESS STATE */}
                     {status === 'success' && (
                         <div className="p-10 flex flex-col items-center justify-center text-center gap-5 py-24 bg-white animate-in slide-in-from-bottom-4 duration-500">
-                            <div className="w-24 h-24 bg-gradient-to-tr from-emerald-400 to-emerald-500 rounded-full flex items-center justify-center shadow-xl shadow-emerald-500/30 animate-in zoom-in duration-500 delay-150">
-                                <CheckCircle2 size={40} className="text-white" />
+                            <div className={`w-24 h-24 bg-gradient-to-tr ${isManualMode ? 'from-amber-400 to-amber-500 shadow-amber-500/30' : 'from-emerald-400 to-emerald-500 shadow-emerald-500/30'} rounded-full flex items-center justify-center shadow-xl animate-in zoom-in duration-500 delay-150`}>
+                                {isManualMode ? <ShieldCheck size={40} className="text-white" /> : <CheckCircle2 size={40} className="text-white" />}
                             </div>
                             <div className="space-y-2">
-                                <h4 className="font-black text-slate-800 text-[22px]">Payment Successful!</h4>
+                                <h4 className="font-black text-slate-800 text-[22px]">
+                                    {isManualMode ? 'Submission Successful!' : 'Payment Successful!'}
+                                </h4>
                                 <p className="text-[13px] text-slate-500 font-medium leading-relaxed max-w-[250px] mx-auto">
-                                    Your account has been upgraded successfully. Welcome aboard!
+                                    {isManualMode 
+                                        ? 'Your manual payment is pending admin approval. Your account will be updated automatically once confirmed.' 
+                                        : 'Your account has been upgraded successfully. Welcome aboard!'}
                                 </p>
                             </div>
                         </div>

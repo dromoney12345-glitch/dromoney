@@ -9,7 +9,6 @@ import Events from './module/user/pages/Events';
 import Profile from './module/user/pages/Profile';
 import Wallet from './module/user/pages/Wallet';
 import Income from './module/user/pages/Income';
-import IncomeInfo from './module/user/pages/IncomeInfo';
 import Marketing from './module/user/pages/Marketing';
 import MarketingHistory from './module/user/pages/MarketingHistory';
 import TaskRunner from './module/user/pages/TaskRunner';
@@ -201,7 +200,6 @@ function App() {
               <Route path="home" element={<Home />} />
               <Route path="earn" element={<Earn />} />
               <Route path="income" element={<Income />} />
-              <Route path="income-info" element={<IncomeInfo />} />
               <Route path="marketing" element={<Marketing />} />
               <Route path="marketing-history" element={<MarketingHistory />} />
               <Route path="history" element={<Navigate to="/user/wallet" replace />} />

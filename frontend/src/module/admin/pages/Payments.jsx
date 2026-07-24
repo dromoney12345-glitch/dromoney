@@ -294,14 +294,27 @@ const Payments = () => {
                                 </div>
 
                                 <div className="aspect-[1.5/1] bg-slate-50 rounded-lg border-2 border-dashed border-slate-200 flex flex-col items-center justify-center relative overflow-hidden group shadow-inner">
-                                    <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-4 backdrop-blur-[2px]">
-                                        <button className="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><Download size={20} /></button>
-                                        <button className="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><ExternalLink size={20} /></button>
-                                    </div>
-                                    <div className="flex flex-col items-center gap-2">
-                                        <ImageIcon size={40} className="text-slate-300" />
-                                        <p className="text-[9px] font-medium text-slate-400 uppercase tracking-[0.15em] font-['Poppins']">Payment Screenshot</p>
-                                    </div>
+                                    {selectedPayment.screenshot ? (
+                                        <img src={selectedPayment.screenshot} alt="Payment Proof" className="w-full h-full object-contain bg-slate-900" />
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-2">
+                                            <ImageIcon size={40} className="text-slate-300" />
+                                            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-[0.15em] font-['Poppins']">No Screenshot Available</p>
+                                        </div>
+                                    )}
+                                    {selectedPayment.screenshot && (
+                                        <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-4 backdrop-blur-[2px]">
+                                            <a 
+                                                href={selectedPayment.screenshot} 
+                                                download 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"
+                                            >
+                                                <Download size={20} />
+                                            </a>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

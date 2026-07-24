@@ -83,10 +83,13 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         }
         if (task) {
             if (task.isDaily) {
-                const today = new Date().setHours(0, 0, 0, 0);
+                const settings = await Settings.findOne() || {};
+                const renewalHours = settings.taskRenewalHours || 24;
+                const cutoffTime = Date.now() - (renewalHours * 60 * 60 * 1000);
+                
                 const alreadyDoneToday = user.dailyTaskCompletions?.some(c =>
                     String(c.taskId) === String(taskId) &&
-                    new Date(c.completedAt).setHours(0, 0, 0, 0) === today
+                    new Date(c.completedAt).getTime() > cutoffTime
                 );
                 if (alreadyDoneToday) {
                     return next(new ErrorResponse('Task already completed today', 400));
@@ -98,10 +101,13 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
             }
         } else {
             // It's a mock task from frontend (e.g., id "1", "2", "3"). Treat as daily task.
-            const today = new Date().setHours(0, 0, 0, 0);
+            const settings = await Settings.findOne() || {};
+            const renewalHours = settings.taskRenewalHours || 24;
+            const cutoffTime = Date.now() - (renewalHours * 60 * 60 * 1000);
+            
             const alreadyDoneToday = user.dailyTaskCompletions?.some(c =>
                 String(c.taskId) === String(taskId) &&
-                new Date(c.completedAt).setHours(0, 0, 0, 0) === today
+                new Date(c.completedAt).getTime() > cutoffTime
             );
             if (alreadyDoneToday) {
                 return next(new ErrorResponse('Task already completed today', 400));

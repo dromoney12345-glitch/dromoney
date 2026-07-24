@@ -257,17 +257,32 @@ async function handlePaymentSuccess(payment) {
         await User.findByIdAndUpdate(user._id, {
             $inc: { 'wallet.balance': payment.amount }
         });
-    } else if (payment.orderType === 'SUBSCRIPTION') {
+    } else if (payment.orderType === 'SUBSCRIPTION' || payment.orderType === 'PLATFORM_UNLOCK') {
         // Subscription activation
         await User.findByIdAndUpdate(user._id, {
             isPaid: true,
             unlockedAt: new Date()
         });
-    } else if (payment.orderType === 'BOOSTER') {
-        // Booster activation
-        await User.findByIdAndUpdate(user._id, {
-            isTaskBoosterActive: true,
-            taskBoosterExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 Hours
-        });
+    } else if (payment.orderType === 'SUPPORT_BOOSTER' || payment.orderType === 'TASK_BOOSTER') {
+        const isSupport = payment.orderType === 'SUPPORT_BOOSTER';
+        const expiryDate = new Date();
+        
+        let updateData = { isBoosterActive: true };
+        
+        if (isSupport) {
+            expiryDate.setDate(expiryDate.getDate() + 30);
+            updateData.isSupportBoosterActive = true;
+            updateData.supportBoosterExpiry = expiryDate;
+            updateData.isTaskBoosterActive = false; // enforce one booster rule
+        } else {
+            expiryDate.setHours(expiryDate.getHours() + 24);
+            updateData.isTaskBoosterActive = true;
+            updateData.taskBoosterExpiry = expiryDate;
+            updateData.isSupportBoosterActive = false; // enforce one booster rule
+        }
+        
+        updateData.boosterExpiry = expiryDate;
+        
+        await User.findByIdAndUpdate(user._id, updateData);
     }
 }
