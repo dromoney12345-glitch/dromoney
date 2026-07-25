@@ -121,6 +121,14 @@ exports.updateKyc = asyncHandler(async (req, res, next) => {
             rejectionReason: ''
         };
 
+        user.notifications = user.notifications || [];
+        user.notifications.push({
+            title: 'KYC Received 📑',
+            message: 'Your KYC documents are successfully received. After 1 hour your KYC will be confirmed, please wait.',
+            type: 'info',
+            createdAt: new Date()
+        });
+
         user.markModified('kyc');
         await user.save();
 
