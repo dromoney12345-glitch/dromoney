@@ -51,7 +51,10 @@ exports.updateKyc = asyncHandler(async (req, res, next) => {
     const settings = await Settings.findOne();
     if (settings && settings.kycWindowStart && settings.kycWindowEnd) {
         const now = new Date();
-        const currentTotalMins = now.getHours() * 60 + now.getMinutes();
+        const options = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' };
+        const timeString = now.toLocaleTimeString('en-GB', options);
+        const [h, m] = timeString.split(':').map(Number);
+        const currentTotalMins = h * 60 + m;
         const [startH, startM] = settings.kycWindowStart.split(':').map(Number);
         const startTotalMins = (startH || 0) * 60 + (startM || 0);
         const [endH, endM] = settings.kycWindowEnd.split(':').map(Number);

@@ -159,17 +159,7 @@ const AdminLogin = () => {
                                     )}
                                 </button>
                                 
-                                <div className="relative flex items-center justify-center py-2">
-                                    <div className="w-full h-px bg-slate-100"></div>
-                                    <span className="absolute bg-white px-4 text-[10px] font-medium text-slate-300 uppercase tracking-normal">secure gateway</span>
-                                </div>
 
-                                <button
-                                    type="button"
-                                    className="w-full bg-white border-2 border-slate-100 hover:border-slate-200 hover:bg-slate-50 text-slate-600 py-3.5 rounded-xl text-[13px] font-medium transition-all active:scale-[0.98]"
-                                >
-                                    Institutional Login
-                                </button>
                             </div>
 
                             {error && (
