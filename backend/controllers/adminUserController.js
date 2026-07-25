@@ -541,9 +541,9 @@ exports.deleteUser = async (req, res, next) => {
             }
         }
 
-        // Payment records are intentionally preserved for financial audit trail.
-        // We only delete non-financial user data.
+        // We delete all associated data including payments
         await Promise.all([
+            Payment.deleteMany({ user: user._id }),
             Transaction.deleteMany({ user: user._id }),
             Withdrawal.deleteMany({ user: user._id }),
             TaskSubmission.deleteMany({ user: user._id }),
