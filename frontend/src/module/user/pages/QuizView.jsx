@@ -306,7 +306,7 @@ const QuizView = () => {
                         </div>
                         <div className="text-left">
                             <p className="text-[9px] font-medium text-amber-600 uppercase leading-none mb-1">Total Prize</p>
-                            <p className="text-lg font-medium text-slate-800 tracking-tight leading-none">+{isTaskBoosterActive ? score * 30 : score * 10} Coins</p>
+                            <p className="text-lg font-medium text-slate-800 tracking-tight leading-none">+{isTaskBoosterActive ? score * 120 : score * 10} Coins</p>
                             {isTaskBoosterActive && (
                                 <p className="text-[8px] font-bold text-sky-500 uppercase mt-1">3X Boost Applied</p>
                             )}

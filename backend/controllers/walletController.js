@@ -297,7 +297,7 @@ exports.requestWithdrawal = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        message: 'Withdrawal request submitted successfully',
+        message: 'Transaction pending. After 10-15 min admin will approve your transaction.',
         transactionId: transaction._id,
         feeTransactionId: feeTransaction._id
     });

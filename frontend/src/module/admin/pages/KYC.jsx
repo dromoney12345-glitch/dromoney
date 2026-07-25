@@ -263,7 +263,6 @@ const KYC = () => {
                                     )}
                                     <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-4 backdrop-blur-[2px]">
                                         <a href={selectedKyc.aadharImage} download target="_blank" rel="noreferrer" className="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><Download size={20} /></a>
-                                        <a href={selectedKyc.aadharImage} target="_blank" rel="noreferrer" className="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-slate-900 shadow-2xl hover:scale-110 active:scale-95 transition-all"><ExternalLink size={20} /></a>
                                     </div>
                                 </div>
                             </div>

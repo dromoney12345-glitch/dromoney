@@ -156,7 +156,7 @@ exports.updateKyc = asyncHandler(async (req, res, next) => {
         
         return res.status(200).json({
             success: true,
-            message: 'KYC documents submitted for verification',
+            message: 'After 1 hour your KYC will be confirmed, please wait.',
             data: {
                 status: user.kyc.status,
                 documentImage: user.kyc.documentImage

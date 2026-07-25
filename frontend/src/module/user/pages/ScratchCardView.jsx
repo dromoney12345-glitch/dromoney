@@ -192,7 +192,7 @@ const ScratchCardView = () => {
                         return (
                             <ScratchCard 
                                 key={i} 
-                                rewardPerCard={isTaskBoosterActive ? baseRewardPerCard * 3 : baseRewardPerCard} 
+                                rewardPerCard={isTaskBoosterActive ? baseRewardPerCard * 12 : baseRewardPerCard} 
                                 quote={randomQuotes[i] || ""}
                                 onComplete={handleCardFinish} 
                                 isTaskBoosterActive={isTaskBoosterActive}

@@ -100,7 +100,7 @@ const TreasureChestView = () => {
                             {step === 2 && selectedIdx === i && (
                                 <div className="absolute -bottom-4 bg-emerald-500 px-4 py-2 rounded-full shadow-2xl animate-in fade-in slide-in-from-top-2">
                                     <span className="text-[11px] font-medium text-white uppercase tracking-widest">
-                                        +{isTaskBoosterActive ? (task.reward || 0) * 3 : task.reward} Coins
+                                        +{isTaskBoosterActive ? (task.reward || 0) * 12 : task.reward} Coins
                                     </span>
                                 </div>
                             )}

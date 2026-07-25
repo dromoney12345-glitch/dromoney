@@ -152,7 +152,7 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
 
     // 6. Calculate rewards
     const baseReward = ad.coinsReward || 0;
-    const factor = user.isBoosterActive ? 3 : 1;
+    const factor = 1; // Booster does NOT apply to Watch and Earn ads
     const totalAwardedCoins = baseReward * factor;
 
     // Update User

@@ -216,7 +216,7 @@ const TaskRunner = () => {
         taskStorage.markComplete(taskId);
         
         if (userData.isTaskBoosterActive) {
-            setToast({ message: `Task completed! 3X Booster Applied! +${rewardAmount} Coins`, type: 'success' });
+            setToast({ message: `Task completed! 12X Booster Applied! +${rewardAmount} Coins`, type: 'success' });
             setTimeout(() => { setToast(null); navigate('/user/earn'); }, 2000);
         } else {
             setTimeout(() => navigate('/user/earn'), 2000);
@@ -249,7 +249,7 @@ const TaskRunner = () => {
                         <Coins size={12} className="text-amber-400" />
                         <span className="font-medium text-amber-400 text-xs">{userData.coins.total}</span>
                     </div>
-                    <span className="font-medium text-amber-400 text-xs">+{userData.isTaskBoosterActive ? (task.coinsReward || task.reward) * 3 : (task.coinsReward || task.reward)} Coin {userData.isTaskBoosterActive && '(3X Boost)'}</span>
+                    <span className="font-medium text-amber-400 text-xs">+{userData.isTaskBoosterActive ? (task.coinsReward || task.reward) * 12 : (task.coinsReward || task.reward)} Coin {userData.isTaskBoosterActive && '(12X Boost)'}</span>
                 </div>
             </div>
 

@@ -425,3 +425,25 @@ exports.submitManualPayment = asyncHandler(async (req, res, next) => {
         message: 'Payment proof submitted successfully! Pending admin approval.'
     });
 });
+
+// @desc    Check if user has a pending manual payment
+// @route   GET /api/user/data/manual-payment/check
+// @access  Private
+exports.checkPendingManualPayment = asyncHandler(async (req, res, next) => {
+    const { type } = req.query;
+    
+    let pType = type || 'PLATFORM_UNLOCK';
+    
+    const pendingPayment = await Payment.findOne({
+        user: req.user.id,
+        paymentType: pType,
+        method: 'Manual',
+        status: 'Pending'
+    });
+    
+    res.status(200).json({
+        success: true,
+        hasPending: !!pendingPayment
+    });
+});
+

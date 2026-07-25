@@ -248,7 +248,7 @@ const TaskQuizView = () => {
                                 </div>
                                 <div className="text-right">
                                     <div className="font-medium text-amber-500 text-sm">
-                                        +{isTaskBoosterActive ? reward * 3 : reward} Coin
+                                        +{isTaskBoosterActive ? reward * 12 : reward} Coin
                                     </div>
                                 </div>
                             </div>

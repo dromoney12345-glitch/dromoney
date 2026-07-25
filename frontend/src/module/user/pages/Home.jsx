@@ -38,9 +38,9 @@ const FALLBACK_BANNERS = [
     },
     {
         _id: '2',
-        tag: '3X Booster Active',
+        tag: '12X Booster Active',
         title: 'Multiply Your Coins',
-        subtitle: 'Upgrade to Monthly Booster and earn 3x coins on every task',
+        subtitle: 'Upgrade to Task Booster and earn 12x coins on every task',
         ctaText: 'Upgrade Now',
         path: '/user/profile',
         gradient: 'from-purple-100 to-indigo-100',

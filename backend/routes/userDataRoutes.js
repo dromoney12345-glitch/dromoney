@@ -15,7 +15,7 @@ const {
 } = require('../controllers/userController');
 const { submitTask } = require('../controllers/taskSubmissionController');
 const { unlockIdea } = require('../controllers/businessIdeaController');
-const { createOrder, verifyPayment, submitManualPayment } = require('../controllers/razorpayController');
+const { createOrder, verifyPayment, submitManualPayment, checkPendingManualPayment } = require('../controllers/razorpayController');
 const { rewardUserForAd } = require('../controllers/adController');
 const { joinEvent, submitResult } = require('../controllers/eventController');
 const { protect } = require('../middleware/authMiddleware');
@@ -58,6 +58,7 @@ router.delete('/notifications', clearPersonalNotifications);
 router.post('/razorpay/create-order', createOrder);
 router.post('/razorpay/verify', verifyPayment);
 router.post('/manual-payment', upload.single('screenshot'), submitManualPayment);
+router.get('/manual-payment/check', checkPendingManualPayment);
 
 router.post('/tasks/submit', submitTask);
 router.post('/upload', uploadMiddleware, uploadToCloud);

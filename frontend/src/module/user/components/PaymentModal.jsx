@@ -20,6 +20,8 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
     const [utrNumber, setUtrNumber] = useState('');
     const [screenshot, setScreenshot] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [adminUpiId, setAdminUpiId] = useState(null);
+    const [hasPendingManual, setHasPendingManual] = useState(false);
     
     const { createPayment, loading: automatedLoading } = usePayment();
 
@@ -30,6 +32,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                 const res = await api.get('/public/settings');
                 if (res.success && res.data) {
                     setQrScannerImage(res.data.qrScannerImage);
+                    setAdminUpiId(res.data.adminUpiId);
                 }
             } catch (err) {
                 console.error("Failed to fetch settings", err);
@@ -49,7 +52,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
             setScreenshot(null);
             document.body.style.overflow = 'hidden';
             
-            initiatePayment();
+            checkPendingManualPayment();
         } else {
             document.body.style.overflow = 'auto';
         }
@@ -81,6 +84,23 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
         }
         return () => clearInterval(interval);
     }, [isOpen, dynamicOrderId, status]);
+
+    const checkPendingManualPayment = async () => {
+        try {
+            setStatus('loading');
+            const res = await api.get(`/user/data/manual-payment/check?type=${type}`);
+            if (res.success && res.hasPending) {
+                setHasPendingManual(true);
+                setIsManualMode(true);
+                setStatus('success');
+            } else {
+                initiatePayment();
+            }
+        } catch (err) {
+            console.error('Error checking pending manual payment', err);
+            initiatePayment();
+        }
+    };
 
     const initiatePayment = async () => {
         const orderType = ['PLATFORM_UNLOCK', 'BUSINESS_HUB_PLAN', 'SUPPORT_CHAT_RENEWAL'].includes(type) 
@@ -150,7 +170,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
             {/* Dark blur backdrop */}
             <div
                 className="absolute inset-0 bg-slate-900/70 backdrop-blur-md transition-opacity"
-                onClick={status === 'idle' || status === 'error' ? onClose : undefined}
+                onClick={(status === 'idle' || status === 'error' || hasPendingManual) ? onClose : undefined}
             />
 
             {/* Modal Box */}
@@ -172,7 +192,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                             <p className="text-[10px] text-slate-400 font-medium tracking-widest uppercase mt-0.5">256-bit Encrypted</p>
                         </div>
                     </div>
-                    {(status === 'idle' || status === 'error') && (
+                    {(status === 'idle' || status === 'error' || hasPendingManual) && (
                         <button onClick={onClose} className="relative p-2 rounded-full hover:bg-white/10 active:scale-95 transition-all text-slate-300 hover:text-white">
                             <X size={18} />
                         </button>
@@ -280,15 +300,46 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                             {!isPlatformAlreadyUnlocked && isManualMode && status !== 'loading' && (
                                 <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 animate-in fade-in zoom-in-95 duration-300">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <button onClick={() => setIsManualMode(false)} className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 active:scale-95 transition-all">
-                                            <X size={14} />
-                                        </button>
+                                        {!hasPendingManual && (
+                                            <button onClick={() => setIsManualMode(false)} className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 active:scale-95 transition-all">
+                                                <X size={14} />
+                                            </button>
+                                        )}
                                         <h4 className="font-semibold text-slate-800 text-[14px]">Manual Transfer</h4>
                                     </div>
 
                                     {qrScannerImage && (
-                                        <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 mx-auto w-fit mb-5">
-                                            <img src={qrScannerImage} alt="Payment QR" className="w-32 h-32 object-cover rounded-xl" />
+                                        <div className="relative mx-auto w-fit mb-6 mt-2">
+                                            {/* Decorative Scanner Background */}
+                                            <div className="absolute -inset-4 border border-blue-500/20 bg-blue-50/30 rounded-[32px] animate-pulse"></div>
+                                            
+                                            <div className="relative bg-white p-3.5 rounded-2xl shadow-2xl shadow-blue-900/10 border border-slate-100 z-10 overflow-hidden group">
+                                                {/* Corner markers */}
+                                                <div className="absolute top-0 left-0 w-6 h-6 border-t-[3px] border-l-[3px] border-blue-600 rounded-tl-[14px] m-1.5 opacity-80"></div>
+                                                <div className="absolute top-0 right-0 w-6 h-6 border-t-[3px] border-r-[3px] border-blue-600 rounded-tr-[14px] m-1.5 opacity-80"></div>
+                                                <div className="absolute bottom-0 left-0 w-6 h-6 border-b-[3px] border-l-[3px] border-blue-600 rounded-bl-[14px] m-1.5 opacity-80"></div>
+                                                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-[3px] border-r-[3px] border-blue-600 rounded-br-[14px] m-1.5 opacity-80"></div>
+                                                
+                                                {/* Scanning laser animation */}
+                                                <div className="absolute left-2 right-2 h-0.5 bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.9)] z-20" style={{ animation: 'scan 2.5s ease-in-out infinite' }}></div>
+
+                                                <img src={qrScannerImage} alt="Payment QR" className="w-36 h-36 sm:w-40 sm:h-40 object-cover rounded-xl relative z-0 transition-transform duration-500 group-hover:scale-105" />
+                                                
+                                                {/* Glass overlay */}
+                                                <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent pointer-events-none"></div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    {adminUpiId && (
+                                        <div className="text-center mb-5">
+                                            <p className="text-[11px] text-slate-500 font-semibold mb-1 uppercase tracking-wider">Or Pay via UPI ID</p>
+                                            <div className="bg-slate-100 py-2.5 px-5 rounded-xl text-[14px] font-bold text-slate-800 tracking-wide inline-flex items-center gap-2 border border-slate-200">
+                                                {adminUpiId}
+                                                <button onClick={() => { navigator.clipboard.writeText(adminUpiId); alert('UPI ID copied!'); }} className="text-blue-600 hover:text-blue-700 ml-2">
+                                                    <Lock size={14} className="inline" /> Copy
+                                                </button>
+                                            </div>
                                         </div>
                                     )}
 
@@ -363,7 +414,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                 </h4>
                                 <p className="text-[13px] text-slate-500 font-medium leading-relaxed max-w-[250px] mx-auto">
                                     {isManualMode 
-                                        ? 'Your manual payment is pending admin approval. Your account will be updated automatically once confirmed.' 
+                                        ? 'Transaction pending. After 10-15 min admin will approve your transaction.' 
                                         : 'Your account has been upgraded successfully. Welcome aboard!'}
                                 </p>
                             </div>
@@ -371,6 +422,14 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                     )}
                 </div>
             </div>
+            <style dangerouslySetInnerHTML={{ __html: `
+                @keyframes scan {
+                    0% { top: 0%; opacity: 0; }
+                    10% { opacity: 1; }
+                    90% { opacity: 1; }
+                    100% { top: 100%; opacity: 0; }
+                }
+            `}} />
         </div>
     );
 };

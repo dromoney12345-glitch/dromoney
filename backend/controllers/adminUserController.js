@@ -61,8 +61,26 @@ exports.manageKYC = async (req, res, next) => {
         
         if (status === 'Approved' || status === 'Verified') {
             user.kyc.rejectionReason = ''; // Clear reason on approval
-        } else if (rejectionReason) {
-            user.kyc.rejectionReason = rejectionReason;
+            
+            // Add in-app notification
+            user.notifications = user.notifications || [];
+            user.notifications.push({
+                title: "KYC Verified! ✅",
+                message: "Congratulations! Your KYC is successfully approved. All earning routes are unlocked.",
+                type: "success",
+                date: new Date()
+            });
+        } else if (status === 'Rejected') {
+            if (rejectionReason) user.kyc.rejectionReason = rejectionReason;
+            
+            // Add in-app notification
+            user.notifications = user.notifications || [];
+            user.notifications.push({
+                title: "KYC Rejected ⚠️",
+                message: `KYC verification failed. Reason: ${rejectionReason || 'Invalid documents or blurred image'}. Click here to re-submit your details.`,
+                type: "error",
+                date: new Date()
+            });
         }
 
         // Use markModified for nested objects to ensure Mongoose detects change

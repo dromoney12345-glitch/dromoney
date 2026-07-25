@@ -8,33 +8,40 @@ exports.getPublicSettings = async (req, res) => {
     try {
         const settings = await Settings.findOne().select('appName contactEmail contactPhone adminUpiId qrScannerImage bankDetails referralSystemEnabled referralCommission registrationFee minWithdrawal futureFundDailyTasksTarget futureFundWatchAdTarget futureFundEventsTarget futureFundBoostersTarget futureFundSalesTarget futureFundDaysTarget businessPlans maintenanceMode registrationOpen taskWindowStart taskWindowEnd');
         
+        // Add fallbacks for existing documents that might not have newer schema fields
+        const responseData = settings ? settings.toObject() : {
+            referralCommission: 200,
+            referralSystemEnabled: true,
+            registrationFee: 499,
+            businessPlans: [
+                {
+                    title: 'Pro Membership',
+                    subtitle: 'अपना बिजनेस शुरू करें...',
+                    price: 499,
+                    duration: '/ Yearly',
+                    durationInDays: 30,
+                    benefits: [
+                        { title: '24/7 Expert Support', subtitle: 'Premium Benefit unlocked', iconType: 'support', colorType: 'emerald' },
+                        { title: 'Weekly Live Meetings', subtitle: 'Premium Benefit unlocked', iconType: 'meeting', colorType: 'indigo' },
+                        { title: 'Daily Strategies', subtitle: 'Premium Benefit unlocked', iconType: 'zap', colorType: 'amber' }
+                    ]
+                }
+            ],
+            futureFundDailyTasksTarget: 10,
+            futureFundWatchAdTarget: 5,
+            futureFundEventsTarget: 3,
+            futureFundBoostersTarget: 1,
+            futureFundSalesTarget: 10,
+            futureFundDaysTarget: 7
+        };
+
+        if (settings && !responseData.adminUpiId) {
+            responseData.adminUpiId = 'dromoney@upi'; // Default fallback
+        }
+        
         res.status(200).json({
             success: true,
-            data: settings || {
-                referralCommission: 200,
-                referralSystemEnabled: true,
-                registrationFee: 499,
-                businessPlans: [
-                    {
-                        title: 'Pro Membership',
-                        subtitle: 'अपना बिजनेस शुरू करें...',
-                        price: 499,
-                        duration: '/ Yearly',
-                        durationInDays: 30,
-                        benefits: [
-                            { title: '24/7 Expert Support', subtitle: 'Premium Benefit unlocked', iconType: 'support', colorType: 'emerald' },
-                            { title: 'Weekly Live Meetings', subtitle: 'Premium Benefit unlocked', iconType: 'meeting', colorType: 'indigo' },
-                            { title: 'Daily Strategies', subtitle: 'Premium Benefit unlocked', iconType: 'zap', colorType: 'amber' }
-                        ]
-                    }
-                ],
-                futureFundDailyTasksTarget: 10,
-                futureFundWatchAdTarget: 5,
-                futureFundEventsTarget: 3,
-                futureFundBoostersTarget: 1,
-                futureFundSalesTarget: 10,
-                futureFundDaysTarget: 7
-            }
+            data: responseData
         });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });

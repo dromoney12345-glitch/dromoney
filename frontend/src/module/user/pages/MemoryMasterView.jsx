@@ -404,7 +404,7 @@ const MemoryMasterView = () => {
                             <div className="flex items-center justify-center gap-1.5">
                                 <Coins size={14} className="text-amber-400" />
                                 <p className="text-2xl font-medium text-white">
-                                    +{isTaskBoosterActive ? taskReward * 3 : taskReward}
+                                    +{isTaskBoosterActive ? taskReward * 12 : taskReward}
                                 </p>
                             </div>
                             {isTaskBoosterActive && (

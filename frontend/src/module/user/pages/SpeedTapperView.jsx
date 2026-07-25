@@ -161,7 +161,7 @@ const SpeedTapperView = () => {
                             )}
                         </div>
                         <p className="text-xl font-medium text-amber-600 mt-0.5">
-                            +{isTaskBoosterActive ? (task.coinsReward || task.reward || 0) * 3 : (task.coinsReward || task.reward || 0)} Coins
+                            +{isTaskBoosterActive ? (task.coinsReward || task.reward || 0) * 12 : (task.coinsReward || task.reward || 0)} Coins
                         </p>
                     </div>
                 </div>

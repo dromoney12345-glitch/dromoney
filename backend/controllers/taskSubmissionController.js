@@ -25,9 +25,10 @@ exports.submitTask = asyncHandler(async (req, res, next) => {
     const settings = await Settings.findOne();
     if (settings && settings.taskWindowStart && settings.taskWindowEnd) {
         const now = new Date();
-        const options = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' };
-        const timeString = now.toLocaleTimeString('en-GB', options);
-        const [h, m] = timeString.split(':').map(Number);
+        const istTimeStr = now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+        const istDate = new Date(istTimeStr);
+        const h = istDate.getHours();
+        const m = istDate.getMinutes();
         const currentTotalMins = h * 60 + m;
 
         const [startH, startM] = settings.taskWindowStart.split(':').map(Number);

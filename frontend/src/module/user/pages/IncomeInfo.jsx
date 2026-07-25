@@ -181,7 +181,7 @@ const IncomeInfo = () => {
                                 {(sections.menu_layout_tasks.steps.length > 0 ? sections.menu_layout_tasks.steps : [
                                     { title: "Complete Tasks", desc: "Complete daily simple tasks to earn reward coins." },
                                     { title: "Redeem for Cash", desc: "Convert your earned coins into real cash balance." },
-                                    { title: "3X Booster Benefit", desc: "Activate Booster to multiply your earnings up to 300%." }
+                                    { title: "12X Booster Benefit", desc: "Activate Booster to multiply your earnings up to 300%." }
                                 ]).slice(0, 3).map((step, i) => (
                                     <div key={i} className="flex gap-4 group/step items-center">
                                         <div className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-[#856404] font-medium text-[11px] border border-slate-100 shrink-0 group-hover/step:bg-[#856404] group-hover/step:text-white transition-all duration-300 shadow-sm">
