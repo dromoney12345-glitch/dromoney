@@ -37,6 +37,7 @@ const TaskRunner = () => {
     const [status, setStatus] = useState('idle'); // idle, running, verify, completed, calling_ad
     const [screenshotFile, setScreenshotFile] = useState(null);
     const [toast, setToast] = useState(null);
+    const [taskMultiplier, setTaskMultiplier] = useState(12);
     const fileInputRef = React.useRef(null);
 
     const showToast = (message, type = 'success') => {
@@ -79,7 +80,26 @@ const TaskRunner = () => {
             }
         };
 
+        const loadBoosterData = async () => {
+            try {
+                const res = await api.get('/public/boosters');
+                if (res.success && res.data) {
+                    const taskBooster = res.data.find(b => b.type === 'task');
+                    if (taskBooster && taskBooster.benefits) {
+                        for (const b of taskBooster.benefits) {
+                            const match = b.match(/(\d+)x/i);
+                            if (match) {
+                                setTaskMultiplier(parseInt(match[1]));
+                                break;
+                            }
+                        }
+                    }
+                }
+            } catch (err) {}
+        };
+
         loadTask();
+        loadBoosterData();
     }, [id]);
 
     useEffect(() => {
@@ -216,7 +236,7 @@ const TaskRunner = () => {
         taskStorage.markComplete(taskId);
         
         if (userData.isTaskBoosterActive) {
-            setToast({ message: `Task completed! 12X Booster Applied! +${rewardAmount} Coins`, type: 'success' });
+            setToast({ message: `Task completed! ${taskMultiplier}X Booster Applied! +${rewardAmount * taskMultiplier} Coins`, type: 'success' });
             setTimeout(() => { setToast(null); navigate('/user/earn'); }, 2000);
         } else {
             setTimeout(() => navigate('/user/earn'), 2000);
@@ -249,7 +269,7 @@ const TaskRunner = () => {
                         <Coins size={12} className="text-amber-400" />
                         <span className="font-medium text-amber-400 text-xs">{userData.coins.total}</span>
                     </div>
-                    <span className="font-medium text-amber-400 text-xs">+{userData.isTaskBoosterActive ? (task.coinsReward || task.reward) * 12 : (task.coinsReward || task.reward)} Coin {userData.isTaskBoosterActive && '(12X Boost)'}</span>
+                    <span className="font-medium text-amber-400 text-xs">+{userData.isTaskBoosterActive ? (task.coinsReward || task.reward) * taskMultiplier : (task.coinsReward || task.reward)} Coin {userData.isTaskBoosterActive && `(${taskMultiplier}X Boost)`}</span>
                 </div>
             </div>
 

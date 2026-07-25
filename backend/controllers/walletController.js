@@ -115,9 +115,10 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         }
     }
 
-    // Booster logic (3x if active and applicable)
+    // Booster logic
     let factor = 1;
-    if (user.isBoosterActive || user.isTaskBoosterActive) {
+    const isWatchTask = task && (task.type === 'Video' || task.type === 'Watch');
+    if ((user.isBoosterActive || user.isTaskBoosterActive) && !isWatchTask) {
         const Booster = mongoose.models.Booster || require('../models/Booster');
         const taskBooster = await Booster.findOne({ type: 'task' });
 
@@ -141,7 +142,16 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         }
 
         if (isApplicable) {
-            factor = 12;
+            factor = 12; // default
+            if (taskBooster && taskBooster.benefits) {
+                for (const b of taskBooster.benefits) {
+                    const match = b.match(/(\d+)x/i);
+                    if (match) {
+                        factor = parseInt(match[1]);
+                        break;
+                    }
+                }
+            }
         }
     }
     const totalAwardedCoins = amount * factor;

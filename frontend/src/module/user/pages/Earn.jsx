@@ -87,6 +87,7 @@ const Earn = () => {
     const [settings, setSettings] = useState(null);
     const [isWithinWindow, setIsWithinWindow] = useState(true);
     const [boosterData, setBoosterData] = useState({ title: '₹49 Daily Boost Pass', subtitle: 'Priority Enabled', price: 49, benefits: [] });
+    const [taskMultiplier, setTaskMultiplier] = useState(12);
 
     const loadTasks = async () => {
         try {
@@ -119,6 +120,18 @@ const Earn = () => {
                         if (!taskBooster.title.includes('₹')) {
                             taskBooster.title = pricePrefix + taskBooster.title;
                         }
+                        let parsedMultiplier = 12;
+                        if (taskBooster.benefits) {
+                            for (const b of taskBooster.benefits) {
+                                const match = b.match(/(\d+)x/i);
+                                if (match) {
+                                    parsedMultiplier = parseInt(match[1]);
+                                    break;
+                                }
+                            }
+                        }
+                        setTaskMultiplier(parsedMultiplier);
+
                         setBoosterData({
                             title: taskBooster.title,
                             subtitle: taskBooster.subtitle || 'Priority Enabled',
@@ -345,9 +358,9 @@ const Earn = () => {
                                             }
                                         };
                                         const taskOptionName = getTaskOptionName(task.type);
-                                        const apply3x = isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes(taskOptionName));
+                                        const apply3x = isTaskBoosterActive && task.type !== 'Video' && task.type !== 'Watch' && (!boostersConfig?.task?.length || boostersConfig.task.includes(taskOptionName));
                                         const baseCoins = task.coinsReward || task.reward || 0;
-                                        const displayCoins = apply3x ? baseCoins * 12 : baseCoins;
+                                        const displayCoins = apply3x ? baseCoins * taskMultiplier : baseCoins;
 
                                         return (
                                             <div className="flex flex-col items-end">
@@ -356,7 +369,7 @@ const Earn = () => {
                                                 </span>
                                                 {apply3x && (
                                                     <span className="text-[8px] font-bold text-[#F59E0B] whitespace-nowrap bg-amber-50 px-1 py-0.5 rounded border border-amber-200 mt-0.5">
-                                                        12x Booster Applied
+                                                        {taskMultiplier}x Booster Applied
                                                     </span>
                                                 )}
                                             </div>
@@ -429,7 +442,7 @@ const Earn = () => {
                                     desc: 'Exclusive booster perk'
                                 }))
                                 : [
-                                    { icon: <Coins size={16} className="text-amber-500" fill="currentColor" />, bg: 'bg-amber-50', title: '12X Coins on Tasks', desc: '1 task = 12 coins' },
+                                    { icon: <Coins size={16} className="text-amber-500" fill="currentColor" />, bg: 'bg-amber-50', title: `${taskMultiplier}X Coins on Tasks`, desc: `1 task = ${taskMultiplier} coins` },
                                     { icon: <Zap size={16} className="text-emerald-500" fill="currentColor" />, bg: 'bg-emerald-50', title: 'Fast Rewards Processing', desc: 'Priority handling' },
                                     { icon: <CheckCircle2 size={16} className="text-blue-500" fill="currentColor" />, bg: 'bg-blue-50', title: 'Priority Task Verification', desc: 'Get verified first' },
                                 ]

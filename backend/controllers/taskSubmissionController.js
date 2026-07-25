@@ -25,11 +25,9 @@ exports.submitTask = asyncHandler(async (req, res, next) => {
     const settings = await Settings.findOne();
     if (settings && settings.taskWindowStart && settings.taskWindowEnd) {
         const now = new Date();
-        const istTimeStr = now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
-        const istDate = new Date(istTimeStr);
-        const h = istDate.getHours();
-        const m = istDate.getMinutes();
-        const currentTotalMins = h * 60 + m;
+        const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+        const istDate = new Date(now.getTime() + istOffset);
+        const currentTotalMins = istDate.getUTCHours() * 60 + istDate.getUTCMinutes();
 
         const [startH, startM] = settings.taskWindowStart.split(':').map(Number);
         const startTotalMins = (startH || 0) * 60 + (startM || 0);
@@ -129,13 +127,22 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('Task not found', 404));
     }
 
-    // Calculate coins to add (apply 12X Booster if active)
+    // Calculate coins to add (apply Booster if active, but not for Video/Watch tasks)
     let factor = 1;
-    if (user.isBoosterActive || user.isTaskBoosterActive) {
+    if ((user.isBoosterActive || user.isTaskBoosterActive) && task.type !== 'Video' && task.type !== 'Watch') {
         const Booster = require('../models/Booster');
         const taskBooster = await Booster.findOne({ type: 'task' });
         if (!taskBooster || !taskBooster.applicableTasks || taskBooster.applicableTasks.length === 0 || taskBooster.applicableTasks.includes('General Tasks') || taskBooster.applicableTasks.includes(task.type)) {
-            factor = 12;
+            factor = 12; // default
+            if (taskBooster && taskBooster.benefits) {
+                for (const b of taskBooster.benefits) {
+                    const match = b.match(/(\d+)x/i);
+                    if (match) {
+                        factor = parseInt(match[1]);
+                        break;
+                    }
+                }
+            }
         }
     }
     const baseCoins = submission.coinsReward || task.coinsReward || 2;
