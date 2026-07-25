@@ -204,18 +204,35 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                         <div className="p-5 sm:p-6">
                             
                             {/* Order Summary */}
-                            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] mb-5 relative overflow-hidden flex justify-between items-center group">
+                            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] mb-5 relative overflow-hidden flex flex-col group">
                                 <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-blue-600 to-indigo-600 rounded-l-2xl"></div>
-                                <div>
-                                    <p className="text-[9px] text-blue-600 font-bold tracking-[0.25em] uppercase mb-1.5">Order Summary</p>
-                                    <h4 className="text-[17px] font-extrabold text-slate-800 line-clamp-1 tracking-tight">{plan}</h4>
+                                
+                                <div className="flex justify-between items-center mb-3">
+                                    <div>
+                                        <p className="text-[9px] text-blue-600 font-bold tracking-[0.25em] uppercase mb-1.5">Order Summary</p>
+                                        <h4 className="text-[17px] font-extrabold text-slate-800 line-clamp-1 tracking-tight">{plan}</h4>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-4xl font-medium text-slate-800 tracking-tight">
+                                            <span className="text-xl font-medium mr-1 opacity-70">₹</span>
+                                            {Math.round(amount)}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="text-right">
-                                    <p className="text-4xl font-medium text-slate-800 tracking-tight">
-                                        <span className="text-xl font-medium mr-1 opacity-70">₹</span>
-                                        {parseFloat(amount).toFixed(0)}
-                                    </p>
-                                </div>
+                                
+                                {/* Breakdown for Boosters */}
+                                {(type === 'SUPPORT_BOOSTER' || type === 'TASK_BOOSTER') && (
+                                    <div className="mt-2 pt-3 border-t border-slate-100 space-y-1.5">
+                                        <div className="flex justify-between items-center text-[11px] text-slate-500 font-medium">
+                                            <span>Base Price</span>
+                                            <span>₹{Math.round(amount / 1.04)}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-[11px] text-rose-500 font-medium">
+                                            <span>Platform Fee (4%)</span>
+                                            <span>+ ₹{Math.round(amount - (amount / 1.04))}</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {isPlatformAlreadyUnlocked && (
