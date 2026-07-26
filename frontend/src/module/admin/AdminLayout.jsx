@@ -114,7 +114,8 @@ const AdminLayout = () => {
                     });
 
                     if (token) {
-                        await api.post('/fcm-tokens/save', { token, platform: 'web' });
+                        const platformStr = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'mobile' : 'web';
+                        await api.post('/fcm-tokens/save', { token, platform: platformStr });
                     }
                 }
             } catch (err) {
