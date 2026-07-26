@@ -309,7 +309,17 @@ const Settings = () => {
                                             
                                             <div className="grid grid-cols-2 gap-4 mt-4">
                                                 <div>
-                                                    <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal ml-1">Start Time (24H)</label>
+                                                    <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal ml-1">
+                                                        Start Time <span className="text-blue-500 font-bold">({
+                                                            (() => {
+                                                                let [h, m] = (config.kycWindowStart || '07:00').split(':');
+                                                                h = parseInt(h);
+                                                                const ampm = h >= 12 ? 'PM' : 'AM';
+                                                                h = h % 12 || 12;
+                                                                return `${h.toString().padStart(2, '0')}:${m} ${ampm}`;
+                                                            })()
+                                                        })</span>
+                                                    </label>
                                                     <input 
                                                         type="time" 
                                                         value={config.kycWindowStart || '07:00'}
@@ -318,7 +328,17 @@ const Settings = () => {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal ml-1">End Time (24H)</label>
+                                                    <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal ml-1">
+                                                        End Time <span className="text-blue-500 font-bold">({
+                                                            (() => {
+                                                                let [h, m] = (config.kycWindowEnd || '19:00').split(':');
+                                                                h = parseInt(h);
+                                                                const ampm = h >= 12 ? 'PM' : 'AM';
+                                                                h = h % 12 || 12;
+                                                                return `${h.toString().padStart(2, '0')}:${m} ${ampm}`;
+                                                            })()
+                                                        })</span>
+                                                    </label>
                                                     <input 
                                                         type="time" 
                                                         value={config.kycWindowEnd || '19:00'}

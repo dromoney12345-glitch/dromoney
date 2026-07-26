@@ -15,6 +15,28 @@ const KycSetup = () => {
     const fileInputRef = React.useRef(null);
 
     const kycStatus = (userData?.kycStatus || '').toLowerCase();
+    const [settings, setSettings] = useState(null);
+
+    React.useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await api.get('/public/settings');
+                if (res.success && res.data) {
+                    setSettings(res.data);
+                }
+            } catch (err) {}
+        };
+        fetchSettings();
+    }, []);
+
+    const formatTime12h = (time24) => {
+        if (!time24) return '';
+        let [h, m] = time24.split(':');
+        h = parseInt(h);
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        return `${h.toString().padStart(2, '0')}:${m} ${ampm}`;
+    };
 
     React.useEffect(() => {
         if (userLoading) return;
@@ -184,7 +206,11 @@ const KycSetup = () => {
                     {/* Compact Operating Hours */}
                     <div className="bg-slate-50/80 px-4 py-2 rounded-2xl flex items-center justify-between border border-slate-100">
                         <span className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">Service</span>
-                        <span className="text-[10px] font-medium text-amber-600">07:00 AM — 07:00 PM</span>
+                        <span className="text-[10px] font-medium text-amber-600">
+                            {settings?.kycWindowStart && settings?.kycWindowEnd 
+                                ? `${formatTime12h(settings.kycWindowStart)} — ${formatTime12h(settings.kycWindowEnd)}`
+                                : '07:00 AM — 07:00 PM'}
+                        </span>
                     </div>
 
                     <div className="space-y-6">

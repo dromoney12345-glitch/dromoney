@@ -10,12 +10,17 @@ router.use(protect);
 
 const REWARD_AMOUNT = 5;
 
+const getISTDateString = (dateObj) => {
+    return new Date(new Date(dateObj).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })).toDateString();
+};
+
 // Reset daily count if a new day has started
 const checkAndResetDailyLimit = async (user) => {
     const now = new Date();
-    // Use lastAdCountResetAt or create logic. For simplicity, check if the current date is different from lastRewardAt's date.
-    // Or just check if today is a different calendar day than lastAdCountResetAt
-    if (!user.lastAdCountResetAt || new Date(user.lastAdCountResetAt).getDate() !== now.getDate() || new Date(user.lastAdCountResetAt).getMonth() !== now.getMonth() || new Date(user.lastAdCountResetAt).getFullYear() !== now.getFullYear()) {
+    const todayStr = getISTDateString(now);
+    const resetStr = getISTDateString(user.lastAdCountResetAt || 0); // 0 ensures it resets if null
+
+    if (todayStr !== resetStr) {
         user.todayRewardCount = 0;
         user.lastAdCountResetAt = now;
         await user.save();

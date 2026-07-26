@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Clock, Coins, MonitorPlay, Sparkles, TrendingUp, RefreshCw, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
+import UnlockModal from '../components/UnlockModal';
 
 const WatchAndEarn = () => {
     const { userData, refreshUserProfile } = useUser();
@@ -40,6 +41,14 @@ const WatchAndEarn = () => {
     useEffect(() => {
         fetchStatus();
     }, []);
+
+    if (!userData?.isPaid) {
+        return (
+            <div className="min-h-screen bg-slate-900 font-poppins">
+                <UnlockModal isOpen={true} onClose={() => navigate('/user/home')} />
+            </div>
+        );
+    }
 
     // Expose refreshRewardStatus to Flutter — re-registered when showToast updates
     useEffect(() => {

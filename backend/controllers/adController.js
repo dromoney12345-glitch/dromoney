@@ -5,6 +5,10 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
 // Helper to calculate a stable seed-based duration between 30 and 60 seconds
+const getISTDateString = (dateObj) => {
+    return new Date(new Date(dateObj).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })).toDateString();
+};
+
 const getDynamicDuration = (adObj) => {
     if (adObj.duration && adObj.duration >= 30 && adObj.duration <= 60) {
         return adObj.duration;
@@ -26,9 +30,9 @@ exports.getAds = asyncHandler(async (req, res, next) => {
     if (req.user) {
         const user = await User.findById(req.user.id);
         if (user) {
-            // Check if day has changed since lastAdCountResetAt
-            const todayStr = new Date().toDateString();
-            const resetStr = new Date(user.lastAdCountResetAt || Date.now()).toDateString();
+            // Check if day has changed since lastAdCountResetAt in IST
+            const todayStr = getISTDateString(new Date());
+            const resetStr = getISTDateString(user.lastAdCountResetAt || Date.now());
             if (todayStr !== resetStr) {
                 user.dailyAdCount = 0;
                 user.watchedAds = []; // Clear daily watches to allow re-watching
@@ -77,9 +81,9 @@ exports.getAdById = asyncHandler(async (req, res, next) => {
     if (req.user) {
         const user = await User.findById(req.user.id);
         if (user) {
-            // Check if day has changed since lastAdCountResetAt
-            const todayStr = new Date().toDateString();
-            const resetStr = new Date(user.lastAdCountResetAt || Date.now()).toDateString();
+            // Check if day has changed since lastAdCountResetAt in IST
+            const todayStr = getISTDateString(new Date());
+            const resetStr = getISTDateString(user.lastAdCountResetAt || Date.now());
             if (todayStr !== resetStr) {
                 user.dailyAdCount = 0;
                 user.watchedAds = []; // Clear daily watches to allow re-watching
@@ -118,9 +122,9 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('User not found', 404));
     }
 
-    // 1. Check day change and reset counters if needed
-    const todayStr = new Date().toDateString();
-    const resetStr = new Date(user.lastAdCountResetAt || Date.now()).toDateString();
+    // 1. Check day change and reset counters if needed in IST
+    const todayStr = getISTDateString(new Date());
+    const resetStr = getISTDateString(user.lastAdCountResetAt || Date.now());
     if (todayStr !== resetStr) {
         user.dailyAdCount = 0;
         user.watchedAds = [];

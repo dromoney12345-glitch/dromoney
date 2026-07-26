@@ -167,6 +167,22 @@ const RouteTracker = () => {
     }
   }, [location]);
   
+  // Expose global method for Flutter to pass native FCM token
+  React.useEffect(() => {
+    window.saveMobileFcmToken = async (token) => {
+      try {
+        const { default: api } = await import('./shared/services/api');
+        await api.post('/fcm-tokens/save', { token, platform: 'mobile' });
+        console.log("Successfully saved Mobile FCM Token from Flutter");
+      } catch (err) {
+        console.error("Error saving Mobile FCM Token from Flutter:", err);
+      }
+    };
+    return () => {
+      delete window.saveMobileFcmToken;
+    };
+  }, []);
+  
   return null;
 };
 
