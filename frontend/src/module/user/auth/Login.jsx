@@ -47,7 +47,7 @@ const Login = () => {
 
         // 1. Validate phone number format (Indian 10-digit)
         if (!/^[6-9]\d{9}$/.test(phone) && phone !== '9999999999') {
-            setError('Number is wrong');
+            setError('Please enter a valid 10-digit mobile number.');
             return;
         }
 
@@ -66,8 +66,8 @@ const Login = () => {
         } else {
             // Check if error represents non-existent account or other errors
             const errMsg = (typeof result.error === 'object' ? result.error.message : result.error) || '';
-            if (errMsg.toLowerCase().includes('no account') || errMsg.toLowerCase().includes('not found') || errMsg.toLowerCase().includes('number')) {
-                setError('Number is wrong');
+            if (errMsg.toLowerCase().includes('no account') || errMsg.toLowerCase().includes('not found')) {
+                setError('No account found with this number. Please Sign Up first.');
             } else {
                 setError(errMsg);
             }

@@ -112,7 +112,7 @@ const Register = () => {
 
         // Validate phone number format (Indian 10-digit)
         if (!/^[6-9]\d{9}$/.test(formData.phone) && formData.phone !== '9999999999') {
-            setError('Number is wrong');
+            setError('Please enter a valid 10-digit mobile number.');
             return;
         }
 
