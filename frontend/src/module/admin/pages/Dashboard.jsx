@@ -143,16 +143,17 @@ const Dashboard = () => {
         boosterRevenue: 0,
         otherRevenue: 0,
         totalReferralPayouts: 0,
-        platformSubGross: 0
+        platformSubGross: 0,
+        totalGrossRevenue: 0
     };
 
-    const fraudAlerts = alerts.length > 0 ? alerts : [
-        { user: 'Security Bot', reason: 'Scanning for anomalies...', severity: 'low', time: 'Active' },
-    ];
+    const monthlyTargetValue = 600000;
+    const currentRevenue = revenueBreakdown.totalGrossRevenue || 0;
+    const targetPercent = Math.min((currentRevenue / monthlyTargetValue) * 100, 100).toFixed(1);
+    const formattedCurrent = currentRevenue >= 100000 ? `₹${(currentRevenue/100000).toFixed(2)}L` : currentRevenue >= 1000 ? `₹${(currentRevenue/1000).toFixed(2)}k` : `₹${currentRevenue.toFixed(0)}`;
 
-    const kycQueue = queue.length > 0 ? queue : [
-        { name: 'System Queue', time: 'Live', type: 'Status', status: 'Empty' },
-    ];
+    const fraudAlerts = alerts || [];
+    const kycQueue = queue || [];
 
     const handleRefresh = async () => {
         setIsRefreshing(true);
@@ -212,29 +213,6 @@ const Dashboard = () => {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-4 bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm">
-                        <div className="flex items-center gap-2.5">
-                            <span className="text-[10px] font-medium text-slate-400 uppercase tracking-normal leading-none">Maintenance</span>
-                            <button
-                                onClick={handleMaintenanceToggle}
-                                disabled={!settingsLoaded}
-                                className={`w-8 h-4 rounded-full relative transition-all ${maintenanceMode ? 'bg-rose-500 shadow-lg shadow-rose-200' : 'bg-slate-200'} ${!settingsLoaded ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                            >
-                                <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${maintenanceMode ? 'right-0.5' : 'left-0.5'}`}></div>
-                            </button>
-                        </div>
-                        <div className="h-3 w-px bg-slate-100"></div>
-                        <div className="flex items-center gap-2.5">
-                            <span className="text-[10px] font-medium text-slate-400 uppercase tracking-normal leading-none">Register</span>
-                            <button
-                                onClick={handleRegToggle}
-                                disabled={!settingsLoaded}
-                                className={`w-8 h-4 rounded-full relative transition-all ${regOpen ? 'bg-emerald-500 shadow-lg shadow-emerald-200' : 'bg-slate-200'} ${!settingsLoaded ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                            >
-                                <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${regOpen ? 'right-0.5' : 'left-0.5'}`}></div>
-                            </button>
-                        </div>
-                    </div>
                     <button onClick={handleRefresh} className={`p-2 bg-white border border-slate-100 rounded-xl shadow-sm text-slate-400 hover:text-slate-900 transition-all ${isRefreshing ? 'animate-spin' : ''}`}>
                         <RefreshCw size={18} />
                     </button>
@@ -349,7 +327,7 @@ const Dashboard = () => {
                             ))
                         ) : null}
                         
-                        {fraudAlerts.map((a, i) => (
+                        {fraudAlerts.length > 0 ? fraudAlerts.map((a, i) => (
                             <div key={`alert-${i}`} className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between hover:bg-white hover:shadow-lg hover:shadow-slate-100 transition-all cursor-pointer group/alert">
                                 <div className="flex items-center gap-3">
                                      <div className={`w-2 h-2 rounded-full ${a.severity === 'high' ? 'bg-rose-500 animate-pulse' : a.severity === 'medium' ? 'bg-amber-500' : 'bg-sky-500'}`}></div>
@@ -360,7 +338,11 @@ const Dashboard = () => {
                                 </div>
                                 <span className="text-[8px] font-medium text-slate-300 uppercase tracking-normal">{a.time}</span>
                             </div>
-                        ))}
+                        )) : (
+                            recentNotifs.length === 0 && (
+                                <div className="p-6 text-center text-slate-400 text-[11px] uppercase tracking-normal">No recent alerts</div>
+                            )
+                        )}
                     </div>
                 </div>
             </div>
@@ -536,7 +518,9 @@ const Dashboard = () => {
                         <button onClick={() => navigate('/admin/withdrawals')} className="text-[9px] font-medium text-indigo-500 uppercase flex items-center gap-2 hover:gap-3 transition-all">Wallets <ChevronRight size={10} /></button>
                     </div>
                     <div className="divide-y divide-slate-50 max-h-[360px] overflow-y-auto custom-scrollbar">
-                        {kycQueue.map((k, i) => (
+                        {kycQueue.length === 0 ? (
+                            <div className="p-6 text-center text-slate-400 text-[11px] uppercase tracking-normal">No pending requests</div>
+                        ) : kycQueue.map((k, i) => (
                             <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-all group/row">
                                 <div className="flex items-center gap-4">
                                     <div className="w-9 h-9 bg-slate-50 border border-slate-100 text-slate-900 rounded-xl flex items-center justify-center font-medium group-hover/row:bg-slate-900 group-hover/row:text-white transition-all">
@@ -561,13 +545,13 @@ const Dashboard = () => {
                     <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm flex flex-col justify-between group">
                         <div className="flex justify-between items-start">
                              <div className="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center border border-emerald-100"><PieChart size={16} /></div>
-                             <span className="text-[8px] font-medium text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-100">82% Cap</span>
+                             <span className="text-[8px] font-medium text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-100">{targetPercent}% Cap</span>
                         </div>
                         <div className="mt-3">
                              <p className="text-[9px] font-medium text-slate-400 uppercase tracking-normal mb-1">Monthly Target</p>
-                             <h4 className="text-lg font-medium text-slate-900 tracking-tighter">₹4.82k <span className="text-[9px] font-medium text-slate-300">/ 6L</span></h4>
+                             <h4 className="text-lg font-medium text-slate-900 tracking-tighter">{formattedCurrent} <span className="text-[9px] font-medium text-slate-300">/ 6L</span></h4>
                              <div className="w-full h-1 bg-slate-50 rounded-full mt-2 overflow-hidden">
-                                 <div className="h-full bg-emerald-500 w-[82%] rounded-full shadow-lg shadow-emerald-100 transition-all duration-1000"></div>
+                                 <div className="h-full bg-emerald-500 rounded-full shadow-lg shadow-emerald-100 transition-all duration-1000" style={{ width: `${targetPercent}%` }}></div>
                              </div>
                         </div>
                     </div>

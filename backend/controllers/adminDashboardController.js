@@ -84,7 +84,7 @@ exports.getStats = async (req, res, next) => {
             data: {
                 stats: [
                     { label: 'Active Users', value: activeUsersCount.toLocaleString(), trend: 'Live', color: 'from-sky-500 to-indigo-600' },
-                    { label: 'Total Revenue', value: `₹${totalNetRevenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: 'Live', color: 'from-emerald-500 to-teal-600' },
+                    { label: 'Total Revenue', value: `₹${totalGrossRevenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: 'Live', color: 'from-emerald-500 to-teal-600' },
                     { label: 'Coins in Market', value: (totalCoins[0]?.total || 0).toLocaleString(), trend: 'Active', color: 'from-amber-400 to-orange-600' },
                     { label: 'Pending Payouts', value: `₹${(pendingWithdrawals[0]?.total || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: `${pendingWithdrawals[0]?.count || 0} requests`, color: 'from-rose-500 to-pink-600' }
                 ],
@@ -100,7 +100,8 @@ exports.getStats = async (req, res, next) => {
                     boosterRevenue,
                     otherRevenue,
                     totalReferralPayouts,
-                    platformSubGross
+                    platformSubGross,
+                    totalGrossRevenue
                 }
             }
         });

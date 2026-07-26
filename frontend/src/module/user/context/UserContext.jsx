@@ -73,6 +73,13 @@ export const UserProvider = ({ children }) => {
                         const event = new CustomEvent('withdrawal_status_updated', { detail: data });
                         window.dispatchEvent(event);
                     });
+
+                    // Listen to real-time payment updates for this specific user
+                    activeSocket.on(`payment_update_${profile._id}`, (data) => {
+                        refreshUserProfile();
+                        const event = new CustomEvent('payment_status_updated', { detail: data });
+                        window.dispatchEvent(event);
+                    });
                 }
             });
 

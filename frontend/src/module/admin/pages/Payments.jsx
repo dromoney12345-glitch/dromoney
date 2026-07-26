@@ -43,10 +43,41 @@ const Payments = () => {
                     method: p.method || 'Razorpay',
                     date: new Date(p.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
                     status: p.status,
-                    utr: p.razorpayPaymentId || p.utrNumber || 'N/A',
+                    utr: p.razorpayPaymentId || p.razorpayOrderId || p.transactionId || p.utrNumber || 'N/A',
                     screenshot: p.screenshot
                 }));
-                setPaymentsList(mapped);
+                
+                // Deduplicate transactions (keep most recent actionable per user)
+                const uniquePayments = [];
+                const seenUserPending = new Set();
+                const userHasManualOrSuccess = new Set();
+                
+                // First pass: check if user has a Manual payment or ANY Success payment
+                mapped.forEach(p => {
+                    const userKey = `${p.email}-${p.phone}`;
+                    if (p.method === 'Manual' || p.status === 'Success') {
+                        userHasManualOrSuccess.add(userKey);
+                    }
+                });
+
+                mapped.forEach(p => {
+                    const userKey = `${p.email}-${p.phone}`;
+                    if (p.status === 'Pending') {
+                        // If they have a manual or success payment, ignore abandoned Razorpay pendings
+                        if (p.method !== 'Manual' && userHasManualOrSuccess.has(userKey)) {
+                            return; 
+                        }
+
+                        if (!seenUserPending.has(userKey)) {
+                            seenUserPending.add(userKey);
+                            uniquePayments.push(p);
+                        }
+                    } else {
+                        uniquePayments.push(p);
+                    }
+                });
+
+                setPaymentsList(uniquePayments);
             }
         } catch (err) {
             console.error(err);
@@ -54,10 +85,6 @@ const Payments = () => {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        fetchPayments();
-    }, []);
 
     const handleStatusUpdate = async (id, newStatus) => {
         try {

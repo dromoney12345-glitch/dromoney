@@ -98,14 +98,8 @@ router.post('/claim', async (req, res) => {
         }
 
         // Booster Logic
-        let factor = 1;
-        if (user.isBoosterActive || user.isTaskBoosterActive) {
-            const Booster = require('../models/Booster');
-            const taskBooster = await Booster.findOne({ type: 'task' });
-            if (taskBooster && taskBooster.applicableTasks && (taskBooster.applicableTasks.includes('General Tasks') || taskBooster.applicableTasks.includes('Watch Video') || taskBooster.applicableTasks.includes('Rewarded Ad'))) {
-                factor = 12;
-            }
-        }
+        // As per user requirement, Watch & Earn should strictly give base coins, Booster does not apply.
+        const factor = 1;
         
         const rewardAmount = BASE_REWARD * factor;
 

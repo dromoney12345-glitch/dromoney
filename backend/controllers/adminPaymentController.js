@@ -238,6 +238,11 @@ exports.updatePaymentStatus = async (req, res) => {
                     }
                 }
             }
+
+            // Emit real-time signal via global io
+            if (global.io && payment.user) {
+                global.io.emit(`payment_update_${payment.user.toString()}`, { status });
+            }
         }
 
         res.json({
