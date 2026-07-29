@@ -18,6 +18,14 @@ const Events = () => {
     const [joinedEvents, setJoinedEvents] = useState([]);
     const [toast, setToast] = useState(null);
     const [isRefreshingCoins, setIsRefreshingCoins] = useState(false);
+
+    if (!userData?.isPaid) {
+        return (
+            <div className="min-h-screen bg-[#f8fafc] font-poppins">
+                <UnlockModal isOpen={true} onClose={() => navigate('/user/income')} />
+            </div>
+        );
+    }
     const [isJoining, setIsJoining] = useState(false);
 
     const handleRefreshCoins = async () => {

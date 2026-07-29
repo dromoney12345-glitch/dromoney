@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, TrendingUp, CheckCircle2, Timer, Calendar, S
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
+import UnlockModal from '../components/UnlockModal';
 
 const FutureFund = () => {
     const navigate = useNavigate();
@@ -17,6 +18,14 @@ const FutureFund = () => {
         futureFundEventsTarget: 3,
         futureFundBoostersTarget: 1
     });
+
+    if (!userData?.isPaid) {
+        return (
+            <div className="min-h-screen bg-[#f8fafc] font-poppins">
+                <UnlockModal isOpen={true} onClose={() => navigate('/user/income')} />
+            </div>
+        );
+    }
 
     // Fetch dynamic settings from admin panel
     useEffect(() => {
@@ -64,17 +73,23 @@ const FutureFund = () => {
     const isEventsEligible = eventsJoinedCount >= settings.futureFundEventsTarget;
     const isBoostersEligible = isBoosterActiveCount >= settings.futureFundBoostersTarget;
 
-    const isEligible = isTasksEligible && isAdsEligible && isEventsEligible && isBoostersEligible;
+    // Previous Future Fund Criteria
+    const salesCriterion = futureFund.criteria?.find(c => c.id === 1) || { current: 0, target: 10 };
+    const activityCriterion = futureFund.criteria?.find(c => c.id === 2) || { current: 0, target: 15 };
+    const daysCriterion = futureFund.criteria?.find(c => c.id === 3) || { current: 0, target: 7 };
+
+    const isEligible = salesCriterion.current >= salesCriterion.target && 
+                       activityCriterion.current >= activityCriterion.target && 
+                       daysCriterion.current >= daysCriterion.target;
 
     // Calculate overall progress for initial state
     const overallProgress = useMemo(() => {
-        const p1 = Math.min((completedTasksCount / Math.max(1, settings.futureFundDailyTasksTarget)) * 100, 100) || 0;
-        const p2 = Math.min((watchedAdsCount / Math.max(1, settings.futureFundWatchAdTarget)) * 100, 100) || 0;
-        const p3 = Math.min((eventsJoinedCount / Math.max(1, settings.futureFundEventsTarget)) * 100, 100) || 0;
-        const p4 = Math.min((isBoosterActiveCount / Math.max(1, settings.futureFundBoostersTarget)) * 100, 100) || 0;
+        const p1 = Math.min((salesCriterion.current / Math.max(1, salesCriterion.target)) * 100, 100) || 0;
+        const p2 = Math.min((activityCriterion.current / Math.max(1, activityCriterion.target)) * 100, 100) || 0;
+        const p3 = Math.min((daysCriterion.current / Math.max(1, daysCriterion.target)) * 100, 100) || 0;
         
-        return Math.floor((p1 + p2 + p3 + p4) / 4);
-    }, [completedTasksCount, watchedAdsCount, eventsJoinedCount, isBoosterActiveCount, settings]);
+        return Math.floor((p1 + p2 + p3) / 3);
+    }, [salesCriterion, activityCriterion, daysCriterion]);
 
     // ── Real earnings data computed from DB transactions ──
     const realEarningsData = useMemo(() => {
@@ -345,79 +360,60 @@ const FutureFund = () => {
 
                     {/* Eligibility Criteria Cards (Made Highly Compact & Beautiful) */}
                     <div className="grid grid-cols-1 gap-2.5">
-                        {/* 1. Daily Tasks */}
-                        <div className="relative bg-white p-3.5 shadow-sm border border-slate-100 transition-all rounded-2xl">
-                            <div className="flex justify-between items-center">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="w-8 h-8 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100 shrink-0">
-                                        <CheckCircle2 size={16} className="text-blue-600" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-[12px] font-medium text-slate-800 uppercase leading-none">Daily Tasks</h4>
-                                        <p className="text-[8px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">Target Milestone</p>
-                                    </div>
-                                </div>
-                                <span className="bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-[10px] font-medium text-slate-700">{completedTasksCount}/{settings.futureFundDailyTasksTarget}</span>
-                            </div>
-                            <div className="w-full h-1 bg-slate-100 rounded-full mt-2.5 overflow-hidden">
-                                <div className="h-full bg-blue-500" style={{ width: `${Math.min((completedTasksCount / Math.max(1, settings.futureFundDailyTasksTarget)) * 100, 100)}%` }}></div>
-                            </div>
-                        </div>
-
-                        {/* 2. Watch Ads */}
+                        {/* 1. Successful Sales */}
                         <div className="relative bg-white p-3.5 shadow-sm border border-slate-100 transition-all rounded-2xl">
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-2.5">
                                     <div className="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100 shrink-0">
-                                        <Timer size={16} className="text-emerald-600" />
+                                        <CheckCircle2 size={16} className="text-emerald-600" />
                                     </div>
                                     <div>
-                                        <h4 className="text-[12px] font-medium text-slate-800 uppercase leading-none">Watch Ads</h4>
-                                        <p className="text-[8px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">Activity Goal</p>
+                                        <h4 className="text-[12px] font-medium text-slate-800 uppercase leading-none">Successful Sales</h4>
+                                        <p className="text-[8px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">Target Milestone</p>
                                     </div>
                                 </div>
-                                <span className="bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-[10px] font-medium text-slate-700">{watchedAdsCount}/{settings.futureFundWatchAdTarget}</span>
+                                <span className="bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-[10px] font-medium text-slate-700">{salesCriterion.current}/{salesCriterion.target}</span>
                             </div>
                             <div className="w-full h-1 bg-slate-100 rounded-full mt-2.5 overflow-hidden">
-                                <div className="h-full bg-emerald-500" style={{ width: `${Math.min((watchedAdsCount / Math.max(1, settings.futureFundWatchAdTarget)) * 100, 100)}%` }}></div>
+                                <div className="h-full bg-emerald-500" style={{ width: `${Math.min((salesCriterion.current / Math.max(1, salesCriterion.target)) * 100, 100)}%` }}></div>
                             </div>
                         </div>
 
-                        {/* 3. Events Joined */}
+                        {/* 2. Daily Activity */}
                         <div className="relative bg-white p-3.5 shadow-sm border border-slate-100 transition-all rounded-2xl">
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-2.5">
                                     <div className="w-8 h-8 bg-amber-50 rounded-xl flex items-center justify-center border border-amber-100 shrink-0">
-                                        <Calendar size={16} className="text-amber-600" />
+                                        <Timer size={16} className="text-amber-600" />
                                     </div>
                                     <div>
-                                        <h4 className="text-[12px] font-medium text-slate-800 uppercase leading-none">Events Joined</h4>
-                                        <p className="text-[8px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">Engagement Goal</p>
+                                        <h4 className="text-[12px] font-medium text-slate-800 uppercase leading-none">Daily Activity</h4>
+                                        <p className="text-[8px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">Time Tracker</p>
                                     </div>
                                 </div>
-                                <span className="bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-[10px] font-medium text-slate-700">{eventsJoinedCount}/{settings.futureFundEventsTarget}</span>
+                                <span className="bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-[10px] font-medium text-slate-700">{activityCriterion.current}m/{activityCriterion.target}m</span>
                             </div>
                             <div className="w-full h-1 bg-slate-100 rounded-full mt-2.5 overflow-hidden">
-                                <div className="h-full bg-amber-500" style={{ width: `${Math.min((eventsJoinedCount / Math.max(1, settings.futureFundEventsTarget)) * 100, 100)}%` }}></div>
+                                <div className="h-full bg-amber-500" style={{ width: `${Math.min((activityCriterion.current / Math.max(1, activityCriterion.target)) * 100, 100)}%` }}></div>
                             </div>
                         </div>
 
-                        {/* 4. Boosters Active */}
+                        {/* 3. Active Days */}
                         <div className="relative bg-white p-3.5 shadow-sm border border-slate-100 transition-all rounded-2xl">
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-2.5">
-                                    <div className="w-8 h-8 bg-rose-50 rounded-xl flex items-center justify-center border border-rose-100 shrink-0">
-                                        <Sparkles size={16} className="text-rose-600" />
+                                    <div className="w-8 h-8 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100 shrink-0">
+                                        <Calendar size={16} className="text-blue-600" />
                                     </div>
                                     <div>
-                                        <h4 className="text-[12px] font-medium text-slate-800 uppercase leading-none">Boosters Active</h4>
-                                        <p className="text-[8px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">Power Up Goal</p>
+                                        <h4 className="text-[12px] font-medium text-slate-800 uppercase leading-none">Active Days</h4>
+                                        <p className="text-[8px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">Continuity Goal</p>
                                     </div>
                                 </div>
-                                <span className="bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-[10px] font-medium text-slate-700">{isBoosterActiveCount}/{settings.futureFundBoostersTarget}</span>
+                                <span className="bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-[10px] font-medium text-slate-700">{daysCriterion.current}/{daysCriterion.target}</span>
                             </div>
                             <div className="w-full h-1 bg-slate-100 rounded-full mt-2.5 overflow-hidden">
-                                <div className="h-full bg-rose-500" style={{ width: `${Math.min((isBoosterActiveCount / Math.max(1, settings.futureFundBoostersTarget)) * 100, 100)}%` }}></div>
+                                <div className="h-full bg-blue-500" style={{ width: `${Math.min((daysCriterion.current / Math.max(1, daysCriterion.target)) * 100, 100)}%` }}></div>
                             </div>
                         </div>
 
@@ -427,7 +423,7 @@ const FutureFund = () => {
                                 <Sparkles size={13} className="text-purple-400" />
                             </div>
                             <p className="text-[9.5px] font-medium text-slate-300 leading-snug">
-                                Complete all goals to unlock the Future Fund and activate profit-sharing.
+                                आपका समय <span className="text-white font-medium">स्वचालित रूप से</span> गिना जाएगा। 15 मिनट = 1 दिन।
                             </p>
                         </div>
 

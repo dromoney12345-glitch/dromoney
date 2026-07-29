@@ -288,7 +288,7 @@ const CoinsAndTasks = () => {
                                         <option value={12}>12 Hours</option>
                                         <option value={24}>24 Hours</option>
                                     </select>
-                                    <span className="text-[10px] text-slate-500">Tasks will renew this many hours after completion.</span>
+                                    <span className="text-[10px] text-slate-500">Tasks will renew every selected hours from the Tasks Window Start Time (e.g., if set to 24 Hours and Start Time is 07:00, they renew at 07:00 AM daily).</span>
                                 </div>
                             </div>
 

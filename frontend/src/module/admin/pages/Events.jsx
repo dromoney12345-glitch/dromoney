@@ -311,9 +311,23 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast, onRefr
                                         />
                                         Is Mega Event? (Sunday 8 PM)
                                     </label>
+                                    <label className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={!!editData.isBoosterEnabled}
+                                            onChange={e => setEditData(p => ({ ...p, isBoosterEnabled: e.target.checked }))}
+                                            className="rounded text-sky-500 focus:ring-sky-400"
+                                        />
+                                        Enable Support Booster (₹21)
+                                    </label>
                                 </div>
                             ) : (
-                                <p className="text-sm font-medium text-slate-700 font-['Poppins']">{event.startTime}</p>
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-sm font-medium text-slate-700 font-['Poppins']">{event.startTime}</p>
+                                    {event.isBoosterEnabled && (
+                                        <span className="text-[9px] font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 self-start">Booster Enabled</span>
+                                    )}
+                                </div>
                             )}
                         </div>
 
@@ -1485,6 +1499,17 @@ const EventsAdmin = () => {
                                             <option value="normal">Normal Event</option>
                                             <option value="mega">Mega Event (Sunday 8 PM)</option>
                                         </select>
+                                    </div>
+                                    <div className="space-y-1.5 pt-2">
+                                        <label className="flex items-center gap-1.5 text-[12px] font-medium text-slate-600 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={!!newEventData.isBoosterEnabled}
+                                                onChange={e => setNewEventData(p => ({ ...p, isBoosterEnabled: e.target.checked }))}
+                                                className="rounded text-sky-500 focus:ring-sky-400"
+                                            />
+                                            Enable Support Booster (₹21) for this event
+                                        </label>
                                     </div>
                                 </div>
                             </div>

@@ -11,6 +11,7 @@ import api from '../../shared/services/api';
 import UniversalVideoPlayer from '../../shared/components/UniversalVideoPlayer';
 import { useUser } from '../context/UserContext';
 import PaymentModal from '../components/PaymentModal';
+import UnlockModal from '../components/UnlockModal';
 
 const BusinessIdeas = () => {
     const navigate = useNavigate();
@@ -18,6 +19,14 @@ const BusinessIdeas = () => {
     const { userData } = useUser();
 
     const isSubscribed = userData?.supportExpiry && new Date(userData.supportExpiry) > new Date();
+
+    if (!userData?.isPaid) {
+        return (
+            <div className="min-h-screen bg-[#f8fafc] font-poppins">
+                <UnlockModal isOpen={true} onClose={() => navigate('/user/income')} />
+            </div>
+        );
+    }
 
     // Derive step from URL
     const getStepFromUrl = () => {

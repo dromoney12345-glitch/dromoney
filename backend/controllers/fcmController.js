@@ -122,6 +122,20 @@ exports.sendNotificationToUser = async (userId, payload) => {
                 title: payload.title,
                 body: payload.body
             },
+            android: {
+                priority: 'high',
+                notification: {
+                    sound: 'default',
+                    channelId: 'high_importance_channel'
+                }
+            },
+            apns: {
+                payload: {
+                    aps: {
+                        sound: 'default'
+                    }
+                }
+            },
             data: {
                 ...payload.data,
                 notificationId
@@ -211,6 +225,20 @@ exports.sendBroadcastNotification = async (payload) => {
                     title: payload.title,
                     body: payload.body
                 },
+                android: {
+                    priority: 'high',
+                    notification: {
+                        sound: 'default',
+                        channelId: 'high_importance_channel'
+                    }
+                },
+                apns: {
+                    payload: {
+                        aps: {
+                            sound: 'default'
+                        }
+                    }
+                },
                 data: {
                     ...payload.data,
                     notificationId: `broadcast_${Date.now()}`
@@ -255,6 +283,20 @@ exports.sendNotificationToAdmin = async (adminId, payload) => {
             notification: {
                 title: payload.title,
                 body: payload.body
+            },
+            android: {
+                priority: 'high',
+                notification: {
+                    sound: 'default',
+                    channelId: 'high_importance_channel'
+                }
+            },
+            apns: {
+                payload: {
+                    aps: {
+                        sound: 'default'
+                    }
+                }
             },
             data: {
                 ...payload.data,

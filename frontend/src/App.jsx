@@ -171,9 +171,18 @@ const RouteTracker = () => {
   React.useEffect(() => {
     window.saveMobileFcmToken = async (token) => {
       try {
+        // Always store it locally first just in case
+        localStorage.setItem('pending_mobile_fcm_token', token);
+        
         const { default: api } = await import('./module/shared/services/api');
-        await api.post('/fcm-tokens/save', { token, platform: 'mobile' });
-        console.log("Successfully saved Mobile FCM Token from Flutter");
+        // Only try to save if we have a user token
+        if (localStorage.getItem('dromoney_token')) {
+            await api.post('/fcm-tokens/save', { token, platform: 'mobile' });
+            console.log("Successfully saved Mobile FCM Token from Flutter");
+            localStorage.removeItem('pending_mobile_fcm_token');
+        } else {
+            console.log("Saved Mobile FCM Token locally, waiting for login...");
+        }
       } catch (err) {
         console.error("Error saving Mobile FCM Token from Flutter:", err);
       }

@@ -162,6 +162,18 @@ export const UserProvider = ({ children }) => {
             if (profileRes.success && profileRes.data) {
                 const transactions = txRes.success && txRes.data ? txRes.data : [];
                 mapAndSetUserData(profileRes.data, transactions, profileRes.settings);
+                
+                // Check for pending FCM token and save it now that user is authenticated
+                const pendingToken = localStorage.getItem('pending_mobile_fcm_token');
+                if (pendingToken) {
+                    api.post('/fcm-tokens/save', { token: pendingToken, platform: 'mobile' })
+                        .then(() => {
+                            localStorage.removeItem('pending_mobile_fcm_token');
+                            console.log('Saved pending FCM token after login.');
+                        })
+                        .catch(err => console.error('Failed to save pending FCM token:', err));
+                }
+                
                 return profileRes.data;
             }
         } catch (err) {

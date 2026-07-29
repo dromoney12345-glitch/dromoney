@@ -2,8 +2,10 @@ const TaskSubmission = require('../models/TaskSubmission');
 const Task = require('../models/Task');
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
+const Settings = require('../models/Settings');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
+const { getLastRenewalTick } = require('../utils/taskRenewal');
 
 // @desc    Submit task proof
 // @route   POST /api/user/tasks/submit
@@ -46,16 +48,15 @@ exports.submitTask = asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user.id);
     
     // Check if already submitted within the renewal period
-    const renewalHours = settings.taskRenewalHours || 24;
-    const cutoffTime = new Date(Date.now() - renewalHours * 60 * 60 * 1000);
+    const lastRenewalTick = getLastRenewalTick(settings);
     const alreadySubmitted = await TaskSubmission.findOne({
         user: req.user.id,
         task: taskId,
-        createdAt: { $gte: cutoffTime }
+        createdAt: { $gte: lastRenewalTick }
     });
 
     if (alreadySubmitted) {
-        return next(new ErrorResponse(`You have already submitted proof for this task recently. Please wait ${renewalHours} hours before submitting again.`, 400));
+        return next(new ErrorResponse(`You have already submitted proof for this task today. Please wait for the next renewal cycle.`, 400));
     }
 
     const submission = await TaskSubmission.create({

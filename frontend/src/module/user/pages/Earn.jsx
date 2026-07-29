@@ -427,11 +427,11 @@ const Earn = () => {
                                 <ChevronDown size={18} />
                             </button>
                             <button
-                                onClick={() => !isBoosterActive && setIsPaymentOpen(true)}
-                                disabled={isBoosterActive}
-                                className={`${isBoosterActive ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md'} px-4 py-2 rounded-xl text-[11px] font-medium tracking-tight active:scale-95 transition-all`}
+                                onClick={() => !(userData.isTaskBoosterActive || userData.isSupportBoosterActive) && setIsPaymentOpen(true)}
+                                disabled={userData.isTaskBoosterActive || userData.isSupportBoosterActive}
+                                className={`${(userData.isTaskBoosterActive || userData.isSupportBoosterActive) ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md'} px-4 py-2 rounded-xl text-[11px] font-medium tracking-tight active:scale-95 transition-all`}
                             >
-                                {isBoosterActive ? 'Already Bought' : 'Buy Now'}
+                                {(userData.isTaskBoosterActive || userData.isSupportBoosterActive) ? 'Already Bought' : 'Buy Now'}
                             </button>
                         </div>
                     </div>

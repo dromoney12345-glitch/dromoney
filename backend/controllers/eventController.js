@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Event = require('../models/Event');
 const EventParticipant = require('../models/EventParticipant');
 const User = require('../models/User');
@@ -290,9 +291,27 @@ exports.updateParticipantStatus = asyncHandler(async (req, res, next) => {
                 cashToAdd = amount;
             }
 
+            // Apply Support Booster Multiplier if enabled for this event
+            let factor = 1;
+            if (participant.event.isBoosterEnabled && user.isSupportBoosterActive) {
+                const mongoose = require('mongoose');
+                const Booster = mongoose.models.Booster || require('../models/Booster');
+                const supportBooster = await Booster.findOne({ type: 'support' });
+                if (supportBooster && supportBooster.benefits) {
+                    for (const b of supportBooster.benefits) {
+                        const match = b.match(/(\d+)x/i);
+                        if (match) {
+                            factor = parseInt(match[1]);
+                            break;
+                        }
+                    }
+                }
+            }
+
             const Transaction = require('../models/Transaction');
 
             if (coinsToAdd > 0) {
+                coinsToAdd = coinsToAdd * factor;
                 user.coins.balance += coinsToAdd;
                 user.coins.total += coinsToAdd;
                 await Transaction.create({
@@ -300,10 +319,11 @@ exports.updateParticipantStatus = asyncHandler(async (req, res, next) => {
                     type: 'credit',
                     currency: 'COIN',
                     amount: coinsToAdd,
-                    source: `Event Reward: ${participant.event.title}`
+                    source: factor > 1 ? `Event Reward (Booster ${factor}x): ${participant.event.title}` : `Event Reward: ${participant.event.title}`
                 });
             }
             if (cashToAdd > 0) {
+                cashToAdd = cashToAdd * factor;
                 user.wallet.balance += cashToAdd;
                 user.wallet.totalEarned += cashToAdd;
                 await Transaction.create({
@@ -311,7 +331,7 @@ exports.updateParticipantStatus = asyncHandler(async (req, res, next) => {
                     type: 'credit',
                     currency: 'INR',
                     amount: cashToAdd,
-                    source: `Event Reward: ${participant.event.title}`
+                    source: factor > 1 ? `Event Reward (Booster ${factor}x): ${participant.event.title}` : `Event Reward: ${participant.event.title}`
                 });
             }
             await user.save();
@@ -387,6 +407,19 @@ exports.approveWinners = asyncHandler(async (req, res, next) => {
     const Transaction = require('../models/Transaction');
     const { sendNotificationToUser } = require('./fcmController');
 
+    const Booster = mongoose.models.Booster || require('../models/Booster');
+    const supportBooster = await Booster.findOne({ type: 'support' });
+    let defaultFactor = 1;
+    if (supportBooster && supportBooster.benefits) {
+        for (const b of supportBooster.benefits) {
+            const match = b.match(/(\d+)x/i);
+            if (match) {
+                defaultFactor = parseInt(match[1]);
+                break;
+            }
+        }
+    }
+
     // 1st gets 50%, 2nd gets 30%, 3rd gets 20% of the prize pool
     const prizeSplits = [0.50, 0.30, 0.20];
     
@@ -395,7 +428,13 @@ exports.approveWinners = asyncHandler(async (req, res, next) => {
         const user = p.user;
         if (!user) continue;
 
-        const rewardCash = prizePool * prizeSplits[i];
+        let rewardCash = prizePool * prizeSplits[i];
+        
+        let factor = 1;
+        if (event.isBoosterEnabled && user.isSupportBoosterActive) {
+            factor = defaultFactor;
+            rewardCash = rewardCash * factor;
+        }
         
         user.wallet.balance += rewardCash;
         user.wallet.totalEarned += rewardCash;
@@ -430,27 +469,34 @@ exports.approveWinners = asyncHandler(async (req, res, next) => {
         for (const p of rest) {
             const user = p.user;
             if (!user) continue;
+            
+            let finalCashback = cashbackPerUser;
+            let factor = 1;
+            if (event.isBoosterEnabled && user.isSupportBoosterActive) {
+                factor = defaultFactor;
+                finalCashback = finalCashback * factor;
+            }
 
-            user.wallet.balance += cashbackPerUser;
-            user.wallet.totalEarned += cashbackPerUser;
+            user.wallet.balance += finalCashback;
+            user.wallet.totalEarned += finalCashback;
             await user.save();
 
             p.prizeStatus = 'Awarded';
-            p.prizeNote = `Participation Cashback: ₹${cashbackPerUser.toFixed(2)}`;
+            p.prizeNote = factor > 1 ? `Participation Cashback (Booster ${factor}x): ₹${finalCashback.toFixed(2)}` : `Participation Cashback: ₹${finalCashback.toFixed(2)}`;
             await p.save();
 
             await Transaction.create({
                 user: user._id,
                 type: 'credit',
                 currency: 'INR',
-                amount: cashbackPerUser,
-                source: `Event Cashback: ${event.title}`
+                amount: finalCashback,
+                source: factor > 1 ? `Event Cashback (Booster ${factor}x): ${event.title}` : `Event Cashback: ${event.title}`
             });
 
             try {
                 await sendNotificationToUser(user._id, {
                     title: '🎁 Event Cashback',
-                    body: `You received ₹${cashbackPerUser.toFixed(2)} as participation cashback for ${event.title}.`,
+                    body: `You received ₹${finalCashback.toFixed(2)} as participation cashback for ${event.title}.`,
                     data: { type: 'reward', link: '/user/wallet' }
                 });
             } catch(e) {}

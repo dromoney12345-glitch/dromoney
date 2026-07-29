@@ -5,6 +5,7 @@ const Settings = require('../models/Settings');
 const Task = require('../models/Task');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
+const { getLastRenewalTick } = require('../utils/taskRenewal');
 
 // @desc    Get user wallet and coin balance
 // @route   GET /api/user/wallet/balance
@@ -84,12 +85,11 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         if (task) {
             if (task.isDaily) {
                 const settings = await Settings.findOne() || {};
-                const renewalHours = settings.taskRenewalHours || 24;
-                const cutoffTime = Date.now() - (renewalHours * 60 * 60 * 1000);
+                const lastRenewalTick = getLastRenewalTick(settings);
                 
                 const alreadyDoneToday = user.dailyTaskCompletions?.some(c =>
                     String(c.taskId) === String(taskId) &&
-                    new Date(c.completedAt).getTime() > cutoffTime
+                    new Date(c.completedAt).getTime() >= lastRenewalTick.getTime()
                 );
                 if (alreadyDoneToday) {
                     return next(new ErrorResponse('Task already completed today', 400));
@@ -102,12 +102,11 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         } else {
             // It's a mock task from frontend (e.g., id "1", "2", "3"). Treat as daily task.
             const settings = await Settings.findOne() || {};
-            const renewalHours = settings.taskRenewalHours || 24;
-            const cutoffTime = Date.now() - (renewalHours * 60 * 60 * 1000);
+            const lastRenewalTick = getLastRenewalTick(settings);
             
             const alreadyDoneToday = user.dailyTaskCompletions?.some(c =>
                 String(c.taskId) === String(taskId) &&
-                new Date(c.completedAt).getTime() > cutoffTime
+                new Date(c.completedAt).getTime() >= lastRenewalTick.getTime()
             );
             if (alreadyDoneToday) {
                 return next(new ErrorResponse('Task already completed today', 400));
@@ -117,8 +116,8 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
 
     // Booster logic
     let factor = 1;
-    const isWatchTask = task && (task.type === 'Video' || task.type === 'Watch');
-    if ((user.isBoosterActive || user.isTaskBoosterActive) && !isWatchTask) {
+    const isWatchTask = task && (task.type === 'Video' || task.type === 'Watch') || (source && source.toLowerCase().includes('ad'));
+    if (user.isBoosterActive || user.isTaskBoosterActive) {
         const Booster = mongoose.models.Booster || require('../models/Booster');
         const taskBooster = await Booster.findOne({ type: 'task' });
 
@@ -135,8 +134,11 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
 
             // Check General Tasks
             const isGeneralTask = allowed.includes('general tasks') && task && !['speed tapper', 'memory master', 'quiz', 'lucky draw', 'treasure chest', 'scratch card'].some(gt => s.includes(gt) || (task.type && task.type.toLowerCase() === gt));
+            
+            // Allow if it's an ad and user has booster
+            const isAd = s.includes('ad') || isWatchTask;
 
-            if (!matchesSource && !matchesTaskType && !isGeneralTask) {
+            if (!matchesSource && !matchesTaskType && !isGeneralTask && !isAd) {
                 isApplicable = false;
             }
         }

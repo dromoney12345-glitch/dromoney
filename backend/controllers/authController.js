@@ -2,9 +2,11 @@ const User = require('../models/User');
 const ReferralTransaction = require('../models/ReferralTransaction');
 const Transaction = require('../models/Transaction');
 const Settings = require('../models/Settings');
+const BusinessIdea = require('../models/BusinessIdea');
 const Otp = require('../models/Otp');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
+const { getLastRenewalTick } = require('../utils/taskRenewal');
 const { sendOtpSMS } = require('../utils/smsService');
 
 // @desc    Register user
@@ -400,10 +402,9 @@ exports.getMe = async (req, res, next) => {
 
             // 2. Filter dailyTaskCompletions older than renewal hours
             if (user.dailyTaskCompletions && user.dailyTaskCompletions.length > 0) {
-                const renewalHours = settings.taskRenewalHours || 24;
-                const cutoffTime = new Date(Date.now() - (renewalHours * 60 * 60 * 1000));
+                const lastRenewalTick = getLastRenewalTick(settings);
                 const activeCompletions = user.dailyTaskCompletions.filter(
-                    c => new Date(c.completedAt) >= cutoffTime
+                    c => new Date(c.completedAt) >= lastRenewalTick
                 );
                 
                 if (activeCompletions.length !== user.dailyTaskCompletions.length) {

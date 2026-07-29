@@ -43,6 +43,10 @@ const EventSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    isBoosterEnabled: {
+        type: Boolean,
+        default: false
+    },
     totalCashPoolINR: {
         type: Number,
         default: 0

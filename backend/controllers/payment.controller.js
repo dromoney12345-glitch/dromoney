@@ -258,6 +258,56 @@ async function handlePaymentSuccess(payment) {
             $inc: { 'wallet.balance': payment.amount }
         });
     } else if (payment.orderType === 'SUBSCRIPTION' || payment.orderType === 'PLATFORM_UNLOCK') {
+        // Process Referral Reward
+        if (user.referredBy && !user.isPaid) {
+            try {
+                const Settings = require('../models/Settings');
+                const settings = await Settings.findOne();
+                const commission = settings ? settings.referralCommission : 200;
+                const referralSystemEnabled = settings ? settings.referralSystemEnabled : true;
+
+                if (referralSystemEnabled) {
+                    const referrer = await User.findById(user.referredBy);
+                    if (referrer) {
+                        referrer.wallet.balance += commission;
+                        referrer.wallet.referralEarnings += commission;
+                        referrer.wallet.lifetimeEarnings += commission;
+                        await referrer.save();
+
+                        const ReferralTransaction = require('../models/ReferralTransaction');
+                        await ReferralTransaction.create({
+                            referrer: referrer._id,
+                            referredUser: user._id,
+                            amount: commission,
+                            status: 'Completed'
+                        });
+
+                        await Transaction.create({
+                            user: referrer._id,
+                            type: 'credit',
+                            currency: 'INR',
+                            amount: commission,
+                            source: `Referral Reward: ${user.name || 'User'}`,
+                            status: 'Success'
+                        });
+
+                        try {
+                            const { sendNotificationToUser } = require('./fcmController');
+                            await sendNotificationToUser(referrer._id, {
+                                title: 'Commission Received! 💰',
+                                body: `You have earned a direct referral commission of ₹${commission} from ${user.name || 'a user'}'s purchase!`,
+                                data: { type: 'commission', link: '/user/income' }
+                            });
+                        } catch (pushErr) {
+                            console.error('Push notification failed for referral commission:', pushErr.message);
+                        }
+                    }
+                }
+            } catch (refErr) {
+                console.error('[REFERRAL ERROR] Failed to process reward in Bulkpe Webhook:', refErr.message);
+            }
+        }
+
         // Subscription activation
         await User.findByIdAndUpdate(user._id, {
             isPaid: true,

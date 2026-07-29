@@ -6,6 +6,7 @@ import {
     History, CheckCircle2, Share2, ArrowUpRight, Wallet, TrendingUp, Trophy, Shield, Mail
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import UnlockModal from '../components/UnlockModal';
 
 const Marketing = () => {
     const navigate = useNavigate();
@@ -17,6 +18,14 @@ const Marketing = () => {
     const [showShareModal, setShowShareModal] = useState(false);
 
     const referralLink = userData?.referrals?.link || `https://earningapp.com/join/nhgfAFF-${userData?.referrals?.code || ''}`;
+
+    if (!userData?.isPaid) {
+        return (
+            <div className="min-h-screen bg-[#f8fafc] font-poppins">
+                <UnlockModal isOpen={true} onClose={() => navigate('/user/income')} />
+            </div>
+        );
+    }
 
     React.useEffect(() => {
         const fetchSettings = async () => {
