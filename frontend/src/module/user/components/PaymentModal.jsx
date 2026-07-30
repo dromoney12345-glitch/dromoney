@@ -219,8 +219,30 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                         </button>
                                     ) : (
                                         <div className="animate-in fade-in zoom-in-95 duration-300">
-                                            <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-100 mx-auto w-fit mb-3">
-                                                <QRCode value={nativeIntent} size={130} className="rounded-xl" />
+                                            <style>
+                                            {`
+                                                @keyframes scanner-laser {
+                                                    0%, 100% { transform: translateY(-10px); opacity: 0; }
+                                                    10% { opacity: 1; }
+                                                    50% { transform: translateY(120px); opacity: 1; }
+                                                    90% { opacity: 1; }
+                                                }
+                                                .animate-scanner {
+                                                    animation: scanner-laser 2.5s ease-in-out infinite;
+                                                }
+                                            `}
+                                            </style>
+                                            <div className="relative bg-white p-3 rounded-2xl shadow-md border-2 border-blue-100 mx-auto w-fit mb-4 overflow-hidden">
+                                                <QRCode value={nativeIntent} size={130} className="rounded-xl relative z-0" />
+                                                
+                                                {/* Animated Scanner Laser */}
+                                                <div className="absolute left-0 right-0 z-10 w-full h-[40px] bg-gradient-to-b from-transparent to-blue-500/20 border-b-2 border-blue-500 shadow-[0_2px_8px_rgba(59,130,246,0.5)] animate-scanner pointer-events-none rounded-b-full"></div>
+
+                                                {/* Scanner Corners */}
+                                                <div className="absolute top-1.5 left-1.5 w-6 h-6 border-t-4 border-l-4 border-blue-600 rounded-tl-xl pointer-events-none"></div>
+                                                <div className="absolute top-1.5 right-1.5 w-6 h-6 border-t-4 border-r-4 border-blue-600 rounded-tr-xl pointer-events-none"></div>
+                                                <div className="absolute bottom-1.5 left-1.5 w-6 h-6 border-b-4 border-l-4 border-blue-600 rounded-bl-xl pointer-events-none"></div>
+                                                <div className="absolute bottom-1.5 right-1.5 w-6 h-6 border-b-4 border-r-4 border-blue-600 rounded-br-xl pointer-events-none"></div>
                                             </div>
                                             <button onClick={() => { navigator.clipboard.writeText(nativeIntent); alert('Payment link copied!'); }} className="text-[11px] text-slate-600 font-medium mb-1 bg-slate-100 px-3 py-1.5 rounded-lg active:scale-95 transition-all">
                                                 Copy Payment Link

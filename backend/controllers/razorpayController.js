@@ -42,14 +42,7 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
     } else if (type === 'SUPPORT_BOOSTER' || type === 'TASK_BOOSTER') {
         const isSupport = type === 'SUPPORT_BOOSTER';
         
-        // Enforce one-booster-at-a-time rule — block if EITHER booster is already active
-        if (user.isSupportBoosterActive) {
-            return next(new ErrorResponse('You already have an active Support Booster. Only one booster is allowed at a time.', 400));
-        }
-        if (user.isTaskBoosterActive) {
-            return next(new ErrorResponse('You already have an active Task Booster. Only one booster is allowed at a time.', 400));
-        }
-        
+        // Both boosters can be active simultaneously
         const boosterType = type === 'SUPPORT_BOOSTER' ? 'support' : 'task';
         const Booster = require('../models/Booster');
         const booster = await Booster.findOne({ type: boosterType });
@@ -189,10 +182,12 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
                 expiryDate.setDate(expiryDate.getDate() + 30); // Support booster legacy fallback, but event reset clears it
                 user.isSupportBoosterActive = true;
                 user.supportBoosterExpiry = expiryDate;
+                user.isTaskBoosterActive = false;
             } else {
                 expiryDate.setHours(expiryDate.getHours() + 24); // 24 Hours validity for ₹49 Power Booster
                 user.isTaskBoosterActive = true;
                 user.taskBoosterExpiry = expiryDate;
+                user.isSupportBoosterActive = false;
             }
 
             // Legacy support

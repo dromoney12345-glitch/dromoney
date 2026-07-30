@@ -323,12 +323,12 @@ async function handlePaymentSuccess(payment) {
             expiryDate.setDate(expiryDate.getDate() + 30);
             updateData.isSupportBoosterActive = true;
             updateData.supportBoosterExpiry = expiryDate;
-            updateData.isTaskBoosterActive = false; // enforce one booster rule
+            updateData.isTaskBoosterActive = false;
         } else {
             expiryDate.setHours(expiryDate.getHours() + 24);
             updateData.isTaskBoosterActive = true;
             updateData.taskBoosterExpiry = expiryDate;
-            updateData.isSupportBoosterActive = false; // enforce one booster rule
+            updateData.isSupportBoosterActive = false;
         }
         
         updateData.boosterExpiry = expiryDate;

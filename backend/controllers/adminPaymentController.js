@@ -59,21 +59,19 @@ exports.updatePaymentStatus = async (req, res) => {
                 if (payment.paymentType === 'SUPPORT_BOOSTER' || payment.paymentType === 'TASK_BOOSTER') {
                     const isSupport = payment.paymentType === 'SUPPORT_BOOSTER';
 
-                    // Enforce one-booster rule
-                    const hasOtherBooster = isSupport ? user.isTaskBoosterActive : user.isSupportBoosterActive;
-                    if (hasOtherBooster) {
-                        return res.status(400).json({ success: false, message: 'User already has an active booster of the other type.' });
-                    }
+                    // Both boosters can be active simultaneously
 
                     const expiryDate = new Date();
                     if (isSupport) {
                         expiryDate.setDate(expiryDate.getDate() + 30); // Fallback: Event Booster expires when event ends or weekly reset
                         user.isSupportBoosterActive = true;
                         user.supportBoosterExpiry = expiryDate;
+                        user.isTaskBoosterActive = false;
                     } else {
                         expiryDate.setHours(expiryDate.getHours() + 24); // 24 Hours validity for ₹49 Power Booster
                         user.isTaskBoosterActive = true;
                         user.taskBoosterExpiry = expiryDate;
+                        user.isSupportBoosterActive = false;
                     }
                     user.isBoosterActive = true;
                     user.boosterExpiry = expiryDate;
