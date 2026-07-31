@@ -105,6 +105,8 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
         } finally {
             setIsSubmitting(false);
         }
+    };
+
     const handleShareQR = () => {
         const svg = document.querySelector('#payment-qr');
         if (!svg) return;
