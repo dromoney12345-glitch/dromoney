@@ -105,6 +105,39 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
         } finally {
             setIsSubmitting(false);
         }
+    const handleShareQR = () => {
+        const svg = document.querySelector('#payment-qr');
+        if (!svg) return;
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const img = new Image();
+        img.onload = () => {
+            const padding = 20;
+            canvas.width = img.width + (padding * 2);
+            canvas.height = img.height + (padding * 2);
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, padding, padding);
+            
+            canvas.toBlob((blob) => {
+                const file = new File([blob], "payment_qr.png", { type: "image/png" });
+                if (navigator.share && navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        files: [file],
+                        title: 'Payment QR Code',
+                        text: 'Scan this QR code from gallery in PhonePe/GPay.',
+                    }).catch(console.error);
+                } else {
+                    const downloadLink = document.createElement("a");
+                    downloadLink.download = "payment_qr.png";
+                    downloadLink.href = URL.createObjectURL(blob);
+                    downloadLink.click();
+                    alert("QR Code saved! Open PhonePe/GPay -> Tap Scan -> Select image from Gallery.");
+                }
+            });
+        };
+        img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
     };
 
     if (!isOpen) return null;
@@ -199,55 +232,64 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                 </div>
                             )}
 
-                            {/* Direct Native UPI Pay Option */}
+                            {/* QR Code and Share Option */}
                             {!isPlatformAlreadyUnlocked && (
                                 <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 text-center relative mb-5">
                                     <h4 className="font-semibold text-slate-800 text-[15px] mb-4">Pay securely via UPI</h4>
                                     
                                     <a
                                         href={nativeIntent}
-                                        className="w-full py-3.5 rounded-xl text-[14px] font-bold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] text-white shadow-xl shadow-blue-600/30 mb-3"
+                                        className="w-full py-3.5 rounded-xl text-[14px] font-bold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-[0.98] text-white shadow-xl shadow-emerald-500/30 mb-5"
                                     >
-                                        <ShieldCheck size={20} className="text-blue-200" />
-                                        Pay Now (Direct)
+                                        <ShieldCheck size={20} className="text-emerald-100" />
+                                        Pay via UPI App (GPay, Paytm, etc)
                                     </a>
 
-                                    {!showQR ? (
-                                        <button onClick={() => setShowQR(true)} className="text-[11px] text-blue-600 font-semibold my-2 uppercase tracking-wider hover:underline flex items-center justify-center w-full mb-1">
-                                            Show QR Code / Share Link
-                                        </button>
-                                    ) : (
-                                        <div className="animate-in fade-in zoom-in-95 duration-300">
-                                            <style>
-                                            {`
-                                                @keyframes scanner-laser {
-                                                    0%, 100% { transform: translateY(-10px); opacity: 0; }
-                                                    10% { opacity: 1; }
-                                                    50% { transform: translateY(120px); opacity: 1; }
-                                                    90% { opacity: 1; }
-                                                }
-                                                .animate-scanner {
-                                                    animation: scanner-laser 2.5s ease-in-out infinite;
-                                                }
-                                            `}
-                                            </style>
-                                            <div className="relative bg-white p-3 rounded-2xl shadow-md border-2 border-blue-100 mx-auto w-fit mb-4 overflow-hidden">
-                                                <QRCode value={nativeIntent} size={130} className="rounded-xl relative z-0" />
-                                                
-                                                {/* Animated Scanner Laser */}
-                                                <div className="absolute left-0 right-0 z-10 w-full h-[40px] bg-gradient-to-b from-transparent to-blue-500/20 border-b-2 border-blue-500 shadow-[0_2px_8px_rgba(59,130,246,0.5)] animate-scanner pointer-events-none rounded-b-full"></div>
+                                    <div className="relative flex items-center py-2 mb-4">
+                                        <div className="flex-grow border-t border-slate-200"></div>
+                                        <span className="flex-shrink-0 mx-4 text-slate-400 text-xs font-medium uppercase tracking-wider">OR SCAN QR</span>
+                                        <div className="flex-grow border-t border-slate-200"></div>
+                                    </div>
+                                    
+                                    <div className="animate-in fade-in zoom-in-95 duration-300">
+                                        <style>
+                                        {`
+                                            @keyframes scanner-laser {
+                                                0%, 100% { transform: translateY(-10px); opacity: 0; }
+                                                10% { opacity: 1; }
+                                                50% { transform: translateY(120px); opacity: 1; }
+                                                90% { opacity: 1; }
+                                            }
+                                            .animate-scanner {
+                                                animation: scanner-laser 2.5s ease-in-out infinite;
+                                            }
+                                        `}
+                                        </style>
+                                        <div className="relative bg-white p-3 rounded-2xl shadow-md border-2 border-blue-100 mx-auto w-fit mb-4 overflow-hidden">
+                                            <QRCode id="payment-qr" value={nativeIntent} size={130} className="rounded-xl relative z-0" />
+                                            
+                                            {/* Animated Scanner Laser */}
+                                            <div className="absolute left-0 right-0 z-10 w-full h-[40px] bg-gradient-to-b from-transparent to-blue-500/20 border-b-2 border-blue-500 shadow-[0_2px_8px_rgba(59,130,246,0.5)] animate-scanner pointer-events-none rounded-b-full"></div>
 
-                                                {/* Scanner Corners */}
-                                                <div className="absolute top-1.5 left-1.5 w-6 h-6 border-t-4 border-l-4 border-blue-600 rounded-tl-xl pointer-events-none"></div>
-                                                <div className="absolute top-1.5 right-1.5 w-6 h-6 border-t-4 border-r-4 border-blue-600 rounded-tr-xl pointer-events-none"></div>
-                                                <div className="absolute bottom-1.5 left-1.5 w-6 h-6 border-b-4 border-l-4 border-blue-600 rounded-bl-xl pointer-events-none"></div>
-                                                <div className="absolute bottom-1.5 right-1.5 w-6 h-6 border-b-4 border-r-4 border-blue-600 rounded-br-xl pointer-events-none"></div>
-                                            </div>
-                                            <button onClick={() => { navigator.clipboard.writeText(nativeIntent); alert('Payment link copied!'); }} className="text-[11px] text-slate-600 font-medium mb-1 bg-slate-100 px-3 py-1.5 rounded-lg active:scale-95 transition-all">
-                                                Copy Payment Link
-                                            </button>
+                                            {/* Scanner Corners */}
+                                            <div className="absolute top-1.5 left-1.5 w-6 h-6 border-t-4 border-l-4 border-blue-600 rounded-tl-xl pointer-events-none"></div>
+                                            <div className="absolute top-1.5 right-1.5 w-6 h-6 border-t-4 border-r-4 border-blue-600 rounded-tr-xl pointer-events-none"></div>
+                                            <div className="absolute bottom-1.5 left-1.5 w-6 h-6 border-b-4 border-l-4 border-blue-600 rounded-bl-xl pointer-events-none"></div>
+                                            <div className="absolute bottom-1.5 right-1.5 w-6 h-6 border-b-4 border-r-4 border-blue-600 rounded-br-xl pointer-events-none"></div>
                                         </div>
-                                    )}
+                                        
+                                        <button 
+                                            onClick={handleShareQR} 
+                                            className="w-full py-3.5 rounded-xl text-[14px] font-bold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] text-white shadow-xl shadow-blue-600/30 mb-3"
+                                        >
+                                            <UploadCloud size={20} className="text-blue-200" />
+                                            Share / Save QR to Scan
+                                        </button>
+                                        
+                                        <p className="text-[11px] text-slate-500 leading-tight">
+                                            Having trouble scanning? Tap above to save this QR Code, then open PhonePe/GPay and select it from your Gallery.
+                                        </p>
+                                    </div>
                                 </div>
                             )}
 
