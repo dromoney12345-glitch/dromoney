@@ -113,8 +113,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
     
     // Generate the Native UPI Intent URL
     const upiIdToUse = adminUpiId || 'Q683884812@ybl';
-    const transactionRef = `TR${Date.now()}`;
-    const nativeIntent = `upi://pay?pa=${upiIdToUse}&pn=DroMoney&tr=${transactionRef}&tn=Platform%20Payment&am=${amount}&cu=INR`;
+    const nativeIntent = `upi://pay?pa=${upiIdToUse}&pn=DroMoney&am=${amount}&cu=INR`;
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-5 font-poppins">
