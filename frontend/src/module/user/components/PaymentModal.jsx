@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { X, ShieldCheck, Loader2, CheckCircle2, AlertCircle, Lock, UploadCloud, CreditCard } from 'lucide-react';
+import { X, ShieldCheck, Loader2, CheckCircle2, AlertCircle, Lock, UploadCloud } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
 import QRCode from 'react-qr-code';
+
+const DEFAULT_UPI_ID = 'BHARATPE2R0P0Z7W3H84355@unitype';
+const DEFAULT_MERCHANT_NAME = 'SUBHASH KUMAR';
+const DEFAULT_QR_IMAGE = '/payment-qr.png';
 
 const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK', itemId = null, onSuccess, extraData = {} }) => {
     const [status, setStatus] = useState('idle'); // idle | loading | success | error
@@ -10,7 +14,6 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
     const { userData } = useUser();
 
     const [isMobile, setIsMobile] = useState(false);
-    const [showQR, setShowQR] = useState(false);
     
     const [qrScannerImage, setQrScannerImage] = useState(null);
     const [utrNumber, setUtrNumber] = useState('');
@@ -25,8 +28,8 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
             try {
                 const res = await api.get('/public/settings');
                 if (res.success && res.data) {
-                    setQrScannerImage(res.data.qrScannerImage);
-                    setAdminUpiId(res.data.adminUpiId);
+                    if (res.data.qrScannerImage) setQrScannerImage(res.data.qrScannerImage);
+                    if (res.data.adminUpiId) setAdminUpiId(res.data.adminUpiId);
                 }
             } catch (err) {
                 console.error("Failed to fetch settings", err);
@@ -107,48 +110,106 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
         }
     };
 
-    const handleShareQR = () => {
-        const svg = document.querySelector('#payment-qr');
-        if (!svg) return;
-        const svgData = new XMLSerializer().serializeToString(svg);
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        const img = new Image();
-        img.onload = () => {
-            const padding = 20;
-            canvas.width = img.width + (padding * 2);
-            canvas.height = img.height + (padding * 2);
-            ctx.fillStyle = "white";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, padding, padding);
-            
-            canvas.toBlob((blob) => {
-                const file = new File([blob], "payment_qr.png", { type: "image/png" });
-                if (navigator.share && navigator.canShare({ files: [file] })) {
-                    navigator.share({
-                        files: [file],
-                        title: 'Payment QR Code',
-                        text: 'Scan this QR code from gallery in PhonePe/GPay.',
-                    }).catch(console.error);
-                } else {
-                    const downloadLink = document.createElement("a");
-                    downloadLink.download = "payment_qr.png";
-                    downloadLink.href = URL.createObjectURL(blob);
-                    downloadLink.click();
-                    alert("QR Code saved! Open PhonePe/GPay -> Tap Scan -> Select image from Gallery.");
-                }
-            });
-        };
-        img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+    const PLACEHOLDER_UPIS = new Set(['dromoney@upi', 'Q683884812@ybl', 'yourname@upi']);
+    const trimmedAdminUpi = adminUpiId?.trim() || '';
+    const upiIdToUse = trimmedAdminUpi && !PLACEHOLDER_UPIS.has(trimmedAdminUpi)
+        ? trimmedAdminUpi
+        : DEFAULT_UPI_ID;
+    const isPlaceholderQr = !qrScannerImage
+        || qrScannerImage.includes('wikipedia')
+        || qrScannerImage.includes('wikimedia');
+    const qrImageToShow = isPlaceholderQr ? DEFAULT_QR_IMAGE : qrScannerImage;
+    const formattedAmount = Number(amount).toFixed(2);
+    // Clean NPCI intent — mode/purpose params break several UPI apps with BharatPe VPAs
+    const nativeIntent = `upi://pay?pa=${upiIdToUse}&pn=${encodeURIComponent(DEFAULT_MERCHANT_NAME)}&am=${formattedAmount}&cu=INR`;
+
+    const handlePayViaApp = (e) => {
+        e.preventDefault();
+        setErrorMsg('');
+
+        if (!isMobile) {
+            setErrorMsg('UPI apps open only on mobile. Please scan the QR with PhonePe / GPay / Paytm, or open this page on your phone.');
+            return;
+        }
+
+        try {
+            // Open UPI without navigating the SPA away (window.location on upi:// causes browser error pages)
+            const opener = document.createElement('a');
+            opener.href = nativeIntent;
+            opener.style.display = 'none';
+            document.body.appendChild(opener);
+            opener.click();
+            document.body.removeChild(opener);
+        } catch (err) {
+            setErrorMsg('Could not open UPI app. Please scan the QR code instead.');
+        }
+    };
+
+    const handleShareQR = async () => {
+        try {
+            // Prefer sharing the real scanner image (BharatPe / admin QR)
+            const response = await fetch(qrImageToShow);
+            const blob = await response.blob();
+            const file = new File([blob], 'payment_qr.png', { type: blob.type || 'image/png' });
+
+            if (navigator.share && navigator.canShare?.({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: 'Payment QR Code',
+                    text: `Pay ₹${formattedAmount} to ${DEFAULT_MERCHANT_NAME} (${upiIdToUse})`,
+                });
+                return;
+            }
+
+            const downloadLink = document.createElement('a');
+            downloadLink.download = 'payment_qr.png';
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.click();
+            URL.revokeObjectURL(downloadLink.href);
+            alert('QR Code saved! Open PhonePe/GPay → Tap Scan → Select image from Gallery.');
+        } catch (err) {
+            // Fallback: share generated UPI QR SVG
+            const svg = document.querySelector('#qr-container svg');
+            if (!svg) {
+                alert('Could not find QR Code to share.');
+                return;
+            }
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.onload = () => {
+                const padding = 20;
+                canvas.width = img.width + (padding * 2);
+                canvas.height = img.height + (padding * 2);
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, padding, padding);
+
+                canvas.toBlob((blob) => {
+                    const file = new File([blob], 'payment_qr.png', { type: 'image/png' });
+                    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: 'Payment QR Code',
+                            text: 'Scan this QR code from gallery in PhonePe/GPay.',
+                        }).catch(console.error);
+                    } else {
+                        const downloadLink = document.createElement('a');
+                        downloadLink.download = 'payment_qr.png';
+                        downloadLink.href = URL.createObjectURL(blob);
+                        downloadLink.click();
+                        alert('QR Code saved! Open PhonePe/GPay → Tap Scan → Select image from Gallery.');
+                    }
+                });
+            };
+            img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+        }
     };
 
     if (!isOpen) return null;
 
     const isPlatformAlreadyUnlocked = type === 'PLATFORM_UNLOCK' && userData?.isPaid;
-    
-    // Generate the Native UPI Intent URL
-    const upiIdToUse = adminUpiId || 'Q683884812@ybl';
-    const nativeIntent = `upi://pay?pa=${upiIdToUse}&pn=DroMoney&am=${amount}&cu=INR&mode=02&purpose=00`;
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-5 font-poppins">
@@ -227,7 +288,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                 </div>
                             )}
 
-                            {status === 'error' && !isPlatformAlreadyUnlocked && (
+                            {errorMsg && !isPlatformAlreadyUnlocked && (
                                 <div className="mb-5 p-3.5 bg-red-50/80 rounded-xl border border-red-200 flex items-start gap-2.5 shadow-sm animate-in shake">
                                     <AlertCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
                                     <p className="text-[12px] font-medium text-red-700 leading-snug">{errorMsg}</p>
@@ -237,15 +298,21 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                             {/* QR Code and Share Option */}
                             {!isPlatformAlreadyUnlocked && (
                                 <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 text-center relative mb-5">
-                                    <h4 className="font-semibold text-slate-800 text-[15px] mb-4">Pay securely via UPI</h4>
+                                    <h4 className="font-semibold text-slate-800 text-[15px] mb-1">Pay securely via UPI</h4>
+                                    <p className="text-[11px] text-slate-500 mb-4">
+                                        Pay to <span className="font-semibold text-slate-700">{DEFAULT_MERCHANT_NAME}</span>
+                                        <br />
+                                        <span className="font-mono text-[10px] text-slate-600 break-all">{upiIdToUse}</span>
+                                    </p>
                                     
-                                    <a
-                                        href={nativeIntent}
+                                    <button
+                                        type="button"
+                                        onClick={handlePayViaApp}
                                         className="w-full py-3.5 rounded-xl text-[14px] font-bold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-[0.98] text-white shadow-xl shadow-emerald-500/30 mb-5"
                                     >
                                         <ShieldCheck size={20} className="text-emerald-100" />
                                         Pay via UPI App (GPay, Paytm, etc)
-                                    </a>
+                                    </button>
 
                                     <div className="relative flex items-center py-2 mb-4">
                                         <div className="flex-grow border-t border-slate-200"></div>
@@ -259,7 +326,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                             @keyframes scanner-laser {
                                                 0%, 100% { transform: translateY(-10px); opacity: 0; }
                                                 10% { opacity: 1; }
-                                                50% { transform: translateY(120px); opacity: 1; }
+                                                50% { transform: translateY(160px); opacity: 1; }
                                                 90% { opacity: 1; }
                                             }
                                             .animate-scanner {
@@ -268,7 +335,10 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                         `}
                                         </style>
                                         <div className="relative bg-white p-3 rounded-2xl shadow-md border-2 border-blue-100 mx-auto w-fit mb-4 overflow-hidden">
-                                            <QRCode id="payment-qr" value={nativeIntent} size={130} className="rounded-xl relative z-0" />
+                                            <div id="qr-container" className="relative z-0 flex items-center justify-center">
+                                                {/* Amount-aware UPI QR for this BharatPe merchant */}
+                                                <QRCode value={nativeIntent} size={160} className="rounded-xl" />
+                                            </div>
                                             
                                             {/* Animated Scanner Laser */}
                                             <div className="absolute left-0 right-0 z-10 w-full h-[40px] bg-gradient-to-b from-transparent to-blue-500/20 border-b-2 border-blue-500 shadow-[0_2px_8px_rgba(59,130,246,0.5)] animate-scanner pointer-events-none rounded-b-full"></div>
@@ -281,6 +351,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                         </div>
                                         
                                         <button 
+                                            type="button"
                                             onClick={handleShareQR} 
                                             className="w-full py-3.5 rounded-xl text-[14px] font-bold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] text-white shadow-xl shadow-blue-600/30 mb-3"
                                         >
@@ -333,6 +404,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                         </div>
 
                                         <button 
+                                            type="button"
                                             onClick={handleManualSubmit}
                                             disabled={isSubmitting || !utrNumber || !screenshot}
                                             className="w-full py-3.5 bg-slate-800 hover:bg-slate-900 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl text-[13px] font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-2 shadow-lg shadow-slate-900/20"

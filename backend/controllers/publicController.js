@@ -36,7 +36,10 @@ exports.getPublicSettings = async (req, res) => {
         };
 
         if (settings && !responseData.adminUpiId) {
-            responseData.adminUpiId = 'dromoney@upi'; // Default fallback
+            responseData.adminUpiId = 'BHARATPE2R0P0Z7W3H84355@unitype';
+        }
+        if (settings && !responseData.qrScannerImage) {
+            responseData.qrScannerImage = '/payment-qr.png';
         }
         
         res.status(200).json({

@@ -191,7 +191,7 @@ const Settings = () => {
                                                 type="text" 
                                                 value={config.adminUpiId}
                                                 onChange={(e) => handleChange('adminUpiId', e.target.value)}
-                                                placeholder="yourname@upi" 
+                                                placeholder="BHARATPE2R0P0Z7W3H84355@unitype" 
                                                 className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-4 text-sm font-medium text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all" 
                                             />
                                         </div>

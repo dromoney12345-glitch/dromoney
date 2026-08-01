@@ -26,11 +26,11 @@ const SettingsSchema = new mongoose.Schema({
     // Payments
     adminUpiId: {
         type: String,
-        default: 'dromoney@upi'
+        default: 'BHARATPE2R0P0Z7W3H84355@unitype'
     },
     qrScannerImage: {
         type: String,
-        default: ''
+        default: '/payment-qr.png'
     },
     bankDetails: {
         type: String,
