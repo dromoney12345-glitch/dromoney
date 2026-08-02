@@ -1,10 +1,8 @@
 /**
- * Calculates the most recent task renewal tick in IST.
- * Admin times (taskWindowStart, taskRenewalHours) are treated as India Standard Time.
- *
- * Example: start 07:00, renew 24h → ticks every day at 07:00 IST.
+ * Task renewal helpers (IST-aligned, mirrors backend/utils/taskRenewal.js)
  */
-function getLastRenewalTick(settings) {
+
+export function getLastRenewalTick(settings) {
     const windowStart = settings?.taskWindowStart || '07:00';
     const renewalHours = Number(settings?.taskRenewalHours) || 24;
 
@@ -16,7 +14,6 @@ function getLastRenewalTick(settings) {
     const nowMs = Date.now();
     const istNow = new Date(nowMs + IST_OFFSET_MS);
 
-    // "Today at windowStart" expressed as a real UTC timestamp
     let baseTickMs = Date.UTC(
         istNow.getUTCFullYear(),
         istNow.getUTCMonth(),
@@ -27,7 +24,6 @@ function getLastRenewalTick(settings) {
         0
     ) - IST_OFFSET_MS;
 
-    // Before today's start → use yesterday's start as the base
     if (nowMs < baseTickMs) {
         baseTickMs -= 24 * 60 * 60 * 1000;
     }
@@ -38,16 +34,21 @@ function getLastRenewalTick(settings) {
     return new Date(baseTickMs + intervalsPassed * renewalIntervalMs);
 }
 
-/**
- * Current minutes since midnight in IST (0–1439).
- */
-function getIstMinutesNow() {
+export function getIstMinutesNow() {
     const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
     const istNow = new Date(Date.now() + IST_OFFSET_MS);
     return istNow.getUTCHours() * 60 + istNow.getUTCMinutes();
 }
 
-module.exports = {
-    getLastRenewalTick,
-    getIstMinutesNow
-};
+export function isWithinTaskWindow(startStr, endStr) {
+    if (!startStr || !endStr) return true;
+    const currentMins = getIstMinutesNow();
+    const [sh, sm] = startStr.split(':').map(Number);
+    const startMins = (sh || 0) * 60 + (sm || 0);
+    const [eh, em] = endStr.split(':').map(Number);
+    const endMins = (eh || 0) * 60 + (em || 0);
+    if (startMins < endMins) {
+        return currentMins >= startMins && currentMins <= endMins;
+    }
+    return currentMins >= startMins || currentMins <= endMins;
+}

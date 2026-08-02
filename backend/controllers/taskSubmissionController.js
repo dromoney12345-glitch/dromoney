@@ -5,7 +5,7 @@ const Transaction = require('../models/Transaction');
 const Settings = require('../models/Settings');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
-const { getLastRenewalTick } = require('../utils/taskRenewal');
+const { getLastRenewalTick, getIstMinutesNow } = require('../utils/taskRenewal');
 
 // @desc    Submit task proof
 // @route   POST /api/user/tasks/submit
@@ -22,14 +22,10 @@ exports.submitTask = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('Task not found', 404));
     }
 
-    // Check Admin Task Timing Window
-    const Settings = require('../models/Settings');
+    // Check Admin Task Timing Window (IST)
     const settings = await Settings.findOne();
     if (settings && settings.taskWindowStart && settings.taskWindowEnd) {
-        const now = new Date();
-        const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
-        const istDate = new Date(now.getTime() + istOffset);
-        const currentTotalMins = istDate.getUTCHours() * 60 + istDate.getUTCMinutes();
+        const currentTotalMins = getIstMinutesNow();
 
         const [startH, startM] = settings.taskWindowStart.split(':').map(Number);
         const startTotalMins = (startH || 0) * 60 + (startM || 0);
@@ -37,11 +33,12 @@ exports.submitTask = asyncHandler(async (req, res, next) => {
         const [endH, endM] = settings.taskWindowEnd.split(':').map(Number);
         const endTotalMins = (endH || 0) * 60 + (endM || 0);
 
-        // Simple check (assuming start < end, e.g., 09:00 to 17:00)
-        if (startTotalMins < endTotalMins) {
-            if (currentTotalMins < startTotalMins || currentTotalMins > endTotalMins) {
-                return next(new ErrorResponse(`Tasks are currently unavailable. Available from ${settings.taskWindowStart} to ${settings.taskWindowEnd}`, 400));
-            }
+        const inWindow = startTotalMins < endTotalMins
+            ? (currentTotalMins >= startTotalMins && currentTotalMins <= endTotalMins)
+            : (currentTotalMins >= startTotalMins || currentTotalMins <= endTotalMins);
+
+        if (!inWindow) {
+            return next(new ErrorResponse(`Tasks are currently unavailable. Available from ${settings.taskWindowStart} to ${settings.taskWindowEnd}`, 400));
         }
     }
 

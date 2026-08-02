@@ -6,7 +6,7 @@ const User = require('../models/User');
 // @access  Public
 exports.getPublicSettings = async (req, res) => {
     try {
-        const settings = await Settings.findOne().select('appName contactEmail contactPhone adminUpiId qrScannerImage bankDetails referralSystemEnabled referralCommission registrationFee minWithdrawal futureFundDailyTasksTarget futureFundWatchAdTarget futureFundEventsTarget futureFundBoostersTarget futureFundSalesTarget futureFundDaysTarget businessPlans maintenanceMode registrationOpen taskWindowStart taskWindowEnd');
+        const settings = await Settings.findOne().select('appName contactEmail contactPhone adminUpiId qrScannerImage bankDetails referralSystemEnabled referralCommission registrationFee minWithdrawal futureFundDailyTasksTarget futureFundWatchAdTarget futureFundEventsTarget futureFundBoostersTarget futureFundSalesTarget futureFundDaysTarget businessPlans maintenanceMode registrationOpen taskWindowStart taskWindowEnd taskRenewalHours');
         
         // Add fallbacks for existing documents that might not have newer schema fields
         const responseData = settings ? settings.toObject() : {
@@ -40,6 +40,9 @@ exports.getPublicSettings = async (req, res) => {
         }
         if (settings && !responseData.qrScannerImage) {
             responseData.qrScannerImage = '/payment-qr.png';
+        }
+        if (settings && !responseData.taskRenewalHours) {
+            responseData.taskRenewalHours = 24;
         }
         
         res.status(200).json({

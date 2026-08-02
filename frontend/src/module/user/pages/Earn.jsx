@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
+import { getLastRenewalTick, isWithinTaskWindow } from '../../shared/utils/taskRenewal';
 import { useNavigate } from 'react-router-dom';
 import {
     ChevronLeft, ChevronRight, ChevronDown,
@@ -50,28 +51,12 @@ const Earn = () => {
         setIsRefreshingCoins(false);
     };
 
-    const checkWindow = (startStr, endStr) => {
-        if (!startStr || !endStr) return;
-        const now = new Date();
-        const currentMins = now.getHours() * 60 + now.getMinutes();
-        const [sh, sm] = startStr.split(':').map(Number);
-        const startMins = (sh || 0) * 60 + (sm || 0);
-        const [eh, em] = endStr.split(':').map(Number);
-        const endMins = (eh || 0) * 60 + (em || 0);
-        if (startMins < endMins) {
-            setIsWithinWindow(currentMins >= startMins && currentMins <= endMins);
-        } else {
-            // handle case where window crosses midnight or is invalid
-            setIsWithinWindow(currentMins >= startMins || currentMins <= endMins);
-        }
-    };
-
     const loadSettings = async () => {
         try {
             const res = await api.get('/public/settings');
             if (res.success && res.data) {
                 setSettings(res.data);
-                checkWindow(res.data.taskWindowStart, res.data.taskWindowEnd);
+                setIsWithinWindow(isWithinTaskWindow(res.data.taskWindowStart, res.data.taskWindowEnd));
             }
         } catch (err) {}
     };
@@ -145,6 +130,17 @@ const Earn = () => {
 
         loadBoosters();
         loadSettings();
+
+        // Re-check task window every minute (IST) so open/close matches admin schedule
+        const timer = setInterval(() => {
+            setSettings((prev) => {
+                if (prev?.taskWindowStart && prev?.taskWindowEnd) {
+                    setIsWithinWindow(isWithinTaskWindow(prev.taskWindowStart, prev.taskWindowEnd));
+                }
+                return prev;
+            });
+        }, 60 * 1000);
+        return () => clearInterval(timer);
     }, []);
 
     const formatTime = (timeStr) => {
@@ -156,27 +152,34 @@ const Earn = () => {
         return `${hr12}:${m} ${ampm}`;
     };
 
-    // Get actually completed tasks dynamically from backend userData (and fallback storage)
-    const completedTasks = (() => {
-        const dbCompleted = userData.completedTasks || [];
-        const localCompleted = taskStorage.getCompletedTasks();
-        const combined = new Set([
-            ...dbCompleted.map(id => String(id)),
-            ...localCompleted.map(id => String(id))
-        ]);
-        return Array.from(combined);
-    })();
+    // Admin-aligned renewal tick (IST). Completions before this are available again.
+    const lastRenewalTick = useMemo(
+        () => getLastRenewalTick(settings || {}),
+        [settings?.taskWindowStart, settings?.taskRenewalHours]
+    );
+
+    useEffect(() => {
+        // Drop stale local completions so mobile doesn't keep tasks permanently claimed
+        taskStorage.clearCompletedBefore(lastRenewalTick);
+    }, [lastRenewalTick]);
+
+    const isTaskCompleted = (taskId) => {
+        const id = String(taskId);
+        const sinceMs = lastRenewalTick.getTime();
+
+        if (userData.dailyTaskCompletions?.some(c =>
+            String(c.taskId) === id &&
+            new Date(c.completedAt).getTime() >= sinceMs
+        )) {
+            return true;
+        }
+
+        // Local fallback only for the current renewal cycle
+        return taskStorage.getCompletedTasks(lastRenewalTick).includes(id);
+    };
 
     const totalCount = tasks.length;
-    const completedCount = tasks.filter(task => {
-        const taskId = task._id || task.id;
-        // ALL tasks now use 24-hour daily Task Completions tracking
-        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-        return userData.dailyTaskCompletions?.some(c => 
-            String(c.taskId) === String(taskId) && 
-            new Date(c.completedAt) >= twentyFourHoursAgo
-        ) || completedTasks.includes(String(taskId));
-    }).length;
+    const completedCount = tasks.filter(task => isTaskCompleted(task._id || task.id)).length;
     const remainingCount = Math.max(0, totalCount - completedCount);
 
     const handleTaskClick = (task) => {
@@ -186,19 +189,10 @@ const Earn = () => {
             return;
         }
 
-        let isCompleted = false;
-        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-        isCompleted = userData.dailyTaskCompletions?.some(c => 
-            String(c.taskId) === String(taskId) && 
-            new Date(c.completedAt) >= twentyFourHoursAgo
-        );
-
-        if (isCompleted) {
-            // Do not open if already completed
+        if (isTaskCompleted(taskId)) {
             return;
         }
 
-        // SWITCH ROUTE BASED ON TYPE
         switch (task.type) {
             case 'Quiz':
                 navigate(`/user/task-quiz/${taskId}`);
@@ -312,12 +306,7 @@ const Earn = () => {
                         const iconConfig = ICON_MAP[task.icon] || ICON_MAP[task.category] || ICON_MAP['Monitor'];
                         const IconEl = iconConfig.el;
                         
-                        let isCompleted = false;
-                        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-                        isCompleted = userData.dailyTaskCompletions?.some(c => 
-                            String(c.taskId) === String(taskId) && 
-                            new Date(c.completedAt) >= twentyFourHoursAgo
-                        ) || completedTasks.includes(String(taskId));
+                        const isCompleted = isTaskCompleted(taskId);
 
                         return (
                             <div

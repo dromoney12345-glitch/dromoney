@@ -1,14 +1,11 @@
 /**
- * Task Storage Service (Simulated Backend)
- * 
- * This utility handles saving and retrieving tasks and completions from LocalStorage.
- * When a real backend is ready, we only need to replace these functions with API calls.
+ * Task Storage Service
+ * Completions are stored with timestamps so daily tasks can renew.
  */
 
 const TASKS_KEY = 'dromoney_tasks';
 const COMPLETED_TASKS_KEY = 'dromoney_completed_tasks';
 
-// Initial Mock Tasks (Exactly what client asked for)
 const INITIAL_TASKS = [
     { 
         id: '1', 
@@ -102,13 +99,23 @@ const INITIAL_TASKS = [
     }
 ];
 
+const normalizeEntries = (raw) => {
+    if (!Array.isArray(raw)) return [];
+    // Legacy format was plain string IDs with no timestamp — those blocked renew forever on mobile.
+    // Drop them so tasks can renew; only keep timestamped entries.
+    return raw
+        .filter((item) => item && typeof item === 'object' && item.taskId)
+        .map((item) => ({
+            taskId: String(item.taskId),
+            completedAt: item.completedAt || new Date().toISOString()
+        }));
+};
+
 export const taskStorage = {
-    // Get all active tasks
     getTasks: () => {
         const stored = localStorage.getItem(TASKS_KEY);
         const currentTasks = stored ? JSON.parse(stored) : null;
 
-        // Force update if tasks are missing or the list is old (less than 10 tasks)
         if (!currentTasks || currentTasks.length < 10) {
             const normalizedInitial = INITIAL_TASKS.map(t => ({
                 ...t,
@@ -125,7 +132,6 @@ export const taskStorage = {
         }));
     },
     
-    // Sync server tasks to local storage
     syncTasks: (serverTasks) => {
         if (!serverTasks || !Array.isArray(serverTasks)) return;
         const normalized = serverTasks.map(t => ({
@@ -135,7 +141,7 @@ export const taskStorage = {
         }));
         localStorage.setItem(TASKS_KEY, JSON.stringify(normalized));
     },
-    // Add a new task (Admin Side)
+
     saveTask: (task) => {
         const tasks = taskStorage.getTasks();
         const newTask = { 
@@ -148,32 +154,49 @@ export const taskStorage = {
         return newTask;
     },
 
-    // Delete a task (Admin Side)
     deleteTask: (id) => {
         const tasks = taskStorage.getTasks();
         const updated = tasks.filter(t => t.id !== id);
         localStorage.setItem(TASKS_KEY, JSON.stringify(updated));
     },
 
-    // Update an existing task (Admin Side)
     updateTask: (id, updatedData) => {
         const tasks = taskStorage.getTasks();
         const updated = tasks.map(t => t.id === id ? { ...t, ...updatedData } : t);
         localStorage.setItem(TASKS_KEY, JSON.stringify(updated));
     },
 
-    // Mark task as completed for a user
     markComplete: (taskId) => {
-        const completed = taskStorage.getCompletedTasks();
-        if (!completed.includes(taskId)) {
-            const updated = [...completed, taskId];
-            localStorage.setItem(COMPLETED_TASKS_KEY, JSON.stringify(updated));
-        }
+        const entries = normalizeEntries(JSON.parse(localStorage.getItem(COMPLETED_TASKS_KEY) || '[]'));
+        const id = String(taskId);
+        const without = entries.filter(e => e.taskId !== id);
+        without.push({ taskId: id, completedAt: new Date().toISOString() });
+        localStorage.setItem(COMPLETED_TASKS_KEY, JSON.stringify(without));
     },
 
-    // Get list of completed task IDs
-    getCompletedTasks: () => {
-        const stored = localStorage.getItem(COMPLETED_TASKS_KEY);
-        return stored ? JSON.parse(stored) : [];
+    /**
+     * Returns completed task IDs still active since the last renewal tick.
+     * Pass sinceDate (Date) to filter; without it returns all IDs (legacy callers).
+     */
+    getCompletedTasks: (sinceDate) => {
+        const entries = normalizeEntries(JSON.parse(localStorage.getItem(COMPLETED_TASKS_KEY) || '[]'));
+        if (!sinceDate) {
+            return entries.map(e => e.taskId);
+        }
+        const sinceMs = new Date(sinceDate).getTime();
+        const active = entries.filter(e => new Date(e.completedAt).getTime() >= sinceMs);
+        // Persist pruned list so old completions don't stick forever on mobile
+        if (active.length !== entries.length) {
+            localStorage.setItem(COMPLETED_TASKS_KEY, JSON.stringify(active));
+        }
+        return active.map(e => e.taskId);
+    },
+
+    clearCompletedBefore: (sinceDate) => {
+        const entries = normalizeEntries(JSON.parse(localStorage.getItem(COMPLETED_TASKS_KEY) || '[]'));
+        const sinceMs = new Date(sinceDate).getTime();
+        const active = entries.filter(e => new Date(e.completedAt).getTime() >= sinceMs);
+        localStorage.setItem(COMPLETED_TASKS_KEY, JSON.stringify(active));
+        return active.map(e => e.taskId);
     }
 };
