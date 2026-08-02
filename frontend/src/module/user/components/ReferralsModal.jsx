@@ -7,9 +7,7 @@ const ReferralsModal = ({ isOpen, onClose, referralCount = 0 }) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (isOpen) {
-            fetchReferrals();
-        }
+        if (isOpen) fetchReferrals();
     }, [isOpen]);
 
     const fetchReferrals = async () => {
@@ -17,7 +15,7 @@ const ReferralsModal = ({ isOpen, onClose, referralCount = 0 }) => {
         try {
             const res = await api.get('/user/data/referrals');
             if (res.success) {
-                setReferralsList(res.data);
+                setReferralsList(Array.isArray(res.data) ? res.data : []);
             }
         } catch (err) {
             console.error('Failed to fetch referrals:', err);
@@ -29,66 +27,112 @@ const ReferralsModal = ({ isOpen, onClose, referralCount = 0 }) => {
     if (!isOpen) return null;
 
     const formatDate = (dateString) => {
-        const options = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-        return new Date(dateString).toLocaleDateString(undefined, options);
+        if (!dateString) return '';
+        return new Date(dateString).toLocaleDateString(undefined, {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
     };
 
+    const totalCount = referralsList.length || referralCount || 0;
+
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-white">
-            <div className="relative bg-white w-full h-full sm:max-w-sm overflow-hidden animate-in slide-in-from-bottom sm:zoom-in-95 duration-300 flex flex-col">
-                
-                <div className="p-5 bg-white border-b border-slate-100 flex justify-between items-center z-10 sticky top-0 shadow-sm">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-sky-50 text-sky-500 rounded-xl flex items-center justify-center border border-sky-100/50">
-                            <Users size={20} />
+        <div
+            className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-slate-900/45 p-3 sm:p-4"
+            onClick={onClose}
+        >
+            <div
+                className="relative bg-white w-full max-w-[360px] rounded-2xl shadow-2xl animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200 flex flex-col overflow-hidden"
+                style={{ maxHeight: 'min(72dvh, 520px)' }}
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="px-3.5 py-2.5 border-b border-slate-100 flex justify-between items-center shrink-0">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-8 h-8 bg-sky-50 text-sky-500 rounded-lg flex items-center justify-center border border-sky-100 shrink-0">
+                            <Users size={16} />
                         </div>
-                        <div>
-                            <h3 className="font-medium text-slate-800 text-[16px] tracking-tight">My Referrals</h3>
-                            <p className="text-[9px] uppercase tracking-widest text-sky-500 font-medium">{referralsList.length || referralCount} Successful Invites</p>
+                        <div className="min-w-0">
+                            <h3 className="font-medium text-slate-800 text-[14px] tracking-tight leading-tight">
+                                My Referrals
+                            </h3>
+                            <p className="text-[8px] uppercase tracking-widest text-sky-500 font-medium mt-0.5">
+                                {totalCount} Successful Invite{totalCount === 1 ? '' : 's'}
+                            </p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 active:scale-95 transition-all outline-none border border-slate-100">
-                        <X size={16} />
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="p-1.5 bg-slate-50 rounded-full text-slate-400 active:scale-95 border border-slate-100 shrink-0"
+                    >
+                        <X size={14} />
                     </button>
                 </div>
 
-                <div className="p-4 overflow-y-auto bg-slate-50/80">
-                    <div className="flex flex-col gap-3">
-                        {loading ? (
-                            <div className="flex justify-center p-6"><Loader2 className="animate-spin text-sky-500" /></div>
-                        ) : referralsList.length === 0 ? (
-                            <div className="text-center p-6 text-[11px] font-medium text-slate-400 uppercase tracking-widest">No successful invites yet.</div>
-                        ) : (
-                            referralsList.map((refData, i) => {
+                {/* List — only as tall as content, scrolls if many */}
+                <div className="overflow-y-auto overscroll-contain px-3 py-2.5 min-h-0">
+                    {loading ? (
+                        <div className="flex justify-center py-6">
+                            <Loader2 size={18} className="animate-spin text-sky-500" />
+                        </div>
+                    ) : referralsList.length === 0 ? (
+                        <div className="text-center py-6 text-[10px] font-medium text-slate-400 uppercase tracking-widest">
+                            No successful invites yet.
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-2">
+                            {referralsList.map((refData, i) => {
                                 const friendName = refData.referredUser?.name || 'Unknown User';
-                                const dateStr = formatDate(refData.createdAt);
                                 const bonus = refData.amount || 200;
                                 return (
-                                    <div key={refData._id || i} style={{ animationDelay: `${i * 50}ms` }} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex justify-between items-center animate-in slide-in-from-bottom-4 duration-500 fill-mode-both">
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-11 h-11 rounded-full flex items-center justify-center font-medium text-sm uppercase ${i % 2 === 0 ? 'bg-sky-50 text-sky-600' : 'bg-indigo-50 text-indigo-600'}`}>
+                                    <div
+                                        key={refData._id || i}
+                                        className="bg-slate-50/80 px-2.5 py-2 rounded-xl border border-slate-100 flex justify-between items-center gap-2"
+                                    >
+                                        <div className="flex items-center gap-2 min-w-0">
+                                            <div
+                                                className={`w-8 h-8 rounded-full flex items-center justify-center font-medium text-[11px] uppercase shrink-0 ${
+                                                    i % 2 === 0
+                                                        ? 'bg-sky-50 text-sky-600'
+                                                        : 'bg-indigo-50 text-indigo-600'
+                                                }`}
+                                            >
                                                 {friendName.charAt(0)}
                                             </div>
-                                            <div>
-                                                <h4 className="text-[13px] font-medium text-slate-800">{friendName}</h4>
-                                                <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mt-0.5">{dateStr}</p>
+                                            <div className="min-w-0">
+                                                <h4 className="text-[12px] font-medium text-slate-800 truncate leading-tight">
+                                                    {friendName}
+                                                </h4>
+                                                <p className="text-[8px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">
+                                                    {formatDate(refData.createdAt)}
+                                                </p>
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <span className="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1.5 rounded-lg flex items-center gap-0.5 border border-emerald-100/50">
-                                                +<IndianRupee size={10} />{bonus}
-                                            </span>
-                                        </div>
+                                        <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md inline-flex items-center gap-0.5 border border-emerald-100 shrink-0">
+                                            +<IndianRupee size={9} />
+                                            {bonus}
+                                        </span>
                                     </div>
                                 );
-                            })
-                        )}
-                    </div>
+                            })}
+                        </div>
+                    )}
                 </div>
 
-                <div className="p-5 bg-white border-t border-slate-100 sticky bottom-0">
-                    <button onClick={onClose} className="w-full py-4 bg-slate-900 text-white font-medium text-[11px] uppercase tracking-[0.2em] rounded-xl hover:bg-slate-800 active:scale-[0.98] transition-all shadow-lg shadow-slate-200">
-                        Close List
+                {/* Footer */}
+                <div
+                    className="px-3 pt-2 border-t border-slate-100 shrink-0"
+                    style={{ paddingBottom: 'max(10px, env(safe-area-inset-bottom, 10px))' }}
+                >
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="w-full py-2.5 bg-slate-900 text-white font-medium text-[10px] uppercase tracking-[0.15em] rounded-xl active:scale-[0.98] transition-all"
+                    >
+                        Close
                     </button>
                 </div>
             </div>

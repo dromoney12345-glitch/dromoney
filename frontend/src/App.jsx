@@ -33,6 +33,7 @@ import GoldProductionView from './module/user/pages/GoldProductionView';
 import AuthLayout from './module/user/auth/AuthLayout';
 import Login from './module/user/auth/Login';
 import Register from './module/user/auth/Register';
+import JoinReferral from './module/user/pages/JoinReferral';
 import KycSetup from './module/user/auth/KycSetup';
 import PendingApproval from './module/user/auth/PendingApproval';
 import AdminLogin from './module/admin/auth/Login';
@@ -211,6 +212,8 @@ function App() {
             <Route path="/" element={<RootRedirect />} />
 
             {/* Auth Module Routes (Always Public) */}
+            <Route path="/join/:code" element={<JoinReferral />} />
+            <Route path="/join" element={<JoinReferral />} />
             <Route path="/user/auth" element={<AuthLayout />}>
               <Route index element={<Navigate to="login" replace />} />
               <Route path="login" element={<Login />} />

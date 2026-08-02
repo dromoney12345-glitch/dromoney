@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Loader2, ArrowRight, Smartphone, Lock, User, Mail, Gift, ShieldCheck } from 'lucide-react';
 import { useUser } from '../context/UserContext';
-import { useSearchParams } from 'react-router-dom';
 import logoImg from '../../../assets/WhatsApp_Image_2026-04-28_at_10.52.49_PM-removebg-preview.png';
+import {
+    extractReferralCode,
+    clearPendingReferralCode,
+} from '../../shared/utils/referral';
 
 const Register = () => {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
     const { register, sendRegisterOtp } = useUser();
     
     const [loading, setLoading] = useState(false);
@@ -24,26 +26,10 @@ const Register = () => {
 
     const [referrerName, setReferrerName] = useState('');
     const [checkingReferral, setCheckingReferral] = useState(false);
-
-    const extractCode = (val) => {
-        if (!val) return '';
-        if (val.includes('nhgfAFF-')) {
-            const parts = val.split('nhgfAFF-');
-            return parts[parts.length - 1].trim().toUpperCase().substring(0, 6);
-        }
-        if (val.includes('/')) {
-            const parts = val.split('/');
-            const lastPart = parts[parts.length - 1];
-            if (lastPart.includes('nhgfAFF-')) {
-                return lastPart.split('nhgfAFF-')[1].trim().toUpperCase().substring(0, 6);
-            }
-            return lastPart.trim().toUpperCase().substring(0, 6);
-        }
-        return val.trim().toUpperCase().substring(0, 6);
-    };
+    const [referralCode, setReferralCode] = useState(''); // cleaned code sent to API
 
     const lookupReferrer = async (code) => {
-        if (!code || code.length < 6) {
+        if (!code || code.length < 4) {
             setReferrerName('');
             return;
         }
@@ -63,18 +49,60 @@ const Register = () => {
         }
     };
 
-    const handleReferralChange = (val) => {
-        const cleaned = extractCode(val);
-        setFormData(prev => ({ ...prev, referral: cleaned }));
-        lookupReferrer(cleaned);
+    // Never auto-fill — only when user pastes/types a link or code
+    const applyReferralInput = (rawValue, { showCode = false } = {}) => {
+        const raw = String(rawValue || '');
+        if (!raw.trim()) {
+            setFormData((prev) => ({ ...prev, referral: '' }));
+            setReferralCode('');
+            setReferrerName('');
+            return;
+        }
+
+        const cleaned = extractReferralCode(raw);
+        setFormData((prev) => ({
+            ...prev,
+            referral: cleaned && (showCode || raw.includes('://') || raw.includes('play.google'))
+                ? cleaned
+                : raw,
+        }));
+
+        if (cleaned) {
+            setReferralCode(cleaned);
+            lookupReferrer(cleaned);
+        } else {
+            setReferralCode('');
+            setReferrerName('');
+        }
     };
 
-    useEffect(() => {
-        const initialRef = searchParams.get('ref') || '';
-        if (initialRef) {
-            handleReferralChange(initialRef);
+    const handleReferralChange = (val) => {
+        applyReferralInput(val);
+    };
+
+    const handleReferralPaste = (e) => {
+        const pasted = e.clipboardData?.getData('text') || '';
+        if (!pasted.trim()) return;
+        e.preventDefault();
+        applyReferralInput(pasted.trim(), { showCode: true });
+    };
+
+    const handleReferralBlur = () => {
+        const cleaned = extractReferralCode(formData.referral);
+        if (cleaned) {
+            setReferralCode(cleaned);
+            setFormData((prev) => ({ ...prev, referral: cleaned }));
+            lookupReferrer(cleaned);
         }
-    }, [searchParams]);
+    };
+
+    // Clear any old saved referral so field stays empty until user pastes
+    useEffect(() => {
+        clearPendingReferralCode();
+        setFormData((prev) => ({ ...prev, referral: '' }));
+        setReferralCode('');
+        setReferrerName('');
+    }, []);
 
     useEffect(() => {
         if (resendCooldown > 0) {
@@ -144,16 +172,21 @@ const Register = () => {
         if (otp.length < 6) return;
         
         setLoading(true);
+        const resolvedCode =
+            referralCode ||
+            extractReferralCode(formData.referral) ||
+            '';
         const result = await register({
             name: formData.name,
             email: formData.email,
             phone: formData.phone,
-            referralCode: formData.referral,
+            referralCode: resolvedCode,
             otp: otp
         });
         setLoading(false);
 
         if (result.success) {
+            clearPendingReferralCode();
             navigate('/user/home');
         } else {
             setError(result.error || "Registration failed. Please try again.");
@@ -238,20 +271,36 @@ const Register = () => {
                                     <div className="relative">
                                         <input
                                             type="text"
-                                            placeholder="Code or Link"
+                                            inputMode="text"
+                                            autoCapitalize="characters"
+                                            autoCorrect="off"
+                                            spellCheck={false}
+                                            placeholder="Paste Play Store invite link"
                                             value={formData.referral}
                                             onChange={(e) => handleReferralChange(e.target.value)}
-                                            className="w-full bg-slate-50 text-[#0f1d3a] font-medium px-5 py-2.5 rounded-full border border-slate-100 focus:bg-white transition-all text-[12px] tracking-widest uppercase"
+                                            onPaste={handleReferralPaste}
+                                            onBlur={handleReferralBlur}
+                                            className="w-full bg-slate-50 text-[#0f1d3a] font-medium px-5 py-2.5 pr-12 rounded-full border border-slate-100 focus:bg-white transition-all text-[12px] tracking-widest uppercase"
                                         />
                                         <Gift className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
                                     </div>
                                     {checkingReferral && (
                                         <div className="text-[9px] text-slate-400 font-medium ml-3 mt-1 animate-pulse">Verifying referral code...</div>
                                     )}
-                                    {referrerName && (
+                                    {referralCode && referrerName && (
                                         <div className="mt-1.5 px-4 py-1.5 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center gap-2 text-emerald-600 text-[10px] font-medium uppercase tracking-wider animate-in fade-in zoom-in duration-300">
                                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                                            <span>Referred By: {referrerName}</span>
+                                            <span>Code {referralCode} · Referred By: {referrerName}</span>
+                                        </div>
+                                    )}
+                                    {referralCode && !referrerName && !checkingReferral && (
+                                        <div className="text-[9px] text-amber-600 font-medium ml-3 mt-1">
+                                            Referral code: {referralCode}
+                                        </div>
+                                    )}
+                                    {formData.referral && !referralCode && !checkingReferral && (
+                                        <div className="text-[9px] text-rose-500 font-medium ml-3 mt-1">
+                                            Invalid link. Paste the Play Store invite link from Marketing.
                                         </div>
                                     )}
                                 </div>

@@ -10,12 +10,19 @@ const { getLastRenewalTick } = require('../utils/taskRenewal');
 const { syncFutureFundCriteria } = require('../utils/futureFund');
 const { sendOtpSMS } = require('../utils/smsService');
 
+const { extractReferralCode } = require('../utils/referralCode');
+
 // @desc    Register user
 // @route   POST /api/user/auth/register
 // @access  Public
 exports.register = async (req, res, next) => {
     try {
-        const { name, email, password, phone, referralCode, otp } = req.body;
+        const { name, email, password, phone, otp } = req.body;
+        const rawReferral =
+            req.body.referralCode ||
+            req.body.referral ||
+            req.body.ref ||
+            '';
 
         if (!phone || !otp) {
             return next(new ErrorResponse('Please provide phone and OTP', 400));
@@ -67,20 +74,42 @@ exports.register = async (req, res, next) => {
             return next(new ErrorResponse('This email address is already registered.', 400));
         }
 
-        // Check if referral code is valid and find referrer
+        // Resolve referral (accepts code OR full invite / Play Store link)
         let referredBy = null;
-        if (referralCode) {
-            const referrer = await User.findOne({ referralCode });
-            if (referrer) {
-                referredBy = referrer._id;
-                
-                // Get commission amount from settings
-                const settings = await Settings.findOne() || { referralCommission: 200 };
-                const commission = settings.referralCommission;
+        let referrerDoc = null;
+        let commission = 200;
+        const cleanCode = extractReferralCode(rawReferral);
 
-                req.referrer = referrer;
-                req.commission = commission;
+        if (cleanCode) {
+            const settings = (await Settings.findOne()) || {
+                referralCommission: 200,
+                referralSystemEnabled: true,
+            };
+            const referrer = await User.findOne({
+                referralCode: new RegExp(`^${cleanCode}$`, 'i'),
+            });
+
+            if (!referrer) {
+                console.warn(`[REFERRAL] No user found for code: ${cleanCode}`);
+            } else {
+                const samePhone = referrer.phone && trimmedPhone && String(referrer.phone) === String(trimmedPhone);
+                const sameEmail =
+                    referrer.email &&
+                    trimmedEmail &&
+                    String(referrer.email).toLowerCase() === trimmedEmail;
+                if (samePhone || sameEmail) {
+                    console.warn(`[REFERRAL] Self-referral blocked for code: ${cleanCode}`);
+                } else {
+                    referredBy = referrer._id;
+                    commission = Number(settings.referralCommission) > 0 ? Number(settings.referralCommission) : 200;
+                    // Always credit on register when system enabled (default true)
+                    if (settings.referralSystemEnabled !== false) {
+                        referrerDoc = referrer;
+                    }
+                }
             }
+        } else if (rawReferral) {
+            console.warn(`[REFERRAL] Could not extract code from: ${String(rawReferral).slice(0, 120)}`);
         }
 
         const userPassword = password || '123456';
@@ -88,61 +117,71 @@ exports.register = async (req, res, next) => {
         // Create user
         const user = await User.create({
             name,
-            email,
+            email: trimmedEmail || email,
             password: userPassword,
-            phone,
-            referredBy
+            phone: trimmedPhone || phone,
+            referredBy: referredBy || undefined,
         });
 
-        // If referredBy, credit the referrer
-        if (referredBy && req.referrer) {
-            const referrer = req.referrer;
-            const commission = req.commission;
-
-            referrer.wallet.balance += commission;
-            referrer.wallet.referralEarnings += commission;
-            referrer.referralCount += 1;
-            await referrer.save();
-
-            await ReferralTransaction.create({
-                referrer: referrer._id,
-                referredUser: user._id,
-                amount: commission,
-                status: 'Completed'
-            });
-
-            await Transaction.create({
-                user: referrer._id,
-                type: 'credit',
-                currency: 'INR',
-                amount: commission,
-                source: `Referral Reward: ${user.name}`,
-                status: 'Success'
-            });
-
-            // Add in-app notification
-            referrer.notifications = referrer.notifications || [];
-            referrer.notifications.push({
-                title: 'New Team Member! 👥',
-                message: `Congratulations! ${user.name} just registered using your referral link.`,
-                type: 'success',
-                isRead: false
-            });
-            await referrer.save({ validateBeforeSave: false });
-
-            // Send Push Notification to Referrer
+        // Credit referrer ₹commission on successful registration (once)
+        if (referredBy && referrerDoc) {
             try {
-                const { sendNotificationToUser } = require('./fcmController');
-                await sendNotificationToUser(referrer._id, {
-                    title: 'New Team Member! 👥',
-                    body: `Congratulations! ${user.name} just registered using your referral link.`,
-                    data: {
-                        type: 'referral',
-                        link: '/user/marketing'
-                    }
+                await ReferralTransaction.create({
+                    referrer: referrerDoc._id,
+                    referredUser: user._id,
+                    amount: commission,
+                    status: 'Completed',
                 });
-            } catch (pushErr) {
-                console.error('Push notification failed for new referral registration:', pushErr.message);
+
+                await User.findByIdAndUpdate(referrerDoc._id, {
+                    $inc: {
+                        'wallet.balance': commission,
+                        'wallet.lifetimeEarnings': commission,
+                        'wallet.referralEarnings': commission,
+                        referralCount: 1,
+                    },
+                    $push: {
+                        notifications: {
+                            title: 'New Team Member! 👥',
+                            message: `Congratulations! ${user.name} just registered using your referral link. ₹${commission} credited.`,
+                            type: 'success',
+                            isRead: false,
+                        },
+                    },
+                });
+
+                await Transaction.create({
+                    user: referrerDoc._id,
+                    type: 'credit',
+                    currency: 'INR',
+                    amount: commission,
+                    source: `Referral Reward: ${user.name}`,
+                    status: 'Success',
+                });
+
+                console.log(
+                    `[REFERRAL] Credited ₹${commission} to ${referrerDoc._id} for new user ${user._id} (code ${cleanCode})`
+                );
+
+                try {
+                    const { sendNotificationToUser } = require('./fcmController');
+                    await sendNotificationToUser(referrerDoc._id, {
+                        title: 'New Team Member! 👥',
+                        body: `Congratulations! ${user.name} just registered using your referral link. ₹${commission} credited.`,
+                        data: {
+                            type: 'referral',
+                            link: '/user/marketing',
+                        },
+                    });
+                } catch (pushErr) {
+                    console.error('Push notification failed for new referral registration:', pushErr.message);
+                }
+            } catch (err) {
+                if (err.code === 11000) {
+                    console.log('Referral reward already processed for this user');
+                } else {
+                    console.error('Referral credit on register failed:', err.message);
+                }
             }
         }
 

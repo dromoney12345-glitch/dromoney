@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import UnlockModal from '../components/UnlockModal';
+import { buildReferralLink } from '../../shared/utils/referral';
 
 const Marketing = () => {
     const navigate = useNavigate();
@@ -14,10 +15,13 @@ const Marketing = () => {
     const { userData } = useUser();
     const [copied, setCopied] = useState(false);
     const [rewardAmount, setRewardAmount] = useState(200);
+    const [linkBase, setLinkBase] = useState('');
     const [showReferralLink, setShowReferralLink] = useState(location.state?.showReferral || false);
     const [showShareModal, setShowShareModal] = useState(false);
 
-    const referralLink = userData?.referrals?.link || `https://earningapp.com/join/nhgfAFF-${userData?.referrals?.code || ''}`;
+    const referralCode = userData?.referrals?.code || '';
+    // Always rebuild from admin base + code (never show localhost /join links)
+    const referralLink = buildReferralLink(referralCode, linkBase);
 
     if (!userData?.isPaid) {
         return (
@@ -32,7 +36,8 @@ const Marketing = () => {
             try {
                 const res = await api.get('/public/settings');
                 if (res.success && res.data) {
-                    setRewardAmount(res.data.referralCommission);
+                    setRewardAmount(res.data.referralCommission || 200);
+                    setLinkBase(res.data.referralLinkBaseUrl || '');
                 }
             } catch (err) {
                 console.error("Failed to fetch referral settings", err);
@@ -48,11 +53,12 @@ const Marketing = () => {
     };
 
     const handleInvite = async () => {
+        const shareText = `Hey! Join Dromoney and start earning 🚀\n\nInvite code: ${referralCode}\n\n${referralLink}`;
         if (navigator.share) {
             try {
                 await navigator.share({
                     title: 'Join Dromoney & Earn',
-                    text: `Hey! Join Dromoney using my link and start earning ₹${rewardAmount} per referral easily! 🚀`,
+                    text: shareText,
                     url: referralLink,
                 });
             } catch (err) {
@@ -64,7 +70,7 @@ const Marketing = () => {
     };
 
     const shareOnSocial = (platform) => {
-        const message = encodeURIComponent(`Hey! Join Dromoney using my link and start earning ₹${rewardAmount} per referral easily! 🚀\n\n${referralLink}`);
+        const message = encodeURIComponent(`Hey! Join Dromoney and start earning 🚀\n\nInvite code: ${referralCode}\n\n${referralLink}`);
         const url = encodeURIComponent(referralLink);
         
         switch (platform) {
@@ -184,7 +190,7 @@ const Marketing = () => {
                         <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
                             <h5 className="text-[11px] font-medium text-blue-800 uppercase tracking-wider mb-1">How it works</h5>
                             <p className="text-[10px] font-medium text-blue-600 leading-relaxed">
-                                Share your referral link with friends. When they join and verify their account, you instantly receive ₹200 in your wallet.
+                                Share your Play Store referral link. When a friend installs and registers with your code, you receive ₹{rewardAmount} in your wallet.
                             </p>
                         </div>
                     </div>

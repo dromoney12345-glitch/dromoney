@@ -72,13 +72,15 @@ const Affiliates = () => {
     };
 
     const handleUpdateBaseUrl = async () => {
-        if (!tempBaseUrl.trim()) return alert("Base URL cannot be empty");
+        const next = tempBaseUrl.trim();
         try {
-            const res = await api.put('/admin/settings', { referralLinkBaseUrl: tempBaseUrl.trim() });
+            const res = await api.put('/admin/settings', { referralLinkBaseUrl: next });
             if (res.success) {
-                setBaseUrl(tempBaseUrl.trim());
+                setBaseUrl(next || 'Play Store (auto)');
                 setEditingBaseUrl(false);
-                alert('Referral Base URL updated successfully!');
+                alert(next
+                    ? 'Referral Base URL updated successfully!'
+                    : 'Base URL cleared. App will share Play Store links with referral code.');
             }
         } catch (err) {
             alert('Failed to update base url');
@@ -162,6 +164,7 @@ const Affiliates = () => {
                                     type="text"
                                     value={tempBaseUrl}
                                     onChange={(e) => setTempBaseUrl(e.target.value)}
+                                    placeholder="Leave empty = Play Store + ref code"
                                     className="w-48 bg-slate-50 border border-indigo-200 rounded-lg px-2 py-1 text-xs text-slate-900 outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                                 <button onClick={handleUpdateBaseUrl} className="bg-indigo-500 text-white px-2 py-1 rounded-md text-[9px] uppercase">Save</button>
@@ -169,7 +172,9 @@ const Affiliates = () => {
                             </div>
                         ) : (
                             <div className="flex items-center gap-2">
-                                <p className="text-xs text-slate-900 max-w-[150px] truncate">{baseUrl}</p>
+                                <p className="text-xs text-slate-900 max-w-[150px] truncate" title={baseUrl}>
+                                    {baseUrl || 'Play Store (auto)'}
+                                </p>
                                 <button onClick={() => { setTempBaseUrl(baseUrl); setEditingBaseUrl(true); }} className="p-1 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-md transition-all" title="Click to change Base URL">
                                     <Edit2 size={10} />
                                 </button>

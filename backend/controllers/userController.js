@@ -514,29 +514,50 @@ exports.unlockFutureFund = asyncHandler(async (req, res, next) => {
 // @route   GET /api/user/data/referrals
 // @access  Private
 exports.getReferrals = asyncHandler(async (req, res, next) => {
-    // Fetch directly from User collection to ensure no missing referrals (even if transaction is missing)
-    const referredUsers = await User.find({ referredBy: req.user.id })
+    const referrerId = req.user._id || req.user.id;
+
+    const referredUsers = await User.find({ referredBy: referrerId })
         .select('name phone createdAt')
         .sort('-createdAt');
 
-    // Also fetch transactions to get the exact amounts if needed
-    const transactions = await ReferralTransaction.find({ referrer: req.user.id });
+    const transactions = await ReferralTransaction.find({ referrer: referrerId })
+        .populate('referredUser', 'name phone createdAt');
 
-    const referralsData = referredUsers.map(user => {
-        const tx = transactions.find(t => t.referredUser?.toString() === user._id.toString());
-        return {
-            _id: tx ? tx._id : user._id,
+    const byUserId = new Map();
+
+    for (const user of referredUsers) {
+        byUserId.set(String(user._id), {
+            _id: user._id,
             referredUser: user,
-            amount: tx ? tx.amount : 200, // default commission if tx missing
-            status: tx ? tx.status : 'Completed',
-            createdAt: user.createdAt
-        };
-    });
+            amount: 200,
+            status: 'Completed',
+            createdAt: user.createdAt,
+        });
+    }
+
+    for (const tx of transactions) {
+        const uid = tx.referredUser?._id
+            ? String(tx.referredUser._id)
+            : String(tx.referredUser || '');
+        if (!uid) continue;
+        const existing = byUserId.get(uid);
+        byUserId.set(uid, {
+            _id: tx._id,
+            referredUser: tx.referredUser || existing?.referredUser || { name: 'Unknown User' },
+            amount: tx.amount || existing?.amount || 200,
+            status: tx.status || 'Completed',
+            createdAt: tx.createdAt || existing?.createdAt,
+        });
+    }
+
+    const referralsData = Array.from(byUserId.values()).sort(
+        (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+    );
 
     res.status(200).json({
         success: true,
         count: referralsData.length,
-        data: referralsData
+        data: referralsData,
     });
 });
 

@@ -18,7 +18,7 @@ const Profile = () => {
     const navigate = useNavigate();
     const galleryInputRef = React.useRef(null);
     const cameraInputRef = React.useRef(null);
-    const { userData, addNotification, updateProfileImage, updateProfileData, logout } = useUser();
+    const { userData, addNotification, updateProfileImage, updateProfileData, logout, refreshUserProfile } = useUser();
     const { name, id, email, phone, referrals, isPaid, profileImage, kycStatus } = userData;
     const [isUploading, setIsUploading] = useState(false);
     const [isUnlockOpen, setIsUnlockOpen] = useState(false);
@@ -38,7 +38,11 @@ const Profile = () => {
             return;
         }
         if (title === 'App Feedback') { setIsFeedbackOpen(true); return; }
-        if (title === 'My Referrals') { setIsReferralsOpen(true); return; }
+        if (title === 'My Referrals') {
+            if (refreshUserProfile) refreshUserProfile(false);
+            setIsReferralsOpen(true);
+            return;
+        }
     };
 
     const handleImageChange = async (e) => {
@@ -213,14 +217,14 @@ const Profile = () => {
 
                         <button 
                             onClick={() => handleAction('My Referrals')}
-                            className="bg-white border border-slate-100 rounded-2xl p-4 text-left shadow-sm active:bg-slate-50 transition-all group relative overflow-hidden cursor-pointer"
+                            className="bg-white border border-slate-100 rounded-2xl p-4 text-left shadow-sm active:bg-slate-50 transition-all group relative cursor-pointer min-h-[108px]"
                         >
-                            <div className="absolute right-0 top-0 w-12 h-12 bg-blue-500/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                            <div className="absolute right-0 top-0 w-12 h-12 bg-blue-500/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
                             <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform border border-blue-100">
                                 <Users size={20} className="text-blue-500" />
                             </div>
                             <h4 className="text-[13px] font-medium text-slate-800 leading-tight">My Referrals</h4>
-                            <p className="text-[8px] font-medium text-blue-600 uppercase mt-1 tracking-wider">{referrals.count} ACTIVE</p>
+                            <p className="text-[8px] font-medium text-blue-600 uppercase mt-1 tracking-wider">{referrals?.count || 0} ACTIVE</p>
                         </button>
                     </div>
                 </div>

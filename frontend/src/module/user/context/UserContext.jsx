@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import api from '../../shared/services/api';
 import io from 'socket.io-client';
+import { buildReferralLink } from '../../shared/utils/referral';
 
 const UserContext = React.createContext();
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'https://dromoney.onrender.com';
@@ -219,10 +220,10 @@ export const UserProvider = ({ children }) => {
             referrals: {
                 count: dbUser.referralCount || 0,
                 code: dbUser.referralCode,
-                link: `${settings?.referralLinkBaseUrl || 'https://earningapp.com/join/'}${dbUser.referralCode}`
+                link: buildReferralLink(dbUser.referralCode, settings?.referralLinkBaseUrl)
             },
             wallet: {
-                balance: dynamicWalletBalance,
+                balance: Math.max(dynamicWalletBalance, dbUser.wallet?.balance || 0),
                 transactions: inrTransactions
             },
             kycStatus: dbUser.kyc?.status || 'Not Started',
