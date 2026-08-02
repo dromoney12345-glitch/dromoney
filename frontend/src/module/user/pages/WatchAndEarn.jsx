@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Coins, MonitorPlay, Sparkles, TrendingUp, RefreshCw, AlertTriangle, CheckCircle, XCircle, Play } from 'lucide-react';
+import { Clock, Coins, MonitorPlay, Sparkles, TrendingUp, RefreshCw, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
 import UnlockModal from '../components/UnlockModal';
@@ -16,7 +16,6 @@ const WatchAndEarn = () => {
     const [loading, setLoading] = useState(true);
     const [calling, setCalling] = useState(false);
     const [toast, setToast] = useState(null);
-    const [fallbackAds, setFallbackAds] = useState([]);
 
     const showToast = (message, type = 'success') => {
         setToast({ message, type });
@@ -28,7 +27,6 @@ const WatchAndEarn = () => {
         setIsRefreshingCoins(true);
         await refreshUserProfile(false);
         await fetchStatus();
-        await fetchFallbackAds();
         setIsRefreshingCoins(false);
     };
 
@@ -46,37 +44,9 @@ const WatchAndEarn = () => {
         }
     };
 
-    const fetchFallbackAds = async () => {
-        try {
-            const res = await api.get('/public/ads');
-            if (res.success && Array.isArray(res.data)) {
-                setFallbackAds(res.data.filter((ad) => !ad.isWatched));
-            }
-        } catch (err) {
-            console.error('Error fetching fallback ads:', err);
-        }
-    };
-
     useEffect(() => {
         fetchStatus();
-        fetchFallbackAds();
     }, []);
-
-    // Re-sync when returning from AdPlayer
-    useEffect(() => {
-        const onFocus = () => {
-            fetchStatus();
-            fetchFallbackAds();
-            if (refreshUserProfile) refreshUserProfile(false);
-        };
-        window.addEventListener('focus', onFocus);
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') onFocus();
-        });
-        return () => {
-            window.removeEventListener('focus', onFocus);
-        };
-    }, [refreshUserProfile]);
 
     const claimFlutterReward = useCallback(async () => {
         try {
@@ -91,7 +61,6 @@ const WatchAndEarn = () => {
             showToast(errMsg, 'error');
         }
         await fetchStatus();
-        await fetchFallbackAds();
         if (refreshUserProfile) await refreshUserProfile();
     }, [refreshUserProfile]);
 
@@ -125,15 +94,6 @@ const WatchAndEarn = () => {
         return () => clearInterval(t);
     }, [status?.nextAdIn]);
 
-    const openFallbackAd = () => {
-        const next = fallbackAds[0];
-        if (next?._id) {
-            navigate(`/user/ad-player/${next._id}`);
-            return true;
-        }
-        return false;
-    };
-
     const handleWatchAd = async () => {
         if (!status?.available) {
             showToast('Ad is not available right now.', 'error');
@@ -143,34 +103,21 @@ const WatchAndEarn = () => {
         setCalling(true);
 
         try {
-            // 1) Prefer native AdMob inside the app
-            if (isFlutterApp()) {
-                const { ok, reason } = await showFlutterRewardedAd('reward_ad_1');
-                if (ok) {
-                    await claimFlutterReward();
-                    return;
-                }
-                // No fill / timeout / error on this device → fall through to in-app video
-                console.warn('Flutter rewarded ad unavailable:', reason);
-            }
-
-            // 2) Fallback: admin-managed in-app video ads (works on all devices/browsers)
-            if (openFallbackAd()) {
-                if (isFlutterApp()) {
-                    showToast('Opening video ad…', 'success');
-                }
+            if (!isFlutterApp()) {
+                showToast('Open the DroMoney app to watch live ads.', 'error');
                 return;
             }
 
-            showToast(
-                isFlutterApp()
-                    ? 'No ad available right now. Please try again in a moment.'
-                    : 'No video ads available right now. Please try again later.',
-                'error'
-            );
+            const { ok, reason } = await showFlutterRewardedAd('reward_ad_1');
+            if (ok) {
+                await claimFlutterReward();
+                return;
+            }
+
+            console.warn('Flutter rewarded ad unavailable:', reason);
+            showToast('No ad available right now. Please try again in a moment.', 'error');
         } catch (e) {
             console.error('Watch ad error', e);
-            if (openFallbackAd()) return;
             showToast('Failed to launch ad. Please try again.', 'error');
         } finally {
             setCalling(false);
@@ -314,47 +261,7 @@ const WatchAndEarn = () => {
                                         <MonitorPlay size={16} />
                                         {calling ? 'Launching Ad...' : 'Watch Ad Now'}
                                     </button>
-                                    <p className="text-[10px] text-slate-400 text-center mt-2">
-                                        If the ad doesn&apos;t open, a video ad will load automatically.
-                                    </p>
                                 </div>
-                            </div>
-                        )}
-
-                        {/* Always show available video ads as device-safe alternative */}
-                        {fallbackAds.length > 0 && status?.remainingAds > 0 && (
-                            <div className="space-y-2 pt-1">
-                                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-0.5">
-                                    Video ads
-                                </p>
-                                {fallbackAds.slice(0, 5).map((ad) => (
-                                    <button
-                                        key={ad._id}
-                                        type="button"
-                                        onClick={() => navigate(`/user/ad-player/${ad._id}`)}
-                                        className="w-full bg-white border border-slate-200 rounded-xl p-3 flex items-center gap-3 text-left active:scale-[0.99] transition-all hover:border-indigo-200"
-                                    >
-                                        <div className="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden shrink-0 relative">
-                                            {ad.thumbnailUrl ? (
-                                                <img src={ad.thumbnailUrl} alt="" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <Play size={16} className="text-slate-400" />
-                                                </div>
-                                            )}
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                                                <Play size={14} className="text-white fill-white" />
-                                            </div>
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-[13px] font-medium text-slate-800 truncate">{ad.title}</p>
-                                            <p className="text-[10px] text-slate-500 mt-0.5">
-                                                {ad.duration}s · +{ad.coinsReward} coins
-                                            </p>
-                                        </div>
-                                        <span className="text-[10px] font-semibold text-indigo-600 shrink-0">Watch</span>
-                                    </button>
-                                ))}
                             </div>
                         )}
                     </>
