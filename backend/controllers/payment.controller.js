@@ -317,20 +317,19 @@ async function handlePaymentSuccess(payment) {
         const isSupport = payment.orderType === 'SUPPORT_BOOSTER';
         const expiryDate = new Date();
         
-        let updateData = { isBoosterActive: true };
+        let updateData = {};
         
         if (isSupport) {
             expiryDate.setDate(expiryDate.getDate() + 30);
             updateData.isSupportBoosterActive = true;
             updateData.supportBoosterExpiry = expiryDate;
-            updateData.isTaskBoosterActive = false;
         } else {
             expiryDate.setHours(expiryDate.getHours() + 24);
             updateData.isTaskBoosterActive = true;
             updateData.taskBoosterExpiry = expiryDate;
-            updateData.isSupportBoosterActive = false;
         }
         
+        updateData.isBoosterActive = true;
         updateData.boosterExpiry = expiryDate;
         
         await User.findByIdAndUpdate(user._id, updateData);

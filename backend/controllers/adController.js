@@ -154,7 +154,7 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('Reward already claimed for this ad', 400));
     }
 
-    // 6. Calculate rewards
+    // 6. Calculate rewards — Task Booster only if admin enabled Watch & Earn
     const baseReward = ad.coinsReward || 0;
     let factor = 1;
 
@@ -162,12 +162,21 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
         const mongoose = require('mongoose');
         const Booster = mongoose.models.Booster || require('../models/Booster');
         const taskBooster = await Booster.findOne({ type: 'task' });
-        if (taskBooster && taskBooster.benefits) {
-            for (const b of taskBooster.benefits) {
-                const match = b.match(/(\d+)x/i);
-                if (match) {
-                    factor = parseInt(match[1]);
-                    break;
+        const allowed = (taskBooster?.applicableTasks || []).map((t) => String(t).toLowerCase());
+        const watchAllowed =
+            allowed.some((t) => t.includes('watch')) ||
+            allowed.includes('watch & earn') ||
+            allowed.includes('watch and earn');
+
+        if (watchAllowed) {
+            factor = 12;
+            if (taskBooster?.benefits) {
+                for (const b of taskBooster.benefits) {
+                    const match = String(b).match(/(\d+)x/i);
+                    if (match) {
+                        factor = parseInt(match[1], 10);
+                        break;
+                    }
                 }
             }
         }

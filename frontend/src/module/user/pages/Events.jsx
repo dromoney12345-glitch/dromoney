@@ -521,15 +521,15 @@ const Events = () => {
                                 <ChevronDown size={14} />
                             </button>
                             <button
-                                onClick={() => !(userData.isSupportBoosterActive || userData.isTaskBoosterActive) && handleBuyBooster()}
-                                disabled={userData.isSupportBoosterActive || userData.isTaskBoosterActive}
+                                onClick={() => !userData.isSupportBoosterActive && handleBuyBooster()}
+                                disabled={userData.isSupportBoosterActive}
                                 className={`px-3 py-2 rounded-lg text-[9px] tracking-widest uppercase shadow-lg active:scale-95 transition-all cursor-pointer ${
-                                    (userData.isSupportBoosterActive || userData.isTaskBoosterActive)
-                                        ? 'bg-slate-600 text-slate-400 cursor-not-allowed'
+                                    userData.isSupportBoosterActive
+                                        ? 'bg-emerald-600/80 text-white cursor-not-allowed'
                                         : 'bg-blue-600 hover:bg-blue-700 text-white'
                                 }`}
                             >
-                                {(userData.isSupportBoosterActive || userData.isTaskBoosterActive) ? '✓ Active' : 'Buy'}
+                                {userData.isSupportBoosterActive ? '✓ Active' : 'Buy'}
                             </button>
                         </div>
                     </div>
@@ -575,8 +575,9 @@ const Events = () => {
             <PaymentModal 
                 isOpen={isPaymentOpen} 
                 onClose={() => setIsPaymentOpen(false)} 
-                amount={supportBooster.price} 
+                amount={Math.round((supportBooster.price || 21) * 1.04 * 100) / 100}
                 plan={supportBooster.title} 
+                type="SUPPORT_BOOSTER"
                 onSuccess={handlePaymentSuccess} 
             />
         </div>

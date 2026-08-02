@@ -665,7 +665,7 @@ const MarketingManager = () => {
                                             <div className="grid grid-cols-2 gap-2 bg-slate-50 border border-slate-100 rounded-xl p-3">
                                                 {(type === 'support' 
                                                     ? ['Speed Tapper', 'Standard Quiz', 'Memory Master', 'Lucky Draw'] 
-                                                    : ['General Tasks', 'Task Quiz', 'Speed Tapper', 'Standard Quiz', 'Memory Master', 'Lucky Draw', 'Scratch Card', 'Treasure Chest', 'Contests']).map((taskOption) => (
+                                                    : ['General Tasks', 'Task Quiz', 'Speed Tapper', 'Standard Quiz', 'Memory Master', 'Lucky Draw', 'Scratch Card', 'Treasure Chest', 'Contests', 'Watch & Earn']).map((taskOption) => (
                                                     <label key={taskOption} className="flex items-center gap-2 cursor-pointer">
                                                         <input 
                                                             type="checkbox" 

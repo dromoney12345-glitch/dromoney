@@ -8,7 +8,10 @@ import { showFlutterRewardedAd, isFlutterApp } from '../../shared/utils/flutterA
 
 const WatchAndEarn = () => {
     const navigate = useNavigate();
-    const { userData, refreshUserProfile } = useUser();
+    const { userData, refreshUserProfile, boostersConfig } = useUser();
+    const watchBoosterEnabled = Array.isArray(boostersConfig?.task) &&
+        boostersConfig.task.some((t) => String(t).toLowerCase().includes('watch'));
+    const showTaskBoosterOnWatch = !!(userData?.isTaskBoosterActive && watchBoosterEnabled);
     const [status, setStatus] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calling, setCalling] = useState(false);
@@ -213,6 +216,11 @@ const WatchAndEarn = () => {
                         </div>
                         <h1 className="text-[18px] text-white leading-tight">Watch & Earn</h1>
                         <p className="text-indigo-200 text-[10px] opacity-70">Get extra coins daily!</p>
+                        {showTaskBoosterOnWatch && (
+                            <span className="inline-block mt-1 text-[8px] font-bold text-amber-200 bg-amber-500/20 border border-amber-400/30 px-1.5 py-0.5 rounded">
+                                Task Booster active on Watch & Earn
+                            </span>
+                        )}
                     </div>
                     <div className="flex items-center gap-2">
                         <button type="button" onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-8 h-8 flex items-center justify-center bg-white/10 text-white rounded-full border border-white/20 active:scale-95 transition-all">

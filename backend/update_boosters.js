@@ -26,7 +26,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => {
         { 
             $set: { 
                 benefits: [
-                    '12X Coins on Tasks & Ads',
+                    '12X Coins on Selected Tasks',
                     'Fast Rewards Processing',
                     'Priority Task Verification'
                 ],
@@ -35,7 +35,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => {
         },
         { upsert: true, new: true }
     );
-    console.log("Updated task booster.");
+    console.log("Updated task booster (Watch & Earn not included by default).");
 
     process.exit(0);
 }).catch(console.error);

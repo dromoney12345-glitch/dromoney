@@ -202,7 +202,7 @@ const FutureFund = () => {
                         <span className="text-xl shrink-0">🎉</span>
                         <div>
                             <h4 className="text-[11px] font-medium text-emerald-800 leading-none">Congratulations!</h4>
-                            <p className="text-[9.5px] font-medium text-emerald-600/90 mt-1 leading-snug">आप Future Fund के लिए eligible हो गए हैं।</p>
+                            <p className="text-[9.5px] font-medium text-emerald-600/90 mt-1 leading-snug">You are now eligible for the Future Fund.</p>
                         </div>
                     </div>
 
@@ -280,7 +280,7 @@ const FutureFund = () => {
             target: salesCriterion.target,
             completed: salesCriterion.completed,
             display: `${salesCriterion.current}/${salesCriterion.target}`,
-            how: `Apne referral code se ${salesCriterion.target} logon ko platform unlock (paid) karwana hoga. Sirf register kaafi nahi — unka payment success hona chahiye.`,
+            how: `Get ${salesCriterion.target} people to unlock the platform using your referral code. Registration alone is not enough — their payment must succeed.`,
         },
         {
             key: 'activity',
@@ -294,7 +294,7 @@ const FutureFund = () => {
             target: activityCriterion.target,
             completed: activityCriterion.completed,
             display: `${activityCriterion.current}m/${activityCriterion.target}m`,
-            how: `App open rakhkar use karo — time auto count hota hai. Aaj ${minsTarget} minute complete hone par ye criteria green ho jayegi.`,
+            how: `Keep the app open and use it — time is counted automatically. Complete ${minsTarget} minutes today to finish this criterion.`,
         },
         {
             key: 'days',
@@ -308,7 +308,7 @@ const FutureFund = () => {
             target: daysCriterion.target,
             completed: daysCriterion.completed,
             display: `${daysCriterion.current}/${daysCriterion.target}`,
-            how: `Jis din aap ${minsTarget} minute activity complete karte ho, woh 1 Active Day ban jata hai. Total ${daysCriterion.target} alag din chahiye.`,
+            how: `Any day you complete ${minsTarget} minutes of activity counts as 1 Active Day. You need ${daysCriterion.target} different days.`,
         },
     ];
 
@@ -405,9 +405,9 @@ const FutureFund = () => {
                                 <Sparkles size={13} className="text-purple-400" />
                             </div>
                             <p className="text-[9.5px] font-medium text-slate-300 leading-snug">
-                                <span className="text-white font-semibold">Kab active?</span> Jab teeno criteria complete hon —
-                                {' '}{salesCriterion.target} successful sales + aaj {minsTarget} min activity + {daysCriterion.target} active days.
-                                App use karte hi minutes auto count hote hain.
+                                <span className="text-white font-semibold">When does it activate?</span> When all three criteria are complete —
+                                {' '}{salesCriterion.target} successful sales + {minsTarget} min activity today + {daysCriterion.target} active days.
+                                Minutes are counted automatically while you use the app.
                             </p>
                         </div>
 

@@ -19,9 +19,9 @@ const DEFAULT_PRIZES = [
 const LuckyDrawView = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { userData, addCoins, addNotification, boostersConfig } = useUser();
+    const { userData, addCoins, addNotification, boostersConfig, refreshUserProfile } = useUser();
     const isSupportBoosterActive = userData?.isSupportBoosterActive && (!boostersConfig?.support?.length || boostersConfig.support.includes('Lucky Draw'));
-    const isTaskBoosterActive = userData?.isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes('Lucky Draw'));
+    const isTaskBoosterActive = false; // Task booster never applies to events
     
     const [prizes, setPrizes] = useState([]);
     const [fixedWinnerIdx, setFixedWinnerIdx] = useState(null);
@@ -134,6 +134,10 @@ const LuckyDrawView = () => {
                     timeTaken: timeTakenMs > 0 ? Math.floor(timeTakenMs / 1000) : 0,
                     result: `Picked Card ${flippedTicket + 1} - ${prize.label}`,
                     prize: prize.label
+                }).then(async (res) => {
+                    if (res?.supportBoosterConsumed) {
+                        await refreshUserProfile?.(false);
+                    }
                 }).catch(err => console.error("Failed to save submission:", err));
             }
         }, 4500);
@@ -285,11 +289,8 @@ const LuckyDrawView = () => {
                         <div className="flex flex-col items-center justify-center gap-1 bg-white/90 rounded-2xl p-3 shadow-md">
                             <div className="flex items-center gap-2">
                                 <Coins size={20} className="text-amber-500 fill-amber-500" />
-                                <span className="text-[13px] font-bold text-slate-800">+{isTaskBoosterActive ? prize.coins * 12 : prize.coins} Coins added to wallet</span>
+                                <span className="text-[13px] font-bold text-slate-800">+{prize.coins} Coins added to wallet</span>
                             </div>
-                            {isTaskBoosterActive && (
-                                <span className="text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded border border-sky-100 uppercase">3X Boost Applied</span>
-                            )}
                         </div>
                     )}
                     {prize?.cash > 0 && (

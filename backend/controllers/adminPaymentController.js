@@ -63,17 +63,17 @@ exports.updatePaymentStatus = async (req, res) => {
 
                     const expiryDate = new Date();
                     if (isSupport) {
-                        expiryDate.setDate(expiryDate.getDate() + 30); // Fallback: Event Booster expires when event ends or weekly reset
+                        expiryDate.setDate(expiryDate.getDate() + 30);
                         user.isSupportBoosterActive = true;
                         user.supportBoosterExpiry = expiryDate;
-                        user.isTaskBoosterActive = false;
+                        // Keep Task Booster if already active
                     } else {
-                        expiryDate.setHours(expiryDate.getHours() + 24); // 24 Hours validity for ₹49 Power Booster
+                        expiryDate.setHours(expiryDate.getHours() + 24);
                         user.isTaskBoosterActive = true;
                         user.taskBoosterExpiry = expiryDate;
-                        user.isSupportBoosterActive = false;
+                        // Keep Support Booster if already active
                     }
-                    user.isBoosterActive = true;
+                    user.isBoosterActive = !!(user.isSupportBoosterActive || user.isTaskBoosterActive);
                     user.boosterExpiry = expiryDate;
                     
                     user.notifications = user.notifications || [];

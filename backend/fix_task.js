@@ -1,17 +1,19 @@
 const mongoose = require('mongoose');
 const AdminBooster = require('./models/Booster');
-require('dotenv').config({path: './.env'});
+require('dotenv').config({ path: './.env' });
 
 mongoose.connect(process.env.MONGO_URI).then(async () => {
-    await AdminBooster.findOneAndUpdate(
+    // Remove Watch & Earn from Task Booster unless admin re-enables it in Marketing
+    const result = await AdminBooster.updateOne(
         { type: 'task' },
-        { 
-            $set: { 
-                applicableTasks: ['General Tasks', 'Task Quiz', 'Speed Tapper', 'Standard Quiz', 'Memory Master', 'Lucky Draw', 'Scratch Card', 'Treasure Chest', 'Watch & Earn', 'Contests']
-            }
-        },
-        { upsert: true, new: true }
+        { $pull: { applicableTasks: { $in: ['Watch & Earn', 'Watch and Earn', 'Watch'] } } }
     );
-    console.log("Updated task booster applicableTasks with all 10.");
+
+    const task = await AdminBooster.findOne({ type: 'task' });
+    console.log('Pull modified:', result.modifiedCount);
+    console.log('Task booster applicableTasks now:', task?.applicableTasks);
     process.exit(0);
-}).catch(console.error);
+}).catch((err) => {
+    console.error(err);
+    process.exit(1);
+});

@@ -352,7 +352,12 @@ const Earn = () => {
                                             }
                                         };
                                         const taskOptionName = getTaskOptionName(task.type);
-                                        const apply3x = isTaskBoosterActive && task.type !== 'Video' && task.type !== 'Watch' && (!boostersConfig?.task?.length || boostersConfig.task.includes(taskOptionName));
+                                        const isWatchTask = task.type === 'Video' || task.type === 'Watch';
+                                        const watchEnabledByAdmin = Array.isArray(boostersConfig?.task) &&
+                                            boostersConfig.task.some((t) => String(t).toLowerCase().includes('watch'));
+                                        const apply3x = isTaskBoosterActive &&
+                                            (!isWatchTask || watchEnabledByAdmin) &&
+                                            (!boostersConfig?.task?.length || boostersConfig.task.includes(taskOptionName));
                                         const baseCoins = task.coinsReward || task.reward || 0;
                                         const displayCoins = apply3x ? baseCoins * taskMultiplier : baseCoins;
 
@@ -416,11 +421,11 @@ const Earn = () => {
                                 <ChevronDown size={18} />
                             </button>
                             <button
-                                onClick={() => !(userData.isTaskBoosterActive || userData.isSupportBoosterActive) && setIsPaymentOpen(true)}
-                                disabled={userData.isTaskBoosterActive || userData.isSupportBoosterActive}
-                                className={`${(userData.isTaskBoosterActive || userData.isSupportBoosterActive) ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md'} px-4 py-2 rounded-xl text-[11px] font-medium tracking-tight active:scale-95 transition-all`}
+                                onClick={() => !userData.isTaskBoosterActive && setIsPaymentOpen(true)}
+                                disabled={userData.isTaskBoosterActive}
+                                className={`${userData.isTaskBoosterActive ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md'} px-4 py-2 rounded-xl text-[11px] font-medium tracking-tight active:scale-95 transition-all`}
                             >
-                                {(userData.isTaskBoosterActive || userData.isSupportBoosterActive) ? 'Already Bought' : 'Buy Now'}
+                                {userData.isTaskBoosterActive ? 'Already Active' : 'Buy Now'}
                             </button>
                         </div>
                     </div>

@@ -179,19 +179,20 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
             const expiryDate = new Date();
 
             if (payment.paymentType === 'SUPPORT_BOOSTER') {
-                expiryDate.setDate(expiryDate.getDate() + 30); // Support booster legacy fallback, but event reset clears it
+                // Event Support Kit — valid until used in one event (fallback 30 days)
+                expiryDate.setDate(expiryDate.getDate() + 30);
                 user.isSupportBoosterActive = true;
                 user.supportBoosterExpiry = expiryDate;
-                user.isTaskBoosterActive = false;
+                // Do NOT deactivate Task Booster — both can be active
             } else {
-                expiryDate.setHours(expiryDate.getHours() + 24); // 24 Hours validity for ₹49 Power Booster
+                expiryDate.setHours(expiryDate.getHours() + 24);
                 user.isTaskBoosterActive = true;
                 user.taskBoosterExpiry = expiryDate;
-                user.isSupportBoosterActive = false;
+                // Do NOT deactivate Support Booster
             }
 
-            // Legacy support
-            user.isBoosterActive = true;
+            // Legacy flag mirrors whichever booster is active
+            user.isBoosterActive = !!(user.isSupportBoosterActive || user.isTaskBoosterActive);
             user.boosterExpiry = expiryDate;
             
             await user.save();

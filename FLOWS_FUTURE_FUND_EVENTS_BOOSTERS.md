@@ -150,20 +150,30 @@ Winners get money/coins in wallet as per admin action.
 ### Option A — Bulk distribute (recommended)
 Admin stops event → **Distribute Prizes**:
 
-Typical split of pool:
-- **50%** → Top 3 winners  
+Typical split of **Total Event Pool** (admin field `totalCashPoolINR`, or derived from fees):
+- **50%** → Top winners prize fund  
 - **20%** → Admin / platform  
 - **30%** → Cashback shared among other participants  
 
-Top 3 ranking:
+Top ranking:
 1. Higher score wins  
 2. If score same → faster time wins  
 
-Top 3 prize share of the 50% pool:
+Top prize share of the **50% prize fund** (weights re-normalized if fewer than 3 winners):
 - 1st → 50%  
 - 2nd → 30%  
 - 3rd → 20%  
 
+**Examples (pool ₹200):**
+- 3 winners → 1st ₹50, 2nd ₹30, 3rd ₹20  
+- 1 winner only → 1st gets full prize fund ₹100  
+- 2 winners → shares normalized from 50:30  
+
+**Examples (pool ₹100):**
+- 3 winners → 1st ₹25, 2nd ₹15, 3rd ₹10  
+- 1 winner only → 1st ₹50  
+
+If `totalCashPoolINR` is 0, pool = participants × entry fee × coin rate.
 ### Option B — Manual award
 Admin opens participants list and marks a user as **Awarded** with a prize amount/text.
 
@@ -259,9 +269,10 @@ Coin rewards become multiplied for allowed tasks/ads
 (Example: 1 coin task can become **12 coins** if 12x is configured)
 
 Usually applies to:
-- Daily tasks (as allowed by admin list)  
-- Some watch/ad rewards  
+- Daily tasks (as allowed by admin `applicableTasks` list)  
+- **Watch & Earn / ads only if Admin checks “Watch & Earn”** on the Task Booster in Marketing  
 
+Default Task Booster does **not** include Watch & Earn.
 ### Expiry
 About **24 hours** from activation.
 

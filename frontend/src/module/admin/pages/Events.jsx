@@ -282,6 +282,13 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast, onRefr
                                 ) : (
                                     <p className="text-sm font-bold text-sky-600 font-['Poppins']">₹{event.totalCashPoolINR || 0}</p>
                                 )}
+                                {(isEditing ? editData.totalCashPoolINR : event.totalCashPoolINR) > 0 && (
+                                    <p className="text-[8px] text-slate-400 mt-1 leading-snug">
+                                        Prize fund 50% = ₹{(((isEditing ? editData.totalCashPoolINR : event.totalCashPoolINR) || 0) * 0.5).toFixed(0)}
+                                        {' '}· 1st (of 3) ≈ ₹{(((isEditing ? editData.totalCashPoolINR : event.totalCashPoolINR) || 0) * 0.25).toFixed(0)}
+                                        {' '}· sole winner ≈ ₹{(((isEditing ? editData.totalCashPoolINR : event.totalCashPoolINR) || 0) * 0.5).toFixed(0)}
+                                    </p>
+                                )}
                             </div>
                         </div>
 

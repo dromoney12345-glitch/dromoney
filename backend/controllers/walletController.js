@@ -49,6 +49,7 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
     const mongoose = require('mongoose');
 
     let task = null;
+    let isEventReward = false;
 
     // Check if already completed
     if (taskId) {
@@ -60,6 +61,7 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
                 const Event = require('../models/Event');
                 const event = await Event.findById(taskId);
                 if (event) {
+                    isEventReward = true;
                     const EventParticipant = require('../models/EventParticipant');
                     const todayDate = new Date();
                     todayDate.setHours(0, 0, 0, 0);
@@ -99,7 +101,7 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
                     return next(new ErrorResponse('Task already completed', 400));
                 }
             }
-        } else {
+        } else if (!isEventReward) {
             // It's a mock task from frontend (e.g., id "1", "2", "3"). Treat as daily task.
             const settings = await Settings.findOne() || {};
             const lastRenewalTick = getLastRenewalTick(settings);
@@ -114,42 +116,61 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         }
     }
 
-    // Booster logic
+    // ₹49 Task Booster — NEVER on events. Only on tasks listed in admin applicableTasks.
+    // Watch & Earn / ads only if admin explicitly added "Watch & Earn" (or similar).
     let factor = 1;
-    const isWatchTask = task && (task.type === 'Video' || task.type === 'Watch') || (source && source.toLowerCase().includes('ad'));
-    if (user.isBoosterActive || user.isTaskBoosterActive) {
+    const sourceLower = (source || '').toLowerCase();
+    const looksLikeEventPrize =
+        isEventReward ||
+        sourceLower.includes('event') ||
+        sourceLower.includes('quiz prize') ||
+        sourceLower.includes('lucky draw') ||
+        sourceLower.includes('gold production') ||
+        sourceLower.includes('memory master victory');
+
+    if (!looksLikeEventPrize && user.isTaskBoosterActive) {
         const Booster = mongoose.models.Booster || require('../models/Booster');
         const taskBooster = await Booster.findOne({ type: 'task' });
 
-        let isApplicable = true;
-        if (taskBooster && taskBooster.applicableTasks && taskBooster.applicableTasks.length > 0) {
-            const allowed = taskBooster.applicableTasks.map(t => t.toLowerCase());
-            const s = (source || '').toLowerCase();
+        let isApplicable = false;
+        const allowed = (taskBooster?.applicableTasks || []).map((t) => String(t).toLowerCase());
 
-            // Check source string for mini-game names
-            const matchesSource = allowed.some(t => s.includes(t));
-
-            // Check task type if available
+        if (allowed.length === 0) {
+            // No admin list → apply only to non-video general tasks
+            isApplicable = task && task.type !== 'Video' && task.type !== 'Watch';
+        } else {
+            const matchesSource = allowed.some((t) => sourceLower.includes(t));
             const matchesTaskType = task && task.type && allowed.includes(task.type.toLowerCase());
+            const isGeneralTask =
+                allowed.includes('general tasks') &&
+                task &&
+                !['speed tapper', 'memory master', 'quiz', 'lucky draw', 'treasure chest', 'scratch card', 'video', 'watch'].includes(
+                    (task.type || '').toLowerCase()
+                );
 
-            // Check General Tasks
-            const isGeneralTask = allowed.includes('general tasks') && task && !['speed tapper', 'memory master', 'quiz', 'lucky draw', 'treasure chest', 'scratch card'].some(gt => s.includes(gt) || (task.type && task.type.toLowerCase() === gt));
-            
-            // Allow if it's an ad and user has booster
-            const isAd = s.includes('ad') || isWatchTask;
+            const isWatchOrAd =
+                (task && (task.type === 'Video' || task.type === 'Watch')) ||
+                sourceLower.includes('ad') ||
+                sourceLower.includes('watch');
+            const watchAllowed =
+                allowed.some((t) => t.includes('watch')) ||
+                allowed.includes('watch & earn') ||
+                allowed.includes('watch and earn');
 
-            if (!matchesSource && !matchesTaskType && !isGeneralTask && !isAd) {
-                isApplicable = false;
+            if (isWatchOrAd) {
+                isApplicable = watchAllowed;
+            } else {
+                isApplicable = matchesSource || matchesTaskType || isGeneralTask;
             }
         }
 
         if (isApplicable) {
-            factor = 12; // default
-            if (taskBooster && taskBooster.benefits) {
+            factor = 12;
+            if (taskBooster?.benefits) {
                 for (const b of taskBooster.benefits) {
-                    const match = b.match(/(\d+)x/i);
+                    const match = String(b).match(/(\d+)x/i);
                     if (match) {
-                        factor = parseInt(match[1]);
+                        factor = parseInt(match[1], 10);
                         break;
                     }
                 }

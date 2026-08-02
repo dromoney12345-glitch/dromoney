@@ -598,17 +598,15 @@ const Home = () => {
                             </div>
                             <div className="flex flex-col items-end gap-2 shrink-0">
                                 <button
-                                    onClick={() => !isSupportBoosterActive && !isTaskBoosterActive && handleBuy(boosters.support.title, boosters.support.price)}
-                                    disabled={isSupportBoosterActive || isTaskBoosterActive}
+                                    onClick={() => !isSupportBoosterActive && handleBuy(boosters.support.title, boosters.support.price)}
+                                    disabled={isSupportBoosterActive}
                                     className={`${
                                         isSupportBoosterActive
                                             ? 'bg-emerald-100 text-emerald-600 cursor-not-allowed shadow-none border border-emerald-200'
-                                            : isTaskBoosterActive
-                                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed shadow-none'
                                             : 'bg-[#10B981] text-white hover:bg-[#059669] shadow-lg shadow-emerald-500/30'
                                     } px-4 py-2 rounded-xl text-[10px] font-medium tracking-tight active:scale-95 transition-all`}
                                 >
-                                    {isSupportBoosterActive ? '✓ Active' : isTaskBoosterActive ? 'Locked' : 'Get Kit'}
+                                    {isSupportBoosterActive ? '✓ Active' : 'Get Kit'}
                                 </button>
                                 <button onClick={() => setIsSupportExpanded(!isSupportExpanded)} className="text-amber-500 flex items-center gap-1 active:scale-95 transition-all">
                                     <span className="text-[9px] font-medium uppercase tracking-widest">{isSupportExpanded ? 'Less Info' : 'More Info'}</span>
@@ -622,7 +620,7 @@ const Home = () => {
                                 <ul className="space-y-1.5 border-t border-amber-100 pt-3">
                                     {(boosters.support.benefits && boosters.support.benefits.length > 0 
                                         ? boosters.support.benefits 
-                                        : ['Extra 3 Seconds in Games', 'Guided Assistance in Events', 'Priority Event Access']
+                                        : ['Extra 3 Seconds in Games', 'Guided Assistance in Events', 'Valid for 1 event (auto-expires after use)']
                                     ).map((benefit, i) => (
                                         <li key={i} className="flex items-center gap-2">
                                             <div className="w-3 h-3 bg-amber-100 rounded-full flex items-center justify-center shrink-0">
@@ -664,17 +662,15 @@ const Home = () => {
                             </div>
                             <div className="flex flex-col items-end gap-2 shrink-0">
                                 <button
-                                    onClick={() => !isTaskBoosterActive && !isSupportBoosterActive && handleBuy(boosters.task.title, boosters.task.price)}
-                                    disabled={isTaskBoosterActive || isSupportBoosterActive}
+                                    onClick={() => !isTaskBoosterActive && handleBuy(boosters.task.title, boosters.task.price)}
+                                    disabled={isTaskBoosterActive}
                                     className={`${
                                         isTaskBoosterActive
                                             ? 'bg-sky-100 text-sky-600 cursor-not-allowed shadow-none border border-sky-200'
-                                            : isSupportBoosterActive
-                                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed shadow-none'
                                             : 'bg-sky-500 hover:bg-sky-600 text-white shadow-lg shadow-sky-500/30'
                                     } px-4 py-2 rounded-xl text-[10px] font-medium uppercase tracking-tight active:scale-95 transition-all`}
                                 >
-                                    {isTaskBoosterActive ? '✓ Active' : isSupportBoosterActive ? 'Locked' : 'Get Pass'}
+                                    {isTaskBoosterActive ? '✓ Active' : 'Get Pass'}
                                 </button>
                                 <button onClick={() => setIsTaskExpanded(!isTaskExpanded)} className="text-sky-500 flex items-center gap-1 active:scale-95 transition-all">
                                     <span className="text-[9px] font-medium uppercase tracking-widest">{isTaskExpanded ? 'Less Info' : 'More Info'}</span>

@@ -24,7 +24,7 @@ const DEFAULT_CARDS = [
 const MemoryMasterView = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { userData, addCoins, addNotification, boostersConfig } = useUser();
+    const { userData, addCoins, addNotification, boostersConfig, refreshUserProfile } = useUser();
 
     const [loading, setLoading] = useState(true);
     const isTaskBoosterActive = userData?.isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes('Memory Master'));
@@ -175,6 +175,10 @@ const MemoryMasterView = () => {
                         result: `${timeLeft}s remaining`,
                         prize: `${reward} Coins`,
                         timeTaken: maxTime - timeLeft
+                    }).then(async (res) => {
+                        if (res?.supportBoosterConsumed && refreshUserProfile) {
+                            await refreshUserProfile(false);
+                        }
                     }).catch(err => console.error("Failed to save event submission:", err));
                 }
             }
@@ -404,12 +408,12 @@ const MemoryMasterView = () => {
                             <div className="flex items-center justify-center gap-1.5">
                                 <Coins size={14} className="text-amber-400" />
                                 <p className="text-2xl font-medium text-white">
-                                    +{isTaskBoosterActive ? taskReward * 12 : taskReward}
+                                    +{(!isEvent && isTaskBoosterActive) ? taskReward * 12 : taskReward}
                                 </p>
                             </div>
-                            {isTaskBoosterActive && (
+                            {!isEvent && isTaskBoosterActive && (
                                 <span className="block text-center mt-1 text-[8px] font-bold text-sky-400 bg-sky-400/10 border border-sky-400/20 px-1 py-0.5 rounded uppercase">
-                                    3X Boost Applied
+                                    Boost Applied
                                 </span>
                             )}
                         </div>
