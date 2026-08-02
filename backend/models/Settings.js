@@ -97,6 +97,7 @@ const SettingsSchema = new mongoose.Schema({
     // Future Fund Rules & Targets
     futureFundSalesTarget: { type: Number, default: 10 },
     futureFundDaysTarget: { type: Number, default: 7 },
+    futureFundActivityMinutes: { type: Number, default: 15 },
     futureFundDailyTasksTarget: { type: Number, default: 10 },
     futureFundWatchAdTarget: { type: Number, default: 5 },
     futureFundEventsTarget: { type: Number, default: 3 },

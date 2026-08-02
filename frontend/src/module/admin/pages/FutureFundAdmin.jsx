@@ -127,7 +127,7 @@ const FutureFundAdmin = () => {
                     setRules({
                         targetSales: Number(res.data.futureFundSalesTarget) || 10,
                         targetDays: Number(res.data.futureFundDaysTarget) || 7,
-                        dailyTargetMinutes: 15,
+                        dailyTargetMinutes: Number(res.data.futureFundActivityMinutes) || 15,
                         futureFundDailyTasksTarget: Number(res.data.futureFundDailyTasksTarget) || 10,
                         futureFundWatchAdTarget: Number(res.data.futureFundWatchAdTarget) || 5,
                         futureFundEventsTarget: Number(res.data.futureFundEventsTarget) || 3,
@@ -153,6 +153,7 @@ const FutureFundAdmin = () => {
             const res = await api.put('/admin/settings', {
                 futureFundSalesTarget: Number(rules.targetSales),
                 futureFundDaysTarget: Number(rules.targetDays),
+                futureFundActivityMinutes: Number(rules.dailyTargetMinutes),
                 futureFundDailyTasksTarget: Number(rules.futureFundDailyTasksTarget),
                 futureFundWatchAdTarget: Number(rules.futureFundWatchAdTarget),
                 futureFundEventsTarget: Number(rules.futureFundEventsTarget),

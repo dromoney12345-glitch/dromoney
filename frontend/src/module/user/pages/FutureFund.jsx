@@ -1,113 +1,127 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, TrendingUp, CheckCircle2, Timer, Calendar, ShieldCheck, Sparkles, Coins, Loader2, Play } from 'lucide-react';
+import {
+    ChevronLeft, TrendingUp, CheckCircle2, Timer, Calendar,
+    Sparkles, Loader2, Users, Info
+} from 'lucide-react';
 import { useUser } from '../context/UserContext';
-import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
 import UnlockModal from '../components/UnlockModal';
 
 const FutureFund = () => {
     const navigate = useNavigate();
-    const { userData, addNotification } = useUser();
-    const { futureFund } = userData;
-    const [viewState, setViewState] = useState(futureFund.status === 'active' ? 'active' : 'initial'); // initial, active
-    const [loadingSettings, setLoadingSettings] = useState(true);
+    const { userData, addNotification, refreshUserProfile } = useUser();
+    const [viewState, setViewState] = useState('initial');
+    const [loading, setLoading] = useState(true);
+    const [unlocking, setUnlocking] = useState(false);
+    const [ffStatus, setFfStatus] = useState(null);
     const [settings, setSettings] = useState({
         futureFundDailyTasksTarget: 10,
         futureFundWatchAdTarget: 5,
         futureFundEventsTarget: 3,
-        futureFundBoostersTarget: 1
+        futureFundBoostersTarget: 1,
     });
 
-    if (!userData?.isPaid) {
-        return (
-            <div className="min-h-screen bg-[#f8fafc] font-poppins">
-                <UnlockModal isOpen={true} onClose={() => navigate('/user/income')} />
-            </div>
-        );
-    }
-
-    // Fetch dynamic settings from admin panel
-    useEffect(() => {
-        const fetchSettings = async () => {
-            try {
-                const res = await api.get('/public/settings');
-                if (res.success && res.data) {
-                    setSettings({
-                        futureFundDailyTasksTarget: Number(res.data.futureFundDailyTasksTarget) || 10,
-                        futureFundWatchAdTarget: Number(res.data.futureFundWatchAdTarget) || 5,
-                        futureFundEventsTarget: Number(res.data.futureFundEventsTarget) || 3,
-                        futureFundBoostersTarget: Number(res.data.futureFundBoostersTarget) || 1
-                    });
-                }
-            } catch (err) {
-                console.error("FF settings fetch error:", err);
-            } finally {
-                setLoadingSettings(false);
-            }
-        };
-        fetchSettings();
-    }, []);
-
-    // Calculate user activity counts dynamically
-    const completedTasksCount = useMemo(() => {
-        return taskStorage.getCompletedTasks().length;
-    }, []);
-
-    const watchedAdsCount = userData.watchedAdsCount || 0;
-
-    const eventsJoinedCount = useMemo(() => {
+    const loadStatus = useCallback(async () => {
         try {
-            const joined = JSON.parse(localStorage.getItem('dromoney_joined_events') || '[]');
-            return Array.isArray(joined) ? joined.length : 1;
-        } catch (e) {
-            return 1;
+            const [statusRes, settingsRes] = await Promise.all([
+                api.get('/user/data/future-fund/status'),
+                api.get('/public/settings'),
+            ]);
+
+            if (statusRes.success) {
+                setFfStatus(statusRes.data);
+                if (statusRes.data.status === 'active') {
+                    setViewState('active');
+                }
+            }
+
+            if (settingsRes.success && settingsRes.data) {
+                setSettings({
+                    futureFundDailyTasksTarget: Number(settingsRes.data.futureFundDailyTasksTarget) || 10,
+                    futureFundWatchAdTarget: Number(settingsRes.data.futureFundWatchAdTarget) || 5,
+                    futureFundEventsTarget: Number(settingsRes.data.futureFundEventsTarget) || 3,
+                    futureFundBoostersTarget: Number(settingsRes.data.futureFundBoostersTarget) || 1,
+                });
+            }
+        } catch (err) {
+            console.error('FF status fetch error:', err);
+        } finally {
+            setLoading(false);
         }
     }, []);
 
-    const isBoosterActiveCount = userData.isBoosterActive ? 1 : 0;
+    useEffect(() => {
+        loadStatus();
+        const t = setInterval(loadStatus, 60 * 1000);
+        return () => clearInterval(t);
+    }, [loadStatus]);
 
-    // Check eligibility status
-    const isTasksEligible = completedTasksCount >= settings.futureFundDailyTasksTarget;
-    const isAdsEligible = watchedAdsCount >= settings.futureFundWatchAdTarget;
-    const isEventsEligible = eventsJoinedCount >= settings.futureFundEventsTarget;
-    const isBoostersEligible = isBoosterActiveCount >= settings.futureFundBoostersTarget;
+    // Today's activity metrics (post-activation dashboard)
+    const completedTasksCount = useMemo(() => {
+        const since = new Date();
+        since.setHours(0, 0, 0, 0);
+        return (userData.dailyTaskCompletions || []).filter(
+            (c) => new Date(c.completedAt) >= since
+        ).length;
+    }, [userData.dailyTaskCompletions]);
 
-    // Previous Future Fund Criteria
-    const salesCriterion = futureFund.criteria?.find(c => c.id === 1) || { current: 0, target: 10 };
-    const activityCriterion = futureFund.criteria?.find(c => c.id === 2) || { current: 0, target: 15 };
-    const daysCriterion = futureFund.criteria?.find(c => c.id === 3) || { current: 0, target: 7 };
+    const watchedAdsCount = userData.watchedAdsCount || userData.todayRewardCount || 0;
+    const isBoosterActiveCount =
+        userData.isBoosterActive || userData.isTaskBoosterActive || userData.isSupportBoosterActive
+            ? 1
+            : 0;
 
-    const isEligible = salesCriterion.current >= salesCriterion.target && 
-                       activityCriterion.current >= activityCriterion.target && 
-                       daysCriterion.current >= daysCriterion.target;
+    const [eventsJoinedCount, setEventsJoinedCount] = useState(0);
+    useEffect(() => {
+        try {
+            const joined = JSON.parse(localStorage.getItem('dromoney_joined_events') || '[]');
+            setEventsJoinedCount(Array.isArray(joined) ? joined.length : 0);
+        } catch {
+            setEventsJoinedCount(0);
+        }
+    }, []);
 
-    // Calculate overall progress for initial state
-    const overallProgress = useMemo(() => {
-        const p1 = Math.min((salesCriterion.current / Math.max(1, salesCriterion.target)) * 100, 100) || 0;
-        const p2 = Math.min((activityCriterion.current / Math.max(1, activityCriterion.target)) * 100, 100) || 0;
-        const p3 = Math.min((daysCriterion.current / Math.max(1, daysCriterion.target)) * 100, 100) || 0;
-        
-        return Math.floor((p1 + p2 + p3) / 3);
-    }, [salesCriterion, activityCriterion, daysCriterion]);
+    const salesCriterion = ffStatus?.criteria?.find((c) => c.id === 1) || {
+        current: 0,
+        target: ffStatus?.targets?.salesTarget || 10,
+        completed: false,
+        description: '',
+    };
+    const activityCriterion = ffStatus?.criteria?.find((c) => c.id === 2) || {
+        current: 0,
+        target: ffStatus?.targets?.activityMinutesTarget || 15,
+        completed: false,
+        description: '',
+    };
+    const daysCriterion = ffStatus?.criteria?.find((c) => c.id === 3) || {
+        current: 0,
+        target: ffStatus?.targets?.daysTarget || 7,
+        completed: false,
+        description: '',
+    };
 
-    // ── Real earnings data computed from DB transactions ──
+    const isEligible = !!ffStatus?.eligible;
+    const overallProgress = ffStatus?.progress || 0;
+    const minsTarget = ffStatus?.targets?.activityMinutesTarget || 15;
+
     const realEarningsData = useMemo(() => {
         const transactions = userData.wallet?.transactions || [];
-
         const now = new Date();
         const todayStart = new Date(now);
         todayStart.setHours(0, 0, 0, 0);
 
+        const isFfTx = (tx) =>
+            tx.type === 'credit' &&
+            tx.status === 'Success' &&
+            String(tx.source || tx.title || '').toLowerCase().includes('future fund');
+
         const todayFF = transactions
-            .filter(tx => {
-                const txDate = new Date(tx.createdAt);
-                return tx.type === 'credit' && tx.status === 'Success' && txDate >= todayStart;
-            })
+            .filter((tx) => isFfTx(tx) && new Date(tx.createdAt || tx.date) >= todayStart)
             .reduce((sum, tx) => sum + (tx.amount || 0), 0);
 
         const totalFF = transactions
-            .filter(tx => tx.type === 'credit' && tx.status === 'Success')
+            .filter((tx) => isFfTx(tx))
             .reduce((sum, tx) => sum + (tx.amount || 0), 0);
 
         const last7Days = [];
@@ -115,14 +129,13 @@ const FutureFund = () => {
             const dayStart = new Date(now);
             dayStart.setDate(dayStart.getDate() - i);
             dayStart.setHours(0, 0, 0, 0);
-
             const dayEnd = new Date(dayStart);
             dayEnd.setHours(23, 59, 59, 999);
 
             const dayTotal = transactions
-                .filter(tx => {
-                    const txDate = new Date(tx.createdAt);
-                    return tx.type === 'credit' && tx.status === 'Success' && txDate >= dayStart && txDate <= dayEnd;
+                .filter((tx) => {
+                    const txDate = new Date(tx.createdAt || tx.date);
+                    return isFfTx(tx) && txDate >= dayStart && txDate <= dayEnd;
                 })
                 .reduce((sum, tx) => sum + (tx.amount || 0), 0);
 
@@ -133,21 +146,36 @@ const FutureFund = () => {
         return { todayFF: todayFF.toFixed(2), totalFF: totalFF.toFixed(2), last7Days };
     }, [userData.wallet?.transactions]);
 
-    // Handle forward unlock / simulation
     const handleMoveForward = async () => {
-        // Instant visual feedback and transition
-        setViewState('active');
-        addNotification("Success!", "Future Fund activated!", "success");
-        
+        if (!isEligible || unlocking) return;
+        setUnlocking(true);
         try {
-            // Asynchronously notify backend of activation
-            await api.post('/user/data/future-fund/unlock');
+            const res = await api.post('/user/data/future-fund/unlock');
+            if (res.success) {
+                setViewState('active');
+                addNotification('Success!', 'Future Fund activated!', 'success');
+                await refreshUserProfile?.(false);
+                await loadStatus();
+            } else {
+                addNotification('Not ready', res.message || 'Complete all criteria first', 'error');
+            }
         } catch (err) {
-            console.log("Async FF unlock handled:", err);
+            addNotification('Not ready', err.message || 'Complete all criteria first', 'error');
+            await loadStatus();
+        } finally {
+            setUnlocking(false);
         }
     };
 
-    if (loadingSettings) {
+    if (!userData?.isPaid) {
+        return (
+            <div className="min-h-screen bg-[#f8fafc] font-poppins">
+                <UnlockModal isOpen={true} onClose={() => navigate('/user/income')} />
+            </div>
+        );
+    }
+
+    if (loading) {
         return (
             <div className="p-8 text-center text-slate-800 min-h-screen bg-slate-50 flex flex-col items-center justify-center font-medium tracking-wider gap-3">
                 <Loader2 className="animate-spin text-blue-600 w-10 h-10" />
@@ -158,11 +186,10 @@ const FutureFund = () => {
 
     if (viewState === 'active') {
         return (
-            <div className="flex flex-col min-h-screen bg-[#F8FAFC] animate-in slide-in-from-right duration-500 pb-12 font-poppins selection:bg-blue-100">
-                {/* ── Compact Header ── */}
+            <div className="flex flex-col min-h-screen bg-[#F8FAFC] animate-in slide-in-from-right duration-500 pb-12 font-poppins">
                 <div className="p-3 bg-white border-b border-slate-100 flex items-center justify-between sticky top-0 z-40 shadow-sm gap-2">
                     <div className="flex items-center gap-2 min-w-0">
-                        <button onClick={() => setViewState('initial')} className="text-slate-600 active:scale-90 transition-all shrink-0">
+                        <button type="button" onClick={() => setViewState('initial')} className="text-slate-600 active:scale-90 transition-all shrink-0">
                             <ChevronLeft size={22} strokeWidth={2.5} />
                         </button>
                         <h1 className="text-[13px] sm:text-[14px] font-medium text-slate-800 tracking-tight uppercase truncate">Future Fund Active</h1>
@@ -171,7 +198,6 @@ const FutureFund = () => {
                 </div>
 
                 <div className="p-3 space-y-2.5 max-w-md mx-auto w-full">
-                    {/* Compact Congratulations Banner */}
                     <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-2.5 flex items-center gap-2.5 shadow-sm">
                         <span className="text-xl shrink-0">🎉</span>
                         <div>
@@ -180,28 +206,19 @@ const FutureFund = () => {
                         </div>
                     </div>
 
-                    {/* Compact Side-by-Side Earnings Row */}
                     <div className="grid grid-cols-2 gap-2.5">
-                        {/* Today's Earning Box */}
-                        <div className="bg-white border border-slate-100 rounded-xl p-3 shadow-sm flex flex-col justify-between">
+                        <div className="bg-white border border-slate-100 rounded-xl p-3 shadow-sm">
                             <p className="text-[8.5px] font-medium text-slate-400 uppercase tracking-wider mb-1.5">Today FF Earning</p>
-                            <div>
-                                <h2 className="text-xl font-medium text-slate-800 leading-none">₹{realEarningsData.todayFF}</h2>
-                                <p className="text-[8px] font-medium text-slate-400 mt-1">Auto-credit to wallet</p>
-                            </div>
+                            <h2 className="text-xl font-medium text-slate-800 leading-none">₹{realEarningsData.todayFF}</h2>
+                            <p className="text-[8px] font-medium text-slate-400 mt-1">Auto-credit to wallet</p>
                         </div>
-
-                        {/* Total Future Fund */}
-                        <div className="bg-white border border-slate-100 rounded-xl p-3 shadow-sm flex flex-col justify-between">
+                        <div className="bg-white border border-slate-100 rounded-xl p-3 shadow-sm">
                             <p className="text-[8.5px] font-medium text-slate-400 uppercase tracking-wider mb-1.5">Total Future Fund</p>
-                            <div>
-                                <h2 className="text-xl font-medium text-blue-600 leading-none">₹{realEarningsData.totalFF}</h2>
-                                <p className="text-[8px] font-medium text-slate-400 mt-1">Based on performance</p>
-                            </div>
+                            <h2 className="text-xl font-medium text-blue-600 leading-none">₹{realEarningsData.totalFF}</h2>
+                            <p className="text-[8px] font-medium text-slate-400 mt-1">Based on performance</p>
                         </div>
                     </div>
 
-                    {/* Compact Last 7 Days Earnings */}
                     <div className="bg-white border border-slate-100 rounded-xl overflow-hidden shadow-sm">
                         <div className="px-3 py-2 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
                             <h4 className="text-[8.5px] font-medium text-slate-600 uppercase tracking-widest">Last 7 Days Earnings</h4>
@@ -217,109 +234,104 @@ const FutureFund = () => {
                         </div>
                     </div>
 
-                    {/* Today's Activity Section (Extremely Compact, Clean, and Dynamic) */}
                     <div className="bg-white border border-slate-100 rounded-xl p-3 shadow-sm space-y-2.5">
                         <div className="flex items-center justify-between border-b border-slate-50 pb-1.5">
                             <h4 className="text-[10px] font-medium text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                                 <Timer size={12} className="text-blue-500" />
-                                Today's Activity Progress
+                                Today&apos;s Activity Progress
                             </h4>
-                            <span className="text-[8px] font-medium text-slate-400 uppercase tracking-widest">Dynamic</span>
                         </div>
 
-                        {/* Progress Item 1: Daily Tasks */}
-                        <div className="space-y-1">
-                            <div className="flex justify-between items-center text-[10px] font-medium text-slate-600">
-                                <span className="text-slate-800">Daily Tasks Activity</span>
-                                <span className="font-medium text-blue-600">
-                                    {completedTasksCount} / {settings.futureFundDailyTasksTarget}
-                                </span>
+                        {[
+                            { label: 'Daily Tasks', current: completedTasksCount, target: settings.futureFundDailyTasksTarget, color: 'bg-blue-500', text: 'text-blue-600' },
+                            { label: 'Watch Ads', current: watchedAdsCount, target: settings.futureFundWatchAdTarget, color: 'bg-emerald-500', text: 'text-emerald-600' },
+                            { label: 'Events Joined', current: eventsJoinedCount, target: settings.futureFundEventsTarget, color: 'bg-amber-500', text: 'text-amber-600' },
+                            { label: 'Boosters Active', current: isBoosterActiveCount, target: settings.futureFundBoostersTarget, color: 'bg-rose-500', text: 'text-rose-500' },
+                        ].map((row) => (
+                            <div key={row.label} className="space-y-1">
+                                <div className="flex justify-between items-center text-[10px] font-medium text-slate-600">
+                                    <span className="text-slate-800">{row.label}</span>
+                                    <span className={`font-medium ${row.text}`}>{row.current} / {row.target}</span>
+                                </div>
+                                <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+                                    <div
+                                        className={`h-full ${row.color} rounded-full transition-all duration-700`}
+                                        style={{ width: `${Math.min((row.current / Math.max(row.target, 1)) * 100, 100)}%` }}
+                                    />
+                                </div>
                             </div>
-                            <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-                                <div 
-                                    className="h-full bg-blue-500 rounded-full shadow-sm transition-all duration-1000"
-                                    style={{ width: `${Math.min((completedTasksCount / settings.futureFundDailyTasksTarget) * 100, 100)}%` }}
-                                ></div>
-                            </div>
-                        </div>
-
-                        {/* Progress Item 2: Watch Ad Activity */}
-                        <div className="space-y-1">
-                            <div className="flex justify-between items-center text-[10px] font-medium text-slate-600">
-                                <span className="text-slate-800">Watch Ad Activity</span>
-                                <span className="font-medium text-emerald-600">
-                                    {watchedAdsCount} / {settings.futureFundWatchAdTarget}
-                                </span>
-                            </div>
-                            <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-                                <div 
-                                    className="h-full bg-emerald-500 rounded-full shadow-sm transition-all duration-1000"
-                                    style={{ width: `${Math.min((watchedAdsCount / settings.futureFundWatchAdTarget) * 100, 100)}%` }}
-                                ></div>
-                            </div>
-                        </div>
-
-                        {/* Progress Item 3: Events Joined */}
-                        <div className="space-y-1">
-                            <div className="flex justify-between items-center text-[10px] font-medium text-slate-600">
-                                <span className="text-slate-800">Events Joined</span>
-                                <span className="font-medium text-amber-600">
-                                    {eventsJoinedCount} / {settings.futureFundEventsTarget}
-                                </span>
-                            </div>
-                            <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-                                <div 
-                                    className="h-full bg-amber-500 rounded-full shadow-sm transition-all duration-1000"
-                                    style={{ width: `${Math.min((eventsJoinedCount / settings.futureFundEventsTarget) * 100, 100)}%` }}
-                                ></div>
-                            </div>
-                        </div>
-
-                        {/* Progress Item 4: Active Boosters */}
-                        <div className="space-y-1">
-                            <div className="flex justify-between items-center text-[10px] font-medium text-slate-600">
-                                <span className="text-slate-800">Boosters Active</span>
-                                <span className={`font-medium ${isBoosterActiveCount > 0 ? 'text-rose-500' : 'text-slate-400'}`}>
-                                    {isBoosterActiveCount} / {settings.futureFundBoostersTarget}
-                                </span>
-                            </div>
-                            <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-                                <div 
-                                    className={`h-full ${isBoosterActiveCount > 0 ? 'bg-rose-500' : 'bg-slate-300'} rounded-full shadow-sm transition-all duration-1000`}
-                                    style={{ width: `${Math.min((isBoosterActiveCount / settings.futureFundBoostersTarget) * 100, 100)}%` }}
-                                ></div>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </div>
         );
     }
 
+    const criteriaCards = [
+        {
+            key: 'sales',
+            title: 'Successful Sales',
+            subtitle: 'Paid referrals',
+            icon: Users,
+            iconBg: 'bg-emerald-50 border-emerald-100',
+            iconColor: 'text-emerald-600',
+            bar: 'bg-emerald-500',
+            current: salesCriterion.current,
+            target: salesCriterion.target,
+            completed: salesCriterion.completed,
+            display: `${salesCriterion.current}/${salesCriterion.target}`,
+            how: `Apne referral code se ${salesCriterion.target} logon ko platform unlock (paid) karwana hoga. Sirf register kaafi nahi — unka payment success hona chahiye.`,
+        },
+        {
+            key: 'activity',
+            title: 'Daily Activity',
+            subtitle: 'Minutes today',
+            icon: Timer,
+            iconBg: 'bg-amber-50 border-amber-100',
+            iconColor: 'text-amber-600',
+            bar: 'bg-amber-500',
+            current: activityCriterion.current,
+            target: activityCriterion.target,
+            completed: activityCriterion.completed,
+            display: `${activityCriterion.current}m/${activityCriterion.target}m`,
+            how: `App open rakhkar use karo — time auto count hota hai. Aaj ${minsTarget} minute complete hone par ye criteria green ho jayegi.`,
+        },
+        {
+            key: 'days',
+            title: 'Active Days',
+            subtitle: 'Continuity goal',
+            icon: Calendar,
+            iconBg: 'bg-blue-50 border-blue-100',
+            iconColor: 'text-blue-600',
+            bar: 'bg-blue-500',
+            current: daysCriterion.current,
+            target: daysCriterion.target,
+            completed: daysCriterion.completed,
+            display: `${daysCriterion.current}/${daysCriterion.target}`,
+            how: `Jis din aap ${minsTarget} minute activity complete karte ho, woh 1 Active Day ban jata hai. Total ${daysCriterion.target} alag din chahiye.`,
+        },
+    ];
+
     return (
         <div className="flex flex-col min-h-screen bg-slate-50 relative overflow-hidden animate-in slide-in-from-right duration-500 pb-10 font-poppins">
-            {/* Background Decorative Elements */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-[-10%] left-[-20%] w-[70%] h-[50%] bg-purple-200/40 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-[10%] right-[-20%] w-[70%] h-[50%] bg-indigo-200/30 rounded-full blur-[120px]"></div>
+                <div className="absolute top-[-10%] left-[-20%] w-[70%] h-[50%] bg-purple-200/40 rounded-full blur-[120px]" />
+                <div className="absolute bottom-[10%] right-[-20%] w-[70%] h-[50%] bg-indigo-200/30 rounded-full blur-[120px]" />
             </div>
 
             <div className="flex-1 space-y-3 relative z-10 max-w-md mx-auto w-full">
-                {/* Full Width Compact Hero Card */}
                 <div className="w-full bg-gradient-to-br from-purple-700 via-purple-600 to-indigo-500 rounded-b-3xl p-3 pb-4 text-white relative overflow-hidden shadow-xl">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
-                    
                     <div className="relative z-10 flex flex-col items-center">
                         <div className="w-full flex items-center justify-between mb-2">
                             <button
+                                type="button"
                                 onClick={() => navigate(-1)}
-                                className="w-8 h-8 flex items-center justify-center text-white active:scale-75 transition-all z-[100] cursor-pointer"
+                                className="w-8 h-8 flex items-center justify-center text-white active:scale-75 transition-all"
                             >
                                 <ChevronLeft size={22} strokeWidth={2.5} />
                             </button>
-                            
                             <div className="flex items-center gap-2 flex-1 justify-center pr-8">
-                                <div className="w-7 h-7 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20 shadow-sm">
+                                <div className="w-7 h-7 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20">
                                     <TrendingUp size={14} className="text-white" />
                                 </div>
                                 <div className="text-left">
@@ -329,115 +341,94 @@ const FutureFund = () => {
                             </div>
                         </div>
 
-                        {/* Progress Area */}
                         <div className="w-full max-w-[260px] bg-white/10 backdrop-blur-md rounded-xl px-3 py-2 border border-white/10">
                             <div className="flex justify-between items-center mb-1">
                                 <span className="text-[8px] font-medium uppercase tracking-widest text-white/80">Progress Status</span>
                                 <span className="text-[11px] font-medium">{overallProgress}%</span>
                             </div>
                             <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-white transition-all duration-1000 shadow-[0_0_8px_rgba(255,255,255,0.6)]"
-                                    style={{ width: `${overallProgress}%` }}
-                                ></div>
+                                <div className="h-full bg-white transition-all duration-1000" style={{ width: `${overallProgress}%` }} />
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="px-4 space-y-3.5">
-                    {/* Compact Description Section */}
                     <div className="bg-slate-900 rounded-2xl p-4 shadow-xl relative overflow-hidden border-b-4 border-purple-500">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl text-white"></div>
                         <h3 className="text-[8px] font-medium text-purple-400 uppercase tracking-[0.25em] mb-2 flex items-center gap-2">
                             <Sparkles size={11} />
                             PROGRAM INSIGHT
                         </h3>
                         <p className="text-[12px] font-medium text-slate-300 leading-normal italic border-l-2 border-purple-500/50 pl-3">
-                            "Future Fund is a long-term passive income opportunity. Once activated, users get direct profit-sharing of the platform on everyday activities."
+                            Future Fund unlock ke baad platform profit-sharing milti hai. Neeche 3 criteria complete karni hongi — ye real-time update hoti hain.
                         </p>
                     </div>
 
-                    {/* Eligibility Criteria Cards (Made Highly Compact & Beautiful) */}
                     <div className="grid grid-cols-1 gap-2.5">
-                        {/* 1. Successful Sales */}
-                        <div className="relative bg-white p-3.5 shadow-sm border border-slate-100 transition-all rounded-2xl">
-                            <div className="flex justify-between items-center">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100 shrink-0">
-                                        <CheckCircle2 size={16} className="text-emerald-600" />
+                        {criteriaCards.map((card) => {
+                            const Icon = card.icon;
+                            return (
+                                <div key={card.key} className={`relative bg-white p-3.5 shadow-sm border transition-all rounded-2xl ${card.completed ? 'border-emerald-200 ring-1 ring-emerald-100' : 'border-slate-100'}`}>
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center gap-2.5">
+                                            <div className={`w-8 h-8 ${card.iconBg} rounded-xl flex items-center justify-center border shrink-0`}>
+                                                <Icon size={16} className={card.iconColor} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-[12px] font-medium text-slate-800 uppercase leading-none flex items-center gap-1.5">
+                                                    {card.title}
+                                                    {card.completed && <CheckCircle2 size={12} className="text-emerald-500" />}
+                                                </h4>
+                                                <p className="text-[8px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">{card.subtitle}</p>
+                                            </div>
+                                        </div>
+                                        <span className={`px-2 py-0.5 rounded-lg text-[10px] font-medium border ${card.completed ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-slate-50 border-slate-100 text-slate-700'}`}>
+                                            {card.display}
+                                        </span>
                                     </div>
-                                    <div>
-                                        <h4 className="text-[12px] font-medium text-slate-800 uppercase leading-none">Successful Sales</h4>
-                                        <p className="text-[8px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">Target Milestone</p>
+                                    <div className="w-full h-1 bg-slate-100 rounded-full mt-2.5 overflow-hidden">
+                                        <div
+                                            className={`h-full ${card.bar} transition-all duration-700`}
+                                            style={{ width: `${Math.min((card.current / Math.max(card.target, 1)) * 100, 100)}%` }}
+                                        />
                                     </div>
+                                    <p className="text-[10px] text-slate-500 mt-2 leading-snug flex gap-1.5">
+                                        <Info size={12} className="text-slate-400 shrink-0 mt-0.5" />
+                                        <span>{card.how}</span>
+                                    </p>
                                 </div>
-                                <span className="bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-[10px] font-medium text-slate-700">{salesCriterion.current}/{salesCriterion.target}</span>
-                            </div>
-                            <div className="w-full h-1 bg-slate-100 rounded-full mt-2.5 overflow-hidden">
-                                <div className="h-full bg-emerald-500" style={{ width: `${Math.min((salesCriterion.current / Math.max(1, salesCriterion.target)) * 100, 100)}%` }}></div>
-                            </div>
-                        </div>
+                            );
+                        })}
 
-                        {/* 2. Daily Activity */}
-                        <div className="relative bg-white p-3.5 shadow-sm border border-slate-100 transition-all rounded-2xl">
-                            <div className="flex justify-between items-center">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="w-8 h-8 bg-amber-50 rounded-xl flex items-center justify-center border border-amber-100 shrink-0">
-                                        <Timer size={16} className="text-amber-600" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-[12px] font-medium text-slate-800 uppercase leading-none">Daily Activity</h4>
-                                        <p className="text-[8px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">Time Tracker</p>
-                                    </div>
-                                </div>
-                                <span className="bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-[10px] font-medium text-slate-700">{activityCriterion.current}m/{activityCriterion.target}m</span>
-                            </div>
-                            <div className="w-full h-1 bg-slate-100 rounded-full mt-2.5 overflow-hidden">
-                                <div className="h-full bg-amber-500" style={{ width: `${Math.min((activityCriterion.current / Math.max(1, activityCriterion.target)) * 100, 100)}%` }}></div>
-                            </div>
-                        </div>
-
-                        {/* 3. Active Days */}
-                        <div className="relative bg-white p-3.5 shadow-sm border border-slate-100 transition-all rounded-2xl">
-                            <div className="flex justify-between items-center">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="w-8 h-8 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100 shrink-0">
-                                        <Calendar size={16} className="text-blue-600" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-[12px] font-medium text-slate-800 uppercase leading-none">Active Days</h4>
-                                        <p className="text-[8px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">Continuity Goal</p>
-                                    </div>
-                                </div>
-                                <span className="bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-lg text-[10px] font-medium text-slate-700">{daysCriterion.current}/{daysCriterion.target}</span>
-                            </div>
-                            <div className="w-full h-1 bg-slate-100 rounded-full mt-2.5 overflow-hidden">
-                                <div className="h-full bg-blue-500" style={{ width: `${Math.min((daysCriterion.current / Math.max(1, daysCriterion.target)) * 100, 100)}%` }}></div>
-                            </div>
-                        </div>
-
-                        {/* Info Box (Made Very Small & Elegant) */}
-                        <div className="bg-slate-950 text-white p-3.5 rounded-2xl flex gap-2.5 items-center">
-                            <div className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center shrink-0 border border-white/5">
+                        <div className="bg-slate-950 text-white p-3.5 rounded-2xl flex gap-2.5 items-start">
+                            <div className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center shrink-0 border border-white/5 mt-0.5">
                                 <Sparkles size={13} className="text-purple-400" />
                             </div>
                             <p className="text-[9.5px] font-medium text-slate-300 leading-snug">
-                                आपका समय <span className="text-white font-medium">स्वचालित रूप से</span> गिना जाएगा। 15 मिनट = 1 दिन।
+                                <span className="text-white font-semibold">Kab active?</span> Jab teeno criteria complete hon —
+                                {' '}{salesCriterion.target} successful sales + aaj {minsTarget} min activity + {daysCriterion.target} active days.
+                                App use karte hi minutes auto count hote hain.
                             </p>
                         </div>
 
-                        {/* Action Buttons */}
                         <div className="pt-1.5 space-y-2.5">
                             <button
+                                type="button"
                                 onClick={handleMoveForward}
-                                disabled={!isEligible}
+                                disabled={!isEligible || unlocking}
                                 className={`w-full ${isEligible ? 'bg-slate-900 hover:bg-black border-b-4 border-purple-600 text-white shadow-lg active:scale-[0.98]' : 'bg-slate-300 text-slate-500 cursor-not-allowed'} font-medium py-3.5 rounded-2xl transition-all text-[13px] tracking-wider uppercase flex items-center justify-center gap-2`}
                             >
-                                {isEligible ? 'MOVE FORWARD ➔' : 'NOT ELIGIBLE'}
+                                {unlocking ? (
+                                    <><Loader2 size={16} className="animate-spin" /> Activating…</>
+                                ) : isEligible ? (
+                                    'MOVE FORWARD ➔'
+                                ) : (
+                                    'NOT ELIGIBLE YET'
+                                )}
                             </button>
 
                             <button
+                                type="button"
                                 onClick={() => navigate(-1)}
                                 className="w-full bg-white text-slate-500 font-medium py-3 rounded-2xl text-[10px] active:scale-[0.98] transition-all tracking-wider uppercase border border-slate-200 shadow-sm text-center"
                             >

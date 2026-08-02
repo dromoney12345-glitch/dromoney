@@ -140,7 +140,7 @@ const Income = () => {
             methodsTitle: '💼 कमाई के तरीके:',
             methods: [
                 { title: '1. Affiliate Marketing (₹200 per sale)', points: ['आपको एक referral link मिलेगा', 'आप उसे share करेंगे', 'हर course sale पर ₹200 commission मिलेगा'] },
-                { title: '2. Future Fund (Reward System)', points: ['Monetization system (YouTube की तरह)', 'Criteria: 10 successful sales & 10 दिन active (15 min daily)', '✓ इसके बाद आपको platform से performance-based reward मिलेगा'] }
+                { title: '2. Future Fund (Reward System)', points: ['Monetization system (YouTube की तरह)', 'Criteria: Successful Sales (paid referrals) + Daily Activity minutes + Active Days (15 min/day)', '✓ तीनों criteria complete होने पर Future Fund active होगा और performance-based reward मिलेगा'] }
             ]
         },
         page2: {

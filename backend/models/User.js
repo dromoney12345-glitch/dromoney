@@ -107,6 +107,9 @@ const UserSchema = new mongoose.Schema({
         status: { type: String, enum: ['locked', 'active'], default: 'locked' },
         progress: { type: Number, default: 0 },
         overrideProfit: { type: Number, default: null },
+        todayActivityMinutes: { type: Number, default: 0 },
+        lastActivityDate: { type: String, default: null }, // IST YYYY-MM-DD
+        activeDayDates: [{ type: String }], // IST dates that counted as active days
         criteria: [{
             id: Number,
             title: String,

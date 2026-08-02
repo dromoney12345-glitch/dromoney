@@ -7,6 +7,10 @@ const asyncHandler = require('../middleware/async');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
 const path = require('path');
+const {
+    syncFutureFundCriteria,
+    addFutureFundActivity
+} = require('../utils/futureFund');
 
 // Configure Cloudinary
 if (!process.env.CLOUDINARY_API_SECRET) {
@@ -395,84 +399,114 @@ exports.updateProfilePhoto = asyncHandler(async (req, res, next) => {
     }
 });
 
-// @desc    Update Future Fund Progress
+// @desc    Sync & return Future Fund eligibility status (dynamic criteria)
+// @route   GET /api/user/data/future-fund/status
+// @access  Private
+exports.getFutureFundStatus = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+    if (!user) return next(new ErrorResponse('User not found', 404));
+
+    const settings = (await Settings.findOne()) || {};
+    const synced = await syncFutureFundCriteria(user, settings);
+    if (synced.modified) {
+        await user.save({ validateBeforeSave: false });
+    }
+
+    res.status(200).json({
+        success: true,
+        data: {
+            status: user.futureFund.status,
+            progress: synced.progress,
+            eligible: synced.eligible,
+            criteria: synced.criteria,
+            targets: synced.targets,
+            todayActivityMinutes: synced.activityCurrent,
+            activeDaysCount: synced.daysCurrent,
+            successfulSales: synced.salesCurrent,
+        }
+    });
+});
+
+// @desc    Heartbeat — count app activity minutes toward Daily Activity / Active Days
+// @route   POST /api/user/data/future-fund/activity
+// @access  Private
+exports.pingFutureFundActivity = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+    if (!user) return next(new ErrorResponse('User not found', 404));
+
+    const minutes = Number(req.body?.minutes) || 1;
+    const settings = (await Settings.findOne()) || {};
+    const synced = await addFutureFundActivity(user, minutes, settings);
+    await user.save({ validateBeforeSave: false });
+
+    res.status(200).json({
+        success: true,
+        data: {
+            status: user.futureFund.status,
+            progress: synced.progress,
+            eligible: synced.eligible,
+            criteria: synced.criteria,
+            targets: synced.targets,
+            todayActivityMinutes: synced.activityCurrent,
+            activeDaysCount: synced.daysCurrent,
+            successfulSales: synced.salesCurrent,
+        }
+    });
+});
+
+// @desc    Update Future Fund Progress (legacy + sync)
 // @route   POST /api/user/data/future-fund/progress
 // @access  Private
 exports.updateFutureFundProgress = asyncHandler(async (req, res, next) => {
-    const { type, value } = req.body; // type: 'sales', 'activity', 'days'
     const user = await User.findById(req.user.id);
+    if (!user) return next(new ErrorResponse('User not found', 404));
 
-    if (!user.futureFund) {
-        user.futureFund = { progress: 0, criteria: [] };
+    const settings = (await Settings.findOne()) || {};
+
+    // Optional: allow adding activity minutes via this legacy route
+    if (req.body?.type === 'activity' && req.body?.value) {
+        await addFutureFundActivity(user, req.body.value, settings);
+    } else {
+        await syncFutureFundCriteria(user, settings);
     }
 
-    // Initialize default criteria if empty
-    if (!user.futureFund.criteria || user.futureFund.criteria.length === 0) {
-        user.futureFund.criteria = [
-            { id: 1, title: 'Successful Sales', target: 10, current: 0, completed: false },
-            { id: 2, title: 'Daily Activity', target: 15, current: 0, completed: false },
-            { id: 3, title: 'Active Days', target: 7, current: 0, completed: false }
-        ];
-    }
-
-    const criterion = user.futureFund.criteria.find(c => {
-        if (type === 'sales' && c.id === 1) return true;
-        if (type === 'activity' && c.id === 2) return true;
-        if (type === 'days' && c.id === 3) return true;
-        return false;
-    });
-
-    if (criterion) {
-        if (type === 'activity') {
-            criterion.current += value; // value is minutes to add
-        } else if (type === 'sales') {
-            criterion.current += value; // add successful sales
-        } else if (type === 'days') {
-            criterion.current = value; // set total active days
-        }
-
-        if (criterion.current >= criterion.target) {
-            criterion.completed = true;
-        }
-    }
-
-    // Recalculate total progress
-    const totalCriteria = user.futureFund.criteria.length;
-    let completedWeight = 0;
-
-    user.futureFund.criteria.forEach(c => {
-        // Simple weight: each criterion contributes equally to the 100%
-        const ratio = Math.min(c.current / c.target, 1);
-        completedWeight += ratio;
-    });
-
-    user.futureFund.progress = Math.round((completedWeight / totalCriteria) * 100);
-
-    await user.save();
+    await user.save({ validateBeforeSave: false });
 
     res.status(200).json({
         success: true,
         data: user.futureFund
     });
 });
-// @desc    Unlock Future Fund
+
+// @desc    Unlock Future Fund (requires all 3 criteria)
 // @route   POST /api/user/data/future-fund/unlock
 // @access  Private
 exports.unlockFutureFund = asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user.id);
+    if (!user) return next(new ErrorResponse('User not found', 404));
 
-    if (user.futureFund.progress < 100) {
-        return next(new ErrorResponse('Please complete all criteria first', 400));
+    const settings = (await Settings.findOne()) || {};
+    const synced = await syncFutureFundCriteria(user, settings);
+
+    if (!synced.eligible) {
+        const missing = synced.criteria
+            .filter((c) => !c.completed)
+            .map((c) => `${c.title} (${c.current}/${c.target})`)
+            .join(', ');
+        return next(new ErrorResponse(`Complete all criteria first: ${missing}`, 400));
     }
 
-    // Mark as unlocked/active
-    user.futureFund.status = 'active'; 
-    await user.save();
+    user.futureFund.status = 'active';
+    await user.save({ validateBeforeSave: false });
 
     res.status(200).json({
         success: true,
         message: 'Future Fund unlocked',
-        status: user.futureFund.status
+        status: user.futureFund.status,
+        data: {
+            progress: synced.progress,
+            criteria: synced.criteria,
+        }
     });
 });
 

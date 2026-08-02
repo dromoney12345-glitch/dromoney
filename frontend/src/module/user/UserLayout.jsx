@@ -20,6 +20,31 @@ const UserLayout = () => {
     const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
     const { userData, notifications, clearNotifications, markAsRead, logout } = useUser();
 
+    // Future Fund: count 1 activity minute per minute while app is visible
+    useEffect(() => {
+        if (!userData?.isPaid) return undefined;
+
+        const ping = () => {
+            if (document.visibilityState !== 'visible') return;
+            api.post('/user/data/future-fund/activity', { minutes: 1 }).catch(() => {});
+        };
+
+        // First ping shortly after open, then every 60s
+        const initial = setTimeout(ping, 5000);
+        const interval = setInterval(ping, 60 * 1000);
+
+        const onVisible = () => {
+            if (document.visibilityState === 'visible') ping();
+        };
+        document.addEventListener('visibilitychange', onVisible);
+
+        return () => {
+            clearTimeout(initial);
+            clearInterval(interval);
+            document.removeEventListener('visibilitychange', onVisible);
+        };
+    }, [userData?.isPaid]);
+
     useEffect(() => {
         const handleResize = () => {
             // If window height shrinks by more than 20% (keyboard opened)

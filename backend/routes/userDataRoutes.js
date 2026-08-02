@@ -8,6 +8,8 @@ const {
     updateProfilePhoto,
     updateFutureFundProgress,
     unlockFutureFund,
+    getFutureFundStatus,
+    pingFutureFundActivity,
     getReferrals,
     updateProfile,
     getFutureFundEstimation,
@@ -45,6 +47,8 @@ router.patch('/profile', updateProfile);
 router.patch('/photo', upload.single('photo'), updateProfilePhoto);
 router.post('/future-fund/progress', updateFutureFundProgress);
 router.post('/future-fund/unlock', unlockFutureFund);
+router.get('/future-fund/status', getFutureFundStatus);
+router.post('/future-fund/activity', pingFutureFundActivity);
 router.get('/future-fund/estimation', getFutureFundEstimation);
 router.post('/feedback', submitFeedback);
 router.post('/reports', submitReport);

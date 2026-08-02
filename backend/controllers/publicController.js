@@ -6,7 +6,7 @@ const User = require('../models/User');
 // @access  Public
 exports.getPublicSettings = async (req, res) => {
     try {
-        const settings = await Settings.findOne().select('appName contactEmail contactPhone adminUpiId qrScannerImage bankDetails referralSystemEnabled referralCommission registrationFee minWithdrawal futureFundDailyTasksTarget futureFundWatchAdTarget futureFundEventsTarget futureFundBoostersTarget futureFundSalesTarget futureFundDaysTarget businessPlans maintenanceMode registrationOpen taskWindowStart taskWindowEnd taskRenewalHours');
+        const settings = await Settings.findOne().select('appName contactEmail contactPhone adminUpiId qrScannerImage bankDetails referralSystemEnabled referralCommission registrationFee minWithdrawal futureFundDailyTasksTarget futureFundWatchAdTarget futureFundEventsTarget futureFundBoostersTarget futureFundSalesTarget futureFundDaysTarget futureFundActivityMinutes businessPlans maintenanceMode registrationOpen taskWindowStart taskWindowEnd taskRenewalHours');
         
         // Add fallbacks for existing documents that might not have newer schema fields
         const responseData = settings ? settings.toObject() : {
@@ -32,7 +32,8 @@ exports.getPublicSettings = async (req, res) => {
             futureFundEventsTarget: 3,
             futureFundBoostersTarget: 1,
             futureFundSalesTarget: 10,
-            futureFundDaysTarget: 7
+            futureFundDaysTarget: 7,
+            futureFundActivityMinutes: 15
         };
 
         if (settings && !responseData.adminUpiId) {
@@ -43,6 +44,9 @@ exports.getPublicSettings = async (req, res) => {
         }
         if (settings && !responseData.taskRenewalHours) {
             responseData.taskRenewalHours = 24;
+        }
+        if (settings && !responseData.futureFundActivityMinutes) {
+            responseData.futureFundActivityMinutes = 15;
         }
         
         res.status(200).json({

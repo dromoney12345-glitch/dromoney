@@ -7,6 +7,7 @@ const Otp = require('../models/Otp');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const { getLastRenewalTick } = require('../utils/taskRenewal');
+const { syncFutureFundCriteria } = require('../utils/futureFund');
 const { sendOtpSMS } = require('../utils/smsService');
 
 // @desc    Register user
@@ -425,6 +426,14 @@ exports.getMe = async (req, res, next) => {
             if (user.isTaskBoosterActive && user.taskBoosterExpiry && new Date(user.taskBoosterExpiry) <= new Date()) {
                 user.isTaskBoosterActive = false;
                 modified = true;
+            }
+
+            // 4. Sync Future Fund criteria (sales / daily mins / active days)
+            try {
+                const ff = await syncFutureFundCriteria(user, settings);
+                if (ff.modified) modified = true;
+            } catch (ffErr) {
+                console.error('Future Fund sync on getMe failed:', ffErr.message);
             }
 
             if (modified) {
