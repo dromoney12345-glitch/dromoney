@@ -157,6 +157,7 @@ const TaskRunner = () => {
     const startTask = async () => {
         if (task.type === 'Video') {
             setStatus('calling_ad');
+            // Prefer native AdMob inside the app
             if (window.flutter_inappwebview) {
                 // Register callback for when Flutter ad completes
                 window.refreshRewardStatus = async () => {
@@ -164,14 +165,26 @@ const TaskRunner = () => {
                     await submitTask();
                 };
                 try {
-                    await window.flutter_inappwebview.callHandler('showRewardAd', 'reward_ad_1');
+                    const { showFlutterRewardedAd } = await import('../../shared/utils/flutterAds');
+                    const { ok } = await showFlutterRewardedAd('reward_ad_1');
+                    if (ok) {
+                        // Some builds claim via refreshRewardStatus; others return true here
+                        if (window.refreshRewardStatus) {
+                            await window.refreshRewardStatus();
+                        } else {
+                            await submitTask();
+                        }
+                    } else {
+                        showToast('No ad available right now. Please try again.', 'error');
+                        setStatus('idle');
+                    }
                 } catch (e) {
-                    console.error("Flutter handler error", e);
-                    showToast("Failed to launch Ad. Please try again.", "error");
+                    console.error('Flutter handler error', e);
+                    showToast('Failed to launch Ad. Please try again.', 'error');
                     setStatus('idle');
                 }
             } else {
-                showToast("This feature is only available in the mobile app.", "error");
+                showToast('This feature is only available in the mobile app.', 'error');
                 setStatus('idle');
             }
             return;

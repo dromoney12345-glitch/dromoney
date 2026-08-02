@@ -185,6 +185,10 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
     user.watchedAds.push(adId);
     user.dailyAdCount += 1;
 
+    // Keep Watch & Earn daily counter in sync (Flutter reward path uses these fields)
+    user.todayRewardCount = (user.todayRewardCount || 0) + 1;
+    user.lastRewardAt = new Date();
+
     // Define random gap/cooldown between 30 and 60 seconds
     const cooldownSeconds = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
     user.nextAdAvailableAt = new Date(Date.now() + cooldownSeconds * 1000);
