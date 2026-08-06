@@ -22,6 +22,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
     const [isDownloading, setIsDownloading] = useState(false);
     const [adminUpiId, setAdminUpiId] = useState(null);
     const [hasPendingManual, setHasPendingManual] = useState(false);
+    const submitLockRef = React.useRef(false);
 
     useEffect(() => {
         setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
@@ -46,6 +47,8 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
             setUtrNumber('');
             setScreenshot(null);
             setShowScanner(false);
+            setHasPendingManual(false);
+            submitLockRef.current = false;
             document.body.style.overflow = 'hidden';
             checkPendingManualPayment();
         } else {
@@ -70,6 +73,8 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
     };
 
     const handleManualSubmit = async () => {
+        if (submitLockRef.current || isSubmitting) return;
+
         if (!utrNumber || utrNumber.length !== 12) {
             setErrorMsg('Please enter a valid 12-digit UTR number');
             return;
@@ -78,7 +83,16 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
             setErrorMsg('Please upload a payment screenshot');
             return;
         }
+        if (type === 'PLATFORM_UNLOCK' && userData?.isPaid) {
+            setErrorMsg('Platform already unlocked.');
+            return;
+        }
+        if (hasPendingManual) {
+            setErrorMsg('You already have a pending payment. Please wait for approval.');
+            return;
+        }
 
+        submitLockRef.current = true;
         setIsSubmitting(true);
         setErrorMsg('');
 
@@ -96,13 +110,16 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
             });
 
             if (res.success) {
+                setHasPendingManual(true);
                 setStatus('success');
                 setTimeout(() => onSuccess(), 2500);
             } else {
                 setErrorMsg(res.message || 'Failed to submit manual payment');
+                submitLockRef.current = false;
             }
         } catch (err) {
             setErrorMsg(err.message || 'An error occurred during submission');
+            submitLockRef.current = false;
         } finally {
             setIsSubmitting(false);
         }
@@ -397,7 +414,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                                     <button
                                         type="button"
                                         onClick={handleManualSubmit}
-                                        disabled={isSubmitting || !utrNumber || !screenshot}
+                                        disabled={isSubmitting || hasPendingManual || !utrNumber || !screenshot}
                                         className="w-full py-2.5 bg-slate-800 hover:bg-slate-900 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-lg text-[12px] font-semibold active:scale-[0.98] flex items-center justify-center gap-1.5"
                                     >
                                         {isSubmitting ? (

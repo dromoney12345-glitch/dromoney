@@ -62,4 +62,33 @@ const PaymentSchema = new mongoose.Schema({
     processedAt: Date
 }, { timestamps: true });
 
+// ── Uniqueness: each logical payment stored only once ──
+PaymentSchema.index({ utrNumber: 1 }, { unique: true, sparse: true });
+PaymentSchema.index({ razorpayOrderId: 1 }, { unique: true, sparse: true });
+PaymentSchema.index({ razorpayPaymentId: 1 }, { unique: true, sparse: true });
+
+// Only one Pending payment per user + paymentType
+PaymentSchema.index(
+    { user: 1, paymentType: 1 },
+    {
+        unique: true,
+        partialFilterExpression: { status: 'Pending', user: { $type: 'objectId' } },
+        name: 'uniq_pending_user_paymentType',
+    }
+);
+
+// Only one successful PLATFORM_UNLOCK per user
+PaymentSchema.index(
+    { user: 1 },
+    {
+        unique: true,
+        partialFilterExpression: {
+            status: 'Success',
+            paymentType: 'PLATFORM_UNLOCK',
+            user: { $type: 'objectId' },
+        },
+        name: 'uniq_success_platform_unlock_user',
+    }
+);
+
 module.exports = mongoose.model('Payment', PaymentSchema);

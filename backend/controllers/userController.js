@@ -187,37 +187,17 @@ exports.unlockPlatform = asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user.id);
 
     // In production, verify payment gateway response here
-    
-    // Check for referral reward
-    if (user.referredBy && !user.isPaid) {
-        try {
-            const settings = await Settings.findOne();
-            const commission = settings ? settings.referralCommission : 200;
-            if (settings && settings.referralSystemEnabled) {
-                const referrer = await User.findById(user.referredBy);
-                if (referrer) {
-                    referrer.wallet.balance += commission;
-                    referrer.wallet.referralEarnings += commission;
-                    referrer.wallet.lifetimeEarnings += commission;
-                    referrer.referralCount += 1;
-                    await referrer.save();
-
-                    await ReferralTransaction.create({
-                        referrer: referrer._id,
-                        referredUser: user._id,
-                        amount: commission,
-                        status: 'Completed'
-                    });
-                }
-            }
-        } catch (err) {
-            console.error('Simulation Referral Error:', err.message);
-        }
-    }
-
     user.isPaid = true;
     user.unlockedAt = new Date();
     await user.save();
+
+    // Referral ₹200 only after KYC + ₹499 unlock
+    try {
+        const { creditReferralOnQualifiedUnlock } = require('../utils/referralReward');
+        await creditReferralOnQualifiedUnlock(user);
+    } catch (err) {
+        console.error('Simulation Referral Error:', err.message);
+    }
 
     res.status(200).json({
         success: true,
@@ -516,43 +496,18 @@ exports.unlockFutureFund = asyncHandler(async (req, res, next) => {
 exports.getReferrals = asyncHandler(async (req, res, next) => {
     const referrerId = req.user._id || req.user.id;
 
-    const referredUsers = await User.find({ referredBy: referrerId })
-        .select('name phone createdAt')
+    // Only show referrals that earned commission (KYC + ₹499 completed)
+    const transactions = await ReferralTransaction.find({ referrer: referrerId })
+        .populate('referredUser', 'name phone createdAt isPaid kyc')
         .sort('-createdAt');
 
-    const transactions = await ReferralTransaction.find({ referrer: referrerId })
-        .populate('referredUser', 'name phone createdAt');
-
-    const byUserId = new Map();
-
-    for (const user of referredUsers) {
-        byUserId.set(String(user._id), {
-            _id: user._id,
-            referredUser: user,
-            amount: 200,
-            status: 'Completed',
-            createdAt: user.createdAt,
-        });
-    }
-
-    for (const tx of transactions) {
-        const uid = tx.referredUser?._id
-            ? String(tx.referredUser._id)
-            : String(tx.referredUser || '');
-        if (!uid) continue;
-        const existing = byUserId.get(uid);
-        byUserId.set(uid, {
-            _id: tx._id,
-            referredUser: tx.referredUser || existing?.referredUser || { name: 'Unknown User' },
-            amount: tx.amount || existing?.amount || 200,
-            status: tx.status || 'Completed',
-            createdAt: tx.createdAt || existing?.createdAt,
-        });
-    }
-
-    const referralsData = Array.from(byUserId.values()).sort(
-        (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
-    );
+    const referralsData = transactions.map((tx) => ({
+        _id: tx._id,
+        referredUser: tx.referredUser || { name: 'Unknown User' },
+        amount: tx.amount || 200,
+        status: tx.status || 'Completed',
+        createdAt: tx.createdAt,
+    }));
 
     res.status(200).json({
         success: true,

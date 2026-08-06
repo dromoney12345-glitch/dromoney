@@ -14,6 +14,7 @@ const Payments = () => {
     const [itemsPerPage] = useState(10);
     const [selectedPayment, setSelectedPayment] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [revenueMeta, setRevenueMeta] = useState({ totalRevenue: 0, successCount: 0 });
 
     // Toast state
     const [toast, setToast] = useState(null); // { message: '', type: 'success' | 'error' }
@@ -32,13 +33,21 @@ const Payments = () => {
         try {
             const response = await api.get('/admin/payments');
             if (response.success) {
+                if (response.meta) {
+                    setRevenueMeta({
+                        totalRevenue: Number(response.meta.totalRevenue) || 0,
+                        successCount: Number(response.meta.successCount) || 0,
+                    });
+                }
                 const mapped = response.data.map(p => ({
                     id: p._id,
+                    userId: p.user?._id || p.userEmail || p._id,
                     user: p.user?.name || 'Deleted User',
                     email: p.user?.email || 'N/A',
                     phone: p.user?.phone || 'N/A',
                     isDeleted: p.user?.isDeleted || !p.user?._id,
                     plan: p.plan || 'Lifetime Access',
+                    paymentType: p.paymentType || 'PLATFORM_UNLOCK',
                     amount: `₹${parseFloat(p.amount).toFixed(2)}`,
                     method: p.method || 'Razorpay',
                     date: new Date(p.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
@@ -47,32 +56,49 @@ const Payments = () => {
                     screenshot: p.screenshot
                 }));
                 
-                // Deduplicate transactions (keep most recent actionable per user)
+                // Deduplicate unlock clutter (Success = keep one; hide Failed after Success)
                 const uniquePayments = [];
                 const seenUserPending = new Set();
-                const userHasManualOrSuccess = new Set();
-                
-                // First pass: check if user has a Manual payment or ANY Success payment
+                const seenPlatformSuccess = new Set();
+                const seenFailedUnlock = new Set();
+                const usersWithSuccess = new Set();
+
                 mapped.forEach(p => {
-                    const userKey = `${p.email}-${p.phone}`;
-                    if (p.method === 'Manual' || p.status === 'Success') {
-                        userHasManualOrSuccess.add(userKey);
+                    const userKey = String(p.userId);
+                    if (p.status === 'Success' && (p.paymentType || 'PLATFORM_UNLOCK') === 'PLATFORM_UNLOCK') {
+                        usersWithSuccess.add(userKey);
                     }
                 });
 
                 mapped.forEach(p => {
-                    const userKey = `${p.email}-${p.phone}`;
-                    if (p.status === 'Pending') {
-                        // If they have a manual or success payment, ignore abandoned Razorpay pendings
-                        if (p.method !== 'Manual' && userHasManualOrSuccess.has(userKey)) {
-                            return; 
-                        }
+                    const userKey = String(p.userId);
+                    const isUnlock = (p.paymentType || 'PLATFORM_UNLOCK') === 'PLATFORM_UNLOCK';
 
-                        if (!seenUserPending.has(userKey)) {
-                            seenUserPending.add(userKey);
-                            uniquePayments.push(p);
-                        }
-                    } else {
+                    if (!isUnlock) {
+                        uniquePayments.push(p);
+                        return;
+                    }
+
+                    if (p.status === 'Success') {
+                        if (seenPlatformSuccess.has(userKey)) return;
+                        seenPlatformSuccess.add(userKey);
+                        uniquePayments.push(p);
+                        return;
+                    }
+
+                    // Amit-style noise: Failed/Pending after already Success
+                    if (usersWithSuccess.has(userKey)) return;
+
+                    if (p.status === 'Pending') {
+                        if (seenUserPending.has(userKey)) return;
+                        seenUserPending.add(userKey);
+                        uniquePayments.push(p);
+                        return;
+                    }
+
+                    if (p.status === 'Failed') {
+                        if (seenFailedUnlock.has(userKey)) return;
+                        seenFailedUnlock.add(userKey);
                         uniquePayments.push(p);
                     }
                 });
@@ -122,10 +148,14 @@ const Payments = () => {
         setIsModalOpen(true);
     };
 
-    // Derived Stats
-    const totalCollected = paymentsList.filter(p => p.status === 'Success').reduce((acc, curr) => acc + Number(curr.amount.replace('₹', '')), 0);
+    // Derived Stats — revenue from backend (one unlock per user, no double-count)
+    const totalCollected = revenueMeta.totalRevenue > 0
+        ? revenueMeta.totalRevenue
+        : paymentsList.filter(p => p.status === 'Success').reduce((acc, curr) => acc + Number(curr.amount.replace('₹', '')), 0);
     const pendingCount = paymentsList.filter(p => p.status === 'Pending').length;
-    const successCount = paymentsList.filter(p => p.status === 'Success').length;
+    const successCount = revenueMeta.successCount > 0
+        ? revenueMeta.successCount
+        : paymentsList.filter(p => p.status === 'Success').length;
     const failedCount = paymentsList.filter(p => p.status === 'Failed').length;
 
     return (

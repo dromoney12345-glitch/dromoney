@@ -94,7 +94,7 @@ const MarketingHistory = () => {
                     ) : referrals.length === 0 ? (
                         <div className="text-center py-10 px-5 bg-slate-50 rounded-[2rem] border border-slate-100">
                             <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-1">No referrals yet</p>
-                            <p className="text-[10px] font-semibold text-slate-400">Share your referral link with friends to earn ₹200 for every signup!</p>
+                            <p className="text-[10px] font-semibold text-slate-400">Share your link — earn ₹200 when they complete KYC and buy ₹499.</p>
                         </div>
                     ) : (
                         referrals.map((ref) => (

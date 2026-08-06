@@ -63,6 +63,56 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
         durationDays = 9999; // Lifetime
     }
 
+    // One pending entry per user + payment type; reuse live Razorpay order when possible
+    const { assertNoDuplicatePayment, createPaymentOnce } = require('../utils/paymentGuards');
+
+    if (pType === 'PLATFORM_UNLOCK') {
+        const existingSuccess = await Payment.findOne({
+            user: req.user.id,
+            paymentType: 'PLATFORM_UNLOCK',
+            status: 'Success',
+        });
+        if (existingSuccess) {
+            return next(new ErrorResponse('Platform unlock payment already completed.', 400));
+        }
+    }
+
+    const existingPending = await Payment.findOne({
+        user: req.user.id,
+        paymentType: pType,
+        status: 'Pending',
+    }).sort({ createdAt: -1 });
+
+    if (existingPending) {
+        if (existingPending.razorpayOrderId) {
+            try {
+                const existingOrder = await razorpay.orders.fetch(existingPending.razorpayOrderId);
+                return res.status(200).json({
+                    success: true,
+                    orderId: existingOrder.id,
+                    amount: existingOrder.amount,
+                    currency: existingOrder.currency || 'INR',
+                    keyId: process.env.RAZORPAY_KEY_ID,
+                    reused: true,
+                });
+            } catch (_) {
+                existingPending.status = 'Failed';
+                existingPending.remarks = 'Stale order replaced';
+                await existingPending.save();
+            }
+        } else {
+            return next(
+                new ErrorResponse(
+                    'You already have a pending payment for this plan. Please wait for approval.',
+                    400
+                )
+            );
+        }
+    }
+
+    // Final guard (race / already unlocked)
+    await assertNoDuplicatePayment(req.user.id, pType);
+
     // Create order on Razorpay servers
     const order = await razorpay.orders.create({
         amount: Math.round(finalAmount * 100), // convert precisely to paise integer
@@ -76,8 +126,8 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
         },
     });
 
-    // Save a pending payment record in DB — snapshot user info for permanent audit trail
-    await Payment.create({
+    // Save exactly one pending payment record
+    await createPaymentOnce({
         user: req.user.id,
         userName: user.name || '',
         userEmail: user.email || '',
@@ -92,21 +142,6 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
         razorpayOrderId: order.id,
         status: 'Pending',
     });
-
-    // Send push notification to all admins
-    try {
-        const { sendNotificationToAllAdmins } = require('./fcmController');
-        await sendNotificationToAllAdmins({
-            title: 'Manual Deposit Pending 💰',
-            body: `User ${user.name} uploaded a receipt for ₹${finalAmount}. Approve or decline.`,
-            data: {
-                type: 'deposit_alert',
-                link: '/admin/deposits'
-            }
-        });
-    } catch (pushErr) {
-        console.error('Admin push notification failed for manual deposit pending:', pushErr.message);
-    }
 
     res.status(200).json({
         success: true,
@@ -144,13 +179,59 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('Payment verification failed. Invalid signature.', 400));
     }
 
-    // ✅ Valid payment — update record and unlock
+        // ✅ Valid payment — update record and unlock
     if (payment) {
+        if (payment.status === 'Success') {
+            return res.status(200).json({
+                success: true,
+                message: 'Payment already verified.',
+            });
+        }
+
+        // One PLATFORM_UNLOCK Success per user — never inflate revenue
+        if ((payment.paymentType || 'PLATFORM_UNLOCK') === 'PLATFORM_UNLOCK') {
+            const priorSuccess = await Payment.findOne({
+                user: payment.user,
+                paymentType: 'PLATFORM_UNLOCK',
+                status: 'Success',
+                _id: { $ne: payment._id },
+            });
+            if (priorSuccess) {
+                payment.status = 'Failed';
+                payment.remarks = 'Duplicate unlock blocked — revenue already counted once';
+                payment.razorpayPaymentId = razorpay_payment_id;
+                payment.processedAt = new Date();
+                await payment.save();
+                return res.status(200).json({
+                    success: true,
+                    message: 'Platform already unlocked. Duplicate payment ignored.',
+                });
+            }
+        }
+
         payment.status = 'Success';
         payment.razorpayPaymentId = razorpay_payment_id;
         payment.razorpaySignature = razorpay_signature;
         payment.processedAt = new Date();
-        await payment.save();
+        try {
+            await payment.save();
+        } catch (saveErr) {
+            if (saveErr && saveErr.code === 11000) {
+                payment.status = 'Failed';
+                payment.remarks = 'Duplicate unlock blocked — revenue already counted once';
+                try { await payment.save(); } catch (_) { /* ignore */ }
+                return res.status(200).json({
+                    success: true,
+                    message: 'Platform already unlocked. Duplicate payment ignored.',
+                });
+            }
+            throw saveErr;
+        }
+
+        if ((payment.paymentType || 'PLATFORM_UNLOCK') === 'PLATFORM_UNLOCK') {
+            const { closeSiblingPlatformPayments } = require('../utils/paymentGuards');
+            await closeSiblingPlatformPayments(payment.user, payment._id);
+        }
 
         const user = await User.findById(req.user.id);
         if (!user) return next(new ErrorResponse('User not found during unlock', 404));
@@ -210,65 +291,6 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
         } else {
             console.log(`[PAYMENT] Unlocking Platform for user ${user._id}`);
             
-            // Check if this user was referred by someone
-            if (user.referredBy && !user.isPaid) {
-                try {
-                    const settings = await Settings.findOne();
-                    const commission = settings ? settings.referralCommission : 200;
-                    const referralSystemEnabled = settings ? settings.referralSystemEnabled : true;
-
-                    if (referralSystemEnabled) {
-                        const referrer = await User.findById(user.referredBy);
-                        if (referrer) {
-                            // Update Referrer Wallet
-                            referrer.wallet.balance += commission;
-                            referrer.wallet.referralEarnings += commission;
-                            referrer.wallet.lifetimeEarnings += commission;
-                            await referrer.save();
-
-                            // Create Referral Audit Log
-                            await ReferralTransaction.create({
-                                referrer: referrer._id,
-                                referredUser: user._id,
-                                amount: commission,
-                                status: 'Completed'
-                            });
-
-                            // Create standard Transaction for user history
-                            const Transaction = require('../models/Transaction');
-                            await Transaction.create({
-                                user: referrer._id,
-                                type: 'credit',
-                                currency: 'INR',
-                                amount: commission,
-                                source: `Referral Reward: ${user.name}`,
-                                status: 'Success'
-                            });
-
-                            console.log(`[REFERRAL] Credited ₹${commission} to referrer ${referrer._id} for user ${user._id}`);
-
-                            // Send Push Notification to Referrer
-                            try {
-                                const { sendNotificationToUser } = require('./fcmController');
-                                await sendNotificationToUser(referrer._id, {
-                                    title: 'Commission Received! 💰',
-                                    body: `You have earned a direct referral commission of ₹${commission} from ${user.name}'s purchase!`,
-                                    data: {
-                                        type: 'commission',
-                                        link: '/user/income'
-                                    }
-                                });
-                            } catch (pushErr) {
-                                console.error('Push notification failed for referral commission:', pushErr.message);
-                            }
-                        }
-                    }
-                } catch (refErr) {
-                    console.error('[REFERRAL ERROR] Failed to process reward:', refErr.message);
-                    // We don't block the main payment success if referral fails
-                }
-            }
-
             // Set user isPaid = true (Platform Unlock)
             user.isPaid = true;
             user.unlockedAt = new Date();
@@ -288,6 +310,14 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
             }
             
             await user.save();
+
+            // Referral ₹200 only after KYC + ₹499 unlock
+            try {
+                const { creditReferralOnQualifiedUnlock } = require('../utils/referralReward');
+                await creditReferralOnQualifiedUnlock(user);
+            } catch (refErr) {
+                console.error('[REFERRAL ERROR] Failed to process reward:', refErr.message);
+            }
 
             // Create standard Transaction for user history
             const Transaction = require('../models/Transaction');
@@ -368,6 +398,10 @@ exports.submitManualPayment = asyncHandler(async (req, res, next) => {
         }
     }
 
+    // One pending / one success unlock only — stop duplicate submits
+    const { assertNoDuplicatePayment, createPaymentOnce } = require('../utils/paymentGuards');
+    await assertNoDuplicatePayment(req.user.id, pType, { utrNumber });
+
     const cloudinary = require('cloudinary').v2;
     const { Readable } = require('stream');
 
@@ -384,7 +418,7 @@ exports.submitManualPayment = asyncHandler(async (req, res, next) => {
 
     const uploadResult = await uploadPromise;
 
-    const payment = await Payment.create({
+    const payment = await createPaymentOnce({
         user: req.user.id,
         userName: user.name || '',
         userEmail: user.email || '',
@@ -396,7 +430,7 @@ exports.submitManualPayment = asyncHandler(async (req, res, next) => {
         businessIdea: ideaId || null,
         amount: finalAmount,
         method: 'Manual',
-        utrNumber: utrNumber,
+        utrNumber: String(utrNumber).trim(),
         screenshot: uploadResult.secure_url,
         status: 'Pending',
         processedAt: null

@@ -14,30 +14,15 @@ exports.getStats = async (req, res, next) => {
         // 1. Active Users Count
         const activeUsersCount = await User.countDocuments();
         
-        // 2. Advanced Revenue Tracking (Net Revenue)
-        const revenueAggregation = await Payment.aggregate([
-            { $match: { status: { $in: ['Success', 'success'] } } },
-            { 
-                $group: { 
-                    _id: { $cond: [ { $eq: [{ $type: "$paymentType" }, "missing"] }, "PLATFORM_UNLOCK", "$paymentType" ] }, 
-                    total: { $sum: '$amount' } 
-                } 
-            }
-        ]);
-
-        let platformSubGross = 0;
-        let businessPlanRevenue = 0;
-        let boosterRevenue = 0;
-        let otherRevenue = 0;
-
-        revenueAggregation.forEach(item => {
-            const type = item._id;
-            const amount = item.total || 0;
-            if (type === 'PLATFORM_UNLOCK') platformSubGross += amount;
-            else if (type === 'BUSINESS_HUB_PLAN') businessPlanRevenue += amount;
-            else if (type === 'TASK_BOOSTER' || type === 'SUPPORT_BOOSTER') boosterRevenue += amount;
-            else otherRevenue += amount;
-        });
+        // 2. Advanced Revenue Tracking — one PLATFORM_UNLOCK Success per user (no double count)
+        const { aggregateUniqueRevenue } = require('../utils/paymentGuards');
+        const {
+            platformSubGross,
+            businessPlanRevenue,
+            boosterRevenue,
+            otherRevenue,
+            totalGrossRevenue,
+        } = await aggregateUniqueRevenue();
 
         // Calculate Referral Payouts to get Net Platform Revenue
         const referralPayoutsResult = await ReferralTransaction.aggregate([
@@ -55,7 +40,6 @@ exports.getStats = async (req, res, next) => {
         const totalFutureFundPayouts = futureFundPayoutsResult[0]?.total || 0;
 
         const platformSubNet = platformSubGross;
-        const totalGrossRevenue = platformSubNet + businessPlanRevenue + boosterRevenue + otherRevenue;
         
         // Total Net Revenue = Everything earned MINUS everything distributed
         const totalNetRevenue = totalGrossRevenue - totalReferralPayouts - totalFutureFundPayouts;

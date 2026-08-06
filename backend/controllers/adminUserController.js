@@ -87,6 +87,16 @@ exports.manageKYC = async (req, res, next) => {
         user.markModified('kyc');
         await user.save();
 
+        // If KYC approved and user already bought ₹499, credit referrer now
+        if (status === 'Approved' || status === 'Verified') {
+            try {
+                const { creditReferralOnQualifiedUnlock } = require('../utils/referralReward');
+                await creditReferralOnQualifiedUnlock(user);
+            } catch (refErr) {
+                console.error('[REFERRAL] KYC approve credit failed:', refErr.message);
+            }
+        }
+
         // Send Push Notification
         try {
             const { sendNotificationToUser } = require('./fcmController');

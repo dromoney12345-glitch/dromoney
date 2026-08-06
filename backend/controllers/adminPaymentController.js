@@ -25,9 +25,19 @@ exports.getPayments = async (req, res) => {
             return obj;
         });
 
+        const { dedupePaymentsForAdmin, aggregateUniqueRevenue } = require('../utils/paymentGuards');
+        const data = dedupePaymentsForAdmin(normalized);
+        const revenue = await aggregateUniqueRevenue();
+
         res.json({
             success: true,
-            data: normalized
+            data,
+            meta: {
+                totalRaw: normalized.length,
+                totalShown: data.length,
+                totalRevenue: revenue.totalGrossRevenue,
+                successCount: revenue.successCount,
+            }
         });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
@@ -46,13 +56,44 @@ exports.updatePaymentStatus = async (req, res) => {
             return res.status(404).json({ success: false, message: "Payment not found" });
         }
 
+        // One successful PLATFORM_UNLOCK per user — check before save
+        if (status === 'Success' && (payment.paymentType || 'PLATFORM_UNLOCK') === 'PLATFORM_UNLOCK') {
+            const already = await Payment.findOne({
+                user: payment.user,
+                paymentType: 'PLATFORM_UNLOCK',
+                status: 'Success',
+                _id: { $ne: payment._id },
+            });
+            if (already) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'This user already has a successful platform unlock payment.',
+                });
+            }
+        }
+
         payment.status = status;
         payment.remarks = remarks;
         payment.processedAt = Date.now();
-        await payment.save();
+        try {
+            await payment.save();
+        } catch (saveErr) {
+            if (saveErr && saveErr.code === 11000) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'A payment entry for this user/plan already exists.',
+                });
+            }
+            throw saveErr;
+        }
 
         // If success, activate the user
         if (status === 'Success') {
+            if ((payment.paymentType || 'PLATFORM_UNLOCK') === 'PLATFORM_UNLOCK') {
+                const { closeSiblingPlatformPayments } = require('../utils/paymentGuards');
+                await closeSiblingPlatformPayments(payment.user, payment._id);
+            }
+
             const user = await User.findById(payment.user);
             if (user) {
                 // Handle Booster Activations
@@ -170,70 +211,9 @@ exports.updatePaymentStatus = async (req, res) => {
                         console.error('Push notification failed for payment activation:', pushErr.message);
                     }
 
-                    // ── REFERRAL REWARD LOGIC ──
-                    // Check if user was referred by someone
-                    if (user.referredBy) {
-                        const Settings = require('../models/Settings');
-                        const ReferralTransaction = require('../models/ReferralTransaction');
-                        
-                        const settings = await Settings.findOne();
-                        const referrer = await User.findById(user.referredBy);
-
-                        // Conditions: System Enabled, Referrer exists, Referrer is subscribed, Not self-referral
-                        if (settings?.referralSystemEnabled && referrer && referrer.isPaid && referrer._id.toString() !== user._id.toString()) {
-                            
-                            try {
-                                // 1. Log Transaction (Unique index on referredUser prevents duplicates)
-                                await ReferralTransaction.create({
-                                    referrer: referrer._id,
-                                    referredUser: user._id,
-                                    amount: settings.referralCommission
-                                });
-
-                                // 2. Atomic Update of Referrer Wallet
-                                await User.findByIdAndUpdate(referrer._id, {
-                                    $inc: {
-                                        'wallet.balance': settings.referralCommission,
-                                        'wallet.lifetimeEarnings': settings.referralCommission,
-                                        'wallet.referralEarnings': settings.referralCommission,
-                                        'referralCount': 1
-                                    },
-                                    $push: {
-                                        notifications: {
-                                            title: 'Commission Received! 💰',
-                                            message: `You have earned a direct referral commission of ₹${settings.referralCommission} from ${user.name}'s purchase!`,
-                                            type: 'success',
-                                            isRead: false
-                                        }
-                                    }
-                                });
-
-                                console.log(`Referral reward of ₹${settings.referralCommission} credited to ${referrer.name} for ${user.name}`);
-
-                                // Send Push Notification to Referrer
-                                try {
-                                    const { sendNotificationToUser } = require('./fcmController');
-                                    await sendNotificationToUser(referrer._id, {
-                                        title: 'Commission Received! 💰',
-                                        body: `You have earned a direct referral commission of ₹${settings.referralCommission} from ${user.name}'s purchase!`,
-                                        data: {
-                                            type: 'commission',
-                                            link: '/user/income'
-                                        }
-                                    });
-                                } catch (pushErr) {
-                                    console.error('Push notification failed for referral commission:', pushErr.message);
-                                }
-                            } catch (err) {
-                                // If index unique constraint fails (code 11000), it means reward already given
-                                if (err.code === 11000) {
-                                    console.log('Referral reward already processed for this user');
-                                } else {
-                                    console.error('Referral Reward Error:', err);
-                                }
-                            }
-                        }
-                    }
+                    // ── REFERRAL: ₹200 only after KYC + ₹499 unlock ──
+                    const { creditReferralOnQualifiedUnlock } = require('../utils/referralReward');
+                    await creditReferralOnQualifiedUnlock(user);
                 }
             }
 

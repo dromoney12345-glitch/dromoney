@@ -190,7 +190,7 @@ const Marketing = () => {
                         <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
                             <h5 className="text-[11px] font-medium text-blue-800 uppercase tracking-wider mb-1">How it works</h5>
                             <p className="text-[10px] font-medium text-blue-600 leading-relaxed">
-                                Share your Play Store referral link. When a friend installs and registers with your code, you receive ₹{rewardAmount} in your wallet.
+                                Share your Play Store referral link. When a friend completes KYC and buys the ₹499 plan, you receive ₹{rewardAmount} in your wallet.
                             </p>
                         </div>
                     </div>
