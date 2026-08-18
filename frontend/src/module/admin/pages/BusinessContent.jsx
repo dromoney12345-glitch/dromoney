@@ -31,7 +31,9 @@ const BusinessContent = () => {
         desc: '',
         badges: ['Trending'],
         videoUrl: '',
-        meetingLink: ''
+        meetingLink: '',
+        price: 199,
+        isPremium: true
     });
 
     // Subscription Settings Data (Multiple Plans)
@@ -191,7 +193,9 @@ const BusinessContent = () => {
             desc: '',
             badges: ['Trending'],
             videoUrl: '',
-            meetingLink: ''
+            meetingLink: '',
+            price: 199,
+            isPremium: true
         });
         setEditingId(null);
     };
@@ -263,7 +267,9 @@ const BusinessContent = () => {
             meetingLink: idea.meetingLink || '',
             howItWorks: idea.howItWorks || '',
             investmentDetails: idea.investmentDetails || '',
-            profitDetails: idea.profitDetails || ''
+            profitDetails: idea.profitDetails || '',
+            price: idea.price || 199,
+            isPremium: idea.isPremium !== false
         });
         setEditingId(idea._id);
         setShowModal(true);
@@ -561,6 +567,20 @@ const BusinessContent = () => {
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Monthly Profit</label>
                                     <input type="text" value={formData.potentialEarnings} onChange={(e) => setFormData({...formData, potentialEarnings: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium outline-none" required />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-medium text-amber-600 uppercase tracking-normal ml-1">Unlock Price (₹)</label>
+                                    <input type="number" min="0" value={formData.price} onChange={(e) => setFormData({...formData, price: Number(e.target.value)})} className="w-full bg-amber-50/40 border border-amber-100 rounded-xl px-4 py-3 text-sm font-medium outline-none" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Premium Idea</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData({ ...formData, isPremium: !formData.isPremium })}
+                                        className={`w-full py-3 rounded-xl text-[11px] font-semibold uppercase tracking-wide ${formData.isPremium ? 'bg-[#5D38F0] text-white' : 'bg-slate-50 text-slate-400'}`}
+                                    >
+                                        {formData.isPremium ? 'Locked until paid' : 'Free for all users'}
+                                    </button>
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Description</label>

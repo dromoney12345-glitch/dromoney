@@ -9,6 +9,8 @@ import Events from './module/user/pages/Events';
 import Profile from './module/user/pages/Profile';
 import Wallet from './module/user/pages/Wallet';
 import Income from './module/user/pages/Income';
+import GuidePage from './module/user/pages/GuidePage';
+import WithdrawalCard from './module/user/pages/WithdrawalCard';
 import Marketing from './module/user/pages/Marketing';
 import MarketingHistory from './module/user/pages/MarketingHistory';
 import TaskRunner from './module/user/pages/TaskRunner';
@@ -218,9 +220,9 @@ function App() {
               <Route index element={<Navigate to="login" replace />} />
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
-              <Route path="kyc" element={<KycSetup />} />
-              <Route path="pending" element={<PendingApproval />} />
             </Route>
+            <Route path="/user/auth/kyc" element={<KycSetup />} />
+            <Route path="/user/auth/pending" element={<PendingApproval />} />
 
             {/* User Module Routes (Protected) */}
             <Route path="/user" element={<ProtectedUserRoute><UserLayout /></ProtectedUserRoute>}>
@@ -228,6 +230,9 @@ function App() {
               <Route path="home" element={<Home />} />
               <Route path="earn" element={<Earn />} />
               <Route path="income" element={<Income />} />
+              <Route path="guide/:slug" element={<GuidePage />} />
+              <Route path="withdrawal-card" element={<WithdrawalCard />} />
+              <Route path="business" element={<BusinessIdeas />} />
               <Route path="marketing" element={<Marketing />} />
               <Route path="marketing-history" element={<MarketingHistory />} />
               <Route path="history" element={<Navigate to="/user/wallet" replace />} />

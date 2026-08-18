@@ -148,44 +148,131 @@ exports.updatePaymentStatus = async (req, res) => {
                     } catch (pushErr) {
                         console.error('Push notification failed for booster activation:', pushErr.message);
                     }
-                } else {
-                    // Handle other payment types
-                    if (payment.paymentType === 'BUSINESS_IDEA_UNLOCK' && payment.businessIdea) {
-                        if (!user.unlockedIdeas.includes(payment.businessIdea)) {
-                            user.unlockedIdeas.push(payment.businessIdea);
-                        }
-                    } else if (payment.paymentType === 'BUSINESS_HUB_PLAN') {
-                        const daysToAdd = payment.durationInDays || 30;
-                        let currentExpiry = user.supportExpiry && new Date(user.supportExpiry) > new Date() 
-                            ? new Date(user.supportExpiry) 
-                            : new Date();
-                        currentExpiry.setDate(currentExpiry.getDate() + daysToAdd);
-                        user.supportExpiry = currentExpiry;
-                        user.activeBusinessPlan = payment.plan || 'Premium Plan';
-                        user.businessPlanStatus = 'active';
-                    } else if (payment.paymentType === 'SUPPORT_CHAT_RENEWAL') {
-                        const daysToAdd = payment.durationInDays || 90;
-                        let currentExpiry = user.supportExpiry && new Date(user.supportExpiry) > new Date() 
-                            ? new Date(user.supportExpiry) 
-                            : new Date();
-                        currentExpiry.setDate(currentExpiry.getDate() + daysToAdd);
-                        user.supportExpiry = currentExpiry;
+                } else if (payment.paymentType === 'BUSINESS_IDEA_UNLOCK') {
+                    const ideaId = payment.businessIdea ? payment.businessIdea.toString() : '';
+                    const already = (user.unlockedIdeas || []).some((id) => id.toString() === ideaId);
+                    if (ideaId && !already) {
+                        user.unlockedIdeas.push(payment.businessIdea);
                     }
+                    user.notifications = user.notifications || [];
+                    user.notifications.push({
+                        title: 'Business Idea Unlocked',
+                        message: `Your payment for ${payment.plan || 'this business idea'} is confirmed. Support content is now open.`,
+                        type: 'success',
+                        isRead: false
+                    });
+                    await user.save();
 
-                    // Default: Platform unlock
-                    user.isPaid = true;
+                    const Transaction = require('../models/Transaction');
+                    await Transaction.create({
+                        user: user._id,
+                        type: 'debit',
+                        currency: 'INR',
+                        amount: payment.amount,
+                        source: payment.plan || 'Business Idea Unlock',
+                        status: 'Success'
+                    });
+
+                    try {
+                        const { sendNotificationToUser } = require('./fcmController');
+                        await sendNotificationToUser(user._id, {
+                            title: 'Business Idea Unlocked 🚀',
+                            body: `Your payment for ${payment.plan || 'this business idea'} is confirmed.`,
+                            data: { type: 'payment', link: '/user/business-ideas' }
+                        });
+                    } catch (pushErr) {
+                        console.error('Push notification failed for idea unlock:', pushErr.message);
+                    }
+                } else if (payment.paymentType === 'BUSINESS_HUB_PLAN') {
+                    const daysToAdd = Number(payment.durationInDays) || 30;
+                    let currentExpiry = user.supportExpiry && new Date(user.supportExpiry) > new Date()
+                        ? new Date(user.supportExpiry)
+                        : new Date();
+                    currentExpiry.setDate(currentExpiry.getDate() + daysToAdd);
+                    user.supportExpiry = currentExpiry;
+                    user.activeBusinessPlan = payment.plan || 'Premium Plan';
+                    user.businessPlanStatus = 'active';
+                    user.notifications = user.notifications || [];
+                    user.notifications.push({
+                        title: 'Premium Support Activated',
+                        message: `${payment.plan || 'Premium Plan'} is now active. Support chat and hub are unlocked.`,
+                        type: 'success',
+                        isRead: false
+                    });
+                    await user.save();
+
+                    const Transaction = require('../models/Transaction');
+                    await Transaction.create({
+                        user: user._id,
+                        type: 'debit',
+                        currency: 'INR',
+                        amount: payment.amount,
+                        source: payment.plan || 'Business Hub Plan',
+                        status: 'Success'
+                    });
+
+                    try {
+                        const { sendNotificationToUser } = require('./fcmController');
+                        await sendNotificationToUser(user._id, {
+                            title: 'Premium Support Activated 🚀',
+                            body: `Your ${payment.plan || 'Premium Plan'} is confirmed.`,
+                            data: { type: 'payment', link: '/user/business-ideas' }
+                        });
+                    } catch (pushErr) {
+                        console.error('Push notification failed for business plan:', pushErr.message);
+                    }
+                } else if (payment.paymentType === 'SUPPORT_CHAT_RENEWAL') {
+                    const daysToAdd = Number(payment.durationInDays) || 90;
+                    let currentExpiry = user.supportExpiry && new Date(user.supportExpiry) > new Date()
+                        ? new Date(user.supportExpiry)
+                        : new Date();
+                    currentExpiry.setDate(currentExpiry.getDate() + daysToAdd);
+                    user.supportExpiry = currentExpiry;
+                    user.businessPlanStatus = 'active';
+                    user.notifications = user.notifications || [];
+                    user.notifications.push({
+                        title: 'Support Chat Renewed',
+                        message: `Support chat is extended by ${daysToAdd} days.`,
+                        type: 'success',
+                        isRead: false
+                    });
+                    await user.save();
+
+                    const Transaction = require('../models/Transaction');
+                    await Transaction.create({
+                        user: user._id,
+                        type: 'debit',
+                        currency: 'INR',
+                        amount: payment.amount,
+                        source: payment.plan || 'Support Chat Renewal',
+                        status: 'Success'
+                    });
+
+                    try {
+                        const { sendNotificationToUser } = require('./fcmController');
+                        await sendNotificationToUser(user._id, {
+                            title: 'Support Chat Renewed 💬',
+                            body: `Your support access is extended by ${daysToAdd} days.`,
+                            data: { type: 'payment', link: '/user/chat-support' }
+                        });
+                    } catch (pushErr) {
+                        console.error('Push notification failed for support renewal:', pushErr.message);
+                    }
+                } else {
+                    // PLATFORM_UNLOCK only — do not unlock wallet for business/support payments
+                    const { activateVirtualWallet } = require('../utils/walletLedger');
+                    await activateVirtualWallet(user);
 
                     user.notifications = user.notifications || [];
                     user.notifications.push({
-                        title: 'Platform Access Unlocked! 🚀',
-                        message: `Your payment for ${payment.plan || 'Lifetime Access'} is confirmed. Welcome to DroMoney Premium!`,
+                        title: 'Virtual Wallet Unlocked',
+                        message: 'Withdrawal Card approved. Virtual Wallet is now active for 6 months.',
                         type: 'success',
                         isRead: false
                     });
 
                     await user.save();
 
-                    // Create standard Transaction for user history
                     const Transaction = require('../models/Transaction');
                     await Transaction.create({
                         user: user._id,
@@ -196,7 +283,6 @@ exports.updatePaymentStatus = async (req, res) => {
                         status: 'Success'
                     });
 
-                    // Send Push Notification to the unlocked user
                     try {
                         const { sendNotificationToUser } = require('./fcmController');
                         await sendNotificationToUser(user._id, {
@@ -211,7 +297,6 @@ exports.updatePaymentStatus = async (req, res) => {
                         console.error('Push notification failed for payment activation:', pushErr.message);
                     }
 
-                    // ── REFERRAL: ₹200 only after KYC + ₹499 unlock ──
                     const { creditReferralOnQualifiedUnlock } = require('../utils/referralReward');
                     await creditReferralOnQualifiedUnlock(user);
                 }

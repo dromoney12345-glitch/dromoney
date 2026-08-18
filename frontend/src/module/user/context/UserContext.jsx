@@ -16,7 +16,8 @@ const INITIAL_USER_STATE = {
     earnings: { today: 0, total: 0, referral: 0 },
     coins: { total: 0, history: [] },
     referrals: { count: 0, code: '', link: '' },
-    wallet: { balance: 0, transactions: [] },
+    wallet: { balance: 0, pendingBalance: 0, virtualBalance: 0, transactions: [] },
+    withdrawalCard: { status: 'none' },
     kycStatus: 'Not Started',
     profileImage: '',
     futureFund: { status: 'locked', progress: 0, criteria: [] },
@@ -24,6 +25,7 @@ const INITIAL_USER_STATE = {
     isSupportBoosterActive: false,
     isTaskBoosterActive: false,
     supportExpiry: null,
+    unlockedIdeas: [],
     activeBusinessPlan: 'Free',
     businessPlanStatus: 'none',
     completedTasks: [],
@@ -42,7 +44,7 @@ export const UserProvider = ({ children }) => {
 
     useEffect(() => {
         // Cache bust for new versions
-        const CURRENT_VERSION = '1.1';
+        const CURRENT_VERSION = '2.0';
         if (localStorage.getItem('dromoney_app_version') !== CURRENT_VERSION) {
             // Preserve token but clear other cached data like notifications
             const token = localStorage.getItem('dromoney_token');
@@ -223,9 +225,12 @@ export const UserProvider = ({ children }) => {
                 link: buildReferralLink(dbUser.referralCode, settings?.referralLinkBaseUrl)
             },
             wallet: {
-                balance: Math.max(dynamicWalletBalance, dbUser.wallet?.balance || 0),
+                balance: dbUser.wallet?.balance || 0,
+                pendingBalance: dbUser.wallet?.pendingBalance || 0,
+                virtualBalance: dbUser.wallet?.virtualBalance || 0,
                 transactions: inrTransactions
             },
+            withdrawalCard: dbUser.withdrawalCard || { status: 'none' },
             kycStatus: dbUser.kyc?.status || 'Not Started',
             kycRejectionReason: dbUser.kyc?.rejectionReason || '',
             profileImage: dbUser.profileImage || '',
@@ -234,8 +239,11 @@ export const UserProvider = ({ children }) => {
                 progress: dbUser.futureFund?.progress || 0,
                 criteria: dbUser.futureFund?.criteria || []
             },
-            watchedAdsCount: dbUser.watchedAds ? dbUser.watchedAds.length : 0,
+            watchedAdsCount: dbUser.lifetimeAdsWatched || (dbUser.watchedAds ? dbUser.watchedAds.length : 0),
+            lifetimeAdsWatched: dbUser.lifetimeAdsWatched || 0,
+            lifetimeTasksCompleted: dbUser.lifetimeTasksCompleted || 0,
             supportExpiry: dbUser.supportExpiry,
+            unlockedIdeas: (dbUser.unlockedIdeas || []).map((id) => id.toString()),
             activeBusinessPlan: dbUser.activeBusinessPlan || 'Free',
             businessPlanStatus: dbUser.businessPlanStatus || 'none',
             businessHubFirstAccessedAt: dbUser.businessHubFirstAccessedAt,

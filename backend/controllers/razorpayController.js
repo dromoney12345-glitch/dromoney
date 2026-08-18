@@ -31,7 +31,7 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
         if (!idea) return next(new ErrorResponse('Business Idea not found', 404));
         if (user.unlockedIdeas.includes(ideaId)) return next(new ErrorResponse('Already unlocked', 400));
         
-        finalAmount = idea.price;
+        finalAmount = Number(idea.price) > 0 ? Number(idea.price) : 199;
         planName = `Unlock: ${idea.title}`;
         pType = 'BUSINESS_IDEA_UNLOCK';
     } else if (type === 'SUPPORT_CHAT_RENEWAL') {
@@ -288,30 +288,52 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
                 source: payment.plan || (payment.paymentType === 'SUPPORT_BOOSTER' ? 'Event Support Kit' : 'Daily Boost Pass'),
                 status: 'Success'
             });
+        } else if (payment.paymentType === 'BUSINESS_HUB_PLAN') {
+            const daysToAdd = payment.durationInDays || 30;
+            let currentExpiry = user.supportExpiry && new Date(user.supportExpiry) > new Date()
+                ? new Date(user.supportExpiry)
+                : new Date();
+            currentExpiry.setDate(currentExpiry.getDate() + daysToAdd);
+            user.supportExpiry = currentExpiry;
+            user.activeBusinessPlan = payment.plan || 'Premium Plan';
+            user.businessPlanStatus = 'active';
+            await user.save();
+
+            const Transaction = require('../models/Transaction');
+            await Transaction.create({
+                user: user._id,
+                type: 'debit',
+                currency: 'INR',
+                amount: payment.amount,
+                source: payment.plan || 'Business Hub Plan',
+                status: 'Success'
+            });
+        } else if (payment.paymentType === 'SUPPORT_CHAT_RENEWAL') {
+            const daysToAdd = payment.durationInDays || 90;
+            let currentExpiry = user.supportExpiry && new Date(user.supportExpiry) > new Date()
+                ? new Date(user.supportExpiry)
+                : new Date();
+            currentExpiry.setDate(currentExpiry.getDate() + daysToAdd);
+            user.supportExpiry = currentExpiry;
+            user.businessPlanStatus = 'active';
+            await user.save();
+
+            const Transaction = require('../models/Transaction');
+            await Transaction.create({
+                user: user._id,
+                type: 'debit',
+                currency: 'INR',
+                amount: payment.amount,
+                source: payment.plan || 'Support Chat Renewal',
+                status: 'Success'
+            });
         } else {
             console.log(`[PAYMENT] Unlocking Platform for user ${user._id}`);
             
-            // Set user isPaid = true (Platform Unlock)
             user.isPaid = true;
             user.unlockedAt = new Date();
-            
-            // If it's a Business Hub Plan, set supportExpiry
-            if (payment.paymentType === 'BUSINESS_HUB_PLAN') {
-                const daysToAdd = payment.durationInDays || 30;
-                
-                let currentExpiry = user.supportExpiry && new Date(user.supportExpiry) > new Date() 
-                    ? new Date(user.supportExpiry) 
-                    : new Date();
-                
-                currentExpiry.setDate(currentExpiry.getDate() + daysToAdd);
-                user.supportExpiry = currentExpiry;
-                user.activeBusinessPlan = payment.plan || 'Premium Plan';
-                user.businessPlanStatus = 'active';
-            }
-            
             await user.save();
 
-            // Referral ₹200 only after KYC + ₹499 unlock
             try {
                 const { creditReferralOnQualifiedUnlock } = require('../utils/referralReward');
                 await creditReferralOnQualifiedUnlock(user);
@@ -319,7 +341,6 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
                 console.error('[REFERRAL ERROR] Failed to process reward:', refErr.message);
             }
 
-            // Create standard Transaction for user history
             const Transaction = require('../models/Transaction');
             await Transaction.create({
                 user: user._id,
@@ -385,9 +406,20 @@ exports.submitManualPayment = asyncHandler(async (req, res, next) => {
     let finalAmount = parseFloat(amount);
     let planName = reqPlanName || 'Manual Payment';
     let pType = type || 'PLATFORM_UNLOCK';
-    let durationDays = reqDurationInDays || 30;
+    let durationDays = parseInt(reqDurationInDays, 10) || 30;
 
-    if (!reqPlanName) {
+    if (pType === 'BUSINESS_IDEA_UNLOCK') {
+        const idea = await BusinessIdea.findById(ideaId);
+        if (!idea) return next(new ErrorResponse('Business Idea not found', 404));
+        const alreadyUnlocked = (user.unlockedIdeas || []).some((id) => id.toString() === String(ideaId));
+        if (alreadyUnlocked) return next(new ErrorResponse('Idea already unlocked', 400));
+        finalAmount = Number(idea.price) > 0 ? Number(idea.price) : 199;
+        planName = reqPlanName || `Unlock: ${idea.title}`;
+    } else if (pType === 'SUPPORT_CHAT_RENEWAL') {
+        finalAmount = 150;
+        planName = reqPlanName || '3 Months Support Extension';
+        durationDays = 90;
+    } else if (!reqPlanName) {
         if (pType === 'PLATFORM_UNLOCK') {
             planName = 'Lifetime Access';
             durationDays = 9999;

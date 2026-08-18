@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { 
-    CreditCard, Wallet as WalletIcon, IndianRupee, ArrowUpRight, 
-    ArrowDownLeft, History, Filter, AlertCircle, Sparkles, Coins, 
-    TrendingUp, ChevronRight, CheckCircle2, Share2, Info, ArrowRightLeft, X, Building, Clock, Loader2, ShieldCheck
+    ChevronLeft, Wallet as WalletIcon, IndianRupee, ArrowUpRight, 
+    ArrowDownLeft, History, Filter, AlertCircle, Coins, 
+    ChevronRight, CheckCircle2, Info, X, Building, Clock, Loader2, ShieldCheck, Users, FileText
 } from 'lucide-react';
 import UnlockModal from '../components/UnlockModal';
 import api from '../../shared/services/api';
 
 const Wallet = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { userData, requestWithdrawal, addNotification, refreshUserProfile } = useUser();
-    const { wallet, coins, name, isPaid } = userData;
+    const { wallet, coins, name, isPaid, withdrawalCard } = userData;
+    const pendingAmt = Number(wallet?.pendingBalance || 0);
+    const virtualAmt = Number(wallet?.virtualBalance || 0);
+    const virtualUnlocked = !!isPaid && withdrawalCard?.status === 'active';
+    const [pane, setPane] = useState(location.state?.pane === 'pending' ? 'pending' : 'virtual');
+    const [pendingFilter, setPendingFilter] = useState('All');
     const [activeTab, setActiveTab] = useState('cash'); // 'cash' or 'coins'
     const [amount, setAmount] = useState('');
     const [isUnlockOpen, setIsUnlockOpen] = useState(false);
@@ -39,6 +45,11 @@ const Wallet = () => {
 
     const [showLimitsModal, setShowLimitsModal] = useState(false);
     const [showSecurityModal, setShowSecurityModal] = useState(false);
+    const [walletMeta, setWalletMeta] = useState({ withdrawable: 0, lockedReserve: 0 });
+    const [referrals, setReferrals] = useState([]);
+
+    const lockedReserve = Number(walletMeta.lockedReserve || withdrawalCard?.lockedReserve || 0);
+    const withdrawableAmt = Number(walletMeta.withdrawable ?? Math.max(0, virtualAmt - lockedReserve));
 
     const handleSettingClick = (id) => {
         if (id === 'withdraw') {
@@ -64,9 +75,22 @@ const Wallet = () => {
             if (res.success) {
                 setPendingWithdrawal(res.pendingWithdrawal || null);
                 setRecentWithdrawal(res.recentWithdrawal || null);
+                setWalletMeta({
+                    withdrawable: Number(res.withdrawable ?? 0),
+                    lockedReserve: Number(res.lockedReserve ?? 0),
+                });
             }
         } catch (err) {
             console.error("Failed to load wallet status:", err);
+        }
+    };
+
+    const fetchReferrals = async () => {
+        try {
+            const res = await api.get('/user/data/referrals');
+            if (res.success) setReferrals(res.data || []);
+        } catch (err) {
+            console.error('Failed to load referrals:', err);
         }
     };
 
@@ -109,7 +133,14 @@ const Wallet = () => {
         };
         fetchSettings();
         fetchWalletStatus();
+        fetchReferrals();
     }, []);
+
+    useEffect(() => {
+        if (location.state?.pane === 'pending' || location.state?.pane === 'virtual') {
+            setPane(location.state.pane);
+        }
+    }, [location.state]);
 
     // Listen to real-time status updates from UserContext socket events
     useEffect(() => {
@@ -133,8 +164,8 @@ const Wallet = () => {
     }, []);
 
     const handleWithdraw = async () => {
-        if (!isPaid) {
-            setIsUnlockOpen(true);
+        if (!virtualUnlocked) {
+            navigate('/user/guide/card');
             return;
         }
 
@@ -267,9 +298,226 @@ const Wallet = () => {
             return true;
         });
 
+    const pendingFilteredTransactions = (wallet.transactions || []).filter((tx) => {
+        const t = `${tx.source || ''} ${tx.title || ''}`.toLowerCase();
+        if (pendingFilter === 'Invite Earnings') return /invite|referral|refer/.test(t);
+        if (pendingFilter === 'Task Earnings') return /task/.test(t);
+        if (pendingFilter === 'Transferred') return /released to virtual|transfer to virtual|invite released/.test(t);
+        return true;
+    });
+
+    const inviteStatusLabel = (ref) => {
+        if (ref.status === 'Completed') return { text: 'Released to Virtual', cls: 'text-emerald-700 bg-emerald-50' };
+        if (ref.status === 'Failed') return { text: 'Removed', cls: 'text-red-700 bg-red-50' };
+        if (ref.milestone === 'card_active') return { text: 'Card active — releasing', cls: 'text-emerald-700 bg-emerald-50' };
+        if (ref.milestone === 'day14') return { text: '14-day warning', cls: 'text-red-700 bg-red-50' };
+        if (ref.milestone === 'day7') return { text: '7-day penalty zone', cls: 'text-amber-700 bg-amber-50' };
+        if (ref.milestone === 'day3_bonus') return { text: `${ref.daysLeft} days left · bonus window`, cls: 'text-[#462211] bg-[#FFF5F0]' };
+        if (ref.milestone === 'card_pending') return { text: `${ref.daysLeft} days left for card`, cls: 'text-[#462211] bg-[#FFF5F0]' };
+        return { text: 'Waiting for KYC', cls: 'text-slate-600 bg-slate-100' };
+    };
+
+    const pendingTabs = ['All', 'Invite Earnings', 'Task Earnings', 'Transferred'];
+
     return (
-        <div className="flex flex-col gap-2.5 p-3 animate-in fade-in duration-700 bg-[#f8fafc] font-['Poppins']">
+        <div className="flex flex-col gap-2.5 p-3 animate-in fade-in duration-700 bg-[#FCF8F5] font-poppins">
             <UnlockModal isOpen={isUnlockOpen} onClose={() => setIsUnlockOpen(false)} />
+
+            {pane === 'pending' ? (
+                <>
+                    <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                            <button type="button" onClick={() => setPane('virtual')} className="text-[#462211] active:scale-90 shrink-0">
+                                <ChevronLeft size={22} strokeWidth={2.2} />
+                            </button>
+                            <h1 className="text-[16px] font-medium text-[#462211]">Pending Wallet</h1>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setPane('virtual')}
+                            className="bg-white border border-[#EDE4DC] text-[#462211] px-2.5 py-1.5 rounded-full text-[10px] font-medium flex items-center gap-1.5 shrink-0"
+                        >
+                            <WalletIcon size={13} /> Virtual Wallet
+                        </button>
+                    </div>
+
+                    <div className="bg-[#FFF5F0] rounded-2xl p-4">
+                        <div className="flex items-start justify-between">
+                            <div>
+                                <p className="text-[12px] text-[#462211]">Wallet Balance</p>
+                                <p className="text-[28px] font-medium text-[#462211] leading-tight mt-1">
+                                    ₹ {pendingAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </p>
+                            </div>
+                            <div className="w-11 h-11 rounded-full bg-[#F3E8E0] text-[#462211] flex items-center justify-center">
+                                <WalletIcon size={18} />
+                            </div>
+                        </div>
+                        <div className="border-t border-[#E8D5C8] mt-3 pt-3">
+                            <p className="text-[11px] text-[#7A5648] leading-snug">
+                                This is your pending balance. Amount from invites, tasks, ads or other earnings will be transferred to your Virtual Wallet.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="bg-[#FFF5F0] rounded-2xl p-4">
+                        <div className="flex items-center gap-1.5 mb-2">
+                            <Info size={14} className="text-[#462211]" />
+                            <h3 className="text-[13px] font-medium text-[#462211]">Important Information</h3>
+                        </div>
+                        <ul className="space-y-1.5 text-[12px] text-[#462211] leading-snug list-disc pl-4">
+                            <li>Pending earnings stay here first before they move to your Virtual Wallet.</li>
+                            <li>Transfers to Virtual Wallet typically complete within 14–28 days.</li>
+                            <li>An active Withdrawal Card is required to redeem from Virtual Wallet.</li>
+                            <li>Invite earnings release when your invitee creates a Withdrawal Card.</li>
+                            <li>If invitee does not create card within 28 days, invite reward is removed.</li>
+                        </ul>
+                    </div>
+
+                    {referrals.length > 0 && (
+                        <>
+                            <h3 className="text-[13px] font-medium text-[#462211] px-0.5">Your Invites</h3>
+                            <div className="bg-white rounded-2xl overflow-hidden divide-y divide-slate-50">
+                                {referrals.map((ref) => {
+                                    const badge = inviteStatusLabel(ref);
+                                    return (
+                                        <div key={ref._id} className="px-3 py-3">
+                                            <div className="flex items-start justify-between gap-2">
+                                                <div className="min-w-0">
+                                                    <p className="text-[13px] font-medium text-[#462211] truncate">{ref.name}</p>
+                                                    <p className="text-[10px] text-slate-400 mt-0.5">₹{ref.amount} · {ref.status}</p>
+                                                </div>
+                                                <span className={`text-[9px] font-medium px-2 py-0.5 rounded-full shrink-0 ${badge.cls}`}>
+                                                    {badge.text}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </>
+                    )}
+
+                    <h3 className="text-[13px] font-medium text-[#462211] px-0.5">Settings</h3>
+                    <div className="bg-white rounded-2xl overflow-hidden">
+                        {[
+                            { id: 'refer', title: 'Invite Reward', subtitle: 'Earn commission on every invite', icon: <Users size={16} className="text-[#462211]" /> },
+                            { id: 'limits', title: 'Transfer Limits', subtitle: 'Check daily and minimum limits', icon: <Filter size={16} className="text-[#462211]" /> },
+                            { id: 'security', title: 'Security', subtitle: 'Keep your account safe and secure', icon: <ShieldCheck size={16} className="text-[#462211]" /> },
+                        ].map((item, idx) => (
+                            <button
+                                key={item.id}
+                                type="button"
+                                onClick={() => handleSettingClick(item.id)}
+                                className={`w-full px-3 py-3 flex items-center justify-between text-left ${idx < 2 ? 'border-b border-slate-100' : ''}`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-lg bg-[#FFF5F0] flex items-center justify-center">
+                                        {item.icon}
+                                    </div>
+                                    <div>
+                                        <h4 className="text-[13px] font-medium text-[#462211] leading-tight">{item.title}</h4>
+                                        <p className="text-[10px] text-slate-400 mt-0.5">{item.subtitle}</p>
+                                    </div>
+                                </div>
+                                <ChevronRight size={16} className="text-slate-300" />
+                            </button>
+                        ))}
+                    </div>
+
+                    <h3 className="text-[13px] font-medium text-[#462211] px-0.5">History</h3>
+                    <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+                        {pendingTabs.map((tab) => (
+                            <button
+                                key={tab}
+                                type="button"
+                                onClick={() => setPendingFilter(tab)}
+                                className={`px-3 py-1.5 rounded-lg text-[10px] font-medium whitespace-nowrap ${
+                                    pendingFilter === tab
+                                        ? 'bg-[#FFF5F0] text-[#462211] border border-[#462211]/30'
+                                        : 'bg-white text-slate-500 border border-transparent'
+                                }`}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="bg-white rounded-2xl min-h-[180px] flex flex-col pb-8">
+                        {pendingFilteredTransactions.length === 0 ? (
+                            <div className="flex-1 flex flex-col items-center justify-center py-12">
+                                <div className="w-16 h-16 rounded-full bg-[#FFF5F0] text-[#462211] flex items-center justify-center mb-3">
+                                    <FileText size={26} />
+                                </div>
+                                <p className="text-[14px] font-medium text-[#462211]">No Records Found</p>
+                                <p className="text-[12px] text-slate-400 mt-0.5">No transactions yet.</p>
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-slate-50">
+                                {pendingFilteredTransactions.map((tx, index) => (
+                                    <div key={tx.id || index} className="px-3 py-3 flex items-center justify-between">
+                                        <div className="min-w-0">
+                                            <h4 className="text-[12px] font-medium text-[#462211] truncate">{tx.title || tx.source}</h4>
+                                            <p className="text-[9px] text-slate-400 mt-0.5">
+                                                {tx.date ? new Date(tx.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Just now'}
+                                            </p>
+                                        </div>
+                                        <p className={`text-[13px] font-medium shrink-0 ${tx.type === 'credit' ? 'text-emerald-600' : 'text-[#462211]'}`}>
+                                            {tx.type === 'credit' ? '+' : '-'}₹{Number(tx.amount).toFixed(2)}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </>
+            ) : (
+                <>
+            <div className="flex items-center justify-between gap-2">
+                <h1 className="text-[16px] font-medium text-[#462211]">Virtual Wallet</h1>
+                <button
+                    type="button"
+                    onClick={() => setPane('pending')}
+                    className="bg-white border border-[#EDE4DC] text-[#462211] px-2.5 py-1.5 rounded-full text-[10px] font-medium flex items-center gap-1.5 shrink-0"
+                >
+                    <Clock size={13} /> Pending Wallet
+                </button>
+            </div>
+
+            <div className="bg-white border border-[#EDE4DC] rounded-2xl p-3.5 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-[#FFF5F0] rounded-xl p-3">
+                        <p className="text-[9px] uppercase tracking-widest text-[#462211]">Virtual Wallet</p>
+                        <p className="text-lg font-medium text-[#462211] mt-1">₹{virtualAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                        <p className="text-[9px] text-slate-400 mt-0.5">{virtualUnlocked ? 'Total balance' : 'Locked'}</p>
+                    </div>
+                    <button type="button" onClick={() => setPane('pending')} className="bg-[#FFF5F0] rounded-xl p-3 text-left">
+                        <p className="text-[9px] uppercase tracking-widest text-[#462211]">Pending Wallet</p>
+                        <p className="text-lg font-medium text-[#462211] mt-1">₹{pendingAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                        <p className="text-[9px] text-slate-400 mt-0.5">Tap to view</p>
+                    </button>
+                </div>
+                {virtualUnlocked && lockedReserve > 0 && (
+                    <div className="grid grid-cols-2 gap-3 pt-1 border-t border-[#F3E8E0]">
+                        <div className="rounded-xl p-2.5 bg-[#FCF8F5]">
+                            <p className="text-[9px] text-[#7A5648]">Withdrawable</p>
+                            <p className="text-[15px] font-medium text-emerald-700 mt-0.5">₹{withdrawableAmt.toFixed(2)}</p>
+                        </div>
+                        <div className="rounded-xl p-2.5 bg-[#FCF8F5]">
+                            <p className="text-[9px] text-[#7A5648]">Reserved (Card)</p>
+                            <p className="text-[15px] font-medium text-[#462211] mt-0.5">₹{lockedReserve.toFixed(2)}</p>
+                        </div>
+                    </div>
+                )}
+                {!virtualUnlocked && (
+                    <button
+                        type="button"
+                        onClick={() => navigate('/user/guide/card')}
+                        className="mt-3 w-full bg-[#462211] text-white py-2.5 rounded-xl text-[11px] font-medium uppercase tracking-widest"
+                    >
+                        Create Withdrawal Card
+                    </button>
+                )}
+            </div>
 
             {/* Green Card: Waiting for Admin Confirmation */}
             {pendingWithdrawal && (
@@ -293,7 +541,7 @@ const Wallet = () => {
             <div className="flex bg-slate-200/50 p-1 rounded-lg border border-slate-200/50">
                 <button 
                     onClick={() => { setActiveTab('cash'); setFilter('All'); }}
-                    className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 transition-all ${activeTab === 'cash' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 font-medium'}`}
+                    className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 transition-all ${activeTab === 'cash' ? 'bg-white text-[#462211] shadow-sm' : 'text-slate-500 font-medium'}`}
                 >
                     <IndianRupee size={14} />
                     <span className="text-[9px] uppercase font-medium tracking-wider">Cash</span>
@@ -312,58 +560,63 @@ const Wallet = () => {
                 <h2 className="text-[15px] font-medium text-slate-800 tracking-tight">My Cards</h2>
             </div>
 
-            <div className="relative rounded-xl p-4.5 shadow-lg overflow-hidden group bg-gradient-to-br from-[#0f1d3a] via-[#1a2c52] to-[#0f1d3a] transition-all duration-500">
-                <div className="absolute top-0 right-0 w-[150%] h-[150%] border-[25px] border-white/5 rounded-full -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
-                
-                <div className="relative z-10 flex flex-col justify-between h-[145px]">
+            <div className="relative rounded-2xl p-4 shadow-lg overflow-hidden bg-gradient-to-br from-[#6B2A12] via-[#8B3A18] to-[#4A1C0C]">
+                <div className="absolute right-[-10px] bottom-[-20px] text-white/10 text-[120px] font-medium leading-none pointer-events-none">D</div>
+
+                <div className="relative z-10 flex flex-col justify-between h-[158px]">
                     <div className="flex justify-between items-start">
-                        <span className="text-[8px] font-medium text-white/40 uppercase tracking-[0.2em]">{activeTab === 'cash' ? 'Cash Account' : 'Coin Assets'}</span>
-                        <div className="flex relative items-center">
-                            <div className="w-5.5 h-5.5 bg-white/20 rounded-full"></div>
-                            <div className="w-5.5 h-5.5 bg-white/40 rounded-full -ml-2.5"></div>
+                        <div>
+                            <p className="text-[11px] font-medium text-white tracking-[0.18em]">DROMONEY</p>
+                            <p className="text-[8px] text-white/70 tracking-[0.16em] mt-0.5">WITHDRAWAL CARD</p>
                         </div>
+                        <p className="text-[8px] text-white/70 tracking-[0.14em]">WITHDRAWAL CARD</p>
                     </div>
 
-                    <div className="flex flex-col">
-                        <div className="flex items-center gap-2.5 text-white/80 font-mono tracking-[0.1em] text-[13px]">
-                             <span>••••</span> <span>••••</span> <span>••••</span> <span>5222</span>
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-7 rounded-md bg-gradient-to-br from-amber-200 to-amber-500 border border-amber-100/40" />
+                        <div className="flex items-center gap-2 text-white/90 font-mono tracking-[0.12em] text-[13px]">
+                            <span>****</span><span>****</span><span>****</span>
+                            <span>{String(userData?.phone || '').replace(/\D/g, '').slice(-4) || '••••'}</span>
                         </div>
-                        <h2 className="text-2xl font-medium text-white tracking-tight flex items-center gap-1">
-                            {activeTab === 'cash' ? <IndianRupee size={18} className="opacity-80" /> : <Coins size={18} className="opacity-80" />}
-                            {activeTab === 'cash' ? Number(wallet.balance).toFixed(2) : coins.total.toLocaleString()}
-                        </h2>
                     </div>
 
                     <div className="flex justify-between items-end">
-                        <div className="flex flex-col">
-                            <p className="text-[6.5px] font-medium text-white/30 uppercase tracking-widest mb-0.5">Card Holder</p>
-                            <p className="text-[10px] font-medium text-white uppercase tracking-wider">{name || 'USER'}</p>
+                        <div>
+                            <p className="text-[8px] text-white/55">Wallet Balance</p>
+                            <p className="text-[20px] font-medium text-white tracking-tight">
+                                {activeTab === 'cash'
+                                    ? `₹ ${Number(wallet.balance).toFixed(2)}`
+                                    : coins.total.toLocaleString()}
+                            </p>
+                            <p className="text-[10px] font-medium text-white/90 uppercase tracking-wider mt-0.5">{name || 'USER'}</p>
                         </div>
-                        <div className="flex flex-col items-end">
-                            <p className="text-[6.5px] font-medium text-white/30 uppercase tracking-widest mb-0.5">Expires</p>
-                            <p className="text-[10px] font-medium text-white uppercase tracking-wider">07/27</p>
+                        <div className="text-right">
+                            <p className="text-[8px] text-white/55 tracking-widest">VALID THRU</p>
+                            <p className="text-[11px] font-medium text-white">
+                                {withdrawalCard?.expiresAt
+                                    ? `${String(new Date(withdrawalCard.expiresAt).getMonth() + 1).padStart(2, '0')}/${String(new Date(withdrawalCard.expiresAt).getFullYear()).slice(-2)}`
+                                    : '—'}
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* --- Refer & Earn Promo --- */}
-            <div 
+            <div
                 onClick={() => navigate('/user/marketing')}
-                className="bg-emerald-50 border border-emerald-100 rounded-lg p-3.5 flex items-center justify-between cursor-pointer active:scale-95 transition-all shadow-sm"
+                className="bg-white rounded-xl p-3.5 flex items-center justify-between cursor-pointer active:scale-[0.99] shadow-[0_2px_10px_rgba(15,23,42,0.04)]"
             >
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center text-white shadow-sm">
-                        <Share2 size={20} />
+                    <div className="w-10 h-10 bg-[#462211] rounded-full flex items-center justify-center text-white shrink-0">
+                        <Users size={18} />
                     </div>
                     <div>
-                        <h4 className="text-[12px] text-emerald-900 uppercase tracking-tight leading-none mb-1">Refer & Earn</h4>
-                        <p className="text-[9px] font-medium text-emerald-600/70">Get ₹200 for every friend!</p>
+                        <h4 className="text-[13px] font-medium text-slate-800 leading-none mb-1">Invite & Earn</h4>
+                        <p className="text-[10px] font-medium text-slate-400">Invite your friends and earn rewards</p>
                     </div>
                 </div>
-                <div className="bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-[9px] uppercase tracking-widest">
-                    Invite
-                </div>
+                <ChevronRight size={16} className="text-slate-300" />
             </div>
 
             {/* --- Withdrawal Section --- */}
@@ -371,11 +624,10 @@ const Wallet = () => {
                 <div id="withdraw-section" className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm flex flex-col gap-3">
                     {/* Header with Fee Information */}
                     <div className="flex items-center justify-between border-b border-slate-50 pb-2.5">
-                        <h3 className="text-[11px] text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                            <ArrowRightLeft size={14} className="text-blue-500" />
+                        <h3 className="text-[13px] font-medium text-slate-800 flex items-center gap-1.5">
                             Redeem Cash
                         </h3>
-                        <span className="bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded-full text-[8.5px] uppercase tracking-wider">
+                        <span className="text-[11px] font-medium text-[#462211]">
                             ₹5 Fee Added
                         </span>
                     </div>
@@ -393,7 +645,7 @@ const Wallet = () => {
                             </div>
                             <div className="border-t border-slate-200/60 pt-1.5 flex justify-between items-center text-[11px] text-slate-800">
                                 <span>Total Deducted from Wallet:</span>
-                                <span className="text-blue-600">₹{(parseFloat(amount) + 5).toFixed(2)}</span>
+                                <span className="text-[#462211]">₹{(parseFloat(amount) + 5).toFixed(2)}</span>
                             </div>
                         </div>
                     )}
@@ -403,13 +655,13 @@ const Wallet = () => {
                         <div className="flex bg-slate-50 p-1 rounded-lg border border-slate-100">
                             <button
                                 onClick={() => setPaymentMethod('UPI')}
-                                className={`flex-1 py-2 rounded-md text-xs font-medium transition-all ${paymentMethod === 'UPI' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                className={`flex-1 py-2 rounded-md text-xs font-medium transition-all ${paymentMethod === 'UPI' ? 'bg-white text-[#462211] shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                             >
                                 UPI Transfer
                             </button>
                             <button
                                 onClick={() => setPaymentMethod('Bank Transfer')}
-                                className={`flex-1 py-2 rounded-md text-xs font-medium transition-all ${paymentMethod === 'Bank Transfer' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                className={`flex-1 py-2 rounded-md text-xs font-medium transition-all ${paymentMethod === 'Bank Transfer' ? 'bg-white text-[#462211] shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                             >
                                 Bank Transfer
                             </button>
@@ -420,7 +672,7 @@ const Wallet = () => {
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                             placeholder={`Amount (Min. ₹${minWithdrawal})`}
-                            className="w-full bg-slate-50 border border-slate-100 rounded-lg py-2.5 px-3.5 text-[13px] font-medium text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-blue-500 transition-all"
+                            className="w-full bg-white border border-slate-200 rounded-lg py-2.5 px-3.5 text-[13px] font-medium text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-[#462211] transition-all"
                         />
 
                         {paymentMethod === 'UPI' && (
@@ -430,7 +682,7 @@ const Wallet = () => {
                                     value={bankDetails.upiId}
                                     onChange={(e) => setBankDetails({...bankDetails, upiId: e.target.value})}
                                     placeholder="Enter your UPI ID (e.g. name@ybl)"
-                                    className="w-full bg-slate-50 border border-slate-100 rounded-lg py-2.5 px-3.5 text-[13px] font-medium text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-blue-500 transition-all"
+                                    className="w-full bg-white border border-slate-200 rounded-lg py-2.5 px-3.5 text-[13px] font-medium text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-[#462211] transition-all"
                                 />
                             </div>
                         )}
@@ -440,21 +692,21 @@ const Wallet = () => {
                         {/* 24-Hour Policy Alert Line (Highly Dynamic & Localized) */}
                         <div className={`p-2.5 rounded-lg flex items-start gap-2.5 transition-all duration-300 ${
                             pendingWithdrawal ? 'bg-amber-50 border border-amber-100' :
-                            cooldownRemaining > 0 ? 'bg-rose-50 border border-rose-100' :
-                            'bg-amber-50/50 border border-amber-100/70'
+                            cooldownRemaining > 0 ? 'bg-orange-50 border border-orange-100' :
+                            'bg-orange-50 border border-orange-100'
                         }`}>
                             {pendingWithdrawal ? (
                                 <Clock size={13} className="text-amber-500 shrink-0 mt-0.5 animate-spin" />
                             ) : cooldownRemaining > 0 ? (
                                 <AlertCircle size={13} className="text-rose-500 shrink-0 mt-0.5" />
                             ) : (
-                                <Info size={13} className="text-amber-500 shrink-0 mt-0.5" />
+                                <Info size={13} className="text-[#462211] shrink-0 mt-0.5" />
                             )}
                             <div className="flex-1">
                                 <p className={`text-[9px] font-medium leading-normal ${
                                     pendingWithdrawal ? 'text-amber-800' :
-                                    cooldownRemaining > 0 ? 'text-rose-800' :
-                                    'text-amber-800'
+                                    cooldownRemaining > 0 ? 'text-[#8B3A12]' :
+                                    'text-[#8B3A12]'
                                 }`}>
                                     {pendingWithdrawal ? (
                                         <>
@@ -480,8 +732,8 @@ const Wallet = () => {
                                     : cooldownRemaining > 0
                                     ? 'bg-rose-50 text-rose-400 border border-rose-100 cursor-not-allowed'
                                     : (!isPaid) || (amount >= minWithdrawal && (Number(amount) + 5) <= wallet.balance)
-                                    ? 'bg-[#1a233b] hover:bg-black text-white shadow-md active:scale-95 cursor-pointer'
-                                    : 'bg-slate-50 text-slate-300 pointer-events-none border border-slate-100'}`}
+                                    ? 'bg-[#462211] text-white shadow-md active:scale-95 cursor-pointer'
+                                    : 'bg-slate-200 text-white pointer-events-none'}`}
                         >
                             {isSubmitting ? 'PROCESSING...' : (pendingWithdrawal 
                                 ? 'Redeem Pending Approval' 
@@ -497,14 +749,14 @@ const Wallet = () => {
 
             {/* --- Wallet Actions --- */}
             <div className="px-1 mt-1">
-                <h3 className="text-[13px] font-medium text-slate-400 uppercase tracking-widest">Settings</h3>
+                <h3 className="text-[13px] font-medium text-slate-800">Settings</h3>
             </div>
             
             <div className="flex flex-col gap-2">
                 {[
-                    { id: 'refer', title: 'Referral Rewards', subtitle: 'Earn commission', icon: <Share2 size={16} className="text-emerald-500" /> },
-                    { id: 'limits', title: 'Transfer Limits', subtitle: `Min ₹${minWithdrawal} · Daily cap`, icon: <Filter size={16} className="text-indigo-500" />, check: true },
-                    { id: 'security', title: 'Security', subtitle: 'Encrypted & protected', icon: <AlertCircle size={16} className="text-sky-500" />, check: true },
+                    { id: 'refer', title: 'Invite Reward', subtitle: 'Earn commission', icon: <Users size={16} className="text-[#462211]" /> },
+                    { id: 'limits', title: 'Transfer Limits', subtitle: `Min ₹${minWithdrawal} · Daily cap`, icon: <Filter size={16} className="text-[#462211]" />, check: true },
+                    { id: 'security', title: 'Security', subtitle: 'Encrypted & protected', icon: <ShieldCheck size={16} className="text-[#462211]" />, check: true },
                 ].map((item) => (
                     <div
                         key={item.id}
@@ -543,14 +795,14 @@ const Wallet = () => {
             <div className="mt-1">
                 <div className="flex items-center justify-between mb-2.5 px-1">
                     <h3 className="text-[12px] font-medium text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                        <History size={14} className="text-blue-500" /> History
+                        <History size={14} className="text-[#462211]" /> History
                     </h3>
                     <div className="flex bg-slate-200/50 p-0.5 rounded-md border border-slate-200/50">
                         {['All', activeTab === 'cash' ? 'In' : 'Tasks', activeTab === 'cash' ? 'Out' : 'Spent'].map((tab, idx) => (
                             <button
                                 key={tab}
                                 onClick={() => setFilter(['All', 'Earning', 'Payout'][idx])}
-                                className={`px-2.5 py-1 rounded-[4px] text-[8px] font-medium uppercase tracking-wider transition-all ${filter === ['All', 'Earning', 'Payout'][idx] ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-400'}`}
+                                className={`px-2.5 py-1 rounded-[4px] text-[8px] font-medium uppercase tracking-wider transition-all ${filter === ['All', 'Earning', 'Payout'][idx] ? 'bg-white text-[#462211] shadow-xs' : 'text-slate-400'}`}
                             >
                                 {tab}
                             </button>
@@ -560,8 +812,11 @@ const Wallet = () => {
 
                 <div className="flex flex-col gap-2 pb-24">
                     {filteredTransactions.length === 0 ? (
-                        <div className="text-center py-10 bg-white border border-slate-100 border-dashed rounded-lg">
-                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">No Records</p>
+                        <div className="text-center py-10 bg-white border border-slate-100 rounded-xl">
+                            <div className="w-12 h-12 rounded-full bg-[#FFF5F0] text-[#462211] flex items-center justify-center mx-auto mb-2">
+                                <FileText size={20} />
+                            </div>
+                            <p className="text-[12px] font-medium text-slate-400">No Records Found</p>
                         </div>
                     ) : (
                         filteredTransactions.map((tx, index) => (
@@ -592,6 +847,8 @@ const Wallet = () => {
                     )}
                 </div>
             </div>
+                </>
+            )}
 
             {/* Bank Details Modal */}
             {isBankModalOpen && (
@@ -600,7 +857,7 @@ const Wallet = () => {
                         <div className="p-5 flex items-center justify-between border-b border-slate-100 bg-slate-50/50">
                             <div>
                                 <h3 className="text-sm text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                                    <Building size={16} className="text-blue-500" /> Bank Details
+                                    <Building size={16} className="text-[#462211]" /> Bank Details
                                 </h3>
                                 <p className="text-[10px] text-slate-500 font-medium mt-0.5">Please provide accurate information</p>
                             </div>
@@ -626,7 +883,7 @@ const Wallet = () => {
                                         if (bankErrors.holderName) setBankErrors({...bankErrors, holderName: ''});
                                     }}
                                     placeholder="Enter full name (letters only)"
-                                    className={`w-full bg-slate-50 border rounded-lg py-3 px-3.5 text-xs text-slate-800 placeholder:text-slate-300 focus:outline-none transition-all ${bankErrors.holderName ? 'border-rose-400 focus:border-rose-500' : 'border-slate-100 focus:border-blue-500'}`}
+                                    className={`w-full bg-slate-50 border rounded-lg py-3 px-3.5 text-xs text-slate-800 placeholder:text-slate-300 focus:outline-none transition-all ${bankErrors.holderName ? 'border-rose-400 focus:border-rose-500' : 'border-slate-100 focus:border-[#462211]'}`}
                                 />
                                 {bankErrors.holderName && (
                                     <p className="text-[10px] text-rose-500 mt-1 ml-1 flex items-center gap-1">
@@ -645,7 +902,7 @@ const Wallet = () => {
                                         if (bankErrors.bankName) setBankErrors({...bankErrors, bankName: ''});
                                     }}
                                     placeholder="e.g. State Bank of India"
-                                    className={`w-full bg-slate-50 border rounded-lg py-3 px-3.5 text-xs text-slate-800 placeholder:text-slate-300 focus:outline-none transition-all ${bankErrors.bankName ? 'border-rose-400 focus:border-rose-500' : 'border-slate-100 focus:border-blue-500'}`}
+                                    className={`w-full bg-slate-50 border rounded-lg py-3 px-3.5 text-xs text-slate-800 placeholder:text-slate-300 focus:outline-none transition-all ${bankErrors.bankName ? 'border-rose-400 focus:border-rose-500' : 'border-slate-100 focus:border-[#462211]'}`}
                                 />
                                 {bankErrors.bankName && (
                                     <p className="text-[10px] text-rose-500 mt-1 ml-1 flex items-center gap-1">
@@ -665,7 +922,7 @@ const Wallet = () => {
                                         if (bankErrors.accountNumber) setBankErrors({...bankErrors, accountNumber: ''});
                                     }}
                                     placeholder="Enter 16-digit account number"
-                                    className={`w-full bg-slate-50 border rounded-lg py-3 px-3.5 text-xs text-slate-800 placeholder:text-slate-300 focus:outline-none transition-all ${bankErrors.accountNumber ? 'border-rose-400 focus:border-rose-500' : 'border-slate-100 focus:border-blue-500'}`}
+                                    className={`w-full bg-slate-50 border rounded-lg py-3 px-3.5 text-xs text-slate-800 placeholder:text-slate-300 focus:outline-none transition-all ${bankErrors.accountNumber ? 'border-rose-400 focus:border-rose-500' : 'border-slate-100 focus:border-[#462211]'}`}
                                 />
                                 {bankErrors.accountNumber && (
                                     <p className="text-[10px] text-rose-500 mt-1 ml-1 flex items-center gap-1">
@@ -688,7 +945,7 @@ const Wallet = () => {
                                         if (bankErrors.ifscCode) setBankErrors({...bankErrors, ifscCode: ''});
                                     }}
                                     placeholder="e.g. SBIN0001234"
-                                    className={`w-full bg-slate-50 border rounded-lg py-3 px-3.5 text-xs text-slate-800 placeholder:text-slate-300 focus:outline-none transition-all uppercase ${bankErrors.ifscCode ? 'border-rose-400 focus:border-rose-500' : 'border-slate-100 focus:border-blue-500'}`}
+                                    className={`w-full bg-slate-50 border rounded-lg py-3 px-3.5 text-xs text-slate-800 placeholder:text-slate-300 focus:outline-none transition-all uppercase ${bankErrors.ifscCode ? 'border-rose-400 focus:border-rose-500' : 'border-slate-100 focus:border-[#462211]'}`}
                                 />
                                 {bankErrors.ifscCode && (
                                     <p className="text-[10px] text-rose-500 mt-1 ml-1 flex items-center gap-1">
@@ -706,7 +963,7 @@ const Wallet = () => {
                                 className={`w-full py-3.5 rounded-lg text-[11px] uppercase tracking-widest transition-all flex justify-center items-center gap-2 ${
                                     isSubmitting
                                         ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                                        : 'bg-[#1a233b] hover:bg-black text-white shadow-md active:scale-95 cursor-pointer'
+                                        : 'bg-[#462211] text-white shadow-md active:scale-95 cursor-pointer'
                                 }`}
                             >
                                 {isSubmitting ? (
@@ -746,7 +1003,7 @@ const Wallet = () => {
                             <h3 className="text-[16px] text-slate-800 tracking-tight mb-1">Request Submitted! 🎉</h3>
                             <p className="text-[13px] font-medium text-amber-600 mb-3 tracking-wide">Waiting for Admin Approval</p>
 
-                            <div className="bg-blue-50 border border-blue-100 rounded-xl p-3.5 text-left mb-3">
+                            <div className="bg-orange-50 border border-orange-100 rounded-xl p-3.5 text-left mb-3">
                                 <p className="text-[10.5px] font-semibold text-slate-600 leading-relaxed">
                                     आपका redeem request सफलतापूर्वक submit हो गया है।
                                     Admin के approve करने के बाद amount आपके bank account में transfer किया जाएगा।
@@ -762,8 +1019,8 @@ const Wallet = () => {
                                     <p className="text-[9.5px] font-medium text-slate-500">Admin reviews your request</p>
                                 </div>
                                 <div className="flex items-start gap-2 mb-1.5">
-                                    <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                                        <span className="text-[8px] text-blue-600">2</span>
+                                    <div className="w-4 h-4 bg-orange-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                                        <span className="text-[8px] text-[#462211]">2</span>
                                     </div>
                                     <p className="text-[9.5px] font-medium text-slate-500">Amount deducted after approval</p>
                                 </div>
@@ -784,7 +1041,7 @@ const Wallet = () => {
                         <div className="p-4">
                             <button
                                 onClick={() => setIsSuccessModalOpen(false)}
-                                className="w-full py-3.5 rounded-xl text-[11px] uppercase tracking-widest bg-gradient-to-r from-[#1a233b] to-[#2a3a5c] hover:from-black hover:to-slate-800 text-white shadow-lg active:scale-95 transition-all cursor-pointer"
+                                className="w-full py-3.5 rounded-xl text-[11px] uppercase tracking-widest bg-[#462211] text-white shadow-lg active:scale-95 transition-all cursor-pointer"
                             >
                                 Got It, Thanks!
                             </button>
@@ -818,7 +1075,7 @@ const Wallet = () => {
             {showLimitsModal && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="bg-white w-full max-w-xs rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="bg-indigo-600 px-5 py-4 flex items-center justify-between">
+                        <div className="bg-[#462211] px-5 py-4 flex items-center justify-between">
                             <div className="flex items-center gap-2.5">
                                 <Filter size={16} className="text-white" />
                                 <h3 className="text-white text-[13px] uppercase tracking-widest">Transfer Limits</h3>
@@ -828,13 +1085,13 @@ const Wallet = () => {
                             </button>
                         </div>
                         <div className="p-5 space-y-3">
-                            <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex items-center justify-between">
+                            <div className="bg-[#FFF5F0] border border-[#EDE4DC] rounded-xl p-4 flex items-center justify-between">
                                 <div>
-                                    <p className="text-[9px] text-indigo-400 uppercase tracking-widest mb-1">Minimum Withdrawal</p>
-                                    <p className="text-[20px] text-indigo-700">₹{minWithdrawal}</p>
+                                    <p className="text-[9px] text-[#7A5648] uppercase tracking-widest mb-1">Minimum Withdrawal</p>
+                                    <p className="text-[20px] text-[#462211]">₹{minWithdrawal}</p>
                                 </div>
-                                <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-                                    <Filter size={18} className="text-indigo-500" />
+                                <div className="w-10 h-10 bg-[#F3E8E0] rounded-xl flex items-center justify-center">
+                                    <Filter size={18} className="text-[#462211]" />
                                 </div>
                             </div>
                             <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-2.5">
@@ -852,7 +1109,7 @@ const Wallet = () => {
                             </div>
                             <button
                                 onClick={() => setShowLimitsModal(false)}
-                                className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[11px] uppercase tracking-widest transition-all cursor-pointer"
+                                className="w-full py-3 bg-[#462211] text-white rounded-xl text-[11px] uppercase tracking-widest transition-all cursor-pointer"
                             >
                                 Got It
                             </button>
@@ -865,7 +1122,7 @@ const Wallet = () => {
             {showSecurityModal && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="bg-white w-full max-w-xs rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="bg-sky-600 px-5 py-4 flex items-center justify-between">
+                        <div className="bg-[#462211] px-5 py-4 flex items-center justify-between">
                             <div className="flex items-center gap-2.5">
                                 <AlertCircle size={16} className="text-white" />
                                 <h3 className="text-white text-[13px] uppercase tracking-widest">Security</h3>
@@ -875,13 +1132,13 @@ const Wallet = () => {
                             </button>
                         </div>
                         <div className="p-5 space-y-3">
-                            <div className="bg-sky-50 border border-sky-100 rounded-xl p-4 flex items-center gap-3">
-                                <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center shrink-0">
-                                    <CheckCircle2 size={20} className="text-sky-500" />
+                            <div className="bg-[#FFF5F0] border border-[#EDE4DC] rounded-xl p-4 flex items-center gap-3">
+                                <div className="w-10 h-10 bg-[#F3E8E0] rounded-xl flex items-center justify-center shrink-0">
+                                    <CheckCircle2 size={20} className="text-[#462211]" />
                                 </div>
                                 <div>
-                                    <p className="text-[12px] text-sky-700">Your account is secured</p>
-                                    <p className="text-[9px] text-sky-400 uppercase tracking-widest mt-0.5">End-to-end encrypted</p>
+                                    <p className="text-[12px] text-[#462211]">Your account is secured</p>
+                                    <p className="text-[9px] text-[#7A5648] uppercase tracking-widest mt-0.5">End-to-end encrypted</p>
                                 </div>
                             </div>
                             <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-2.5">
@@ -901,7 +1158,7 @@ const Wallet = () => {
                             </div>
                             <button
                                 onClick={() => setShowSecurityModal(false)}
-                                className="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-[11px] uppercase tracking-widest transition-all cursor-pointer"
+                                className="w-full py-3 bg-[#462211] text-white rounded-xl text-[11px] uppercase tracking-widest transition-all cursor-pointer"
                             >
                                 Got It
                             </button>

@@ -394,12 +394,21 @@ exports.getMe = async (req, res, next) => {
                 modified = true;
             }
 
-            // 4. Sync Future Fund criteria (sales / daily mins / active days)
+            // 4. Sync Future Fund criteria (KYC / ads / tasks)
             try {
                 const ff = await syncFutureFundCriteria(user, settings);
                 if (ff.modified) modified = true;
             } catch (ffErr) {
                 console.error('Future Fund sync on getMe failed:', ffErr.message);
+            }
+
+            try {
+                const { migrateWalletSplits, ensureWithdrawalCardShape } = require('../utils/walletLedger');
+                if (migrateWalletSplits(user)) modified = true;
+                ensureWithdrawalCardShape(user);
+                modified = true;
+            } catch (wErr) {
+                console.error('Wallet split migrate failed:', wErr.message);
             }
 
             if (modified) {

@@ -38,6 +38,7 @@ exports.getBusinessIdeas = async (req, res, next) => {
                     description: isUnlocked ? card.description : ''
                 })),
                 isPremium: idea.isPremium,
+                price: idea.price || 199,
                 isLocked: !isUnlocked,
                 howItWorks: idea.howItWorks || '',
                 investmentDetails: idea.investmentDetails || '',
@@ -74,15 +75,7 @@ exports.unlockIdea = async (req, res, next) => {
             return next(new ErrorResponse('Idea already unlocked', 400));
         }
 
-        // Logic for unlocking (can be based on subscription or points)
-        // For now, adding to unlocked list
-        user.unlockedIdeas.push(ideaId);
-        await user.save();
-
-        res.status(200).json({
-            success: true,
-            message: 'Strategy unlocked successfully'
-        });
+        return next(new ErrorResponse('Please complete payment to unlock this idea.', 400));
     } catch (err) {
         next(err);
     }
@@ -180,6 +173,7 @@ exports.getBusinessIdeaById = async (req, res, next) => {
                 description: isUnlocked ? card.description : ''
             })),
             isPremium: idea.isPremium,
+            price: idea.price || 199,
             isLocked: !isUnlocked,
             howItWorks: idea.howItWorks || '',
             investmentDetails: idea.investmentDetails || '',

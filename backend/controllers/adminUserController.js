@@ -61,12 +61,12 @@ exports.manageKYC = async (req, res, next) => {
         
         if (status === 'Approved' || status === 'Verified') {
             user.kyc.rejectionReason = ''; // Clear reason on approval
-            
-            // Add in-app notification
+            if (!user.kycApprovedAt) user.kycApprovedAt = new Date();
+
             user.notifications = user.notifications || [];
             user.notifications.push({
                 title: "KYC Verified! ✅",
-                message: "Congratulations! Your KYC is successfully approved. All earning routes are unlocked.",
+                message: "KYC approved. Income page is now free to use. Create a Withdrawal Card to unlock Virtual Wallet.",
                 type: "success",
                 date: new Date()
             });
@@ -87,11 +87,11 @@ exports.manageKYC = async (req, res, next) => {
         user.markModified('kyc');
         await user.save();
 
-        // If KYC approved and user already bought ₹499, credit referrer now
+        // Invite ₹200 goes to referrer Pending Wallet after KYC
         if (status === 'Approved' || status === 'Verified') {
             try {
-                const { creditReferralOnQualifiedUnlock } = require('../utils/referralReward');
-                await creditReferralOnQualifiedUnlock(user);
+                const { creditReferralOnKyc } = require('../utils/referralReward');
+                await creditReferralOnKyc(user);
             } catch (refErr) {
                 console.error('[REFERRAL] KYC approve credit failed:', refErr.message);
             }
@@ -320,8 +320,10 @@ exports.distributeFutureFundProfit = async (req, res, next) => {
             return next(new ErrorResponse('Please provide a valid amount to distribute', 400));
         }
 
-        // Distribute to all regular users based on activity
-        const users = await User.find({ role: { $ne: 'admin' } });
+        const { creditEarning } = require('../utils/walletLedger');
+        const { recordDistribution } = require('../utils/fundPool');
+
+        const users = await User.find({ 'futureFund.status': 'active' });
 
         if (users.length === 0) {
             return res.status(404).json({ success: false, message: 'No active Future Fund users found' });
@@ -408,19 +410,12 @@ exports.distributeFutureFundProfit = async (req, res, next) => {
             let userShare = Math.floor(item.userShare * 100) / 100; // Keep up to 2 decimals
 
             if (userShare > 0) {
-                item.user.wallet.balance += userShare;
-                item.user.wallet.lifetimeEarnings += userShare;
-                
-                await Transaction.create({
-                    user: item.user._id,
-                    type: 'credit',
-                    currency: 'INR',
-                    amount: userShare,
+                await creditEarning(item.user, userShare, {
                     source: 'Future Fund Daily Distribution',
-                    status: 'Success'
+                    inviteHold: false,
+                    createTx: true,
                 });
-
-                await item.user.save();
+                await item.user.save({ validateBeforeSave: false });
                 totalDistributed += userShare;
 
                 // Send notification
@@ -440,9 +435,11 @@ exports.distributeFutureFundProfit = async (req, res, next) => {
             }
         }
 
+        await recordDistribution(totalDistributed, `Admin manual distribution to ${users.length} active FF users`);
+
         res.status(200).json({
             success: true,
-            message: `Successfully distributed ₹${totalDistributed} across ${users.length} users.`
+            message: `Successfully distributed ₹${totalDistributed} across ${users.length} active Future Fund users.`
         });
 
     } catch (err) {
@@ -509,6 +506,19 @@ exports.getFutureFundHistory = async (req, res, next) => {
             success: true,
             data: history
         });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// @desc    Get Future Fund pool summary
+// @route   GET /api/admin/users/future-fund/pool
+// @access  Private (Admin)
+exports.getFundPoolSummary = async (req, res, next) => {
+    try {
+        const { getPoolSummary } = require('../utils/fundPool');
+        const summary = await getPoolSummary(Number(req.query.days) || 7);
+        res.status(200).json({ success: true, data: summary });
     } catch (err) {
         next(err);
     }

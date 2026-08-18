@@ -184,11 +184,6 @@ const Earn = () => {
 
     const handleTaskClick = (task) => {
         const taskId = task._id || task.id;
-        if (!isPaid) {
-            setIsUnlockOpen(true);
-            return;
-        }
-
         if (isTaskCompleted(taskId)) {
             return;
         }
@@ -217,22 +212,14 @@ const Earn = () => {
         }
     };
 
-    if (!userData?.isPaid) {
-        return (
-            <div className="min-h-screen bg-[#f0f9f4] font-poppins">
-                <UnlockModal isOpen={true} onClose={() => navigate('/user/home')} />
-            </div>
-        );
-    }
-
     return (
-        <div className="flex flex-col min-h-screen bg-[#f0f9f4] font-poppins">
-            <div className="bg-white px-4 py-3 flex items-center justify-between border-b border-slate-100 sticky top-0 z-40">
+        <div className="flex flex-col min-h-screen bg-[#FCF8F5] font-poppins">
+            <div className="bg-[#FCF8F5] px-4 py-3 flex items-center justify-between sticky top-0 z-40">
                 <div className="flex items-center gap-3">
-                    <button onClick={() => navigate(-1)} className="text-slate-500 active:scale-95 transition-all">
+                    <button onClick={() => navigate(-1)} className="text-[#462211] active:scale-95 transition-all">
                         <ChevronLeft size={22} />
                     </button>
-                    <h1 className="text-[17px] font-medium text-slate-800 tracking-tight">Tasks</h1>
+                    <h1 className="text-[17px] font-medium text-[#462211] tracking-tight">Tasks</h1>
                 </div>
                 <div className="flex items-center gap-2">
                     <button onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-8 h-8 flex items-center justify-center bg-slate-50 text-slate-400 rounded-full border border-slate-200 active:scale-95 transition-all">

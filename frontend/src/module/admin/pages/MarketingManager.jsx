@@ -3,7 +3,7 @@ import {
     Sparkles, Zap, Rocket, Plus, Trash2,
     Save, Layout, Palette, Type,
     ChevronRight, ChevronLeft, Info, CheckCircle2,
-    Trophy, Users, Target, MousePointer2, List, FileText, Briefcase
+    Trophy, Users, Target, MousePointer2, List, FileText, Briefcase, Upload
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { contentStorage } from '../../shared/services/contentStorage';
@@ -39,13 +39,14 @@ const MarketingManager = () => {
 
     const handleAddBanner = async () => {
         const dummy = {
-            tag: 'NEW OFFER',
-            title: 'New Banner',
-            subtitle: 'Click edit to customize this banner.',
-            gradient: 'from-slate-500 to-slate-700',
+            tag: 'Your Growth',
+            title: 'Our Guidance',
+            subtitle: 'Dromoney is your trusted platform to learn, grow and earn online with smart opportunities.',
+            gradient: 'from-amber-400 to-orange-500',
             iconName: 'Sparkles',
-            ctaText: 'View More',
-            path: '/user/events',
+            ctaText: 'Explore Now',
+            path: '/user/home',
+            imageUrl: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=640&q=80',
             isActive: true
         };
         try {
@@ -245,13 +246,13 @@ const MarketingManager = () => {
 
     return (
         <div className="p-4 animate-in fade-in duration-700 bg-slate-50/50 min-h-screen">
-            <PageHeader title="Marketing & Promos" subtitle="Manage banners, booster benefits, and visual promotions" />
+            <PageHeader title="Marketing & Promos" subtitle="Home top banner, booster benefits, and promotions" />
 
             {/* Sub-navigation Tabs */}
             <div className="flex gap-2 mb-6 mt-6 bg-white p-2 rounded-lg border border-slate-100 shadow-sm w-fit">
                 {[
                     { id: 'menu', label: 'Menu Pages', icon: FileText },
-                    { id: 'banners', label: 'Ad Banners', icon: Layout },
+                    { id: 'banners', label: 'Home Banners', icon: Layout },
                     { id: 'boosters', label: 'Booster Packs', icon: Zap },
                     { id: 'lifetime', label: 'Lifetime Promo', icon: Rocket },
                     { id: 'future', label: 'Future and Option', icon: Sparkles },
@@ -501,7 +502,7 @@ const MarketingManager = () => {
                                     <div className="flex items-center justify-between mb-5">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 bg-slate-900 text-sky-400 rounded-xl flex items-center justify-center font-medium">0{idx + 1}</div>
-                                            <h3 className="text-[13px] font-medium text-slate-400 uppercase tracking-normal">Banner Config</h3>
+                                            <h3 className="text-[13px] font-medium text-slate-400 uppercase tracking-normal">Home Banner</h3>
                                         </div>
                                         <button onClick={() => handleDeleteBanner(banner._id)} className="w-10 h-10 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"><Trash2 size={16} /></button>
                                     </div>
@@ -544,6 +545,71 @@ const MarketingManager = () => {
                                                 const newB = [...banners]; newB[idx].subtitle = e.target.value; setBanners(newB);
                                             }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-4 text-[13px] font-medium text-slate-500 h-24 outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
                                         </div>
+                                        <p className="text-[10px] text-slate-400 -mt-2">Home hero uses Tag as the first heading, Title as the orange heading, and Image on the right.</p>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Hero Image</label>
+                                            <div className="flex gap-3 items-center">
+                                                {banner.imageUrl ? (
+                                                    <img src={banner.imageUrl} alt="" className="w-14 h-14 object-cover rounded-lg border border-slate-200 shrink-0" />
+                                                ) : (
+                                                    <div className="w-14 h-14 rounded-lg bg-slate-100 border border-dashed border-slate-200 shrink-0" />
+                                                )}
+                                                <div className="flex-1 space-y-2">
+                                                    <input
+                                                        value={banner.imageUrl || ''}
+                                                        onChange={(e) => {
+                                                            const newB = [...banners]; newB[idx].imageUrl = e.target.value; setBanners(newB);
+                                                        }}
+                                                        className="w-full bg-slate-50 border border-slate-100 rounded-lg px-3 py-2.5 text-[12px] text-slate-800 outline-none"
+                                                        placeholder="Image URL"
+                                                    />
+                                                    <label className="inline-flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wide text-sky-600 cursor-pointer">
+                                                        <Upload size={12} /> Upload
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            className="hidden"
+                                                            onChange={async (e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (!file) return;
+                                                                try {
+                                                                    const form = new FormData();
+                                                                    form.append('file', file);
+                                                                    const res = await api.post('/admin/upload', form, {
+                                                                        headers: { 'Content-Type': 'multipart/form-data' }
+                                                                    });
+                                                                    if (res.success && res.url) {
+                                                                        const newB = [...banners];
+                                                                        newB[idx].imageUrl = res.url;
+                                                                        setBanners(newB);
+                                                                        addNotification('Success', 'Image uploaded. Click Sync Banner to save.', 'success');
+                                                                    } else {
+                                                                        addNotification('Error', 'Could not retrieve upload URL.', 'error');
+                                                                    }
+                                                                } catch (err) {
+                                                                    addNotification('Error', 'Image upload failed.', 'error');
+                                                                }
+                                                                e.target.value = '';
+                                                            }}
+                                                        />
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between bg-slate-50 rounded-lg px-4 py-3">
+                                            <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wide">Show on Home</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newB = [...banners];
+                                                    newB[idx].isActive = !newB[idx].isActive;
+                                                    setBanners(newB);
+                                                }}
+                                                className={`w-11 h-6 rounded-full relative transition-colors ${banner.isActive ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                                            >
+                                                <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-all ${banner.isActive ? 'left-5' : 'left-0.5'}`} />
+                                            </button>
+                                        </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Button Text (CTA)</label>
@@ -579,13 +645,21 @@ const MarketingManager = () => {
 
                             <div className="space-y-6 px-10 pb-10">
                                 {banners.map((banner) => (
-                                    <div key={banner._id || banner.tag} className={`bg-gradient-to-r ${banner.gradient} rounded-xl p-4 relative overflow-hidden group shadow-lg shadow-black/20 scale-95 opacity-80 hover:scale-100 hover:opacity-100 transition-all duration-300 border border-white/5`}>
-                                        <div className="relative z-10 text-white">
-                                            <span className="text-[9px] font-medium uppercase tracking-normal bg-white/20 px-3 py-1 rounded-full border border-white/10">{banner.tag}</span>
-                                            <h2 className="text-2xl font-medium tracking-tight mt-3">{banner.title}</h2>
-                                            <p className="text-[11px] font-medium text-white/70 mt-1 max-w-[80%]">{banner.subtitle}</p>
-                                            <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-xl mt-5 text-[10px] font-medium uppercase tracking-normal">Upgrade Now <ChevronRight size={14} /></div>
+                                    <div key={banner._id || banner.tag} className="bg-[#F8F1E8] rounded-xl p-4 relative overflow-hidden group shadow-lg min-h-[140px]">
+                                        <div className={`absolute top-3 right-3 text-[8px] font-bold uppercase px-2 py-0.5 rounded-full ${banner.isActive ? 'bg-emerald-500 text-white' : 'bg-slate-300 text-slate-600'}`}>
+                                            {banner.isActive ? 'Live' : 'Hidden'}
                                         </div>
+                                        <div className="relative z-10 pr-[38%]">
+                                            <h2 className="text-lg font-bold text-slate-900 leading-tight">{banner.tag}</h2>
+                                            <h3 className="text-lg font-bold text-[#C2520A] leading-tight">{banner.title}</h3>
+                                            <p className="text-[11px] font-medium text-slate-500 mt-1 line-clamp-3">{banner.subtitle}</p>
+                                            <div className="inline-flex items-center gap-1 bg-[#C2520A] text-white px-3 py-1.5 rounded-full mt-3 text-[10px] font-semibold">
+                                                {banner.ctaText || 'Explore Now'} <ChevronRight size={12} />
+                                            </div>
+                                        </div>
+                                        {banner.imageUrl && (
+                                            <img src={banner.imageUrl} alt="" className="absolute right-0 bottom-0 h-full w-[42%] object-cover object-top" />
+                                        )}
                                     </div>
                                 ))}
                             </div>

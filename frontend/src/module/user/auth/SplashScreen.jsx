@@ -2,98 +2,129 @@ import React, { useEffect, useState } from 'react';
 import logoImg from '../../../assets/WhatsApp_Image_2026-04-28_at_10.52.49_PM-removebg-preview.png';
 
 const SplashScreen = ({ onComplete }) => {
-    const [isVisible, setIsVisible] = useState(true);
+    const [phase, setPhase] = useState('enter');
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsVisible(false);
-            setTimeout(onComplete, 800); // Allow fade out animation to finish
-        }, 3000); // Show for 3 seconds
+        const holdTimer = setTimeout(() => setPhase('exit'), 2800);
+        const exitTimer = setTimeout(onComplete, 3400);
 
-        return () => clearTimeout(timer);
+        return () => {
+            clearTimeout(holdTimer);
+            clearTimeout(exitTimer);
+        };
     }, [onComplete]);
 
     return (
-        <div className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#060b1a] transition-all duration-1000 ease-in-out ${isVisible ? 'opacity-100' : 'opacity-0 scale-110 pointer-events-none'}`}>
-            <style>
-                {`
-                    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;700;900&display=swap');
-                    
-                    @keyframes logo-pop {
-                        0% { transform: scale(0); opacity: 0; }
-                        70% { transform: scale(1.15); opacity: 1; }
-                        85% { transform: scale(0.95); }
-                        100% { transform: scale(1); }
-                    }
-                    @keyframes pulse-glow {
-                        0% { box-shadow: 0 0 0px rgba(245, 158, 11, 0); }
-                        50% { box-shadow: 0 0 40px rgba(245, 158, 11, 0.2); }
-                        100% { box-shadow: 0 0 0px rgba(245, 158, 11, 0); }
-                    }
-                    @keyframes text-reveal {
-                        0% { opacity: 0; transform: translateY(20px); filter: blur(10px); }
-                        100% { opacity: 1; transform: translateY(0); filter: blur(0); }
-                    }
-                    @keyframes shimmer {
-                        0% { background-position: -200% center; }
-                        100% { background-position: 200% center; }
-                    }
-                    .animate-logo-pop {
-                        animation: logo-pop 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-                    }
-                    .animate-text-reveal {
-                        animation: text-reveal 1s ease-out 0.5s forwards;
+        <div
+            className={`fixed inset-0 z-[9999] font-poppins flex flex-col splash-root ${
+                phase === 'exit' ? 'splash-exit' : 'splash-enter'
+            }`}
+        >
+            <style>{`
+                .splash-root {
+                    background: #FFFFFF;
+                }
+                .splash-enter {
+                    animation: splashBgIn 0.6s ease-out forwards;
+                }
+                .splash-exit {
+                    animation: splashBgOut 0.6s ease-in forwards;
+                }
+                @keyframes splashBgIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes splashBgOut {
+                    from { opacity: 1; }
+                    to { opacity: 0; }
+                }
+                .splash-logo-wrap {
+                    animation: logoReveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+                }
+                @keyframes logoReveal {
+                    0% {
                         opacity: 0;
+                        transform: scale(0.88);
                     }
-                    .premium-text {
-                        font-family: 'Poppins', sans-serif !important;
-                        background: linear-gradient(135deg, #fff 0%, #f59e0b 50%, #fff 100%);
-                        background-size: 200% auto;
-                        -webkit-background-clip: text;
-                        -webkit-text-fill-color: transparent;
-                        animation: shimmer 4s infinite linear;
-                        text-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
+                    100% {
+                        opacity: 1;
+                        transform: scale(1);
                     }
-                    .dro-text {
-                        font-family: 'Poppins', sans-serif !important;
-                        color: #f59e0b;
-                        text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+                }
+                .splash-logo-pulse {
+                    animation: logoPulse 2.4s ease-in-out 1s infinite;
+                }
+                @keyframes logoPulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.02); }
+                }
+                .splash-icon-box {
+                    width: 120px;
+                    height: 120px;
+                    border-radius: 28px;
+                    background: radial-gradient(
+                        ellipse 90% 85% at 50% 38%,
+                        #FFF9F3 0%,
+                        #F5E4D0 42%,
+                        #E2C4A4 100%
+                    );
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow:
+                        0 8px 22px rgba(70, 34, 17, 0.1),
+                        inset 0 3px 8px rgba(255, 255, 255, 0.75),
+                        inset 0 -5px 12px rgba(160, 100, 60, 0.12);
+                }
+                .splash-logo-img {
+                    width: 74px;
+                    height: 74px;
+                    object-fit: contain;
+                    filter: drop-shadow(0 2px 5px rgba(70, 34, 17, 0.18));
+                    user-select: none;
+                    pointer-events: none;
+                }
+                .splash-footer {
+                    animation: footerReveal 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both;
+                }
+                @keyframes footerReveal {
+                    0% {
+                        opacity: 0;
+                        transform: translateY(18px);
                     }
-                `}
-            </style>
-            
-            <div className="relative flex flex-col items-center gap-8">
-                {/* Immersive Background Glows */}
-                <div className="absolute inset-0 -m-32 bg-amber-500/10 blur-[120px] rounded-full animate-pulse"></div>
-                <div className="absolute inset-0 -m-16 bg-blue-600/5 blur-[80px] rounded-full animate-pulse delay-1000"></div>
+                    100% {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                .splash-exit .splash-logo-wrap,
+                .splash-exit .splash-footer {
+                    animation: splashFadeOut 0.5s ease-in forwards;
+                }
+                @keyframes splashFadeOut {
+                    to {
+                        opacity: 0;
+                        transform: scale(0.96);
+                    }
+                }
+            `}</style>
 
-                {/* Logo with Pop Animation */}
-                <div className="relative z-10 animate-logo-pop">
-                    <div className="p-1 rounded-full bg-gradient-to-tr from-amber-500/20 to-transparent backdrop-blur-sm">
-                        <img src={logoImg} alt="Dromoney" className="w-36 h-36 object-contain" />
+            <div className="flex-1 flex items-center justify-center px-6">
+                <div className={`splash-logo-wrap ${phase !== 'exit' ? 'splash-logo-pulse' : ''}`}>
+                    <div className="splash-icon-box">
+                        <img
+                            src={logoImg}
+                            alt="Dromoney"
+                            className="splash-logo-img"
+                            draggable={false}
+                        />
                     </div>
                 </div>
+            </div>
 
-                {/* Brand Identity */}
-                <div className="relative z-10 text-center animate-text-reveal">
-                    <h2 className="text-[42px] font-medium tracking-[-0.02em] flex items-center justify-center">
-                        <span className="dro-text">DRO</span>
-                        <span className="premium-text ml-1">MONEY</span>
-                    </h2>
-                    <div className="flex items-center justify-center gap-4 mt-2">
-                        <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-amber-500/50"></div>
-                        <p className="text-white/50 text-[10px] font-medium uppercase tracking-[0.5em] whitespace-nowrap">The Future of Earning</p>
-                        <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-amber-500/50"></div>
-                    </div>
-                </div>
-
-                {/* Loading State */}
-                <div className="mt-8 flex flex-col items-center gap-3 animate-text-reveal" style={{ animationDelay: '1s' }}>
-                    <div className="w-56 h-[3px] bg-white/5 rounded-full relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 via-amber-500 to-amber-500/0 w-full animate-[shimmer_2s_infinite_linear]"></div>
-                    </div>
-                    <span className="text-[8px] font-medium text-amber-500/40 uppercase tracking-widest">Initialising Secure Session</span>
-                </div>
+            <div className="splash-footer pb-12 text-center">
+                <p className="text-[13px] text-[#9A8478] font-normal leading-none tracking-wide">From</p>
+                <p className="text-[19px] font-semibold text-[#462211] mt-1.5 tracking-tight">Jangu Group</p>
             </div>
         </div>
     );

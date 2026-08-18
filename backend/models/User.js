@@ -69,10 +69,35 @@ const UserSchema = new mongoose.Schema({
     // Financial Data
     wallet: {
         balance: { type: Number, default: 0 },
+        pendingBalance: { type: Number, default: 0 },
+        virtualBalance: { type: Number, default: 0 },
         lifetimeEarnings: { type: Number, default: 0 },
         todayEarnings: { type: Number, default: 0 },
         referralEarnings: { type: Number, default: 0 },
+        walletSplitMigrated: { type: Boolean, default: false },
     },
+    withdrawalCard: {
+        status: {
+            type: String,
+            enum: ['none', 'pending_approval', 'active', 'expired'],
+            default: 'none',
+        },
+        holderName: String,
+        phone: String,
+        issuedAt: Date,
+        expiresAt: Date,
+        lockedReserve: { type: Number, default: 0 },
+        quotedAmount: { type: Number, default: 499 },
+        quotedCredit: { type: Number, default: 0 },
+        lastPaymentAt: Date,
+    },
+    kycApprovedAt: { type: Date },
+    inviteInactive: {
+        day7PenaltyApplied: { type: Boolean, default: false },
+        day14WipeApplied: { type: Boolean, default: false },
+    },
+    lifetimeAdsWatched: { type: Number, default: 0 },
+    lifetimeTasksCompleted: { type: Number, default: 0 },
     coins: {
         balance: { type: Number, default: 0 },
         lifetimeCoins: { type: Number, default: 0 },

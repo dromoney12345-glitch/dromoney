@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, ShieldCheck, Loader2, CheckCircle2, AlertCircle, Lock, UploadCloud, QrCode, Download, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShieldCheck, Loader2, AlertCircle, UploadCloud, QrCode, Download, Copy, ChevronLeft } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
 import QRCode from 'react-qr-code';
@@ -8,10 +8,10 @@ const DEFAULT_UPI_ID = 'BHARATPE2R0P0Z7W3H84355@unitype';
 const DEFAULT_MERCHANT_NAME = 'SUBHASH KUMAR';
 const DEFAULT_QR_IMAGE = '/payment-qr.png';
 
-const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK', itemId = null, onSuccess }) => {
+const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK', itemId = null, extraData = {}, onSuccess }) => {
     const [status, setStatus] = useState('idle');
     const [errorMsg, setErrorMsg] = useState('');
-    const { userData } = useUser();
+    const { userData, refreshUserProfile } = useUser();
 
     const [isMobile, setIsMobile] = useState(false);
     const [showScanner, setShowScanner] = useState(false);
@@ -22,6 +22,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
     const [isDownloading, setIsDownloading] = useState(false);
     const [adminUpiId, setAdminUpiId] = useState(null);
     const [hasPendingManual, setHasPendingManual] = useState(false);
+    const [copied, setCopied] = useState(false);
     const submitLockRef = React.useRef(false);
 
     useEffect(() => {
@@ -48,6 +49,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
             setScreenshot(null);
             setShowScanner(false);
             setHasPendingManual(false);
+            setCopied(false);
             submitLockRef.current = false;
             document.body.style.overflow = 'hidden';
             checkPendingManualPayment();
@@ -100,10 +102,12 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
             const formData = new FormData();
             formData.append('amount', amount);
             formData.append('type', type);
-            formData.append('planName', plan);
+            formData.append('planName', extraData.planName || plan);
             formData.append('utrNumber', utrNumber);
             formData.append('screenshot', screenshot);
             if (itemId) formData.append('ideaId', itemId);
+            if (extraData.planDuration) formData.append('planDuration', extraData.planDuration);
+            if (extraData.durationInDays) formData.append('durationInDays', extraData.durationInDays);
 
             const res = await api.post('/user/data/manual-payment', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
@@ -112,7 +116,10 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
             if (res.success) {
                 setHasPendingManual(true);
                 setStatus('success');
-                setTimeout(() => onSuccess(), 2500);
+                setTimeout(async () => {
+                    if (refreshUserProfile) await refreshUserProfile();
+                    if (onSuccess) onSuccess();
+                }, 2500);
             } else {
                 setErrorMsg(res.message || 'Failed to submit manual payment');
                 submitLockRef.current = false;
@@ -245,210 +252,197 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
         }
     };
 
+    const handleCopyUpi = async () => {
+        try {
+            await navigator.clipboard.writeText(upiIdToUse);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1600);
+        } catch {
+            setErrorMsg('Could not copy UPI ID.');
+        }
+    };
+
     if (!isOpen) return null;
 
     const isPlatformAlreadyUnlocked = type === 'PLATFORM_UNLOCK' && userData?.isPaid;
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-5 font-poppins">
+        <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center font-poppins">
             <div
-                className="absolute inset-0 bg-slate-900/70 backdrop-blur-md"
+                className="absolute inset-0 bg-slate-900/50"
                 onClick={(status === 'idle' || status === 'error' || hasPendingManual) ? onClose : undefined}
             />
 
-            <div className="relative bg-white w-full max-w-[380px] mx-auto rounded-2xl shadow-2xl shadow-black/30 ring-1 ring-black/5 animate-in zoom-in-95 duration-300 flex flex-col max-h-[92vh] overflow-hidden">
-                {/* Header */}
-                <div className="relative bg-slate-900 px-4 py-3.5 flex justify-between items-center text-white shrink-0">
-                    <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center border border-white/15">
-                            <Lock size={12} className="text-sky-300" />
-                        </div>
-                        <div>
-                            <h3 className="font-semibold text-[13px] tracking-wide">Secure Checkout</h3>
-                            <p className="text-[9px] text-slate-400 font-medium tracking-wider uppercase">Direct UPI · 0% fee</p>
-                        </div>
-                    </div>
+            <div className="relative bg-[#F8F9FA] w-full max-w-[430px] mx-auto rounded-t-2xl sm:rounded-2xl shadow-2xl animate-in slide-in-from-bottom-4 duration-300 flex flex-col max-h-[94vh] overflow-hidden">
+                <div className="relative px-4 py-3 flex items-center shrink-0 bg-[#F8F9FA]">
                     {(status === 'idle' || status === 'error' || hasPendingManual) && (
-                        <button type="button" onClick={onClose} className="p-1.5 rounded-full hover:bg-white/10 text-slate-300">
-                            <X size={16} />
+                        <button type="button" onClick={onClose} className="absolute left-3 w-8 h-8 flex items-center justify-center text-slate-800">
+                            <ChevronLeft size={22} />
                         </button>
                     )}
+                    <h3 className="w-full text-center text-[16px] font-medium text-slate-900">Payment</h3>
                 </div>
 
-                <div className="overflow-y-auto scrollbar-hide flex-1 bg-slate-50">
+                <div className="overflow-y-auto scrollbar-hide flex-1 px-4 pb-5 space-y-3">
                     {(status === 'idle' || status === 'error') && (
-                        <div className="p-4 space-y-3.5">
-                            {/* Order summary — compact */}
-                            <div className="bg-white rounded-xl px-3.5 py-3 border border-slate-100 flex items-center justify-between gap-3">
-                                <div className="min-w-0">
-                                    <p className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">Paying for</p>
-                                    <h4 className="text-[13px] font-semibold text-slate-800 truncate">{plan}</h4>
-                                </div>
-                                <p className="text-[22px] font-semibold text-slate-900 tracking-tight shrink-0">
-                                    <span className="text-[13px] font-medium text-slate-500 mr-0.5">₹</span>
-                                    {Math.round(amount)}
-                                </p>
+                        <>
+                            <div className="bg-white rounded-xl px-4 py-3.5 flex items-center justify-between shadow-[0_2px_10px_rgba(15,23,42,0.04)]">
+                                <p className="text-[14px] font-medium text-slate-900">{plan || 'Withdrawal Card'}</p>
+                                <p className="text-[16px] font-medium text-[#462211]">₹{Math.round(amount)}</p>
                             </div>
 
                             {(type === 'SUPPORT_BOOSTER' || type === 'TASK_BOOSTER') && (
-                                <div className="flex justify-between text-[10px] text-slate-500 px-1 -mt-1">
+                                <div className="flex justify-between text-[10px] text-slate-500 px-1">
                                     <span>Base ₹{Math.round(amount / 1.04)} + 4% fee</span>
                                     <span className="text-rose-500">+₹{Math.round(amount - (amount / 1.04))}</span>
                                 </div>
                             )}
 
                             {isPlatformAlreadyUnlocked && (
-                                <div className="p-2.5 bg-rose-50 rounded-lg border border-rose-100 flex items-start gap-2">
+                                <div className="p-2.5 bg-rose-50 rounded-xl flex items-start gap-2">
                                     <AlertCircle size={14} className="text-rose-500 mt-0.5 shrink-0" />
                                     <p className="text-[11px] font-medium text-rose-700">You have already unlocked the platform.</p>
                                 </div>
                             )}
 
                             {errorMsg && !isPlatformAlreadyUnlocked && (
-                                <div className="p-2.5 bg-red-50 rounded-lg border border-red-100 flex items-start gap-2">
+                                <div className="p-2.5 bg-red-50 rounded-xl flex items-start gap-2">
                                     <AlertCircle size={14} className="text-red-500 mt-0.5 shrink-0" />
                                     <p className="text-[11px] font-medium text-red-700 leading-snug">{errorMsg}</p>
                                 </div>
                             )}
 
                             {!isPlatformAlreadyUnlocked && (
-                                <div className="bg-white rounded-xl border border-slate-100 p-3.5 space-y-2.5">
-                                    <div className="text-center">
-                                        <p className="text-[12px] font-semibold text-slate-800">Pay via UPI</p>
-                                        <p className="text-[10px] text-slate-500 mt-0.5">
-                                            {DEFAULT_MERCHANT_NAME}
-                                            <span className="mx-1 text-slate-300">·</span>
-                                            <span className="font-mono text-[9px] text-slate-600">{upiIdToUse}</span>
-                                        </p>
-                                    </div>
+                                <>
+                                    <p className="text-[13px] font-medium text-slate-800 pt-1">
+                                        1. Pay via UPI (<span className="text-[#462211]">Recommended</span>)
+                                    </p>
 
-                                    {/* Compact app pay button */}
                                     <button
                                         type="button"
                                         onClick={handlePayViaApp}
-                                        className="w-full py-2.5 rounded-lg text-[12px] font-semibold flex items-center justify-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white transition-all"
+                                        className="w-full py-3.5 rounded-xl bg-[#462211] active:scale-[0.99] text-white"
                                     >
-                                        <ShieldCheck size={15} />
-                                        Pay with PhonePe / GPay / Paytm
+                                        <span className="block text-[16px] font-medium leading-tight">Pay Now</span>
+                                        <span className="block text-[10px] font-normal text-white/85 mt-0.5">PhonePe / GPay / Paytm / any UPI App</span>
                                     </button>
 
-                                    {/* Compact scanner actions — scanner closed by default */}
-                                    <div className="grid grid-cols-2 gap-2">
+                                    <div className="grid grid-cols-3 gap-2">
                                         <button
                                             type="button"
                                             onClick={() => setShowScanner((v) => !v)}
-                                            className="py-2 rounded-lg text-[11px] font-medium flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-[0.98] transition-all"
+                                            className="bg-white rounded-xl py-3 px-1.5 flex flex-col items-center gap-1.5 shadow-[0_2px_10px_rgba(15,23,42,0.04)] text-[#462211]"
                                         >
-                                            <QrCode size={13} />
-                                            {showScanner ? 'Hide Scanner' : 'Pay via Scanner'}
-                                            {showScanner ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                                            <QrCode size={20} />
+                                            <span className="text-[10px] font-medium text-center leading-tight">{showScanner ? 'Hide Scanner' : 'Scan & Pay'}</span>
                                         </button>
                                         <button
                                             type="button"
                                             onClick={handleDownloadScanner}
                                             disabled={isDownloading}
-                                            className="py-2 rounded-lg text-[11px] font-medium flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-900 disabled:bg-slate-400 text-white active:scale-[0.98] transition-all"
+                                            className="bg-white rounded-xl py-3 px-1.5 flex flex-col items-center gap-1.5 shadow-[0_2px_10px_rgba(15,23,42,0.04)] text-[#462211] disabled:opacity-50"
                                         >
-                                            {isDownloading ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
-                                            Download Scanner
+                                            {isDownloading ? <Loader2 size={20} className="animate-spin" /> : <Download size={20} />}
+                                            <span className="text-[10px] font-medium text-center leading-tight">Download Scanner</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={handleCopyUpi}
+                                            className="bg-white rounded-xl py-3 px-1.5 flex flex-col items-center gap-1.5 shadow-[0_2px_10px_rgba(15,23,42,0.04)] text-[#462211]"
+                                        >
+                                            <Copy size={20} />
+                                            <span className="text-[10px] font-medium text-center leading-tight">{copied ? 'Copied' : 'Copy UPI'}</span>
                                         </button>
                                     </div>
 
                                     {showScanner && (
-                                        <div className="pt-1 animate-in fade-in zoom-in-95 duration-200">
+                                        <div className="pt-1">
                                             <div className="relative bg-white p-2.5 rounded-xl border border-slate-200 mx-auto w-fit overflow-hidden">
                                                 <div id="qr-container" className="flex items-center justify-center">
                                                     <QRCode value={nativeIntent} size={140} className="rounded-lg" />
                                                 </div>
-                                                <img
-                                                    src={qrImageToShow}
-                                                    alt=""
-                                                    className="hidden"
-                                                    aria-hidden="true"
-                                                />
+                                                <img src={qrImageToShow} alt="" className="hidden" aria-hidden="true" />
                                             </div>
                                             <p className="text-[10px] text-slate-400 text-center mt-2 leading-snug">
                                                 Scan with any UPI app · amount ₹{formattedAmount} is prefilled
                                             </p>
                                         </div>
                                     )}
-                                </div>
-                            )}
 
-                            {!isPlatformAlreadyUnlocked && status !== 'loading' && (
-                                <div className="bg-white rounded-xl border border-slate-100 p-3.5 space-y-3">
-                                    <div>
-                                        <h4 className="font-semibold text-slate-800 text-[12px]">Confirm payment</h4>
-                                        <p className="text-[10px] text-slate-500 mt-0.5">
-                                            After paying, enter UTR and upload screenshot.
-                                        </p>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wider mb-1">UTR / Reference</label>
-                                        <input
-                                            type="text"
-                                            value={utrNumber}
-                                            onChange={(e) => setUtrNumber(e.target.value.replace(/\D/g, '').slice(0, 12))}
-                                            placeholder="12-digit UTR"
-                                            maxLength={12}
-                                            inputMode="numeric"
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[12px] font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-[9px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Screenshot</label>
-                                        <label className="flex items-center justify-center gap-1.5 w-full bg-slate-50 border border-dashed border-slate-300 rounded-lg px-3 py-2 text-[11px] font-medium text-slate-600 hover:bg-slate-100 cursor-pointer">
-                                            <UploadCloud size={14} className="text-sky-500" />
-                                            {screenshot ? screenshot.name : 'Upload receipt'}
+                                    <div className="bg-white rounded-xl p-3.5 space-y-3 shadow-[0_2px_10px_rgba(15,23,42,0.04)]">
+                                        <div>
+                                            <label className="block text-[11px] font-medium text-slate-400 mb-1.5">Enter UTR (12 digit)</label>
                                             <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={(e) => setScreenshot(e.target.files[0])}
-                                                className="hidden"
+                                                type="text"
+                                                value={utrNumber}
+                                                onChange={(e) => setUtrNumber(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                                                placeholder="Enter 12 digit UTR"
+                                                maxLength={12}
+                                                inputMode="numeric"
+                                                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-[13px] font-medium text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-[#462211]"
                                             />
-                                        </label>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-[11px] font-medium text-slate-400 mb-1.5">Upload Screenshot</label>
+                                            <label className="flex flex-col items-center justify-center gap-1 w-full bg-slate-50 border border-dashed border-slate-300 rounded-xl px-3 py-6 cursor-pointer">
+                                                <UploadCloud size={26} className="text-[#462211]" />
+                                                <span className="text-[13px] font-medium text-slate-800">Upload Screenshot</span>
+                                                <span className="text-[10px] text-slate-400">{screenshot ? screenshot.name : 'JPG, PNG or PDF (Max 5MB)'}</span>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={(e) => setScreenshot(e.target.files[0])}
+                                                    className="hidden"
+                                                />
+                                            </label>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={handleManualSubmit}
+                                            disabled={isSubmitting || hasPendingManual || utrNumber.length !== 12 || !screenshot}
+                                            className="w-full py-3 rounded-xl text-[14px] font-medium text-white flex items-center justify-center gap-1.5 disabled:bg-slate-300 disabled:cursor-not-allowed bg-[#462211] active:scale-[0.99]"
+                                        >
+                                            {isSubmitting ? <><Loader2 size={16} className="animate-spin" /> Submitting...</> : 'Submit'}
+                                        </button>
                                     </div>
 
-                                    <button
-                                        type="button"
-                                        onClick={handleManualSubmit}
-                                        disabled={isSubmitting || hasPendingManual || !utrNumber || !screenshot}
-                                        className="w-full py-2.5 bg-slate-800 hover:bg-slate-900 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-lg text-[12px] font-semibold active:scale-[0.98] flex items-center justify-center gap-1.5"
-                                    >
-                                        {isSubmitting ? (
-                                            <><Loader2 size={14} className="animate-spin" /> Submitting...</>
-                                        ) : (
-                                            <><CheckCircle2 size={14} /> Submit Proof</>
-                                        )}
-                                    </button>
-                                </div>
+                                    <div className="bg-white rounded-xl px-3.5 py-3 flex items-center gap-3 shadow-[0_2px_10px_rgba(15,23,42,0.04)]">
+                                        <div className="w-9 h-9 rounded-lg bg-[#FFF5F0] text-[#462211] flex items-center justify-center shrink-0">
+                                            <ShieldCheck size={18} />
+                                        </div>
+                                        <div>
+                                            <p className="text-[13px] font-medium text-slate-800">100% Secure Payment</p>
+                                            <p className="text-[11px] text-slate-400">Your payment details are safe with us.</p>
+                                        </div>
+                                    </div>
+                                </>
                             )}
-                        </div>
+                        </>
                     )}
 
                     {status === 'loading' && (
-                        <div className="p-10 flex flex-col items-center justify-center text-center gap-4 py-24 bg-white">
+                        <div className="p-10 flex flex-col items-center justify-center text-center gap-4 py-24">
                             <div className="relative w-14 h-14 flex items-center justify-center">
-                                <div className="absolute inset-0 border-[3px] border-slate-100 rounded-full" />
-                                <div className="absolute inset-0 border-[3px] border-sky-600 rounded-full border-t-transparent animate-spin" />
-                                <ShieldCheck size={20} className="text-sky-600" />
+                                <div className="absolute inset-0 border-[3px] border-orange-100 rounded-full" />
+                                <div className="absolute inset-0 border-[3px] border-[#462211] rounded-full border-t-transparent animate-spin" />
+                                <ShieldCheck size={20} className="text-[#462211]" />
                             </div>
                             <div>
-                                <h4 className="font-semibold text-slate-800 text-[14px]">Checking payment…</h4>
+                                <h4 className="font-medium text-slate-800 text-[14px]">Checking payment…</h4>
                                 <p className="text-[11px] text-slate-500 mt-0.5">Please wait</p>
                             </div>
                         </div>
                     )}
 
                     {status === 'success' && (
-                        <div className="p-8 flex flex-col items-center justify-center text-center gap-4 py-20 bg-white">
-                            <div className="w-16 h-16 bg-amber-400 rounded-full flex items-center justify-center shadow-lg shadow-amber-400/30">
+                        <div className="p-8 flex flex-col items-center justify-center text-center gap-4 py-20">
+                            <div className="w-16 h-16 bg-[#462211] rounded-full flex items-center justify-center">
                                 <ShieldCheck size={28} className="text-white" />
                             </div>
                             <div className="space-y-1">
-                                <h4 className="font-bold text-slate-800 text-[16px]">Submission Successful!</h4>
+                                <h4 className="font-medium text-slate-800 text-[16px]">Submission Successful!</h4>
                                 <p className="text-[11px] text-slate-500 leading-relaxed max-w-[220px] mx-auto">
                                     {(type === 'SUPPORT_BOOSTER' || type === 'TASK_BOOSTER')
                                         ? 'Wait ~5 min — booster activates after admin approval.'

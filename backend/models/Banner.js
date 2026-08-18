@@ -29,6 +29,10 @@ const BannerSchema = new mongoose.Schema({
         type: String,
         default: '/user/events',
     },
+    imageUrl: {
+        type: String,
+        default: '',
+    },
     isActive: {
         type: Boolean,
         default: true

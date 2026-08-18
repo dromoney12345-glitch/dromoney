@@ -126,11 +126,15 @@ io.on('connection', (socket) => {
 const { startFutureFundCron } = require('./cron/futureFundCron');
 const { startWeeklySeasonCron } = require('./cron/weeklySeasonCron');
 const { startNotificationCleanupCron } = require('./cron/notificationCron');
+const { startInviteInactivityCron } = require('./cron/inviteInactivityCron');
+const { startBusinessPlanExpiryCron } = require('./cron/businessPlanExpiryCron');
 
 if (process.env.NODE_ENV !== 'test') {
     startFutureFundCron();
     startWeeklySeasonCron();
     startNotificationCleanupCron();
+    startInviteInactivityCron();
+    startBusinessPlanExpiryCron();
 
     server.listen(PORT, () => {
         console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);

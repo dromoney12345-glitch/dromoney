@@ -184,13 +184,39 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
 
     const totalAwardedCoins = baseReward * factor;
 
+    const Settings = require('../models/Settings');
+    const settings = await Settings.findOne() || {};
+    const coinRate = Number(settings.coinRate) || 0.1;
+    const inrEarned = Math.round(totalAwardedCoins * coinRate * 100) / 100;
+    const poolPercent = Number(settings.futureFundPoolPercent) || 30;
+    const adRevenue = Number(settings.adRevenuePerView) || 0.5;
+
+    const { creditEarning } = require('../utils/walletLedger');
+    const { addPoolRevenue } = require('../utils/fundPool');
+
+    let walletCredit = null;
+    if (inrEarned > 0) {
+        walletCredit = await creditEarning(user, inrEarned, {
+            source: `Ad Earning: ${ad.title}`,
+            inviteHold: false,
+            createTx: true,
+        });
+    }
+
+    const poolShare = Math.round(adRevenue * (poolPercent / 100) * 100) / 100;
+    if (poolShare > 0) {
+        await addPoolRevenue(poolShare, {
+            source: 'ad',
+            note: `Ad view pool share (${ad.title})`,
+            user: user._id,
+        });
+    }
+
     // Update User
     user.coins.balance += totalAwardedCoins;
     user.coins.lifetimeCoins += totalAwardedCoins;
-    
-    // Also update wallet balance (Auto-conversion)
-    // removed
 
+    user.lifetimeAdsWatched = (user.lifetimeAdsWatched || 0) + 1;
     user.watchedAds.push(adId);
     user.dailyAdCount += 1;
 
@@ -225,8 +251,12 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
         message: 'Reward claimed successfully!',
         data: {
             coinsAwarded: totalAwardedCoins,
+            inrEarned,
+            walletDestination: walletCredit?.destination || null,
             newCoinBalance: user.coins.balance,
             newWalletBalance: user.wallet.balance,
+            newPendingBalance: user.wallet.pendingBalance,
+            newVirtualBalance: user.wallet.virtualBalance,
             dailyAdCount: user.dailyAdCount,
             nextAdAvailableAt: user.nextAdAvailableAt
         }

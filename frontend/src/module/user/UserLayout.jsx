@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
-    Menu, Bell, Wallet as WalletIcon, Home as HomeIcon, LayoutGrid, User, History, 
-    PhoneCall, HelpCircle, Building2, Rocket, MonitorPlay, X, CheckCircle2, 
-    AlertCircle, Info, Sparkles, Headset, TrendingUp, 
-    Wrench, MessageSquare, Zap, Users, Share2 
+    Bell, Home as HomeIcon, User, HelpCircle, Building2, Rocket, X, CheckCircle2, 
+    AlertCircle, Info, Sparkles, Headset, TrendingUp, Briefcase, Share2, MoreVertical, Menu
 } from 'lucide-react';
-import { motion } from "framer-motion";
 import { useUser } from './context/UserContext';
 import api from '../shared/services/api';
 import LogoImg from '../../assets/WhatsApp_Image_2026-04-28_at_10.52.49_PM-removebg-preview.png';
@@ -20,9 +17,11 @@ const UserLayout = () => {
     const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
     const { userData, notifications, clearNotifications, markAsRead, logout } = useUser();
 
-    // Future Fund: count 1 activity minute per minute while app is visible
+    const kycOk = ['approved', 'verified'].includes(String(userData?.kycStatus || '').toLowerCase());
+
+    // Future Fund heartbeat after KYC (no longer requires ₹499 unlock)
     useEffect(() => {
-        if (!userData?.isPaid) return undefined;
+        if (!kycOk) return undefined;
 
         const ping = () => {
             if (document.visibilityState !== 'visible') return;
@@ -43,7 +42,7 @@ const UserLayout = () => {
             clearInterval(interval);
             document.removeEventListener('visibilitychange', onVisible);
         };
-    }, [userData?.isPaid]);
+    }, [kycOk]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -87,12 +86,12 @@ const UserLayout = () => {
         return [...globalNotifs, ...personalNotifs].sort((a, b) => b.timestamp - a.timestamp);
     }, [notifications, userData?.userNotifications]);
 
+    const unreadNotifs = allNotifications.filter(n => !n.isRead);
 
     const navItems = [
         { path: '/user/home', label: 'Home', icon: HomeIcon },
         { path: '/user/income', label: 'Income', icon: TrendingUp },
-        { path: '/user/wallet', label: 'Wallet', icon: WalletIcon },
-        { path: '/user/watch', label: 'Watch', icon: MonitorPlay },
+        { path: '/user/business', label: 'Business', icon: Briefcase },
         { path: '/user/profile', label: 'Profile', icon: User },
     ];
 
@@ -106,41 +105,33 @@ const UserLayout = () => {
     };
 
     return (
-        <div className="bg-slate-50 text-slate-900 font-poppins overflow-hidden flex flex-col max-w-md mx-auto relative" style={{ height: '100vh' }}>
-            {/* --- New Dromoney Fixed Top Header --- */}
-            <header className="shrink-0 z-50 bg-slate-900/95 backdrop-blur-md px-4 py-1 flex items-center justify-between border-b border-slate-800 shadow-xl min-h-[48px] max-h-[48px]">
-                {/* 1. Brand & Logo (Left Side) */}
-                <div className="flex items-center gap-1 active:scale-95 transition-transform cursor-pointer -ml-1" onClick={() => navigate('/user/home')}>
-                    <div className="w-10 h-10 flex items-center justify-center">
-                        <img src={LogoImg} alt="Logo" className="w-full h-full object-contain brightness-110 drop-shadow-xl" />
+        <div className="bg-white text-slate-900 font-poppins overflow-hidden flex flex-col max-w-md mx-auto relative" style={{ height: '100vh', backgroundColor: '#FCF8F5' }}>
+            <header className="shrink-0 z-50 bg-[#FCF8F5] px-3 py-1.5 flex items-center justify-between min-h-[50px]">
+                <div className="flex items-center gap-2 active:scale-95 transition-transform cursor-pointer" onClick={() => navigate('/user/home')}>
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-[#F8F1E8] flex items-center justify-center shrink-0">
+                        <img src={LogoImg} alt="Logo" className="w-7 h-7 object-contain" />
                     </div>
-                    <span className="text-[15px] font-semibold tracking-wider uppercase font-poppins truncate">
-                        <span className="text-[#8B4513]">DRO</span>
-                        <span className="text-white">MONEY</span>
-                    </span>
+                    <div className="flex flex-col">
+                        <span className="text-[15px] font-bold text-slate-900 leading-none tracking-tight">Dromoney</span>
+                        <span className="text-[8px] text-slate-400 font-medium mt-0.5 tracking-wide">Learn • Grow • Earn</span>
+                    </div>
                 </div>
 
-                {/* 3. Right Side: Actions */}
-                <div className="flex items-center gap-0.5 flex-shrink-0">
-
- 
-                    {/* Bell */}
+                <div className="flex items-center gap-1 flex-shrink-0">
                     <button
                         onClick={() => setIsNotifOpen(true)}
-                        className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-sky-400 relative active:scale-90 transition-all"
+                        className="w-9 h-9 flex items-center justify-center text-slate-700 relative active:scale-90"
                     >
-                        <Bell size={17} strokeWidth={2} />
-                        {allNotifications.filter(n => !n.isRead).length > 0 && (
-                            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-sky-500 rounded-full border border-slate-900"></span>
+                        <Bell size={20} strokeWidth={2} />
+                        {unreadNotifs.length > 0 && (
+                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#462211] rounded-full border-2 border-white"></span>
                         )}
                     </button>
- 
-                    {/* Menu */}
                     <button
                         onClick={() => setIsMenuOpen(true)}
-                        className="w-8 h-8 flex items-center justify-center text-slate-100 hover:text-sky-400 active:scale-90 transition-all"
+                        className="w-9 h-9 flex items-center justify-center text-slate-700 active:scale-90"
                     >
-                        <Menu size={22} strokeWidth={2} />
+                        <MoreVertical size={20} strokeWidth={2} />
                     </button>
                 </div>
             </header>
@@ -286,7 +277,7 @@ const UserLayout = () => {
                                 { icon: User, label: 'Settings', path: '/user/profile' },
                                 { icon: HelpCircle, label: 'How It Works', path: '/user/info/how-it-works' },
                                 { icon: Sparkles, label: 'Benefits', path: '/user/info/benefits' },
-                                { icon: Share2, label: 'Refer & Earn', path: '/user/marketing' },
+                                { icon: Share2, label: 'Invite', path: '/user/guide/invite' },
                                 { icon: Rocket, label: 'Promote Brand', path: '/user/promote-brand' },
                                 { icon: Building2, label: 'About Us', path: '/user/info/about' },
                                 { icon: Headset, label: 'Contact Us', path: '/user/info/contact' }
@@ -294,7 +285,7 @@ const UserLayout = () => {
                                 <button 
                                     key={idx}
                                     onClick={() => { 
-                                        if (item.path === '/user/marketing') {
+                                        if (item.path.includes('invite') || item.path.includes('marketing')) {
                                             navigate(item.path, { state: { showReferral: true } });
                                         } else {
                                             navigate(item.path);
@@ -324,7 +315,7 @@ const UserLayout = () => {
             </div>
 
             {/* --- Dynamic Content Rendering Area (Pages) --- */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth" style={{ paddingBottom: '80px' }}>
+            <div className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth" style={{ paddingBottom: '68px' }}>
                 <PullToRefreshWrapper>
                     <Outlet />
                 </PullToRefreshWrapper>
@@ -333,68 +324,33 @@ const UserLayout = () => {
             {/* --- Premium White Elevated Bottom Navigation Bar --- FIXED: stays at bottom even when keyboard is open */}
             {!isKeyboardOpen && (
             <div
-                className="absolute bottom-0 left-0 right-0 z-50 w-full"
+                className="absolute bottom-0 left-0 right-0 z-50 w-full px-3 pb-2"
                 style={{ transform: 'translateZ(0)' }}
             >
-                {/* The Ultra-Light Mustard Bar Container */}
-                <div className="relative bg-[#FFFEF7] border-t border-black/5 h-20 flex items-center px-4 shadow-[0_-10px_30px_rgba(0,0,0,0.06)]">
-                    
-                    {/* --- The Jumping Bubble Layer --- */}
-                    <div className="absolute inset-0 flex px-4 pointer-events-none">
-                        {(() => {
-                            const activeIdx = navItems.findIndex(item => location.pathname === item.path);
-                            const isBottomNavRoute = activeIdx !== -1;
-                            
-                            return isBottomNavRoute && (
-                                <motion.div
-                                    animate={{ x: `${activeIdx * 100}%` }}
-                                    transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-                                    className="w-1/5 h-full flex items-center justify-center"
-                                >
-                                    <motion.div
-                                        key={location.pathname}
-                                        initial={{ y: 0 }}
-                                        animate={{ 
-                                            y: [0, -38, 0],
-                                            scaleX: [1, 0.8, 1.1, 1],
-                                            scaleY: [1, 1.2, 0.9, 1]
-                                        }}
-                                        transition={{ 
-                                            duration: 0.5, 
-                                            times: [0, 0.5, 1],
-                                            ease: ["easeOut", "easeIn"]
-                                        }}
-                                        className="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-400 via-indigo-400 to-purple-500 flex items-center justify-center shadow-[0_8px_20px_rgba(59,130,246,0.3)] border-[6px] border-[#FFFEF7] -mt-16"
-                                    >
-                                        {(() => {
-                                            const activeItem = navItems[activeIdx];
-                                            const Icon = activeItem.icon;
-                                            return <Icon size={28} className="text-white" strokeWidth={2.5} />;
-                                        })()}
-                                    </motion.div>
-                                </motion.div>
-                            );
-                        })()}
-                    </div>
-
-                    {/* --- Static Navigation Buttons --- */}
+                <div className="relative bg-white rounded-2xl h-[60px] flex items-center px-1.5 shadow-[0_-6px_20px_rgba(15,23,42,0.07)] border border-slate-100">
                     {navItems.map((item, idx) => {
                         const Icon = item.icon;
-                        const isActive = location.pathname === item.path;
+                        const isActive = item.label === 'Business'
+                            ? location.pathname.includes('business')
+                            : location.pathname === item.path;
+                        const activeCls = 'text-[#462211]';
+                        const activeShadow = 'bg-[#FFF5F0] shadow-[0_4px_12px_rgba(70,34,17,0.12)]';
                         return (
                             <button
                                 key={idx}
                                 onClick={() => navigate(item.path)}
-                                className="flex-1 h-full flex flex-col items-center justify-center relative z-10"
+                                className="flex-1 h-full flex items-center justify-center"
                             >
-                                <Icon 
-                                    size={26} 
-                                    className={`mb-1 transition-opacity duration-300 ${isActive ? "opacity-0" : "opacity-100 text-slate-400"}`} 
-                                    strokeWidth={2} 
-                                />
-                                <span className={`text-[10px] font-semibold uppercase tracking-wider ${isActive ? "text-blue-600" : "text-slate-600"}`}>
-                                    {item.label}
-                                </span>
+                                <div className={`flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-1.5 rounded-xl ${isActive ? activeShadow : ''}`}>
+                                    <Icon
+                                        size={18}
+                                        className={isActive ? activeCls : 'text-slate-400'}
+                                        strokeWidth={isActive ? 2.4 : 2}
+                                    />
+                                    <span className={`text-[10px] font-semibold tracking-wide ${isActive ? activeCls : 'text-slate-400'}`}>
+                                        {item.label}
+                                    </span>
+                                </div>
                             </button>
                         );
                     })}

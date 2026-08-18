@@ -95,11 +95,12 @@ const SettingsSchema = new mongoose.Schema({
     },
     
     // Future Fund Rules & Targets
+    futureFundKycTarget: { type: Number, default: 10 },
     futureFundSalesTarget: { type: Number, default: 10 },
     futureFundDaysTarget: { type: Number, default: 7 },
     futureFundActivityMinutes: { type: Number, default: 15 },
-    futureFundDailyTasksTarget: { type: Number, default: 10 },
-    futureFundWatchAdTarget: { type: Number, default: 5 },
+    futureFundDailyTasksTarget: { type: Number, default: 50 },
+    futureFundWatchAdTarget: { type: Number, default: 50 },
     futureFundEventsTarget: { type: Number, default: 3 },
     futureFundBoostersTarget: { type: Number, default: 1 },
     
@@ -124,8 +125,16 @@ const SettingsSchema = new mongoose.Schema({
     ffAdScoreWeight: { type: Number, default: 1 },
     ffTaskScoreWeight: { type: Number, default: 1 },
     ffBoosterMultiplier: { type: Number, default: 1.5 },
-    
-    // Auth
+
+    // Future Fund Pool
+    futureFundPoolPercent: { type: Number, default: 30 },
+    adRevenuePerView: { type: Number, default: 0.5 },
+    taskRevenuePerTask: { type: Number, default: 1.0 },
+    taskUserEarningPercent: { type: Number, default: 66 },
+
+    // Withdrawal Card renewal display
+    cardRenewalAmount: { type: Number, default: 199 },
+    cardRenewalDisplayAmount: { type: Number, default: 699 },
     adminEmail: {
         type: String,
         default: 'admin@dromoney.com'

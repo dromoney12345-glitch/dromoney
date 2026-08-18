@@ -191,7 +191,10 @@ exports.unlockPlatform = asyncHandler(async (req, res, next) => {
     user.unlockedAt = new Date();
     await user.save();
 
-    // Referral ₹200 only after KYC + ₹499 unlock
+    const { activateVirtualWallet } = require('../utils/walletLedger');
+    await activateVirtualWallet(user);
+    await user.save();
+
     try {
         const { creditReferralOnQualifiedUnlock } = require('../utils/referralReward');
         await creditReferralOnQualifiedUnlock(user);
@@ -201,7 +204,7 @@ exports.unlockPlatform = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        message: 'Platform unlocked successfully',
+        message: 'Virtual Wallet unlocked',
         isPaid: user.isPaid
     });
 });
@@ -495,19 +498,48 @@ exports.unlockFutureFund = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.getReferrals = asyncHandler(async (req, res, next) => {
     const referrerId = req.user._id || req.user.id;
+    const { daysSince } = require('../utils/walletLedger');
 
-    // Only show referrals that earned commission (KYC + ₹499 completed)
     const transactions = await ReferralTransaction.find({ referrer: referrerId })
-        .populate('referredUser', 'name phone createdAt isPaid kyc')
+        .populate('referredUser', 'name phone createdAt isPaid kyc kycApprovedAt withdrawalCard isBlocked')
         .sort('-createdAt');
 
-    const referralsData = transactions.map((tx) => ({
-        _id: tx._id,
-        referredUser: tx.referredUser || { name: 'Unknown User' },
-        amount: tx.amount || 200,
-        status: tx.status || 'Completed',
-        createdAt: tx.createdAt,
-    }));
+    const referralsData = transactions.map((tx) => {
+        const ref = tx.referredUser || {};
+        const kycStatus = String(ref.kyc?.status || '').toLowerCase();
+        const kycDone = kycStatus === 'approved' || kycStatus === 'verified';
+        const cardActive = ref.isPaid && ref.withdrawalCard?.status === 'active';
+        const days = kycDone ? daysSince(ref.kycApprovedAt) : null;
+        const daysLeft = days != null ? Math.max(0, 28 - days) : null;
+
+        let milestone = 'waiting_kyc';
+        if (ref.isBlocked) milestone = 'suspended';
+        else if (cardActive) milestone = 'card_active';
+        else if (kycDone && days != null) {
+            if (days >= 28) milestone = 'suspended';
+            else if (days >= 14) milestone = 'day14';
+            else if (days >= 7) milestone = 'day7';
+            else if (days <= 3) milestone = 'day3_bonus';
+            else milestone = 'card_pending';
+        }
+
+        return {
+            _id: tx._id,
+            referredUser: ref._id ? ref : { name: 'Unknown User' },
+            name: ref.name || 'Unknown User',
+            phone: ref.phone || '',
+            amount: tx.amount || 200,
+            status: tx.status || 'Pending',
+            createdAt: tx.createdAt,
+            kycStatus: ref.kyc?.status || 'Not Started',
+            kycApprovedAt: ref.kycApprovedAt || null,
+            cardStatus: ref.withdrawalCard?.status || 'none',
+            isPaid: !!ref.isPaid,
+            daysSinceKyc: days,
+            daysLeft,
+            milestone,
+        };
+    });
 
     res.status(200).json({
         success: true,
@@ -610,5 +642,51 @@ exports.getFutureFundEstimation = asyncHandler(async (req, res, next) => {
             estimatedTotalPool: estimatedPool,
             estimatedReward: Math.floor(estimatedReward * 100) / 100
         }
+    });
+});
+
+// @desc    Withdrawal Card quote + auto-filled details
+// @route   GET /api/user/data/withdrawal-card
+// @access  Private
+exports.getWithdrawalCard = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+    if (!user) return next(new ErrorResponse('User not found', 404));
+
+    const {
+        migrateWalletSplits,
+        ensureWithdrawalCardShape,
+        getCardQuote,
+        withdrawableVirtual,
+    } = require('../utils/walletLedger');
+
+    const settings = (await Settings.findOne()) || {};
+    migrateWalletSplits(user);
+    ensureWithdrawalCardShape(user);
+    const quote = getCardQuote(user, settings);
+    user.withdrawalCard.quotedAmount = quote.amount;
+    user.withdrawalCard.quotedCredit = quote.credit;
+    await user.save({ validateBeforeSave: false });
+
+    const issued = new Date();
+    const expires = new Date(issued);
+    expires.setMonth(expires.getMonth() + 6);
+
+    res.status(200).json({
+        success: true,
+        data: {
+            card: user.withdrawalCard,
+            quote,
+            preview: {
+                name: user.name,
+                phone: user.phone,
+                issuedAt: issued,
+                expiresAt: expires,
+            },
+            pendingBalance: user.wallet.pendingBalance || 0,
+            virtualBalance: user.wallet.virtualBalance || 0,
+            withdrawable: withdrawableVirtual(user),
+            lockedReserve: user.withdrawalCard?.lockedReserve || 0,
+            virtualUnlocked: !!user.isPaid,
+        },
     });
 });

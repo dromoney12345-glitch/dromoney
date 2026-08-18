@@ -22,7 +22,7 @@ const PullToRefreshWrapper = ({ children }) => {
     if (!isMobileApp) {
         return (
             <div className="flex-1 overflow-y-auto overflow-x-hidden relative h-full">
-                <div className="min-h-full w-full bg-slate-50 flex flex-col">
+                <div className="min-h-full w-full bg-[#FCF8F5] flex flex-col">
                     {children}
                 </div>
             </div>
@@ -35,7 +35,7 @@ const PullToRefreshWrapper = ({ children }) => {
             pullingContent={<div className="p-4 text-center text-slate-400 text-sm">Pull down to refresh...</div>}
             refreshingContent={<div className="p-4 text-center text-blue-500 text-sm flex items-center justify-center gap-2"><div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>Refreshing...</div>}
         >
-            <div className="min-h-full w-full bg-slate-50 flex flex-col relative z-0">
+            <div className="min-h-full w-full bg-[#FCF8F5] flex flex-col relative z-0">
                 {children}
             </div>
         </PullToRefresh>

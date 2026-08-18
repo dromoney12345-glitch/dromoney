@@ -130,19 +130,11 @@ const WatchAndEarn = () => {
         return `${m}m ${s}s`;
     };
 
-    if (!userData?.isPaid) {
-        return (
-            <div className="min-h-screen bg-slate-900 font-poppins">
-                <UnlockModal isOpen={true} onClose={() => navigate('/user/home')} />
-            </div>
-        );
-    }
-
     const maxDailyLimit = status?.maxDailyLimit || 10;
     const dailyAdCount = status ? (maxDailyLimit - status.remainingAds) : 0;
 
     return (
-        <div className="pb-24 bg-[#F8FAFC] font-['Poppins'] min-h-screen">
+        <div className="pb-24 bg-[#FCF8F5] font-['Poppins'] min-h-screen">
             {toast && (
                 <div className={`fixed top-5 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-2.5 px-4 py-3 rounded-xl border shadow-xl animate-in fade-in slide-in-from-top-4 duration-300 w-[88%] max-w-sm ${
                     toast.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-rose-50 border-rose-100 text-rose-800'
@@ -152,51 +144,49 @@ const WatchAndEarn = () => {
                 </div>
             )}
 
-            <div className="bg-gradient-to-br from-slate-950 via-blue-900 to-slate-900 px-4 pt-3 pb-4 shadow-lg relative overflow-hidden">
-                <div className="absolute -right-8 -top-8 w-28 h-28 bg-white/5 rounded-full blur-3xl pointer-events-none" />
-
+            <div className="bg-[#FCF8F5] px-4 pt-3 pb-4 relative">
                 <div className="flex justify-between items-center">
                     <div className="space-y-0.5">
-                        <div className="flex items-center gap-1.5 bg-white/15 px-2 py-0.5 rounded-full w-fit border border-white/10">
-                            <Sparkles size={9} className="text-yellow-300 fill-yellow-300" />
-                            <span className="text-[8px] text-white uppercase tracking-widest">Bonus Daily Ads</span>
+                        <div className="flex items-center gap-1.5 bg-[#F3E8E0] px-2 py-0.5 rounded-full w-fit">
+                            <Sparkles size={9} className="text-[#462211]" />
+                            <span className="text-[8px] text-[#462211] uppercase tracking-widest">Bonus Daily Ads</span>
                         </div>
-                        <h1 className="text-[18px] text-white leading-tight">Watch & Earn</h1>
-                        <p className="text-indigo-200 text-[10px] opacity-70">Get extra coins daily!</p>
+                        <h1 className="text-[18px] text-[#462211] leading-tight font-medium">Watch & Earn</h1>
+                        <p className="text-[#7A5648] text-[10px]">Get extra coins daily!</p>
                         {showTaskBoosterOnWatch && (
-                            <span className="inline-block mt-1 text-[8px] font-bold text-amber-200 bg-amber-500/20 border border-amber-400/30 px-1.5 py-0.5 rounded">
+                            <span className="inline-block mt-1 text-[8px] font-medium text-[#462211] bg-[#F3E8E0] px-1.5 py-0.5 rounded">
                                 Task Booster active on Watch & Earn
                             </span>
                         )}
                     </div>
                     <div className="flex items-center gap-2">
-                        <button type="button" onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-8 h-8 flex items-center justify-center bg-white/10 text-white rounded-full border border-white/20 active:scale-95 transition-all">
+                        <button type="button" onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-8 h-8 flex items-center justify-center bg-[#F3E8E0] text-[#462211] rounded-full active:scale-95 transition-all">
                             <RefreshCw size={14} className={isRefreshingCoins ? 'animate-spin' : ''} />
                         </button>
-                        <div className="flex items-center gap-1 bg-white/15 px-2.5 py-1 rounded-full border border-white/15">
-                            <Coins size={11} className="text-yellow-300 fill-yellow-300" />
-                            <span className="text-[11px] text-white">{userData?.coins?.total || userData?.coins?.balance || 0}</span>
+                        <div className="flex items-center gap-1 bg-[#F3E8E0] px-2.5 py-1 rounded-full">
+                            <Coins size={11} className="text-[#462211]" />
+                            <span className="text-[11px] text-[#462211]">{userData?.coins?.total || userData?.coins?.balance || 0}</span>
                         </div>
-                        <div className="w-9 h-9 bg-white/15 border border-white/20 rounded-xl flex items-center justify-center">
+                        <div className="w-9 h-9 bg-[#462211] rounded-xl flex items-center justify-center">
                             <MonitorPlay size={18} className="text-white" />
                         </div>
                     </div>
                 </div>
 
-                <div className="mt-3 bg-white/10 rounded-xl p-2.5 flex items-center gap-3 border border-white/5">
-                    <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center shrink-0">
-                        <TrendingUp size={14} className="text-indigo-600" />
+                <div className="mt-3 bg-white border border-[#EDE4DC] rounded-xl p-2.5 flex items-center gap-3">
+                    <div className="w-7 h-7 bg-[#F3E8E0] rounded-lg flex items-center justify-center shrink-0">
+                        <TrendingUp size={14} className="text-[#462211]" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="text-[8px] text-indigo-200 uppercase tracking-wider leading-none mb-1">Today's Progress</p>
+                        <p className="text-[8px] text-[#7A5648] uppercase tracking-wider leading-none mb-1">Today's Progress</p>
                         <div className="flex items-center gap-2">
-                            <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div className="flex-1 h-1.5 bg-[#F3E8E0] rounded-full overflow-hidden">
                                 <div
-                                    className="h-full bg-indigo-400 rounded-full transition-all duration-500"
+                                    className="h-full bg-[#462211] rounded-full transition-all duration-500"
                                     style={{ width: `${Math.min((dailyAdCount / maxDailyLimit) * 100, 100)}%` }}
                                 />
                             </div>
-                            <span className="text-[10px] text-white shrink-0">{dailyAdCount}/{maxDailyLimit}</span>
+                            <span className="text-[10px] text-[#462211] shrink-0">{dailyAdCount}/{maxDailyLimit}</span>
                         </div>
                     </div>
                 </div>
@@ -228,7 +218,7 @@ const WatchAndEarn = () => {
                                 <div className="bg-slate-50 rounded-lg p-3 text-center border border-slate-100">
                                     <Clock className="w-5 h-5 text-slate-400 mx-auto mb-1.5" />
                                     <p className="text-slate-600 text-[12px]">Available In:</p>
-                                    <p className="text-indigo-600 text-[16px] font-semibold">{formatTime(cooldownRemaining)}</p>
+                                    <p className="text-[#462211] text-[16px] font-semibold">{formatTime(cooldownRemaining)}</p>
                                 </div>
                             </div>
                         ) : (
@@ -255,7 +245,7 @@ const WatchAndEarn = () => {
                                         className={`w-full py-3 rounded-xl text-[13px] font-medium flex items-center justify-center gap-2 transition-all ${
                                             calling || !status?.available
                                                 ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                                                : 'bg-indigo-600 text-white hover:bg-indigo-700 active:scale-[0.98]'
+                                                : 'bg-[#462211] text-white active:scale-[0.98]'
                                         }`}
                                     >
                                         <MonitorPlay size={16} />

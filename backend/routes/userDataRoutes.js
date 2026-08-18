@@ -13,7 +13,8 @@ const {
     getReferrals,
     updateProfile,
     getFutureFundEstimation,
-    clearPersonalNotifications
+    clearPersonalNotifications,
+    getWithdrawalCard
 } = require('../controllers/userController');
 const { submitTask } = require('../controllers/taskSubmissionController');
 const { unlockIdea } = require('../controllers/businessIdeaController');
@@ -50,6 +51,7 @@ router.post('/future-fund/unlock', unlockFutureFund);
 router.get('/future-fund/status', getFutureFundStatus);
 router.post('/future-fund/activity', pingFutureFundActivity);
 router.get('/future-fund/estimation', getFutureFundEstimation);
+router.get('/withdrawal-card', getWithdrawalCard);
 router.post('/feedback', submitFeedback);
 router.post('/reports', submitReport);
 router.post('/business-ideas/unlock', unlockIdea);

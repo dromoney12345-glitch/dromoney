@@ -50,6 +50,20 @@ const FutureFundAdmin = () => {
     
     const [reportData, setReportData] = useState([]);
     const [reportLoading, setReportLoading] = useState(true);
+    const [poolSummary, setPoolSummary] = useState(null);
+
+    // Fetch real users from backend
+    useEffect(() => {
+        const fetchPool = async () => {
+            try {
+                const res = await api.get('/admin/users/future-fund/pool');
+                if (res.success) setPoolSummary(res.data);
+            } catch (err) {
+                console.error('Failed to load pool summary', err);
+            }
+        };
+        fetchPool();
+    }, [distributing]);
 
     // Fetch real users from backend
     useEffect(() => {
@@ -186,7 +200,7 @@ const FutureFundAdmin = () => {
             return showToast("There are no active Future Fund users.", "error");
         }
 
-        if (!window.confirm(`Are you sure you want to distribute a total pool of ₹${distributeAmount} among all Future Fund users?`)) return;
+        if (!window.confirm(`Are you sure you want to distribute ₹${distributeAmount} among active Future Fund users?`)) return;
 
         setDistributing(true);
         try {
@@ -257,6 +271,15 @@ const FutureFundAdmin = () => {
                 <AdminStatCard label="Eligible Today" value={usersData.filter(u => u.stage === 'Eligible').length} change="Move Forward ready" icon={Award} color="bg-emerald-500" />
                 <AdminStatCard label="Criteria Goal" value={`${rules.targetSales}/${rules.targetDays}/${rules.dailyTargetMinutes}`} change="Referral/Days/Mins" icon={LayoutDashboard} color="bg-amber-500" />
             </div>
+
+            {poolSummary && (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+                    <AdminStatCard label="Pool Balance" value={`₹${poolSummary.balance}`} change="All-time net" icon={IndianRupee} color="bg-[#462211]" />
+                    <AdminStatCard label="Today In" value={`₹${poolSummary.todayIn}`} change="Ad + task revenue" icon={TrendingUp} color="bg-emerald-600" />
+                    <AdminStatCard label="Today Out" value={`₹${poolSummary.todayOut}`} change="Distributed" icon={History} color="bg-rose-500" />
+                    <AdminStatCard label="Today Net" value={`₹${poolSummary.todayNet}`} change="Available to distribute" icon={Award} color="bg-sky-600" />
+                </div>
+            )}
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-5">
                 {/* CMS Control */}

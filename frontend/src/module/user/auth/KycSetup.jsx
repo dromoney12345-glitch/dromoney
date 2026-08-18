@@ -1,8 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, ShieldCheck, UploadCloud, Camera, ArrowLeft, Info, Fingerprint, Lock, BadgeCheck } from 'lucide-react';
+import {
+    Loader2, ShieldCheck, UploadCloud, Camera, ArrowLeft,
+    Info, Clock, CreditCard
+} from 'lucide-react';
 import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
+
+const ACCENT = '#462211';
+
+const IMPORTANT_NOTES = [
+    'Aadhaar number and photo must be your own.',
+    'Ensure details are clear and valid.',
+    'Incorrect information will lead to KYC rejection.',
+    'Our team verifies KYC manually.',
+    'Approval will be done within 20 – 30 minutes.',
+];
+
 const KycSetup = () => {
     const navigate = useNavigate();
     const { userData, addNotification, refreshUserProfile, loading: userLoading } = useUser();
@@ -12,7 +26,6 @@ const KycSetup = () => {
     const [previewUrl, setPreviewUrl] = useState('');
     const [error, setError] = useState('');
     const [showErrorModal, setShowErrorModal] = useState(false);
-    const fileInputRef = React.useRef(null);
 
     const kycStatus = (userData?.kycStatus || '').toLowerCase();
     const [settings, setSettings] = useState(null);
@@ -32,7 +45,7 @@ const KycSetup = () => {
     const formatTime12h = (time24) => {
         if (!time24) return '';
         let [h, m] = time24.split(':');
-        h = parseInt(h);
+        h = parseInt(h, 10);
         const ampm = h >= 12 ? 'PM' : 'AM';
         h = h % 12 || 12;
         return `${h.toString().padStart(2, '0')}:${m} ${ampm}`;
@@ -60,24 +73,21 @@ const KycSetup = () => {
     }, [aadhaarFile]);
 
     if (userLoading) return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-            <Loader2 className="animate-spin text-amber-500 w-8 h-8" />
+        <div className="min-h-screen bg-[#FCF8F5] flex items-center justify-center font-poppins">
+            <Loader2 className="animate-spin w-8 h-8" style={{ color: ACCENT }} />
         </div>
     );
-
-    // triggerFileSelect removed in favor of label
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        // On mobile, file.type can be empty or application/octet-stream for HEIC/HEIF files
         const isImage = !file.type || file.type.startsWith('image/') || file.type === 'application/octet-stream';
         const ext = file.name ? file.name.split('.').pop().toLowerCase() : '';
         const allowedExts = ['jpeg', 'jpg', 'png', 'gif', 'webp', 'heic', 'heif', 'svg', 'bmp', 'tiff', 'jfif', 'pjpeg', 'pjp', 'avif', ''];
-        
+
         if (!isImage && !allowedExts.includes(ext)) {
-            setError("Note: Incorrect image format! Please upload a valid image file (All image formats like JPEG, PNG, WEBP, HEIC, HEIF, etc. are accepted).");
+            setError('Note: Incorrect image format! Please upload a valid image file (All image formats like JPEG, PNG, WEBP, HEIC, HEIF, etc. are accepted).');
             setShowErrorModal(true);
             e.target.value = '';
             setAadhaarFile(null);
@@ -85,7 +95,7 @@ const KycSetup = () => {
         }
 
         if (file.size > 5 * 1024 * 1024) {
-            setError("Note: File is too large! Maximum limit is 5MB.");
+            setError('Note: File is too large! Maximum limit is 5MB.');
             setShowErrorModal(true);
             e.target.value = '';
             setAadhaarFile(null);
@@ -101,17 +111,17 @@ const KycSetup = () => {
         setError('');
 
         if (aadhaar.length < 12) {
-            setError("Note: Aadhaar number must be exactly 12 digits.");
+            setError('Note: Aadhaar number must be exactly 12 digits.');
             setShowErrorModal(true);
             return;
         }
 
         if (!aadhaarFile) {
-            setError("Note: Please upload your document photo first.");
+            setError('Note: Please upload your document photo first.');
             setShowErrorModal(true);
             return;
         }
-        
+
         setLoading(true);
         const formData = new FormData();
         formData.append('documentNumber', aadhaar);
@@ -123,45 +133,44 @@ const KycSetup = () => {
             });
             if (res.success) {
                 await refreshUserProfile();
-                addNotification("Success", "KYC submitted successfully!", "success");
+                addNotification('Success', 'KYC submitted successfully!', 'success');
                 navigate('/user/auth/pending');
             }
         } catch (err) {
             console.error('KYC Submission Error:', err);
-            const rawMsg = err.response?.data?.message || err.message || "Failed to submit KYC.";
-            const userFriendlyMsg = rawMsg.replace(/Error:/gi, 'Note:');
-            setError(userFriendlyMsg);
+            const rawMsg = err.response?.data?.message || err.message || 'Failed to submit KYC.';
+            setError(rawMsg.replace(/Error:/gi, 'Note:'));
             setShowErrorModal(true);
         } finally {
             setLoading(false);
         }
     };
 
+    const windowStart = formatTime12h(settings?.kycWindowStart) || '07:00 AM';
+    const windowEnd = formatTime12h(settings?.kycWindowEnd) || '07:00 PM';
+
     return (
-        <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col items-center justify-center p-4 relative overflow-hidden font-poppins">
+        <div className="min-h-screen bg-[#FCF8F5] text-slate-900 font-poppins flex flex-col">
             <style>
                 {`
-                    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;700;900&display=swap');
-                    .font-poppins { font-family: 'Poppins', sans-serif !important; }
                     @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(5px); } to { opacity: 1; transform: scale(1) translateY(0); } }
                     .animate-modal { animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
                 `}
             </style>
 
-            {/* Note Pop-up (Compact) */}
             {showErrorModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm">
-                    <div className="bg-white w-full max-w-[300px] rounded-[32px] p-6 shadow-2xl animate-modal flex flex-col items-center text-center">
-                        <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 mb-4">
-                            <Info size={28} />
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40">
+                    <div className="bg-white w-full max-w-[300px] rounded-2xl p-6 shadow-2xl animate-modal flex flex-col items-center text-center">
+                        <div className="w-12 h-12 bg-[#FFF5F0] rounded-2xl flex items-center justify-center mb-4" style={{ color: ACCENT }}>
+                            <Info size={26} />
                         </div>
-                        <h2 className="text-lg font-medium text-slate-900 mb-2 tracking-tight">Attention</h2>
-                        <p className="text-slate-500 text-[11px] font-medium leading-relaxed mb-6">
-                            {error}
-                        </p>
-                        <button 
+                        <h2 className="text-lg font-bold text-slate-900 mb-2 tracking-tight">Attention</h2>
+                        <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-6">{error}</p>
+                        <button
+                            type="button"
                             onClick={() => setShowErrorModal(false)}
-                            className="w-full bg-[#0F172A] hover:bg-slate-800 text-white font-medium uppercase text-[10px] tracking-[0.2em] py-3.5 rounded-xl transition-all active:scale-95"
+                            className="w-full text-white font-semibold uppercase text-[11px] tracking-wide py-3 rounded-xl active:scale-95"
+                            style={{ backgroundColor: ACCENT }}
                         >
                             Understood
                         </button>
@@ -169,140 +178,114 @@ const KycSetup = () => {
                 </div>
             )}
 
-            {/* BG Elements */}
-            <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-50">
-                <div className="absolute top-[-10%] right-[-10%] w-[400px] h-[400px] bg-amber-100 rounded-full blur-[100px]"></div>
-                <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-blue-100 rounded-full blur-[100px]"></div>
-            </div>
-
-            <div className="w-full max-w-[380px] relative z-10 flex flex-col items-center">
-                {/* Header (Compact) */}
-                <div className="w-full flex items-center justify-between mb-4 px-2">
-                    <button 
-                        onClick={() => navigate('/user/home')} 
-                        className="w-8 h-8 flex items-center justify-center bg-white border border-slate-100 rounded-xl text-slate-400 shadow-sm active:scale-90 transition-all"
+            <div className="w-full max-w-[430px] mx-auto px-5 pt-4 pb-8 flex-1 flex flex-col">
+                <div className="relative flex items-center justify-center min-h-[36px] mb-4">
+                    <button
+                        type="button"
+                        onClick={() => navigate('/user/home')}
+                        className="absolute left-0 w-9 h-9 flex items-center justify-center text-slate-900 active:scale-90"
                     >
-                        <ArrowLeft size={16} />
+                        <ArrowLeft size={22} strokeWidth={2.2} />
                     </button>
-                    <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-50 shadow-sm">
-                        <BadgeCheck size={14} className="text-amber-500" />
-                        <span className="text-[9px] font-medium text-slate-500 uppercase tracking-widest">Secured</span>
-                    </div>
+                    <h1 className="text-[22px] font-bold text-slate-900 tracking-tight">KYC Verification</h1>
                 </div>
 
-                <div className="text-center mb-6">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-white shadow-lg border border-slate-50 mb-3">
-                        <Fingerprint size={24} className="text-amber-500" />
+                <div className="flex flex-col items-center text-center mb-6">
+                    <div className="relative mb-2.5">
+                        <div className="absolute inset-0 rounded-full bg-[#462211]/15 blur-xl scale-125" />
+                        <div className="relative w-14 h-14 rounded-2xl bg-[#462211] flex items-center justify-center shadow-[0_8px_20px_rgba(70,34,17,0.28)]">
+                            <ShieldCheck size={28} className="text-white" strokeWidth={2.2} />
+                        </div>
                     </div>
-                    <h1 className="text-2xl font-medium text-slate-900 tracking-tight font-poppins">Identity Setup</h1>
-                    <p className="text-slate-400 text-[10px] font-medium uppercase tracking-wide mt-1">Unlock account withdrawals</p>
+                    <p className="text-[15px] font-bold text-slate-900">100% Secure & Trusted Platform</p>
+                    <p className="text-[12px] text-slate-400 mt-0.5">Your security is our top priority</p>
                 </div>
 
-                {/* Main Card (Compact) */}
-                <form 
-                    onSubmit={handleSubmit} 
-                    className="bg-white w-full p-5 rounded-[32px] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] border border-white flex flex-col gap-6"
-                >
-                    {/* Compact Operating Hours */}
-                    <div className="bg-slate-50/80 px-4 py-2 rounded-2xl flex items-center justify-between border border-slate-100">
-                        <span className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">Service</span>
-                        <span className="text-[10px] font-medium text-amber-600">
-                            {settings?.kycWindowStart && settings?.kycWindowEnd 
-                                ? `${formatTime12h(settings.kycWindowStart)} — ${formatTime12h(settings.kycWindowEnd)}`
-                                : '07:00 AM — 07:00 PM'}
-                        </span>
-                    </div>
-
-                    <div className="space-y-6">
-                        {/* Aadhaar Input */}
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between px-1">
-                                <label className="text-[9px] uppercase font-medium tracking-widest text-slate-400">Aadhaar Card</label>
-                                <Lock size={10} className="text-slate-300" />
-                            </div>
-                            <input 
-                                type="text" 
-                                placeholder="0000 0000 0000"
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                    <div>
+                        <label className="block text-[13px] font-semibold text-slate-800 mb-1.5">Aadhaar Card Number</label>
+                        <div className="flex items-center gap-2.5 rounded-xl border border-slate-200 px-3.5 py-3 focus-within:border-[#462211] transition-colors">
+                            <CreditCard size={18} className="text-slate-400 shrink-0" />
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                autoComplete="off"
+                                placeholder="Enter 12 digit Aadhaar number"
                                 value={aadhaar}
                                 onChange={(e) => setAadhaar(e.target.value.replace(/\D/g, '').slice(0, 12))}
-                                className="w-full bg-slate-50/50 text-slate-900 font-medium tracking-[0.25em] px-5 py-4 rounded-2xl border border-slate-100 focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/5 transition-all text-base font-poppins"
+                                className="flex-1 bg-transparent text-[13px] text-slate-900 placeholder:text-slate-400 outline-none font-medium"
                                 required
                             />
                         </div>
-                        
-                        {/* Upload area (More compact) */}
-                        <div className="space-y-2">
-                            <label className="text-[9px] uppercase font-medium tracking-widest text-slate-400 px-1">Photo Upload</label>
-                            <label 
-                                htmlFor="kyc-upload"
-                                className="relative group cursor-pointer border-2 border-dashed border-slate-100 hover:border-amber-500/30 rounded-2xl p-1 bg-slate-50/30 transition-all overflow-hidden block"
-                            >
-                                {!aadhaarFile ? (
-                                    <div className="py-8 flex flex-col items-center justify-center gap-2">
-                                        <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-slate-300 transition-all">
-                                            <UploadCloud size={20} />
-                                        </div>
-                                        <div className="text-center">
-                                            <p className="text-[10px] text-slate-600 font-medium uppercase tracking-widest">Select Image</p>
-                                            <p className="text-[8px] text-slate-400 font-medium">All Image Formats (Max 5MB)</p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="relative w-full h-32 rounded-xl overflow-hidden shadow-inner">
-                                        {previewUrl && (
-                                            <img 
-                                                src={previewUrl} 
-                                                alt="Preview" 
-                                                className="w-full h-full object-cover"
-                                            />
-                                        )}
-                                        <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center backdrop-blur-[2px]">
-                                            <Camera size={20} className="text-white" />
-                                            <span className="text-[9px] text-white font-medium uppercase tracking-widest mt-1">Change</span>
-                                        </div>
-                                    </div>
-                                )}
-                            </label>
-                            <input 
-                                id="kyc-upload"
-                                type="file" 
-                                onChange={handleFileChange} 
-                                className="hidden" 
-                                accept="image/*"
-                            />
-                        </div>
                     </div>
 
-                    <div className="space-y-3">
-                        <button 
-                            type="submit"
-                            disabled={loading}
-                            className="w-full bg-[#0F172A] hover:bg-slate-800 disabled:opacity-30 text-white font-medium uppercase text-[11px] tracking-[0.2em] py-4 rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-slate-200 font-poppins"
+                    <div>
+                        <label className="block text-[13px] font-semibold text-slate-800 mb-1.5">Aadhaar Card Photo</label>
+                        <label
+                            htmlFor="kyc-upload"
+                            className="relative block cursor-pointer rounded-2xl border border-dashed border-slate-300 hover:border-[#462211] transition-colors overflow-hidden"
                         >
-                            {loading ? <Loader2 size={16} className="animate-spin" /> : (
-                                <>
-                                    <span>Submit KYC</span>
-                                    <ShieldCheck size={14} />
-                                </>
+                            {!aadhaarFile ? (
+                                <div className="py-8 flex flex-col items-center justify-center gap-1.5">
+                                    <UploadCloud size={32} style={{ color: ACCENT }} strokeWidth={1.8} />
+                                    <p className="text-[13px] font-bold text-slate-800">Upload Aadhaar Card Photo</p>
+                                    <p className="text-[11px] text-slate-400">JPG, PNG (Max. 5MB)</p>
+                                </div>
+                            ) : (
+                                <div className="relative h-36 group">
+                                    {previewUrl && (
+                                        <img src={previewUrl} alt="Aadhaar preview" className="w-full h-full object-cover" />
+                                    )}
+                                    <div className="absolute inset-0 bg-slate-900/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Camera size={22} className="text-white" />
+                                        <span className="text-[11px] text-white font-semibold mt-1">Change Photo</span>
+                                    </div>
+                                </div>
                             )}
-                        </button>
-                        <p className="text-[8px] text-center text-slate-400 font-medium uppercase tracking-wider">
-                            Encrypted & Secure Submission
-                        </p>
+                        </label>
+                        <input
+                            id="kyc-upload"
+                            type="file"
+                            onChange={handleFileChange}
+                            className="hidden"
+                            accept="image/*"
+                        />
                     </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full disabled:opacity-50 text-white font-bold uppercase text-[13px] tracking-wide py-3.5 rounded-xl active:scale-[0.99] flex items-center justify-center gap-2 mt-1 shadow-[0_8px_18px_rgba(70,34,17,0.28)]"
+                        style={{ backgroundColor: ACCENT }}
+                    >
+                        {loading ? <Loader2 size={18} className="animate-spin" /> : 'SUBMIT KYC'}
+                    </button>
+
+                    <p className="flex items-center justify-center gap-1.5 text-[12px] text-slate-500 -mt-1">
+                        <Clock size={13} className="text-slate-400" />
+                        KYC Timing:{' '}
+                        <span className="font-bold" style={{ color: ACCENT }}>{windowStart} – {windowEnd}</span>
+                        <span>(Daily)</span>
+                    </p>
                 </form>
 
-                <div className="mt-8">
-                    <button 
-                        onClick={() => navigate('/user/help')} 
-                        className="text-[9px] font-medium text-slate-400 uppercase tracking-[0.1em] hover:text-amber-600 transition-colors"
-                    >
-                        Need Help? Contact Support
-                    </button>
+                <div className="mt-5 rounded-2xl bg-[#FDF4EC] px-4 py-3.5">
+                    <div className="flex items-center gap-2 mb-2.5">
+                        <span className="w-5 h-5 rounded-full border border-[#462211] text-[#462211] flex items-center justify-center shrink-0">
+                            <Info size={11} strokeWidth={2.5} />
+                        </span>
+                        <h2 className="text-[13px] font-bold text-slate-900">Important Notes</h2>
+                    </div>
+                    <ul className="space-y-1.5">
+                        {IMPORTANT_NOTES.map((note) => (
+                            <li key={note} className="flex items-start gap-2 text-[12px] text-slate-600 leading-snug">
+                                <span className="mt-[5px] w-1.5 h-1.5 rounded-[2px] shrink-0" style={{ backgroundColor: ACCENT }} />
+                                {note}
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             </div>
-
-
         </div>
     );
 };

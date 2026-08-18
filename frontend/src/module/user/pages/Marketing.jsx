@@ -6,7 +6,6 @@ import {
     History, CheckCircle2, Share2, ArrowUpRight, Wallet, TrendingUp, Trophy, Shield, Mail
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import UnlockModal from '../components/UnlockModal';
 import { buildReferralLink } from '../../shared/utils/referral';
 
 const Marketing = () => {
@@ -18,18 +17,11 @@ const Marketing = () => {
     const [linkBase, setLinkBase] = useState('');
     const [showReferralLink, setShowReferralLink] = useState(location.state?.showReferral || false);
     const [showShareModal, setShowShareModal] = useState(false);
+    const [referrals, setReferrals] = useState([]);
 
     const referralCode = userData?.referrals?.code || '';
     // Always rebuild from admin base + code (never show localhost /join links)
     const referralLink = buildReferralLink(referralCode, linkBase);
-
-    if (!userData?.isPaid) {
-        return (
-            <div className="min-h-screen bg-[#f8fafc] font-poppins">
-                <UnlockModal isOpen={true} onClose={() => navigate('/user/income')} />
-            </div>
-        );
-    }
 
     React.useEffect(() => {
         const fetchSettings = async () => {
@@ -45,6 +37,26 @@ const Marketing = () => {
         };
         fetchSettings();
     }, []);
+
+    React.useEffect(() => {
+        if (!showReferralLink) return;
+        const loadReferrals = async () => {
+            try {
+                const res = await api.get('/user/data/referrals');
+                if (res.success) setReferrals(res.data || []);
+            } catch (err) {
+                console.error('Failed to load referrals', err);
+            }
+        };
+        loadReferrals();
+    }, [showReferralLink]);
+
+    const inviteBadge = (ref) => {
+        if (ref.status === 'Completed') return 'Released';
+        if (ref.status === 'Failed') return 'Removed';
+        if (ref.daysLeft != null) return `${ref.daysLeft} days left`;
+        return ref.kycStatus || 'Pending';
+    };
 
     const handleCopy = () => {
         navigator.clipboard.writeText(referralLink);
@@ -97,7 +109,7 @@ const Marketing = () => {
 
     if (showReferralLink) {
         return (
-            <div className="flex flex-col min-h-fit bg-[#f0f4f9] font-poppins pb-20">
+            <div className="flex flex-col min-h-fit bg-[#FCF8F5] font-poppins pb-20">
                 {/* ── Compact Header ── */}
                 <div className="bg-white px-5 py-2.5 flex items-center justify-between border-b border-slate-100 sticky top-0 z-40">
                     <div className="flex items-center gap-3">
@@ -190,10 +202,29 @@ const Marketing = () => {
                         <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
                             <h5 className="text-[11px] font-medium text-blue-800 uppercase tracking-wider mb-1">How it works</h5>
                             <p className="text-[10px] font-medium text-blue-600 leading-relaxed">
-                                Share your Play Store referral link. When a friend completes KYC and buys the ₹499 plan, you receive ₹{rewardAmount} in your wallet.
+                                Share your link. When a friend completes KYC, ₹{rewardAmount} goes to your Pending Wallet. It releases to Virtual Wallet when they create a Withdrawal Card within 28 days.
                             </p>
                         </div>
                     </div>
+
+                    {referrals.length > 0 && (
+                        <div className="px-5 pb-4">
+                            <h5 className="text-[11px] font-medium text-[#462211] uppercase tracking-wider mb-2">Invite Status</h5>
+                            <div className="bg-white border border-slate-100 divide-y divide-slate-50">
+                                {referrals.map((ref) => (
+                                    <div key={ref._id} className="px-3 py-2.5 flex items-center justify-between gap-2">
+                                        <div className="min-w-0">
+                                            <p className="text-[12px] font-medium text-[#462211] truncate">{ref.name}</p>
+                                            <p className="text-[10px] text-slate-400">₹{ref.amount} · {ref.status}</p>
+                                        </div>
+                                        <span className="text-[9px] font-medium text-[#462211] bg-[#FFF5F0] px-2 py-0.5 rounded-full shrink-0">
+                                            {inviteBadge(ref)}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Share Modal */}
@@ -251,7 +282,7 @@ const Marketing = () => {
 
     // Otherwise show the 4 cards Information Center (guide to earning systems)
     return (
-        <div className="flex flex-col min-h-fit bg-[#F8FAFC] font-poppins pb-24 relative overflow-hidden">
+        <div className="flex flex-col min-h-fit bg-[#FCF8F5] font-poppins pb-24 relative overflow-hidden">
             {/* ── Header ── */}
             <div className="bg-white px-5 py-2.5 flex items-center gap-4 sticky top-0 z-40 border-b border-slate-100 shadow-sm">
                 <button 

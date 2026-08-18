@@ -11,9 +11,16 @@ const { getLastRenewalTick } = require('../utils/taskRenewal');
 // @route   GET /api/user/wallet/balance
 // @access  Private
 exports.getBalance = asyncHandler(async (req, res, next) => {
-    const user = await User.findById(req.user.id).select('wallet coins');
+    const user = await User.findById(req.user.id).select('wallet coins isPaid withdrawalCard');
+    const {
+        migrateWalletSplits,
+        ensureWithdrawalCardShape,
+        withdrawableVirtual,
+    } = require('../utils/walletLedger');
+    migrateWalletSplits(user);
+    ensureWithdrawalCardShape(user);
+    await user.save({ validateBeforeSave: false });
 
-    // Fetch any non-rejected withdrawal in the last 24 hours
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const recentWithdrawal = await Withdrawal.findOne({
         user: req.user.id,
@@ -21,7 +28,6 @@ exports.getBalance = asyncHandler(async (req, res, next) => {
         createdAt: { $gte: twentyFourHoursAgo }
     }).sort('-createdAt');
 
-    // Fetch any pending withdrawal request
     const pendingWithdrawal = await Withdrawal.findOne({
         user: req.user.id,
         status: 'Pending'
@@ -30,6 +36,12 @@ exports.getBalance = asyncHandler(async (req, res, next) => {
     res.status(200).json({
         success: true,
         data: user,
+        pendingBalance: user.wallet.pendingBalance || 0,
+        virtualBalance: user.wallet.virtualBalance || 0,
+        withdrawable: withdrawableVirtual(user),
+        lockedReserve: user.withdrawalCard?.lockedReserve || 0,
+        card: user.withdrawalCard,
+        virtualUnlocked: !!user.isPaid,
         recentWithdrawal,
         pendingWithdrawal
     });
@@ -179,14 +191,36 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
     }
     const totalAwardedCoins = amount * factor;
 
-    // Remove conversion logic - coins stay as coins and do not convert to wallet balance (Rupees)
+    const settings = await Settings.findOne() || {};
+    const coinRate = Number(settings.coinRate) || 0.1;
+    const inrEarned = Math.round(totalAwardedCoins * coinRate * 100) / 100;
+    const poolPercent = Number(settings.futureFundPoolPercent) || 30;
+    const taskRevenue = Number(settings.taskRevenuePerTask) || 1.0;
 
-    // Update User
+    const { creditEarning } = require('../utils/walletLedger');
+    const { addPoolRevenue } = require('../utils/fundPool');
+
+    let walletCredit = null;
+    if (inrEarned > 0) {
+        walletCredit = await creditEarning(user, inrEarned, {
+            source: factor > 1 ? `Task Earning (${source})` : `Task Earning: ${source}`,
+            inviteHold: false,
+            createTx: true,
+        });
+    }
+
+    const poolShare = Math.round(taskRevenue * (poolPercent / 100) * 100) / 100;
+    if (poolShare > 0) {
+        await addPoolRevenue(poolShare, {
+            source: 'task',
+            note: `Task activity pool share (${source})`,
+            user: user._id,
+        });
+    }
+
+    // Update User — coins + wallet
     user.coins.balance += totalAwardedCoins;
     user.coins.lifetimeCoins += totalAwardedCoins;
-    // user.wallet.balance is no longer updated by coins
-    // user.wallet.lifetimeEarnings is no longer updated by coins
-    // user.wallet.todayEarnings is no longer updated by coins
 
     // Track completed tasks dynamically in database
     if (taskId) {
@@ -199,6 +233,7 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
                 taskId: taskId,
                 completedAt: new Date()
             });
+            user.lifetimeTasksCompleted = (user.lifetimeTasksCompleted || 0) + 1;
         } else {
             // Add to one-time completed tasks
             if (!user.completedTasks) {
@@ -225,7 +260,11 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         success: true,
         data: {
             coinsAwarded: totalAwardedCoins,
+            inrEarned,
+            walletDestination: walletCredit?.destination || null,
             newWalletBalance: user.wallet.balance,
+            newPendingBalance: user.wallet.pendingBalance,
+            newVirtualBalance: user.wallet.virtualBalance,
             newCoinBalance: user.coins.balance,
             completedTasks: user.completedTasks,
             dailyTaskCompletions: user.dailyTaskCompletions
@@ -268,11 +307,19 @@ exports.requestWithdrawal = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse(`You can only withdraw once every 24 hours. Please wait ${diffHours}h ${diffMins}m before trying again.`, 400));
     }
 
-    // Check with ₹5 transaction fee
+    const { withdrawableVirtual, migrateWalletSplits, ensureWithdrawalCardShape } = require('../utils/walletLedger');
+    migrateWalletSplits(user);
+    ensureWithdrawalCardShape(user);
+
+    if (!user.isPaid || user.withdrawalCard?.status !== 'active') {
+        return next(new ErrorResponse('Unlock Virtual Wallet with a Withdrawal Card first.', 400));
+    }
+
+    const available = withdrawableVirtual(user);
     const totalDeduction = Number(amount) + 5;
 
-    if (user.wallet.balance < totalDeduction) {
-        return next(new ErrorResponse(`Insufficient balance. You need ₹${totalDeduction} (₹${amount} withdrawal + ₹5 transaction fee) to complete this transaction`, 400));
+    if (available < totalDeduction) {
+        return next(new ErrorResponse(`Insufficient Virtual Wallet. Withdrawable ₹${available.toFixed(2)} after reserve. You need ₹${totalDeduction} (amount + ₹5 fee).`, 400));
     }
 
     // 3. Check for any existing pending withdrawal request to prevent race conditions

@@ -18,7 +18,7 @@ const ReferralTransactionSchema = new mongoose.Schema({
     status: {
         type: String,
         enum: ['Pending', 'Completed', 'Failed'],
-        default: 'Completed'
+        default: 'Pending'
     }
 }, {
     timestamps: true

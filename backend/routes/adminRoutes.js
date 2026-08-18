@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { login, getMe } = require('../controllers/adminAuthController');
 const { getStats, getDashboardAlerts, getEngagement } = require('../controllers/adminDashboardController');
-const { getUsers, manageKYC, toggleBlock, getPendingKyc, deleteUser, getUserTransactions, distributeFutureFundProfit, getFutureFundReport, updateOverrideProfit, getFutureFundHistory } = require('../controllers/adminUserController');
+const { getUsers, manageKYC, toggleBlock, getPendingKyc, deleteUser, getUserTransactions, distributeFutureFundProfit, getFutureFundReport, updateOverrideProfit, getFutureFundHistory, getFundPoolSummary } = require('../controllers/adminUserController');
 const { 
     createTask, getTasks, updateTask,
     deleteContent 
@@ -51,6 +51,7 @@ router.get('/users/future-fund/report', protectAdmin, getFutureFundReport);
 router.post('/users/future-fund/distribute', protectAdmin, distributeFutureFundProfit);
 router.put('/users/:id/future-fund/override', protectAdmin, updateOverrideProfit);
 router.get('/users/future-fund/history', protectAdmin, getFutureFundHistory);
+router.get('/users/future-fund/pool', protectAdmin, getFundPoolSummary);
 router.get('/users/:id/transactions', protectAdmin, getUserTransactions);
 router.put('/users/:id/kyc', protectAdmin, manageKYC);
 router.put('/users/:id/block', protectAdmin, toggleBlock);

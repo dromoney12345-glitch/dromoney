@@ -22,10 +22,14 @@ exports.sendMessage = asyncHandler(async (req, res, next) => {
     const { message } = req.body;
     const user = await User.findById(req.user.id);
 
+    const hasActiveSupport = user.supportExpiry && new Date(user.supportExpiry) > new Date();
+    if (!hasActiveSupport) {
+        return next(new ErrorResponse('Support plan expired. Please renew to continue chatting.', 403));
+    }
+
     // If first time accessing Business Hub, set the date
     if (!user.businessHubFirstAccessedAt) {
         user.businessHubFirstAccessedAt = new Date();
-        // Removed hardcoded 3-month grant to support dynamic plans
         await user.save();
     }
 
@@ -120,21 +124,5 @@ exports.adminSendMessage = asyncHandler(async (req, res, next) => {
 // @route   POST /api/chat/renew
 // @access  Private
 exports.renewSupport = asyncHandler(async (req, res, next) => {
-    const user = await User.findById(req.user.id);
-
-    const now = new Date();
-    const currentExpiry = user.supportExpiry || now;
-    const baseDate = currentExpiry > now ? currentExpiry : now;
-
-    const newExpiry = new Date(baseDate);
-    // Standardizing to 30 days default for this specific legacy endpoint
-    newExpiry.setDate(newExpiry.getDate() + 30);
-
-    user.supportExpiry = newExpiry;
-    await user.save();
-
-    res.status(200).json({
-        success: true,
-        data: user.supportExpiry
-    });
+    return next(new ErrorResponse('Please complete payment to renew support chat.', 400));
 });
