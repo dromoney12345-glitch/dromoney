@@ -195,76 +195,51 @@ const InfoPage = () => {
 
     if (loading) {
         return (
-            <div className="max-w-md mx-auto shadow-2xl min-h-screen bg-white flex flex-col items-center justify-center font-poppins">
-                <div className="w-12 h-12 border-4 border-slate-100 border-t-red-500 rounded-full animate-spin"></div>
-                <p className="mt-4 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] animate-pulse">Syncing Design...</p>
+            <div className="min-h-full bg-[#FCF8F5] flex flex-col items-center justify-center font-poppins">
+                <div className="w-10 h-10 border-3 border-[#EDE4DC] border-t-[#B3591C] rounded-full animate-spin"></div>
+                <p className="mt-3 text-[10px] font-medium text-[#7A5648] uppercase tracking-widest animate-pulse">Loading...</p>
             </div>
         );
     }
 
     if (!pageData) return null;
 
-    // Premium Layout for Information Pages
     return (
-        <div className="max-w-md mx-auto shadow-2xl flex flex-col min-h-screen bg-[#F8FAFC] font-poppins pb-24 relative overflow-hidden">
-            {/* Ultra-Compact Header Row - Navy Blue Theme */}
-            <div className="relative h-16 bg-gradient-to-br from-[#0B1221] to-[#1E293B] rounded-b-3xl shadow-lg overflow-hidden flex items-center px-5">
-                {/* Decorative Elements */}
-                <div className="absolute right-[-10px] top-[-10px] opacity-[0.03] pointer-events-none">
-                    {getIcon(100, "text-white")}
-                </div>
-                
-                {/* Compact Row: Back + Title */}
-                <div className="flex items-center gap-3 relative z-20 w-full">
-                    <button 
-                        onClick={() => {
-                            if (type === 'future-features') {
-                                navigate('/user/income');
-                            } else {
-                                navigate('/user/home');
-                            }
-                        }} 
-                        className="w-8 h-8 flex items-center justify-center bg-white/5 backdrop-blur-md rounded-lg text-white active:scale-90 transition-all border border-white/10"
-                    >
-                        <ChevronLeft size={18} />
-                    </button>
-                    
-                    <div className="flex flex-col">
-                        <p className="text-blue-400 text-[7px] font-medium uppercase tracking-[0.2em] leading-none mb-1">
-                            User Guide
-                        </p>
-                        <h1 className="text-base font-medium text-white tracking-tight leading-none uppercase">
-                            {pageData.title}
-                        </h1>
-                    </div>
-                </div>
+        <div className="flex flex-col min-h-full bg-[#FCF8F5] font-poppins pb-6">
+            <div className="bg-white px-4 py-2.5 flex items-center gap-3 sticky top-0 z-40 border-b border-[#EDE4DC]">
+                <button 
+                    onClick={() => {
+                        if (type === 'future-features') {
+                            navigate('/user/income');
+                        } else {
+                            navigate('/user/home');
+                        }
+                    }} 
+                    className="text-[#462211] active:scale-95 transition-all"
+                >
+                    <ChevronLeft size={22} strokeWidth={2.2} />
+                </button>
+                <h1 className="text-[17px] font-semibold text-[#462211] tracking-tight">
+                    {pageData.title}
+                </h1>
             </div>
 
-            <div className="px-4 pt-8 flex flex-col gap-4 relative z-10">
-                {/* Subtitle / Intro - Compact */}
-                <div className="px-2">
-                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-relaxed">
+            <div className="px-4 pt-4">
+                {pageData.subtitle && (
+                    <p className="text-[11px] font-medium text-[#7A5648] uppercase tracking-widest mb-4">
                         {pageData.subtitle}
                     </p>
-                </div>
+                )}
 
-                {/* Content Sections as Compact Cards */}
-                <div className="grid gap-3">
+                <div className="bg-white rounded-2xl border border-[#EDE4DC] shadow-[0_2px_12px_rgba(70,34,17,0.06)] overflow-hidden">
                     {pageData.sections.map((section, idx) => (
-                        <div key={idx} className="bg-white p-4 border border-slate-100 rounded-xl shadow-sm group active:bg-slate-50 transition-colors">
-                            <div className="flex items-start gap-3">
-                                <div className="w-6 h-6 bg-blue-50 rounded-lg flex items-center justify-center shrink-0 border border-blue-100 text-blue-500">
-                                    <CheckCircle2 size={14} />
-                                </div>
-                                <div className="flex-1">
-                                    <h4 className="text-[13px] font-medium text-slate-800 mb-0.5 uppercase tracking-wide">
-                                        {section.title}
-                                    </h4>
-                                    <p className="text-[11px] font-medium text-slate-500 leading-relaxed whitespace-pre-line">
-                                        {section.text}
-                                    </p>
-                                </div>
-                            </div>
+                        <div key={idx} className={`px-4 py-3.5 ${idx !== pageData.sections.length - 1 ? 'border-b border-[#EDE4DC]/60' : ''}`}>
+                            <h4 className="text-[13px] font-semibold text-[#462211] mb-1.5">
+                                {section.title}
+                            </h4>
+                            <p className="text-[11px] text-[#7A5648] leading-relaxed whitespace-pre-line">
+                                {section.text}
+                            </p>
                         </div>
                     ))}
                 </div>

@@ -153,65 +153,55 @@ const UserLayout = () => {
                 ></div>
 
                 {/* Modal Body */}
-                <div className={`relative w-[92%] max-w-sm bg-[#F1F9F3] shadow-2xl rounded-3xl overflow-hidden transition-all duration-300 ease-out flex flex-col max-h-[80vh] ${isNotifOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4'}`}>
-                    {/* Ultra-Compact Header Row - Navy Blue Theme */}
-                    <div className="relative h-16 bg-gradient-to-br from-[#0B1221] to-[#1E293B] flex items-center px-5 shrink-0">
-                        <div className="absolute right-[-10px] top-[-10px] opacity-[0.03] pointer-events-none">
-                            <Bell size={100} className="text-white" />
+                <div className={`relative w-[92%] max-w-sm bg-[#FCF8F5] shadow-2xl rounded-3xl overflow-hidden transition-all duration-300 ease-out flex flex-col max-h-[80vh] ${isNotifOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4'}`}>
+                    <div className="bg-white px-5 py-3 flex items-center gap-3 border-b border-[#EDE4DC] shrink-0">
+                        <div className="w-8 h-8 flex items-center justify-center bg-[#462211] rounded-lg text-white">
+                            <Bell size={16} />
                         </div>
-                        
-                        {/* Compact Row: Icon + Title */}
-                        <div className="flex items-center gap-3 relative z-20 w-full">
-                            <div className="w-8 h-8 flex items-center justify-center bg-white/5 backdrop-blur-md rounded-lg text-white border border-white/10">
-                                <Bell size={18} />
-                            </div>
-                            
-                            <div className="flex flex-col flex-1">
-                                <p className="text-blue-400 text-[7px] font-medium uppercase tracking-[0.2em] leading-none mb-1">
-                                    In-App Updates
-                                </p>
-                                <h2 className="text-base font-medium text-white tracking-tight leading-none uppercase">
-                                    Notifications
-                                </h2>
-                            </div>
-
-                            <button
-                                onClick={() => setIsNotifOpen(false)}
-                                className="w-8 h-8 flex items-center justify-center bg-white/5 backdrop-blur-md rounded-lg text-white active:scale-90 transition-all border border-white/10"
-                            >
-                                <X size={18} />
-                            </button>
+                        <div className="flex flex-col flex-1">
+                            <p className="text-[#B3591C] text-[7px] font-medium uppercase tracking-[0.2em] leading-none mb-0.5">
+                                In-App Updates
+                            </p>
+                            <h2 className="text-[15px] font-semibold text-[#462211] tracking-tight leading-none">
+                                Notifications
+                            </h2>
                         </div>
+                        <button
+                            onClick={() => setIsNotifOpen(false)}
+                            className="w-8 h-8 flex items-center justify-center bg-[#FFF5F0] rounded-lg text-[#462211] active:scale-90 transition-all border border-[#EDE4DC]"
+                        >
+                            <X size={16} />
+                        </button>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                    <div className="flex-1 overflow-y-auto p-3 space-y-2.5">
                         {allNotifications.length > 0 ? (
                             allNotifications.map((notif) => (
                                 <div 
                                     key={notif.id} 
                                     onClick={() => markAsRead(notif.id)}
-                                    className={`flex gap-3 p-4 rounded-2xl transition-all cursor-pointer group relative border ${
+                                    className={`flex gap-3 p-3.5 rounded-2xl transition-all cursor-pointer group relative border ${
                                         notif.isRead 
-                                        ? 'bg-white/40 border-slate-200/50 opacity-60' 
-                                        : 'bg-white border-blue-100 shadow-sm shadow-blue-100/30'
+                                        ? 'bg-white/60 border-[#EDE4DC]/50 opacity-60' 
+                                        : 'bg-white border-[#EDE4DC] shadow-[0_2px_8px_rgba(70,34,17,0.06)]'
                                     }`}
                                 >
                                     {!notif.isRead && (
-                                        <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse"></div>
+                                        <div className="absolute top-3.5 right-3.5 w-1.5 h-1.5 bg-[#B3591C] rounded-full animate-pulse"></div>
                                     )}
                                     <div className={`mt-0.5 shrink-0 transition-transform group-hover:scale-110 ${notif.isRead ? 'grayscale opacity-30' : ''}`}>
                                         {getNotifIcon(notif.type)}
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex justify-between items-start mb-0.5">
-                                            <h4 className={`text-[13px] font-medium tracking-tight transition-colors ${notif.isRead ? 'text-slate-500' : 'text-slate-800'} uppercase`}>
+                                            <h4 className={`text-[12px] font-medium tracking-tight transition-colors ${notif.isRead ? 'text-[#7A5648]' : 'text-[#462211]'} uppercase`}>
                                                 {notif.title}
                                             </h4>
-                                            <span className="text-[8px] font-medium text-slate-400 bg-slate-50/50 px-1.5 py-0.5 rounded-md border border-slate-100">
+                                            <span className="text-[8px] font-medium text-[#7A5648] bg-[#FFF5F0] px-1.5 py-0.5 rounded-md border border-[#EDE4DC]">
                                                 {notif.time}
                                             </span>
                                         </div>
-                                        <p className={`text-[11px] font-medium leading-relaxed ${notif.isRead ? 'text-slate-400' : 'text-slate-500'}`}>
+                                        <p className={`text-[11px] font-medium leading-relaxed ${notif.isRead ? 'text-[#A89890]' : 'text-[#7A5648]'}`}>
                                             {notif.message}
                                         </p>
                                     </div>
@@ -219,10 +209,10 @@ const UserLayout = () => {
                             ))
                         ) : (
                             <div className="h-full flex flex-col items-center justify-center py-20">
-                                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 opacity-40">
-                                    <Bell size={32} className="text-slate-300 stroke-1" />
+                                <div className="w-16 h-16 bg-[#F3E8E0] rounded-full flex items-center justify-center mb-4 opacity-60">
+                                    <Bell size={32} className="text-[#D4C4B8] stroke-1" />
                                 </div>
-                                <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-400">All caught up</p>
+                                <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-[#7A5648]">All caught up</p>
                             </div>
                         )}
                     </div>

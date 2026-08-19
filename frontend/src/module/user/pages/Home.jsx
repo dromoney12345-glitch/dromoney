@@ -65,13 +65,15 @@ const Home = () => {
     const helpsRef = useRef(null);
     const [banner, setBanner] = useState(FALLBACK_BANNER);
     const [whatsappPhone, setWhatsappPhone] = useState(DEFAULT_WHATSAPP);
+    const [guideCards, setGuideCards] = useState(HOME_GUIDE_CARDS);
 
     useEffect(() => {
         const load = async () => {
             try {
-                const [bannerRes, settingsRes] = await Promise.all([
+                const [bannerRes, settingsRes, guidesRes] = await Promise.all([
                     api.get('/public/banners'),
                     api.get('/public/settings').catch(() => null),
+                    api.get('/public/content/home_guides').catch(() => null),
                 ]);
                 if (bannerRes.success && bannerRes.data?.length) {
                     setBanner(resolveHomeBanner(bannerRes.data));
@@ -80,6 +82,9 @@ const Home = () => {
                 }
                 const phone = digitsOnly(settingsRes?.data?.contactPhone);
                 if (phone.length >= 10) setWhatsappPhone(phone.length === 10 ? `91${phone}` : phone);
+                if (guidesRes?.success && guidesRes.data?.data?.cards?.length) {
+                    setGuideCards(guidesRes.data.data.cards);
+                }
             } catch {
                 setBanner(FALLBACK_BANNER);
             }
@@ -158,7 +163,7 @@ const Home = () => {
                 </div>
 
                 <div className="grid grid-cols-4 gap-1.5">
-                    {HOME_GUIDE_CARDS.map((card) => {
+                    {guideCards.map((card) => {
                         const Icon = ICON_MAP[card.icon] || ClipboardCheck;
                         return (
                             <button

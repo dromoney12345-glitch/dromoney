@@ -157,12 +157,12 @@ const AdminLayout = () => {
             <div className={`fixed inset-0 z-[100] transition-all duration-500 ${isNotifOpen ? 'visible' : 'invisible'}`}>
                 <div onClick={() => setIsNotifOpen(false)} className={`absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-500 ${isNotifOpen ? 'opacity-100' : 'opacity-0'}`}></div>
                 <div className={`absolute top-0 right-0 h-full w-full max-w-[380px] bg-white shadow-2xl transition-transform duration-500 ease-out flex flex-col ${isNotifOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                    <div className="px-6 py-3 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
+                    <div className="px-6 py-3 border-b border-[#EDE4DC] flex items-center justify-between bg-white sticky top-0 z-10">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-sky-100">
+                            <div className="w-10 h-10 bg-[#462211] rounded-xl flex items-center justify-center text-white shadow-lg shadow-[#462211]/20">
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
                             </div>
-                            <h2 className="font-medium text-slate-800 text-lg tracking-tight uppercase">Admin Activity</h2>
+                            <h2 className="font-medium text-[#462211] text-lg tracking-tight uppercase">Admin Activity</h2>
                         </div>
                         <button onClick={() => setIsNotifOpen(false)} className="w-10 h-10 hover:bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-500 transition-all">
                             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 18M6 6l12 12" /></svg>
@@ -171,10 +171,10 @@ const AdminLayout = () => {
 
                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
                         {notifications.length > 0 ? notifications.map((notif) => (
-                            <div key={notif.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-xl hover:shadow-slate-100/40 transition-all cursor-pointer group">
+                            <div key={notif.id} className="p-4 rounded-2xl bg-[#FFF5F0] border border-[#EDE4DC] hover:bg-white hover:shadow-xl hover:shadow-[#462211]/5 transition-all cursor-pointer group">
                                 <div className="flex justify-between items-start mb-2">
-                                    <h4 className="text-[13px] font-medium text-slate-800 group-hover:text-sky-600 transition-colors uppercase tracking-tight">{notif.title}</h4>
-                                    <span className="text-[9px] font-medium text-slate-400 bg-white px-2 py-1 rounded-lg border border-slate-100 shrink-0 ml-3">Just now</span>
+                                    <h4 className="text-[13px] font-medium text-[#462211] group-hover:text-[#B3591C] transition-colors uppercase tracking-tight">{notif.title}</h4>
+                                    <span className="text-[9px] font-medium text-[#7A5648] bg-white px-2 py-1 rounded-lg border border-[#EDE4DC] shrink-0 ml-3">Just now</span>
                                 </div>
                                 <p className="text-[11px] font-medium text-slate-500 leading-relaxed">{notif.message}</p>
                             </div>
@@ -189,17 +189,17 @@ const AdminLayout = () => {
 
             {/* ── Sidebar ── */}
             <aside
-                className={`${sidebarOpen ? 'w-64' : 'w-16'} bg-[#0f172a] flex flex-col shrink-0 transition-all duration-300 relative z-30 h-full border-r border-slate-800/40`}
+                className={`${sidebarOpen ? 'w-64' : 'w-16'} bg-[#462211] flex flex-col shrink-0 transition-all duration-300 relative z-30 h-full border-r border-[#5a2d1a]`}
                 style={{ overscrollBehaviorY: 'contain' }}
             >
-                <div className="flex flex-col items-center px-3 py-3 border-b border-slate-800/40 shrink-0 gap-1.5">
-                    <div className="w-12 h-12 flex items-center justify-center shrink-0">
-                        <img src={logo} alt="Dromoney" className="w-full h-full object-contain filter drop-shadow-2xl" />
+                <div className="flex flex-col items-center px-3 py-3 border-b border-[#5a2d1a] shrink-0 gap-1.5">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#FFF9F3] to-[#E8C4A0] flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                        <img src={logo} alt="Dromoney" className="w-10 h-10 object-contain" />
                     </div>
                     {sidebarOpen && (
                         <div className="text-center">
                             <h1 className="text-sm font-medium text-white leading-none tracking-wide mb-0.5 uppercase">Dromoney</h1>
-                            <p className="text-[8px] font-medium text-amber-500 uppercase tracking-normal leading-none">Admin Control</p>
+                            <p className="text-[8px] font-medium text-[#F5C28A] uppercase tracking-normal leading-none">Admin Control</p>
                         </div>
                     )}
                 </div>
@@ -215,7 +215,7 @@ const AdminLayout = () => {
                                                 toggleMenu(item.path);
                                                 if (!sidebarOpen) setSidebarOpen(true);
                                             }}
-                                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-300 group relative ${openMenus[item.path] ? 'bg-white/5 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}
+                                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-300 group relative ${openMenus[item.path] ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'}`}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <item.icon className={`w-5 h-5 shrink-0 ${sidebarOpen ? 'mr-1' : ''}`} />
@@ -226,13 +226,13 @@ const AdminLayout = () => {
                                             )}
                                         </button>
                                         {sidebarOpen && openMenus[item.path] && (
-                                            <div className="mt-1 ml-9 space-y-1 border-l-2 border-slate-800/50 pl-3">
+                                            <div className="mt-1 ml-9 space-y-1 border-l-2 border-[#5a2d1a] pl-3">
                                                 {item.subMenus.map((sub) => (
                                                     <NavLink
                                                         key={sub.path}
                                                         to={sub.path}
                                                         end
-                                                        className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive ? 'bg-[#FDF2D0] text-[#856404] shadow-sm' : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'}`}
+                                                        className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${isActive ? 'bg-[#FFF5F0] text-[#B3591C] shadow-sm' : 'text-white/50 hover:text-white hover:bg-white/10'}`}
                                                     >
                                                         <span className="text-[11px] font-medium tracking-tight whitespace-nowrap uppercase">{sub.label}</span>
                                                     </NavLink>
@@ -244,7 +244,7 @@ const AdminLayout = () => {
                                     <NavLink
                                         to={item.path}
                                         end
-                                        className={({ isActive }) => `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group relative ${isActive ? 'bg-[#FDF2D0] text-[#856404] shadow-lg shadow-black/20 border border-[#F9E9B8]' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}
+                                        className={({ isActive }) => `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group relative ${isActive ? 'bg-[#FFF5F0] text-[#B3591C] shadow-lg shadow-black/20 border border-[#EDE4DC]' : 'text-white/60 hover:bg-white/10 hover:text-white'}`}
                                     >
                                         <item.icon className={`w-5 h-5 shrink-0 ${sidebarOpen ? 'mr-1' : ''}`} />
                                         {sidebarOpen && <span className="text-[12px] font-medium tracking-tight whitespace-nowrap uppercase">{item.label}</span>}
@@ -254,9 +254,8 @@ const AdminLayout = () => {
                         ))}
                     </nav>
 
-                    {/* Logout moved here - directly after Nav */}
-                    <div className="pt-4 border-t border-slate-800/40 mt-2">
-                        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-all group font-medium uppercase text-[12px]">
+                    <div className="pt-4 border-t border-[#5a2d1a] mt-2">
+                        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-rose-300 hover:bg-rose-500/10 hover:text-rose-200 transition-all group font-medium uppercase text-[12px]">
                             <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" /></svg>
                             {sidebarOpen && <span className="whitespace-nowrap">Logout Session</span>}
                         </button>
@@ -285,10 +284,10 @@ const AdminLayout = () => {
 
                         <button onClick={() => setIsNotifOpen(true)} className="w-9 h-9 bg-slate-50 hover:bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 border border-slate-100 relative transition-transform active:scale-95">
                             <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
-                            <span className="absolute top-2 right-2.5 w-1.5 h-1.5 bg-sky-500 rounded-full"></span>
+                            <span className="absolute top-2 right-2.5 w-1.5 h-1.5 bg-[#B3591C] rounded-full"></span>
                         </button>
-                        <div className="flex items-center gap-2.5 bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
-                            <div className="w-7 h-7 bg-gradient-to-br from-sky-500 to-indigo-500 rounded-lg flex items-center justify-center text-white font-medium text-[11px]">A</div>
+                        <div className="flex items-center gap-2.5 bg-[#FFF5F0] rounded-xl px-3 py-2 border border-[#EDE4DC]">
+                            <div className="w-7 h-7 bg-gradient-to-br from-[#B3591C] to-[#462211] rounded-lg flex items-center justify-center text-white font-medium text-[11px]">A</div>
                             <div className="hidden sm:block">
                                 <p className="text-[12px] font-medium text-slate-800 leading-none">Admin</p>
                                 <p className="text-[9px] font-medium text-slate-400 leading-none mt-0.5 uppercase tracking-tighter">Super Admin</p>
@@ -298,7 +297,7 @@ const AdminLayout = () => {
                 </header>
 
                 <main
-                    className="flex-1 overflow-y-auto bg-slate-50/30 grow h-full admin-compact-container"
+                    className="flex-1 overflow-y-auto bg-[#FCF8F5] grow h-full admin-compact-container"
                     style={{ overscrollBehaviorY: 'contain' }}
                 >
                     <Outlet />
