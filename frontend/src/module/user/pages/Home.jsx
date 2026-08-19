@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { HOME_GUIDE_CARDS } from '../data/guides';
 import api from '../../shared/services/api';
+import homeHeroPerson from '../../../assets/home-hero-person.png';
 
 const WhatsAppIcon = ({ size = 18, className = '' }) => (
     <svg viewBox="0 0 24 24" width={size} height={size} className={className} fill="currentColor" aria-hidden>
@@ -30,20 +31,39 @@ const ICON_MAP = {
     ClipboardCheck, UserPlus, CreditCard, Wallet, TrendingUp, PiggyBank, ListChecks, Building2,
 };
 
+const PROMO_BANNER_PATTERN = /booster|multiply|coin|affiliate|contest|jackpot|event|upgrade|3x|₹200|live contest|earn ₹/i;
+
 const FALLBACK_BANNER = {
     tag: 'Your Growth',
     title: 'Our Guidance',
     subtitle: 'Dromoney is your trusted platform to learn, grow and earn online with smart opportunities.',
     ctaText: 'Explore Now',
     path: '',
-    imageUrl: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=640&q=80',
+    imageUrl: homeHeroPerson,
+};
+
+const isPromoBanner = (banner) => {
+    const text = `${banner?.tag || ''} ${banner?.title || ''} ${banner?.subtitle || ''}`;
+    return PROMO_BANNER_PATTERN.test(text);
+};
+
+const resolveHomeBanner = (list) => {
+    const heroes = (list || []).filter((b) => !isPromoBanner(b));
+    const preferred = heroes.find(
+        (b) => /your growth/i.test(b.tag || '') || /our guidance/i.test(b.title || '')
+    );
+    const picked = preferred || heroes[0];
+    if (!picked) return FALLBACK_BANNER;
+    return {
+        ...picked,
+        imageUrl: picked.imageUrl || homeHeroPerson,
+    };
 };
 
 const Home = () => {
     const navigate = useNavigate();
     const helpsRef = useRef(null);
-    const [banners, setBanners] = useState([FALLBACK_BANNER]);
-    const [active, setActive] = useState(0);
+    const [banner, setBanner] = useState(FALLBACK_BANNER);
     const [whatsappPhone, setWhatsappPhone] = useState(DEFAULT_WHATSAPP);
 
     useEffect(() => {
@@ -54,25 +74,18 @@ const Home = () => {
                     api.get('/public/settings').catch(() => null),
                 ]);
                 if (bannerRes.success && bannerRes.data?.length) {
-                    setBanners(bannerRes.data);
-                    setActive(0);
+                    setBanner(resolveHomeBanner(bannerRes.data));
+                } else {
+                    setBanner(FALLBACK_BANNER);
                 }
                 const phone = digitsOnly(settingsRes?.data?.contactPhone);
                 if (phone.length >= 10) setWhatsappPhone(phone.length === 10 ? `91${phone}` : phone);
             } catch {
-                setBanners([FALLBACK_BANNER]);
+                setBanner(FALLBACK_BANNER);
             }
         };
         load();
     }, []);
-
-    useEffect(() => {
-        if (banners.length < 2) return undefined;
-        const t = setInterval(() => setActive((i) => (i + 1) % banners.length), 5000);
-        return () => clearInterval(t);
-    }, [banners.length]);
-
-    const banner = banners[active] || FALLBACK_BANNER;
 
     const handleCta = () => {
         const path = banner.path || '';
@@ -94,50 +107,40 @@ const Home = () => {
 
     return (
         <div className="flex flex-col min-h-full bg-white font-poppins pb-2">
-            {/* Hero banner — admin: tag, title, subtitle, ctaText, imageUrl, path */}
-            <section className="mx-2.5 mt-1.5 mb-2.5 bg-[#F8F1E8] rounded-2xl overflow-hidden relative min-h-[132px] shadow-[0_2px_12px_rgba(70,34,17,0.06)]">
-                <div className="relative z-10 pl-3.5 pr-0 py-3 flex items-stretch min-h-[132px]">
-                    <div className="flex-1 min-w-0 flex flex-col justify-center pr-1">
-                        <h1 className="text-[17px] font-bold text-slate-900 leading-[1.15] tracking-tight">
+            {/* Hero banner — Your Growth / Our Guidance */}
+            <section className="mb-2.5 bg-[#FDF8F5] overflow-hidden relative min-h-[138px] shadow-[0_2px_14px_rgba(70,34,17,0.07)] home-hero-enter">
+                <div className="absolute right-[12%] bottom-[-8%] w-[72%] max-w-[140px] aspect-square rounded-full bg-[#F0E0D0]/55 home-hero-glow pointer-events-none" />
+
+                <div className="relative z-10 py-3.5 flex items-stretch min-h-[138px]">
+                    <div className="flex-1 min-w-0 flex flex-col justify-center pl-3 pr-1">
+                        <h1 className="text-[17px] font-bold text-[#1A1A1A] leading-[1.12] tracking-tight">
                             {banner.tag || 'Your Growth'}
                         </h1>
-                        <h2 className="text-[17px] font-bold text-[#C2520A] leading-[1.15] tracking-tight">
+                        <h2 className="text-[17px] font-bold text-[#B3591C] leading-[1.12] tracking-tight">
                             {banner.title || 'Our Guidance'}
                         </h2>
-                        <p className="text-[9px] text-slate-500 mt-1 leading-snug line-clamp-3 pr-0.5">
+                        <p className="text-[9.5px] text-slate-500 mt-1.5 leading-[1.45] line-clamp-3 pr-0.5 font-medium">
                             {banner.subtitle}
                         </p>
                         <button
                             type="button"
                             onClick={handleCta}
-                            className="mt-2 inline-flex items-center gap-1 bg-[#C2520A] text-white text-[9px] font-semibold px-3 py-1.5 rounded-full w-fit active:scale-95 shadow-sm"
+                            className="mt-2.5 inline-flex items-center gap-1 bg-[#B3591C] hover:bg-[#9E4E18] text-white text-[9.5px] font-semibold px-3.5 py-[7px] rounded-full w-fit active:scale-95 transition-all duration-200 shadow-[0_2px_8px_rgba(179,89,28,0.35)]"
                         >
                             {banner.ctaText || 'Explore Now'}
                             <ArrowRight size={11} strokeWidth={2.5} />
                         </button>
                     </div>
 
-                    <div className="w-[42%] max-w-[150px] shrink-0 self-end flex items-end justify-end overflow-hidden">
+                    <div className="w-[44%] max-w-[158px] shrink-0 self-end flex items-end justify-end overflow-visible relative">
                         <img
-                            src={banner.imageUrl || FALLBACK_BANNER.imageUrl}
+                            src={banner.imageUrl || homeHeroPerson}
                             alt=""
-                            className="h-[118px] w-full object-cover object-top select-none pointer-events-none"
+                            className="h-[124px] w-full object-contain object-bottom select-none pointer-events-none home-hero-person relative z-10"
+                            draggable={false}
                         />
                     </div>
                 </div>
-                {banners.length > 1 && (
-                    <div className="absolute bottom-1.5 left-3.5 z-20 flex gap-1">
-                        {banners.map((_, i) => (
-                            <button
-                                key={i}
-                                type="button"
-                                onClick={() => setActive(i)}
-                                aria-label={`Banner ${i + 1}`}
-                                className={`h-1 rounded-full transition-all ${i === active ? 'w-3.5 bg-[#C2520A]' : 'w-1.5 bg-black/15'}`}
-                            />
-                        ))}
-                    </div>
-                )}
             </section>
 
             {/* 4 × 2 compact guide grid */}
@@ -147,7 +150,7 @@ const Home = () => {
                         How{' '}
                         <span className="relative inline-block">
                             Dromoney
-                            <span className="absolute left-0 right-0 -bottom-0.5 h-[2px] bg-[#C2520A] rounded-full" />
+                            <span className="absolute left-0 right-0 -bottom-0.5 h-[2px] bg-[#B3591C] rounded-full" />
                         </span>{' '}
                         Helps?
                     </h3>
@@ -212,7 +215,7 @@ const Home = () => {
             <section className="px-2.5 mt-3">
                 <div className="mb-2">
                     <h3 className="text-[12px] font-bold text-slate-900">Important Documents</h3>
-                    <div className="mt-0.5 h-[2px] w-10 rounded-full bg-[#C2520A]" />
+                    <div className="mt-0.5 h-[2px] w-10 rounded-full bg-[#B3591C]" />
                 </div>
                 <div className="space-y-1.5">
                     {DOCUMENTS.map((doc) => {

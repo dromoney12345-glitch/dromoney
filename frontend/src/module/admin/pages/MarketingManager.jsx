@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Sparkles, Zap, Rocket, Plus, Trash2,
+    Sparkles, Rocket, Plus, Trash2,
     Save, Layout, Palette, Type,
     ChevronRight, ChevronLeft, Info, CheckCircle2,
-    Trophy, Users, Target, MousePointer2, List, FileText, Briefcase, Upload
+    Trophy, Users, MousePointer2, FileText, Briefcase, Upload
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { contentStorage } from '../../shared/services/contentStorage';
@@ -13,7 +13,8 @@ import { useAdmin } from '../context/AdminContext';
 const MarketingManager = () => {
     const { addNotification } = useAdmin();
     const [activeTab, setActiveTab] = useState(() => {
-        return localStorage.getItem('admin_marketing_active_tab') || 'banners';
+        const saved = localStorage.getItem('admin_marketing_active_tab') || 'banners';
+        return saved === 'boosters' ? 'banners' : saved;
     });
 
     const handleTabChange = (tabId) => {
@@ -80,28 +81,6 @@ const MarketingManager = () => {
         }
     };
 
-    const [boosters, setBoosters] = useState({
-        support: { _id: null, title: 'Support Booster', subtitle: 'Boost participation & win more!', price: 11, benefits: [] },
-        task: { _id: null, title: 'Task Booster', subtitle: 'Increase coin value 3X now!', price: 49, benefits: [] }
-    });
-
-    const fetchBoosters = async () => {
-        try {
-            const res = await api.get('/admin/boosters');
-            if (res.success && res.data) {
-                const results = { ...boosters };
-                res.data.forEach(item => {
-                    if (item.type === 'support' || item.type === 'task') {
-                        results[item.type] = item;
-                    }
-                });
-                setBoosters(results);
-            }
-        } catch (err) {
-            console.error('Error fetching boosters:', err);
-        }
-    };
-
     // ── Lifetime Access Data (Image 2) ──
     const [lifetime, setLifetime] = useState({
         title: 'Lifetime Access',
@@ -149,7 +128,7 @@ const MarketingManager = () => {
     const fetchAllMarketingData = async () => {
         const keys = [
             'menu_how_it_works', 'menu_benefits', 'menu_support', 'menu_about', 'menu_contact',
-            'menu_boosters', 'menu_future_features'
+            'menu_future_features'
         ];
         try {
             const res = await api.get(`/public/content/bulk?keys=${keys.join(',')}`);
@@ -171,14 +150,7 @@ const MarketingManager = () => {
                 });
                 if (Object.keys(results).length > 0) setInfoPages(prev => ({ ...prev, ...results }));
 
-                // 2. Process Boosters - REMOVED, now fetched via fetchBoosters()
-                /*
-                if (data['menu_boosters'] && data['menu_boosters'].data) {
-                    setBoosters(data['menu_boosters'].data);
-                }
-                */
-
-                // 3. Process Future Features
+                // Process Future Features
                 const fData = data['menu_future_features']?.data;
                 if (fData) {
                     if (Array.isArray(fData)) {
@@ -212,25 +184,10 @@ const MarketingManager = () => {
         }
     };
 
-    const handleUpdateBooster = async (type) => {
-        const b = boosters[type];
-        if (!b._id) return addNotification("Error", "Booster ID not found. Sync from DB first.", "error");
-
-        try {
-            const { _id, createdAt, __v, ...payload } = b;
-            const res = await api.put(`/admin/boosters/${_id}`, payload);
-            if (res.success) addNotification("Success", `${b.title} Updated!`, "success");
-        } catch (err) {
-            console.error(err);
-            addNotification("Error", "Failed to update booster.", "error");
-        }
-    };
-
     useEffect(() => {
         fetchBanners();
         fetchLifetimePromo();
         fetchAllMarketingData();
-        fetchBoosters();
     }, []);
 
     // ── Future Features Data (Image 1 & 2) ──
@@ -246,14 +203,13 @@ const MarketingManager = () => {
 
     return (
         <div className="p-4 animate-in fade-in duration-700 bg-slate-50/50 min-h-screen">
-            <PageHeader title="Marketing & Promos" subtitle="Home top banner, booster benefits, and promotions" />
+            <PageHeader title="Marketing & Promos" subtitle="Home top banner and promotions" />
 
             {/* Sub-navigation Tabs */}
             <div className="flex gap-2 mb-6 mt-6 bg-white p-2 rounded-lg border border-slate-100 shadow-sm w-fit">
                 {[
                     { id: 'menu', label: 'Menu Pages', icon: FileText },
                     { id: 'banners', label: 'Home Banners', icon: Layout },
-                    { id: 'boosters', label: 'Booster Packs', icon: Zap },
                     { id: 'lifetime', label: 'Lifetime Promo', icon: Rocket },
                     { id: 'future', label: 'Future and Option', icon: Sparkles },
                 ].map(tab => (
@@ -652,131 +608,7 @@ const MarketingManager = () => {
                     </div>
                 )}
 
-                {/* ── TAB 2: BOOSTER PACKS ── */}
-                {activeTab === 'boosters' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                        {['support', 'task'].map((type) => {
-                            const b = boosters[type];
-                            return (
-                                <div key={type} className="bg-white rounded-lg border border-slate-100 shadow-sm p-4 group">
-                                    {/* Card Header */}
-                                    <div className="flex items-center gap-3 mb-4 pb-3 border-b border-slate-50">
-                                        <div className={`w-9 h-9 ${type === 'support' ? 'bg-amber-100 text-amber-600' : 'bg-sky-100 text-sky-600'} rounded-xl flex items-center justify-center shrink-0`}><Zap size={18} /></div>
-                                        <div>
-                                            <h3 className="text-[13px] font-medium text-slate-800 tracking-tight leading-none">{b.title}</h3>
-                                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mt-0.5">Manage Dropdown Benefits</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-3 mb-4">
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="space-y-1">
-                                                <label className="text-[9px] font-medium text-slate-400 uppercase tracking-normal ml-0.5">Booster Title</label>
-                                                <input value={b.title} onChange={(e) => {
-                                                    setBoosters({ ...boosters, [type]: { ...boosters[type], title: e.target.value } });
-                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5 text-[12px] font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-400" />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <label className="text-[9px] font-medium text-slate-400 uppercase tracking-normal ml-0.5">Booster Price (₹)</label>
-                                                <input type="number" min="0" value={b.price} onChange={(e) => {
-                                                    const val = Math.max(0, Number(e.target.value));
-                                                    setBoosters({ ...boosters, [type]: { ...boosters[type], price: val } });
-                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5 text-[12px] font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-400" />
-                                            </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="space-y-1">
-                                                <label className="text-[9px] font-medium text-slate-400 uppercase tracking-normal ml-0.5">Booster Validity (Value)</label>
-                                                <input type="number" min="0" value={b.validityValue === undefined ? 30 : b.validityValue} onChange={(e) => {
-                                                    const raw = e.target.value === '' ? '' : Number(e.target.value);
-                                                    const val = raw === '' ? '' : Math.max(0, raw);
-                                                    const unit = b.validityUnit || 'Days';
-                                                    setBoosters({
-                                                        ...boosters,
-                                                        [type]: { ...boosters[type], validityValue: val, validity: `${val || 0} ${unit}` }
-                                                    });
-                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5 text-[12px] font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-400" placeholder="e.g. 30" />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <label className="text-[9px] font-medium text-slate-400 uppercase tracking-normal ml-0.5">Booster Validity (Unit)</label>
-                                                <select value={b.validityUnit || 'Days'} onChange={(e) => {
-                                                    const unit = e.target.value;
-                                                    const val = b.validityValue || 30;
-                                                    setBoosters({ ...boosters, [type]: { ...boosters[type], validityUnit: unit, validity: `${val} ${unit}` } });
-                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5 text-[12px] font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-400">
-                                                    <option value="Days">Days</option>
-                                                    <option value="Months">Months</option>
-                                                    <option value="Years">Years</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <label className="text-[9px] font-medium text-slate-400 uppercase tracking-normal ml-0.5">Sub-heading Text</label>
-                                            <input value={b.subtitle} onChange={(e) => {
-                                                setBoosters({ ...boosters, [type]: { ...boosters[type], subtitle: e.target.value } });
-                                            }} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5 text-[12px] font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-400" />
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <label className="text-[9px] font-medium text-slate-400 uppercase tracking-normal ml-0.5 flex items-center gap-1.5"><Target size={12} /> Applicable Tasks / Events</label>
-                                            <div className="grid grid-cols-2 gap-2 bg-slate-50 border border-slate-100 rounded-xl p-3">
-                                                {(type === 'support' 
-                                                    ? ['Speed Tapper', 'Standard Quiz', 'Memory Master', 'Lucky Draw'] 
-                                                    : ['General Tasks', 'Task Quiz', 'Speed Tapper', 'Standard Quiz', 'Memory Master', 'Lucky Draw', 'Scratch Card', 'Treasure Chest', 'Contests', 'Watch & Earn']).map((taskOption) => (
-                                                    <label key={taskOption} className="flex items-center gap-2 cursor-pointer">
-                                                        <input 
-                                                            type="checkbox" 
-                                                            checked={b.applicableTasks?.includes(taskOption) || false}
-                                                            onChange={(e) => {
-                                                                const current = b.applicableTasks || [];
-                                                                let updated = [];
-                                                                if (e.target.checked) {
-                                                                    updated = [...current, taskOption];
-                                                                } else {
-                                                                    updated = current.filter(t => t !== taskOption);
-                                                                }
-                                                                setBoosters({ ...boosters, [type]: { ...boosters[type], applicableTasks: updated } });
-                                                            }}
-                                                            className="w-3.5 h-3.5 text-sky-500 rounded border-slate-300 focus:ring-sky-500"
-                                                        />
-                                                        <span className="text-[11px] font-medium text-slate-700">{taskOption}</span>
-                                                    </label>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <label className="text-[9px] font-medium text-slate-400 uppercase tracking-normal ml-0.5 flex items-center gap-1.5"><List size={12} /> Benefit List (Image 1 Dropdown)</label>
-                                            {b.benefits.map((text, idx) => (
-                                                <div key={idx} className="flex gap-2">
-                                                    <input value={text} onChange={(e) => {
-                                                        const newBenefits = [...b.benefits];
-                                                        newBenefits[idx] = e.target.value;
-                                                        setBoosters({ ...boosters, [type]: { ...boosters[type], benefits: newBenefits } });
-                                                    }} className="flex-1 bg-white border border-slate-100 rounded-lg px-3 py-2 text-[12px] font-medium text-slate-700 shadow-sm focus:ring-2 focus:ring-sky-400 outline-none" />
-                                                    <button onClick={() => {
-                                                        setBoosters({ ...boosters, [type]: { ...boosters[type], benefits: b.benefits.filter((_, i) => i !== idx) } });
-                                                    }} className="w-8 h-8 bg-rose-50 text-rose-400 rounded-lg flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shrink-0"><Trash2 size={13} /></button>
-                                                </div>
-                                            ))}
-                                            <button onClick={() => {
-                                                setBoosters({ ...boosters, [type]: { ...boosters[type], benefits: [...b.benefits, 'New Benefit Point'] } });
-                                            }} className="w-full py-2.5 border-2 border-dashed border-slate-100 rounded-xl text-[10px] font-medium uppercase text-slate-400 hover:text-sky-500 hover:border-sky-200 transition-all">+ Add New Point</button>
-                                        </div>
-                                    </div>
-
-                                    <button onClick={() => handleUpdateBooster(type)} className="w-full bg-[#0F172A] text-white py-3 rounded-xl font-medium text-[11px] uppercase tracking-normal flex items-center justify-center gap-2 shadow-lg hover:scale-[1.01] active:scale-95 transition-all">
-                                        <Save size={14} /> Update {b.title} Configuration
-                                    </button>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-
-                {/* ── TAB 3: LIFETIME PROMO ── */}
+                {/* ── TAB: LIFETIME PROMO ── */}
                 {activeTab === 'lifetime' && (
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                         <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-4 space-y-8">
