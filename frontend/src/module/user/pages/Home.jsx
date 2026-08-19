@@ -132,11 +132,12 @@ const Home = () => {
                         </button>
                     </div>
 
-                    <div className="w-[44%] max-w-[158px] shrink-0 self-end flex items-end justify-end overflow-visible relative">
+                    <div className="w-[44%] max-w-[158px] shrink-0 self-end flex items-end justify-center overflow-hidden relative pr-1">
                         <img
                             src={banner.imageUrl || homeHeroPerson}
                             alt=""
-                            className="h-[124px] w-full object-contain object-bottom select-none pointer-events-none home-hero-person relative z-10"
+                            className="h-[138px] w-auto max-w-none object-cover object-bottom select-none pointer-events-none home-hero-person relative z-10 mix-blend-multiply scale-105"
+                            style={{ clipPath: 'inset(0 4px 0 4px)' }}
                             draggable={false}
                         />
                     </div>
