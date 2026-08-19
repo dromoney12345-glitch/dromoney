@@ -710,14 +710,14 @@ const Wallet = () => {
                                 }`}>
                                     {pendingWithdrawal ? (
                                         <>
-                                            आपकी एक निकासी (redeem) अभी Pending है। कृपया Admin के approval का इंतज़ार करें।
+                                            You have a withdrawal (redeem) request pending. Please wait for admin approval.
                                         </>
                                     ) : cooldownRemaining > 0 ? (
                                         <>
-                                            निकासी सीमा: आप 24 घंटे में केवल एक बार ही निकासी (redeem) कर सकते हैं। अगला redeem {Math.floor(cooldownRemaining / (1000 * 60 * 60))}h {Math.floor((cooldownRemaining % (1000 * 60 * 60)) / (1000 * 60))}m {Math.floor((cooldownRemaining % (1000 * 60)) / 1000)}s बाद कर सकते हैं।
+                                            Withdrawal limit: You can redeem only once every 24 hours. Next redeem available in {Math.floor(cooldownRemaining / (1000 * 60 * 60))}h {Math.floor((cooldownRemaining % (1000 * 60 * 60)) / (1000 * 60))}m {Math.floor((cooldownRemaining % (1000 * 60)) / 1000)}s.
                                         </>
                                     ) : (
-                                        "नोट: आप 24 घंटे में केवल एक बार ही निकासी (redeem) कर सकते हैं।"
+                                        "Note: You can redeem only once every 24 hours."
                                     )}
                                 </p>
                             </div>
@@ -1005,8 +1005,8 @@ const Wallet = () => {
 
                             <div className="bg-orange-50 border border-orange-100 rounded-xl p-3.5 text-left mb-3">
                                 <p className="text-[10.5px] font-semibold text-slate-600 leading-relaxed">
-                                    आपका redeem request सफलतापूर्वक submit हो गया है।
-                                    Admin के approve करने के बाद amount आपके bank account में transfer किया जाएगा।
+                                    Your redeem request has been submitted successfully.
+                                    The amount will be transferred to your bank account after admin approval.
                                 </p>
                             </div>
 

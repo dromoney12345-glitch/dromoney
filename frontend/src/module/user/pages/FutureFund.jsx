@@ -35,7 +35,7 @@ const ActionCards = ({ navigate }) => (
                 <Play size={14} fill="currentColor" />
             </div>
             <p className="text-[12px] font-medium text-[#462211] leading-tight">Watch Ad Video</p>
-            <p className="text-[9px] text-[#7A5648] mt-0.5 leading-snug pr-4">Ad video देखो और fund बढ़ाओ</p>
+            <p className="text-[9px] text-[#7A5648] mt-0.5 leading-snug pr-4">Watch ad videos and grow your fund</p>
             <ChevronRight size={14} className="absolute right-2.5 top-3 text-[#C4A99A]" />
         </button>
         <button
@@ -47,7 +47,7 @@ const ActionCards = ({ navigate }) => (
                 <ClipboardList size={14} />
             </div>
             <p className="text-[12px] font-medium text-[#462211] leading-tight">Small Task</p>
-            <p className="text-[9px] text-[#7A5648] mt-0.5 leading-snug pr-4">छोटे-छोटे task पूरे करो और fund बढ़ाओ</p>
+            <p className="text-[9px] text-[#7A5648] mt-0.5 leading-snug pr-4">Complete small tasks and grow your fund</p>
             <ChevronRight size={14} className="absolute right-2.5 top-3 text-[#C4A99A]" />
         </button>
     </div>
@@ -234,15 +234,15 @@ const FutureFund = () => {
     const fundInfoRows = [
         {
             icon: Calendar,
-            text: 'Fund distribution din complete hone ke baad hoti hai — aaj ki activity ke hisaab se kal credit milega।',
+            text: 'Fund distribution happens after the day is complete — today\'s activity credits tomorrow based on your progress.',
         },
         {
             icon: CreditCard,
-            text: 'Paisa aapke Withdrawal Card par bheja jayega, jahan se aap withdraw kar sakte ho।',
+            text: 'Earnings are sent to your Withdrawal Card, from where you can withdraw.',
         },
         {
             icon: Star,
-            text: 'Rozana mehnat karo — jitna zyada kaam karoge, utna behtar future fund banega।',
+            text: 'Work daily — the more you participate, the stronger your future fund grows.',
         },
     ];
 
@@ -271,28 +271,28 @@ const FutureFund = () => {
                         <div>
                             <h2 className="text-[14px] font-medium text-[#462211] leading-tight">Your Fund is Active!</h2>
                             <p className="text-[11px] text-[#462211] mt-1 leading-snug">
-                                Congratulations! 🎉 अब आप रोजाना कमाई कर सकते हैं।
+                                Congratulations! 🎉 You can now earn daily.
                             </p>
                         </div>
                     </div>
 
                     <ActionCards navigate={navigate} />
 
-                    <SectionDivider title="Fund में पैसा बनाएँ" />
+                    <SectionDivider title="Grow Your Fund" />
 
                     <div className="bg-white border border-[#EDE4DC] rounded-2xl p-3.5 space-y-4">
                         <ProgressRow
                             icon={Play}
-                            title="Ad Video देखें"
-                            subtitle={`रोजाना अधिकतम ${dailyAdTarget} Ad Video देखें`}
+                            title="Watch Ad Videos"
+                            subtitle={`Watch up to ${dailyAdTarget} ad videos daily`}
                             current={dailyAdCurrent}
                             target={dailyAdTarget}
                             onClick={() => navigate('/user/watch')}
                         />
                         <ProgressRow
                             icon={ClipboardList}
-                            title="Task Complete करें"
-                            subtitle={`रोजाना अधिकतम ${dailyTaskTarget} Task पूरा करें`}
+                            title="Complete Tasks"
+                            subtitle={`Complete up to ${dailyTaskTarget} tasks daily`}
                             current={completedTasksCount}
                             target={dailyTaskTarget}
                             onClick={() => navigate('/user/earn')}
@@ -357,7 +357,7 @@ const FutureFund = () => {
         },
         {
             key: 'tasks',
-            label: `${tasksTarget} Task Complete करो`,
+            label: `${tasksTarget} Tasks Complete`,
             icon: ClipboardList,
             current: tasksCurrent,
             target: tasksTarget,
@@ -366,10 +366,10 @@ const FutureFund = () => {
     ];
 
     const instructions = [
-        { icon: Play, text: 'Ad Video रोजाना देखो और fund balance बढ़ाओ।' },
-        { icon: ClipboardList, text: 'Small tasks पूरे करो और अपने fund को जल्दी active करो।' },
-        { icon: IndianRupee, text: 'Fund active होने के बाद भी आप daily काम करके passive income कमा सकते हो।' },
-        { icon: AlertCircle, text: 'अगर Ad Video और Task नहीं करोगे तो fund में पैसा बहुत कम बनेगा या नहीं बनेगा।' },
+        { icon: Play, text: 'Watch ad videos daily and grow your fund balance.' },
+        { icon: ClipboardList, text: 'Complete small tasks to activate your fund faster.' },
+        { icon: IndianRupee, text: 'Even after your fund is active, keep working daily to earn passive income.' },
+        { icon: AlertCircle, text: 'If you skip ad videos and tasks, your fund earnings will be very low or may not grow.' },
     ];
 
     return (
@@ -424,7 +424,7 @@ const FutureFund = () => {
 
                 <div className="bg-[#F3E8E0] rounded-xl px-3 py-2.5 flex items-start gap-2">
                     <Info size={14} className="text-[#462211] shrink-0 mt-0.5" />
-                    <p className="text-[11px] text-[#462211] leading-snug">इन तीनों activity को complete करो और अपना fund enable करो।</p>
+                    <p className="text-[11px] text-[#462211] leading-snug">Complete all three activities to enable your fund.</p>
                 </div>
 
                 <div className="space-y-3 pt-1">

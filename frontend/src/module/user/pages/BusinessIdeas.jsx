@@ -192,28 +192,28 @@ const BusinessIdeas = () => {
     const BUSINESS_FEATURES = [
         {
             icon: Lightbulb,
-            title: 'बिजनेस आइडिया',
-            text: 'कम इन्वेस्टमेंट और हाई प्रॉफिट वाले मैन्युफैक्चरिंग बिजनेस आइडिया।',
+            title: 'Business Ideas',
+            text: 'Low-investment, high-profit manufacturing business ideas.',
         },
         {
             icon: PlayCircle,
-            title: 'वीडियो सपोर्ट',
-            text: 'स्टेप बाय स्टेप वीडियो गाइड से बिजनेस समझें और शुरू करें।',
+            title: 'Video Support',
+            text: 'Understand and start your business with step-by-step video guides.',
         },
         {
             icon: Calculator,
-            title: 'कितनी लागत लगेगी, कितना मुनाफा है',
-            text: 'लागत, मुनाफा और ब्रेक-ईवन की स्पष्ट कैलकुलेशन।',
+            title: 'Cost & Profit Breakdown',
+            text: 'Clear calculations for cost, profit, and break-even.',
         },
         {
             icon: Settings,
-            title: 'मशीन, सप्लायर्स और डिटेल्स',
-            text: 'मशीन कहाँ से खरीदें और सप्लायर की पूरी जानकारी।',
+            title: 'Machines, Suppliers & Details',
+            text: 'Where to buy machines and full supplier information.',
         },
         {
             icon: TrendingUp,
-            title: 'रोजाना बिजनेस को कैसे आगे बढ़ाएं',
-            text: 'रोज़ की ग्रोथ, सेल्स और मार्केटिंग की गाइड।',
+            title: 'Grow Your Business Daily',
+            text: 'Daily growth, sales, and marketing guidance.',
         },
     ];
 
@@ -228,11 +228,11 @@ const BusinessIdeas = () => {
                     <BarChart3 size={26} className="absolute right-4 top-5 text-[#462211]" strokeWidth={1.6} />
                     <h2 className="text-[28px] font-semibold text-[#462211] tracking-tight leading-none">SHME</h2>
                     <p className="text-[11px] font-medium text-[#462211] mt-1.5 leading-snug px-8">
-                        स्वदेशी हाइपर लोकल मैन्युफैक्चरिंग इकोसिस्टम
+                        Swadeshi Hyper Local Manufacturing Ecosystem
                     </p>
                     <p className="text-[12px] text-[#462211] mt-3 leading-snug font-medium">
-                        बहुत कम इन्वेस्टमेंट में <span className="font-semibold">₹{monthly}</span> महीना वाले{' '}
-                        <span className="font-semibold">Business</span> शुरू करें
+                        Start a <span className="font-semibold">Business</span> earning{' '}
+                        <span className="font-semibold">₹{monthly}</span>/month with very low investment
                     </p>
                 </div>
 
@@ -256,7 +256,7 @@ const BusinessIdeas = () => {
                 <div className="bg-[#F8EEE4] rounded-2xl px-3 py-3 flex items-start gap-2.5">
                     <ShieldCheck size={22} className="text-[#462211] shrink-0 mt-0.5" strokeWidth={1.8} />
                     <p className="text-[11px] text-[#462211] leading-snug">
-                        हम सिखाते नहीं, सफल बनाते हैं। हमारे साथ जुड़कर अपना खुद का मैन्युफैक्चरिंग बिजनेस शुरू करें और फाइनैंशियल फ्री बनें।
+                        We do not just teach — we help you succeed. Join us to start your own manufacturing business and achieve financial freedom.
                     </p>
                 </div>
 
@@ -265,7 +265,7 @@ const BusinessIdeas = () => {
                     onClick={() => navigate('/user/business-ideas/all')}
                     className="w-full bg-[#462211] text-white font-semibold text-[14px] py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-[0.99]"
                 >
-                    क्या बिजनेस शुरू करें? <ArrowRight size={16} strokeWidth={2.4} />
+                    Which Business to Start? <ArrowRight size={16} strokeWidth={2.4} />
                 </button>
 
                 <p className="text-center text-[11px] text-slate-400 pb-2">

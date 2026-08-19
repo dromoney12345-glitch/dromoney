@@ -238,86 +238,77 @@ const UserLayout = () => {
                 </div>
             </div>
 
-            {/* --- Standard Compact Side Menu (Right Side) --- */}
-            <div className={`fixed inset-0 z-[100] transition-all duration-500 ${isMenuOpen ? 'visible' : 'invisible'}`}>
-                {/* Backdrop */}
+            {/* --- Side Menu (Right Drawer) — scoped inside app container --- */}
+            <div className={`absolute inset-0 z-[100] transition-all duration-400 ${isMenuOpen ? 'visible' : 'invisible'}`}>
                 <div
                     onClick={() => setIsMenuOpen(false)}
-                    className={`absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`}
+                    className={`absolute inset-0 bg-black/30 backdrop-blur-[2px] transition-opacity duration-400 ${isMenuOpen ? 'opacity-100' : 'opacity-0'}`}
                 ></div>
 
-                {/* Drawer Body (Full Height, Compact, No Scroll) */}
-                <div className={`absolute top-0 right-0 h-full w-[260px] bg-[#0B1221] shadow-2xl transition-transform duration-500 ease-out flex flex-col ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                    
-                    {/* --- Slim Header --- */}
-                    <div className="p-4 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/10">
-                                <Menu size={16} className="text-emerald-500" />
+                <div className={`absolute top-0 right-0 h-full w-[270px] max-w-[80%] bg-[#FCF8F5] shadow-2xl transition-transform duration-400 ease-out flex flex-col ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+                    <div className="px-4 py-3.5 border-b border-[#EDE4DC] flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-[9px] bg-[#462211] flex items-center justify-center">
+                                <Menu size={14} className="text-white" />
                             </div>
-                            <h2 className="text-[13px] font-medium text-slate-300 tracking-[0.1em] uppercase">Menu</h2>
+                            <span className="text-[13px] font-semibold text-[#462211] tracking-tight uppercase">Menu</span>
                         </div>
-                        <button onClick={() => setIsMenuOpen(false)} className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-white transition-colors">
+                        <button onClick={() => setIsMenuOpen(false)} className="w-8 h-8 flex items-center justify-center text-[#9A8478] hover:text-[#462211] transition-colors active:scale-90">
                             <X size={18} />
                         </button>
                     </div>
 
-                    {/* Navigation Area - Ultra Compact */}
-                    <div className="flex-1 overflow-hidden py-3 px-3">
-                        <div className="flex flex-col space-y-1">
-                            {/* Profile Entry - Simplified */}
+                    <div className="flex-1 overflow-y-auto py-2.5 px-2.5">
+                        <button 
+                            onClick={() => { navigate('/user/profile'); setIsMenuOpen(false); }}
+                            className="w-full px-3 py-3 flex items-center gap-3 hover:bg-white/60 rounded-xl transition-all mb-1"
+                        >
+                            <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-[#EDE4DC]">
+                                <img src={userData?.profileImage || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&q=80&fit=crop"} alt="Avatar" className="w-full h-full object-cover" />
+                            </div>
+                            <div className="text-left min-w-0">
+                                <p className="text-[14px] font-semibold text-[#462211] leading-none tracking-tight truncate">{userData?.name || 'Guest User'}</p>
+                                <p className="text-[9px] text-[#B3591C] font-semibold mt-1 uppercase tracking-wider">Profile</p>
+                            </div>
+                        </button>
+
+                        <div className="h-px bg-[#EDE4DC] mx-3 mb-1.5"></div>
+
+                        {[
+                            { icon: User, label: 'Settings', path: '/user/profile' },
+                            { icon: HelpCircle, label: 'How It Works', path: '/user/info/how-it-works' },
+                            { icon: Sparkles, label: 'Benefits', path: '/user/info/benefits' },
+                            { icon: Share2, label: 'Invite', path: '/user/guide/invite' },
+                            { icon: Rocket, label: 'Promote Brand', path: '/user/promote-brand' },
+                            { icon: Building2, label: 'About Us', path: '/user/info/about' },
+                            { icon: Headset, label: 'Contact Us', path: '/user/info/contact' }
+                        ].map((item, idx) => (
                             <button 
-                                onClick={() => { navigate('/user/profile'); setIsMenuOpen(false); }}
-                                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white/[0.03] rounded-2xl transition-all group mb-2"
+                                key={idx}
+                                onClick={() => { 
+                                    if (item.path.includes('invite') || item.path.includes('marketing')) {
+                                        navigate(item.path, { state: { showReferral: true } });
+                                    } else {
+                                        navigate(item.path);
+                                    }
+                                    setIsMenuOpen(false); 
+                                }}
+                                className="w-full px-3 py-2.5 flex items-center gap-3 hover:bg-white/60 rounded-xl transition-all group"
                             >
-                                <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-slate-800">
-                                    <img src={userData?.profileImage || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&q=80&fit=crop"} alt="Avatar" className="w-full h-full object-cover" />
-                                </div>
-                                <div className="text-left">
-                                    <p className="text-[15px] font-normal text-white leading-none tracking-tight">{userData?.name || 'Guest User'}</p>
-                                    <p className="text-[10px] text-emerald-500 font-normal mt-1 uppercase tracking-wider">Profile</p>
-                                </div>
+                                <item.icon size={17} className="text-[#9A8478] group-hover:text-[#B3591C] transition-colors" strokeWidth={2} />
+                                <span className="text-[13px] font-medium text-[#462211]">{item.label}</span>
                             </button>
-
-                            <div className="h-px bg-white/5 mx-4 mb-2"></div>
-
-                            {[
-                                { icon: User, label: 'Settings', path: '/user/profile' },
-                                { icon: HelpCircle, label: 'How It Works', path: '/user/info/how-it-works' },
-                                { icon: Sparkles, label: 'Benefits', path: '/user/info/benefits' },
-                                { icon: Share2, label: 'Invite', path: '/user/guide/invite' },
-                                { icon: Rocket, label: 'Promote Brand', path: '/user/promote-brand' },
-                                { icon: Building2, label: 'About Us', path: '/user/info/about' },
-                                { icon: Headset, label: 'Contact Us', path: '/user/info/contact' }
-                            ].map((item, idx) => (
-                                <button 
-                                    key={idx}
-                                    onClick={() => { 
-                                        if (item.path.includes('invite') || item.path.includes('marketing')) {
-                                            navigate(item.path, { state: { showReferral: true } });
-                                        } else {
-                                            navigate(item.path);
-                                        }
-                                        setIsMenuOpen(false); 
-                                    }}
-                                    className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-white/[0.03] rounded-xl transition-all group"
-                                >
-                                    <item.icon size={18} className="text-slate-500 group-hover:text-emerald-400 group-hover:scale-105 transition-all" />
-                                    <span className="text-[13px] font-normal text-slate-300">{item.label}</span>
-                                </button>
-                            ))}
-                        </div>
+                        ))}
                     </div>
 
-                    {/* Footer - No Scroll Anchor */}
-                    <div className="p-4 border-t border-white/5">
+                    <div className="px-4 py-3.5 border-t border-[#EDE4DC]">
                         <button 
                             onClick={() => { logout(); navigate('/user/auth/login'); setIsMenuOpen(false); }}
-                            className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition-all active:scale-95 shadow-lg shadow-black/20 font-normal uppercase text-[11px] tracking-widest"
+                            className="w-full py-3 bg-[#462211] hover:bg-[#5D2E17] text-white rounded-xl transition-all active:scale-95 shadow-md font-semibold uppercase text-[11px] tracking-widest"
                         >
-                            Log out
+                            Log Out
                         </button>
-                        <p className="text-[9px] font-normal text-slate-600 uppercase tracking-[0.1em] mt-4 text-center">Version 1.0.2</p>
+                        <p className="text-[9px] font-medium text-[#9A8478] uppercase tracking-[0.1em] mt-3 text-center">Version 1.0.2</p>
                     </div>
                 </div>
             </div>

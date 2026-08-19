@@ -40,7 +40,7 @@ const Income = () => {
     const [inviteAmount, setInviteAmount] = useState(null);
     const [futurePlan, setFuturePlan] = useState({
         title: 'Future Plan',
-        subtitle: 'हम लगातार आपके लिए नए कमाई के अवसर ला रहे हैं।',
+        subtitle: 'We are continuously bringing new earning opportunities for you.',
     });
 
     useEffect(() => {
@@ -65,7 +65,7 @@ const Income = () => {
                 if (payload?.title || payload?.subtitle) {
                     setFuturePlan({
                         title: payload.title || 'Future Plan',
-                        subtitle: payload.subtitle || payload.description || 'हम लगातार आपके लिए नए कमाई के अवसर ला रहे हैं।',
+                        subtitle: payload.subtitle || payload.description || 'We are continuously bringing new earning opportunities for you.',
                     });
                 }
             } catch {
@@ -98,7 +98,7 @@ const Income = () => {
                     iconColor="text-[#462211]"
                     arrowBg="bg-[#FFF5F0]"
                     title={`Invite & Earn ₹${reward}`}
-                    subtitle={`किसी को भी एप्लिकेशन डाउनलोड करवाओ ₹${reward} क्रेडिट पाओ।`}
+                    subtitle={`Get anyone to download the app and earn ₹${reward} credit.`}
                     onClick={() => navigate('/user/guide/invite')}
                 />
                 <OptionCard
@@ -107,7 +107,7 @@ const Income = () => {
                     iconColor="text-emerald-600"
                     arrowBg="bg-emerald-50"
                     title="Future Fund"
-                    subtitle="जल्दी से मोनेटाइज़ करो और रोजाना कमाई शुरू करो।"
+                    subtitle="Monetize quickly and start earning daily."
                     onClick={() => navigate('/user/guide/fund')}
                 />
                 <OptionCard
@@ -115,8 +115,8 @@ const Income = () => {
                     iconBg="bg-sky-50"
                     iconColor="text-sky-600"
                     arrowBg="bg-sky-50"
-                    title="रोजाना काम करें, कमाई शुरू करें"
-                    subtitle="कंपनियों के काम करें और रोजाना कमाई करें।"
+                    title="Work Daily, Start Earning"
+                    subtitle="Complete company tasks and earn every day."
                     onClick={() => navigate('/user/guide/daily')}
                 />
             </div>

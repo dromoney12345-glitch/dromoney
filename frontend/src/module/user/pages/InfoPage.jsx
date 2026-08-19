@@ -5,24 +5,24 @@ import api from '../../shared/services/api';
 
 const LOCAL_FALLBACKS = {
     'privacy': {
-        title: 'Privacy Policy (गोपनीयता नीति)',
+        title: 'Privacy Policy',
         subtitle: 'Your Data Privacy & Security',
         sections: [
             {
-                title: 'A. डेटा जो हम इकट्ठा करते हैं (Data We Collect)',
-                text: '• व्यक्तिगत जानकारी: आपका नाम, फोन नंबर, और ईमेल एड्रेस।\n• KYC डेटा: आधार कार्ड/पैन कार्ड की जानकारी (केवल आपकी पहचान सत्यापित करने और धोखाधड़ी रोकने के लिए)।\n• बैंक विवरण: विड्रॉल भेजने के लिए आपके द्वारा दी गई बैंक जानकारी।\n• डिवाइस जानकारी: आपका IP एड्रेस और डिवाइस ID (ताकि एक फोन में एक ही अकाउंट चले)।'
+                title: 'A. Data We Collect',
+                text: '• Personal information: your name, phone number, and email address.\n• KYC data: Aadhaar/PAN details (used only to verify identity and prevent fraud).\n• Bank details: information you provide for withdrawals.\n• Device information: your IP address and device ID (to ensure one account per phone).'
             },
             {
-                title: 'B. डेटा का उपयोग (How We Use Data)',
-                text: '• आपके वॉलेट में पैसे भेजने और केवाईसी (KYC) वेरिफिकेशन के लिए।\n• विज्ञापनों और टास्क की सत्यता की जांच करने के लिए।\n• ऐप की सुरक्षा बढ़ाने और स्पैम रोकने के लिए।'
+                title: 'B. How We Use Data',
+                text: '• To send payments to your wallet and complete KYC verification.\n• To verify ads and task completion.\n• To improve app security and prevent spam.'
             },
             {
-                title: 'C. डेटा सुरक्षा (Data Security)',
-                text: 'हम आपका डेटा किसी भी तीसरी पार्टी को नहीं बेचते हैं। आपका डेटा हमारे सुरक्षित सर्वर पर एन्क्रिप्टेड (Encrypted) रूप में रहता है।'
+                title: 'C. Data Security',
+                text: 'We do not sell your data to third parties. Your data is stored encrypted on our secure servers.'
             },
             {
-                title: 'D. थर्ड पार्टी सर्विसेज (Third-Party Services)',
-                text: 'हम भुगतान के लिए Razorpay और विज्ञापनों के लिए AdMob/Google Ads का उपयोग करते हैं। वे अपनी पॉलिसी के अनुसार आपका डेटा प्रोसेस कर सकते हैं।'
+                title: 'D. Third-Party Services',
+                text: 'We use Razorpay for payments and AdMob/Google Ads for advertisements. They may process your data according to their own policies.'
             }
         ]
     },
@@ -44,24 +44,24 @@ const LOCAL_FALLBACKS = {
         ]
     },
     'refund-policy': {
-        title: 'Refund & Cancellation Policy (रिफंड और रद्दीकरण नीति)',
+        title: 'Refund & Cancellation Policy',
         subtitle: 'Rules regarding digital content, technical issues, bans, and user errors.',
         sections: [
             {
-                title: '1. डिजिटल कंटेंट (Digital Content)',
-                text: 'हमारे प्लेटफॉर्म पर ₹499 का कोर्स और ₹49/₹11 के बूस्टर "Digital Goods" की श्रेणी में आते हैं। एक बार पेमेंट सफल होने और कंटेंट का एक्सेस (Access) मिलने के बाद, कोई भी रिफंड प्रदान नहीं किया जाएगा।\n\nOnce the course or booster is activated, no refund will be issued.'
+                title: '1. Digital Content',
+                text: 'The ₹499 course and ₹49/₹11 boosters on our platform are digital goods. Once payment is successful and content access is granted, no refund will be issued.'
             },
             {
-                title: '2. तकनीकी खराबी (Technical Issues)',
-                text: 'यदि आपके बैंक से पैसे कट गए हैं लेकिन ऐप में कोर्स या बूस्टर एक्टिवेट नहीं हुआ है, तो कृपया 24-48 घंटे प्रतीक्षा करें। यदि फिर भी समस्या हल नहीं होती, तो आप हमारे सपोर्ट सेक्शन में ट्रांजैक्शन आईडी (Transaction ID) भेज सकते हैं। जांच के बाद यदि पेमेंट हमें प्राप्त हुआ है, तो सर्विस एक्टिवेट कर दी जाएगी, लेकिन पैसा वापस नहीं होगा।\n\nIn case of payment failure contact support. No cash refund, only service activation.'
+                title: '2. Technical Issues',
+                text: 'If money was deducted from your bank but the course or booster was not activated in the app, please wait 24–48 hours. If the issue persists, contact support with your transaction ID. If payment is confirmed, the service will be activated — cash refunds are not provided.'
             },
             {
-                title: '3. अकाउंट बैन (Account Ban)',
-                text: 'यदि कोई यूजर धोखाधड़ी, फेक रेफरल, या नियमों का उल्लंघन करते हुए पाया जाता है और उसका अकाउंट बैन किया जाता है, तो उस स्थिति में उसकी बची हुई कोई भी राशि या सब्सक्रिप्शन फीस रिफंड नहीं की जाएगी।\n\nNo refunds for banned accounts due to violation of community guidelines.'
+                title: '3. Account Ban',
+                text: 'If a user is found committing fraud, fake referrals, or violating rules and their account is banned, no remaining balance or subscription fee will be refunded.'
             },
             {
-                title: '4. यूजर की गलती (User Error)',
-                text: 'गलती से खरीदे गए बूस्टर या कोर्स के लिए कंपनी जिम्मेदार नहीं होगी और न ही इसके लिए कोई रिफंड दिया जाएगा।\n\nNo refunds for accidental purchases.'
+                title: '4. User Error',
+                text: 'The company is not responsible for accidentally purchased boosters or courses, and no refund will be issued for such purchases.'
             }
         ]
     },

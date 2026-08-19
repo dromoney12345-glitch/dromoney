@@ -198,8 +198,8 @@ const Home = () => {
                         <WhatsAppIcon size={18} />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="text-[11px] font-bold text-slate-900 leading-tight">Help Chahiye?</p>
-                        <p className="text-[9px] text-slate-500 mt-0.5 leading-snug">WhatsApp se turant support lein.</p>
+                        <p className="text-[11px] font-bold text-slate-900 leading-tight">Need Help?</p>
+                        <p className="text-[9px] text-slate-500 mt-0.5 leading-snug">Get instant support on WhatsApp.</p>
                     </div>
                     <button
                         type="button"

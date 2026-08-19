@@ -10,7 +10,11 @@ const GuidePage = () => {
 
     const goNext = () => {
         localStorage.setItem(`dromoney_guide_${slug}`, 'seen');
-        navigate(guide.next);
+        if (slug === 'invite') {
+            navigate('/user/marketing', { state: { showReferral: true } });
+        } else {
+            navigate(guide.next);
+        }
     };
 
     return (
