@@ -106,14 +106,20 @@ const UserLayout = () => {
 
     return (
         <div className="bg-white text-slate-900 font-poppins overflow-hidden flex flex-col max-w-md mx-auto relative" style={{ height: '100vh', backgroundColor: '#FCF8F5' }}>
-            <header className="shrink-0 z-50 bg-[#FCF8F5] px-3 py-1.5 flex items-center justify-between min-h-[50px]">
-                <div className="flex items-center gap-2 active:scale-95 transition-transform cursor-pointer" onClick={() => navigate('/user/home')}>
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-[#F8F1E8] flex items-center justify-center shrink-0">
-                        <img src={LogoImg} alt="Logo" className="w-7 h-7 object-contain" />
+            <header className="shrink-0 z-50 bg-white px-3 py-2 flex items-center justify-between min-h-[52px] border-b border-slate-100/80">
+                <div className="flex items-center gap-2.5 active:scale-95 transition-transform cursor-pointer" onClick={() => navigate('/user/home')}>
+                    <div
+                        className="w-9 h-9 rounded-[10px] shrink-0 flex items-center justify-center"
+                        style={{
+                            background: 'radial-gradient(ellipse 90% 85% at 50% 38%, #FFF9F3 0%, #F5E4D0 42%, #E2C4A4 100%)',
+                            boxShadow: '0 2px 8px rgba(70,34,17,0.08), inset 0 2px 4px rgba(255,255,255,0.7)',
+                        }}
+                    >
+                        <img src={LogoImg} alt="Logo" className="w-[22px] h-[22px] object-contain" draggable={false} />
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-[15px] font-bold text-slate-900 leading-none tracking-tight">Dromoney</span>
-                        <span className="text-[8px] text-slate-400 font-medium mt-0.5 tracking-wide">Learn • Grow • Earn</span>
+                        <span className="text-[16px] font-bold text-slate-900 leading-none tracking-tight">Dromoney</span>
+                        <span className="text-[9px] text-slate-400 font-medium mt-0.5 tracking-wide">Learn • Grow • Earn</span>
                     </div>
                 </div>
 
@@ -124,7 +130,7 @@ const UserLayout = () => {
                     >
                         <Bell size={20} strokeWidth={2} />
                         {unreadNotifs.length > 0 && (
-                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#462211] rounded-full border-2 border-white"></span>
+                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#C2520A] rounded-full border-2 border-white"></span>
                         )}
                     </button>
                     <button

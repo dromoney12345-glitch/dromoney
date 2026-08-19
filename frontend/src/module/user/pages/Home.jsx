@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     ClipboardCheck, UserPlus, CreditCard, Wallet, TrendingUp,
-    Landmark, ListChecks, Building2, ChevronRight, ArrowRight, Shield,
+    PiggyBank, ListChecks, Building2, ChevronRight, ArrowRight, Shield,
     ShieldCheck, Search, Users, ShieldAlert, FileText
 } from 'lucide-react';
 import { HOME_GUIDE_CARDS } from '../data/guides';
@@ -27,7 +27,7 @@ const DEFAULT_WHATSAPP = '919680947738';
 const digitsOnly = (value) => String(value || '').replace(/\D/g, '');
 
 const ICON_MAP = {
-    ClipboardCheck, UserPlus, CreditCard, Wallet, TrendingUp, Landmark, ListChecks, Building2,
+    ClipboardCheck, UserPlus, CreditCard, Wallet, TrendingUp, PiggyBank, ListChecks, Building2,
 };
 
 const FALLBACK_BANNER = {
@@ -93,58 +93,67 @@ const Home = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-full bg-[#FCF8F5] font-poppins">
-            <section className="mx-3 mt-2 mb-3 bg-[#F8F1E8] rounded-2xl overflow-hidden relative min-h-[148px]">
-                <div className="relative z-10 p-3.5 flex items-center justify-between gap-3 min-h-[148px]">
-                    <div className="flex-1 min-w-0">
-                        <h1 className="text-[18px] font-semibold text-slate-900 leading-tight tracking-tight">
+        <div className="flex flex-col min-h-full bg-white font-poppins pb-2">
+            {/* Hero banner — admin: tag, title, subtitle, ctaText, imageUrl, path */}
+            <section className="mx-2.5 mt-1.5 mb-2.5 bg-[#F8F1E8] rounded-2xl overflow-hidden relative min-h-[132px] shadow-[0_2px_12px_rgba(70,34,17,0.06)]">
+                <div className="relative z-10 pl-3.5 pr-0 py-3 flex items-stretch min-h-[132px]">
+                    <div className="flex-1 min-w-0 flex flex-col justify-center pr-1">
+                        <h1 className="text-[17px] font-bold text-slate-900 leading-[1.15] tracking-tight">
                             {banner.tag || 'Your Growth'}
                         </h1>
-                        <h2 className="text-[18px] font-semibold text-[#462211] leading-tight tracking-tight">
+                        <h2 className="text-[17px] font-bold text-[#C2520A] leading-[1.15] tracking-tight">
                             {banner.title || 'Our Guidance'}
                         </h2>
-                        <p className="text-[10px] text-slate-500 mt-1.5 leading-snug line-clamp-3">
+                        <p className="text-[9px] text-slate-500 mt-1 leading-snug line-clamp-3 pr-0.5">
                             {banner.subtitle}
                         </p>
                         <button
                             type="button"
                             onClick={handleCta}
-                            className="mt-2.5 inline-flex items-center gap-1 bg-[#462211] text-white text-[10px] font-medium px-3 py-1.5 rounded-full w-fit active:scale-95"
+                            className="mt-2 inline-flex items-center gap-1 bg-[#C2520A] text-white text-[9px] font-semibold px-3 py-1.5 rounded-full w-fit active:scale-95 shadow-sm"
                         >
                             {banner.ctaText || 'Explore Now'}
-                            <ArrowRight size={12} strokeWidth={2.5} />
+                            <ArrowRight size={11} strokeWidth={2.5} />
                         </button>
                     </div>
 
-                    <div className="w-[44%] h-full shrink-0 flex items-end justify-end">
+                    <div className="w-[42%] max-w-[150px] shrink-0 self-end flex items-end justify-end overflow-hidden">
                         <img
                             src={banner.imageUrl || FALLBACK_BANNER.imageUrl}
                             alt=""
-                            className="h-[95%] w-full object-cover object-top select-none pointer-events-none"
+                            className="h-[118px] w-full object-cover object-top select-none pointer-events-none"
                         />
                     </div>
                 </div>
                 {banners.length > 1 && (
-                    <div className="absolute bottom-2 left-3.5 z-20 flex gap-1">
+                    <div className="absolute bottom-1.5 left-3.5 z-20 flex gap-1">
                         {banners.map((_, i) => (
                             <button
                                 key={i}
                                 type="button"
                                 onClick={() => setActive(i)}
-                                className={`h-1 rounded-full transition-all ${i === active ? 'w-4 bg-[#462211]' : 'w-1.5 bg-black/20'}`}
+                                aria-label={`Banner ${i + 1}`}
+                                className={`h-1 rounded-full transition-all ${i === active ? 'w-3.5 bg-[#C2520A]' : 'w-1.5 bg-black/15'}`}
                             />
                         ))}
                     </div>
                 )}
             </section>
 
-            <section ref={helpsRef} className="px-3 pb-1">
-                <div className="text-center mb-2.5">
-                    <h3 className="text-[14px] font-bold text-slate-900">How Dromoney Helps?</h3>
-                    <div className="mx-auto mt-1 h-[2px] w-10 rounded-full bg-[#462211]" />
+            {/* 4 × 2 compact guide grid */}
+            <section ref={helpsRef} className="px-2.5 pb-1">
+                <div className="text-center mb-2">
+                    <h3 className="text-[13px] font-bold text-slate-900 leading-snug">
+                        How{' '}
+                        <span className="relative inline-block">
+                            Dromoney
+                            <span className="absolute left-0 right-0 -bottom-0.5 h-[2px] bg-[#C2520A] rounded-full" />
+                        </span>{' '}
+                        Helps?
+                    </h3>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-4 gap-1.5">
                     {HOME_GUIDE_CARDS.map((card) => {
                         const Icon = ICON_MAP[card.icon] || ClipboardCheck;
                         return (
@@ -152,59 +161,60 @@ const Home = () => {
                                 key={card.slug}
                                 type="button"
                                 onClick={() => navigate(`/user/guide/${card.slug}`)}
-                                className="bg-white rounded-xl px-2 py-2.5 text-center border border-slate-100 shadow-[0_2px_10px_rgba(15,23,42,0.04)] active:scale-[0.98]"
+                                className="bg-white rounded-xl px-1 py-2 border border-slate-100/80 shadow-[0_1px_6px_rgba(15,23,42,0.05)] active:scale-[0.97] flex flex-col items-center gap-1"
                             >
-                                <div className={`w-8 h-8 rounded-full ${card.iconBg} mx-auto flex items-center justify-center`}>
-                                    <Icon size={15} className={card.iconColor} strokeWidth={2} />
+                                <div className={`w-7 h-7 rounded-full ${card.iconBg} flex items-center justify-center shrink-0`}>
+                                    <Icon size={14} className={card.iconColor} strokeWidth={2} />
                                 </div>
-                                <p className="text-[11px] font-semibold text-slate-800 mt-1.5 leading-snug">
-                                    {card.label}
-                                </p>
-                                <ChevronRight size={12} className="text-slate-300 mx-auto mt-0.5" />
+                                <div className="flex items-center justify-center gap-0.5 w-full px-0.5">
+                                    <p className="text-[8px] font-semibold text-slate-800 leading-[1.25] text-center min-w-0">
+                                        {card.label}
+                                    </p>
+                                    <ChevronRight size={9} className="text-slate-400 shrink-0" strokeWidth={2.5} />
+                                </div>
                             </button>
                         );
                     })}
                 </div>
             </section>
 
-            <section className="px-3 mt-3 space-y-2.5">
-                <div className="relative overflow-hidden bg-white rounded-2xl border border-[#EDE4DC] shadow-[0_4px_14px_rgba(70,34,17,0.08)] px-3 py-3 flex items-center gap-3">
-                    <Shield className="absolute -right-2 -bottom-3 text-[#462211] opacity-[0.08]" size={72} />
-                    <Shield className="absolute right-10 -top-4 text-[#462211] opacity-[0.06]" size={40} />
-                    <div className="w-11 h-11 rounded-xl bg-[#462211] flex items-center justify-center shrink-0 relative z-10">
-                        <ShieldCheck size={22} className="text-white" strokeWidth={2.2} />
+            <section className="px-2.5 mt-2.5 space-y-2">
+                <div className="relative overflow-hidden bg-white rounded-xl border border-[#EDE4DC] shadow-[0_2px_10px_rgba(70,34,17,0.06)] px-2.5 py-2.5 flex items-center gap-2.5">
+                    <Shield className="absolute -right-2 -bottom-3 text-[#462211] opacity-[0.06]" size={64} />
+                    <div className="w-9 h-9 rounded-lg bg-[#462211] flex items-center justify-center shrink-0 relative z-10">
+                        <ShieldCheck size={18} className="text-white" strokeWidth={2.2} />
                     </div>
                     <div className="relative z-10 min-w-0">
-                        <p className="text-[13px] font-bold text-slate-900 leading-tight">100% Secure & Trusted Platform</p>
-                        <p className="text-[10px] text-slate-500 mt-0.5 leading-snug">Transparent system, secure payments and lifetime support.</p>
+                        <p className="text-[11px] font-bold text-slate-900 leading-tight">100% Secure & Trusted Platform</p>
+                        <p className="text-[9px] text-slate-500 mt-0.5 leading-snug">Transparent system, secure payments and lifetime support.</p>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-[0_2px_10px_rgba(15,23,42,0.04)] px-3 py-2.5 flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-full bg-[#25D366] text-white flex items-center justify-center shrink-0">
-                        <WhatsAppIcon size={20} />
+                <div className="bg-white rounded-xl border border-slate-100 shadow-[0_1px_6px_rgba(15,23,42,0.04)] px-2.5 py-2 flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-full bg-[#25D366] text-white flex items-center justify-center shrink-0">
+                        <WhatsAppIcon size={18} />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-bold text-slate-900 leading-tight">Help Chahiye?</p>
-                        <p className="text-[10px] text-slate-500 mt-0.5 leading-snug">Upar menu bar mein WhatsApp support se turant support lein.</p>
+                        <p className="text-[11px] font-bold text-slate-900 leading-tight">Help Chahiye?</p>
+                        <p className="text-[9px] text-slate-500 mt-0.5 leading-snug">WhatsApp se turant support lein.</p>
                     </div>
                     <button
                         type="button"
                         onClick={openWhatsApp}
-                        className="shrink-0 inline-flex items-center gap-1 border border-[#25D366] text-[#128C7E] text-[10px] font-semibold px-2 py-1.5 rounded-lg active:scale-95"
+                        className="shrink-0 inline-flex items-center gap-1 border border-[#25D366] text-[#128C7E] text-[9px] font-semibold px-2 py-1 rounded-lg active:scale-95"
                     >
-                        <WhatsAppIcon size={12} />
-                        WhatsApp Support
+                        <WhatsAppIcon size={11} />
+                        Chat
                     </button>
                 </div>
             </section>
 
-            <section className="px-3 mt-4">
-                <div className="mb-2.5">
-                    <h3 className="text-[14px] font-bold text-slate-900">Important Documents</h3>
-                    <div className="mt-1 h-[3px] w-12 rounded-full bg-[#462211]" />
+            <section className="px-2.5 mt-3">
+                <div className="mb-2">
+                    <h3 className="text-[12px] font-bold text-slate-900">Important Documents</h3>
+                    <div className="mt-0.5 h-[2px] w-10 rounded-full bg-[#C2520A]" />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                     {DOCUMENTS.map((doc) => {
                         const Icon = doc.icon;
                         return (
@@ -212,20 +222,20 @@ const Home = () => {
                                 key={doc.path}
                                 type="button"
                                 onClick={() => navigate(`/user/info/${doc.path}`)}
-                                className="w-full bg-white rounded-xl border border-slate-100 shadow-[0_2px_10px_rgba(15,23,42,0.04)] px-3 py-2.5 flex items-center gap-3 text-left active:scale-[0.99]"
+                                className="w-full bg-white rounded-xl border border-slate-100 shadow-[0_1px_6px_rgba(15,23,42,0.04)] px-2.5 py-2 flex items-center gap-2.5 text-left active:scale-[0.99]"
                             >
-                                <div className="w-9 h-9 rounded-full bg-[#FFF5F0] text-[#462211] flex items-center justify-center shrink-0">
-                                    <Icon size={16} strokeWidth={2} />
+                                <div className="w-8 h-8 rounded-full bg-[#FFF5F0] text-[#462211] flex items-center justify-center shrink-0">
+                                    <Icon size={14} strokeWidth={2} />
                                 </div>
-                                <span className="flex-1 text-[13px] font-semibold text-slate-800">{doc.label}</span>
-                                <ChevronRight size={16} className="text-slate-300" />
+                                <span className="flex-1 text-[11px] font-semibold text-slate-800">{doc.label}</span>
+                                <ChevronRight size={14} className="text-slate-300" />
                             </button>
                         );
                     })}
                 </div>
             </section>
 
-            <p className="text-center text-[11px] text-slate-400 mt-5 mb-4">From Jangu Group</p>
+            <p className="text-center text-[10px] text-slate-400 mt-4 mb-2">From Jangu Group</p>
         </div>
     );
 };

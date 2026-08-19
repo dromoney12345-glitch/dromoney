@@ -510,34 +510,17 @@ const MarketingManager = () => {
                                     <div className="space-y-5">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Banner Tag</label>
+                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Line 1 (dark text)</label>
                                                 <input value={banner.tag} onChange={(e) => {
                                                     const newB = [...banners]; newB[idx].tag = e.target.value; setBanners(newB);
-                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-3.5 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                                }} placeholder="e.g. Your Growth" className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-3.5 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Gradient Theme</label>
-                                                <select value={banner.gradient} onChange={(e) => {
-                                                    const newB = [...banners]; newB[idx].gradient = e.target.value; setBanners(newB);
-                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-3.5 text-[14px] font-medium text-slate-800 outline-none custom-scrollbar">
-                                                    <option value="from-sky-500 to-sky-700">Sky Premium (Blue)</option>
-                                                    <option value="from-indigo-500 to-indigo-700">Indigo Royal (Dark Blue/Purple)</option>
-                                                    <option value="from-emerald-500 to-teal-600">Emerald Growth (Green)</option>
-                                                    <option value="from-rose-500 to-orange-600">Orange Spark (Red/Orange)</option>
-                                                    <option value="from-violet-600 to-fuchsia-600">Fuchsia Dream (Purple/Pink)</option>
-                                                    <option value="from-amber-400 to-orange-500">Amber Glow (Yellow/Orange)</option>
-                                                    <option value="from-cyan-400 to-blue-600">Ocean Wave (Cyan/Blue)</option>
-                                                    <option value="from-pink-500 to-rose-600">Rose Petal (Pink/Red)</option>
-                                                    <option value="from-slate-800 to-slate-950">Midnight Stealth (Dark/Black)</option>
-                                                    <option value="from-teal-400 to-emerald-600">Mint Fresh (Teal/Green)</option>
-                                                </select>
+                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Line 2 (orange heading)</label>
+                                                <input value={banner.title} onChange={(e) => {
+                                                    const newB = [...banners]; newB[idx].title = e.target.value; setBanners(newB);
+                                                }} placeholder="e.g. Our Guidance" className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-3.5 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                             </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Main Heading</label>
-                                            <input value={banner.title} onChange={(e) => {
-                                                const newB = [...banners]; newB[idx].title = e.target.value; setBanners(newB);
-                                            }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-3.5 text-[15px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Subtitle / Description</label>
@@ -545,7 +528,7 @@ const MarketingManager = () => {
                                                 const newB = [...banners]; newB[idx].subtitle = e.target.value; setBanners(newB);
                                             }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-4 text-[13px] font-medium text-slate-500 h-24 outline-none focus:ring-2 focus:ring-sky-500 resize-none" />
                                         </div>
-                                        <p className="text-[10px] text-slate-400 -mt-2">Home hero uses Tag as the first heading, Title as the orange heading, and Image on the right.</p>
+                                        <p className="text-[10px] text-slate-400 -mt-2">Home hero: Line 1 + Line 2 + subtitle + CTA + right-side image. Toggle Active to show on /user/home.</p>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Hero Image</label>
                                             <div className="flex gap-3 items-center">
@@ -645,21 +628,23 @@ const MarketingManager = () => {
 
                             <div className="space-y-6 px-10 pb-10">
                                 {banners.map((banner) => (
-                                    <div key={banner._id || banner.tag} className="bg-[#F8F1E8] rounded-xl p-4 relative overflow-hidden group shadow-lg min-h-[140px]">
-                                        <div className={`absolute top-3 right-3 text-[8px] font-bold uppercase px-2 py-0.5 rounded-full ${banner.isActive ? 'bg-emerald-500 text-white' : 'bg-slate-300 text-slate-600'}`}>
+                                    <div key={banner._id || banner.tag} className="bg-[#F8F1E8] rounded-2xl p-3.5 relative overflow-hidden shadow-lg min-h-[132px]">
+                                        <div className={`absolute top-2.5 right-2.5 text-[8px] font-bold uppercase px-2 py-0.5 rounded-full z-20 ${banner.isActive ? 'bg-emerald-500 text-white' : 'bg-slate-300 text-slate-600'}`}>
                                             {banner.isActive ? 'Live' : 'Hidden'}
                                         </div>
-                                        <div className="relative z-10 pr-[38%]">
-                                            <h2 className="text-lg font-bold text-slate-900 leading-tight">{banner.tag}</h2>
-                                            <h3 className="text-lg font-bold text-[#C2520A] leading-tight">{banner.title}</h3>
-                                            <p className="text-[11px] font-medium text-slate-500 mt-1 line-clamp-3">{banner.subtitle}</p>
-                                            <div className="inline-flex items-center gap-1 bg-[#C2520A] text-white px-3 py-1.5 rounded-full mt-3 text-[10px] font-semibold">
-                                                {banner.ctaText || 'Explore Now'} <ChevronRight size={12} />
+                                        <div className="relative z-10 flex items-stretch min-h-[112px]">
+                                            <div className="flex-1 min-w-0 pr-1 flex flex-col justify-center">
+                                                <h2 className="text-[15px] font-bold text-slate-900 leading-tight">{banner.tag || 'Your Growth'}</h2>
+                                                <h3 className="text-[15px] font-bold text-[#C2520A] leading-tight">{banner.title || 'Our Guidance'}</h3>
+                                                <p className="text-[9px] font-medium text-slate-500 mt-1 line-clamp-3">{banner.subtitle}</p>
+                                                <div className="inline-flex items-center gap-1 bg-[#C2520A] text-white px-2.5 py-1 rounded-full mt-2 text-[9px] font-semibold w-fit">
+                                                    {banner.ctaText || 'Explore Now'} <ChevronRight size={10} />
+                                                </div>
                                             </div>
+                                            {banner.imageUrl && (
+                                                <img src={banner.imageUrl} alt="" className="w-[42%] max-w-[120px] h-[108px] object-cover object-top shrink-0 self-end" />
+                                            )}
                                         </div>
-                                        {banner.imageUrl && (
-                                            <img src={banner.imageUrl} alt="" className="absolute right-0 bottom-0 h-full w-[42%] object-cover object-top" />
-                                        )}
                                     </div>
                                 ))}
                             </div>

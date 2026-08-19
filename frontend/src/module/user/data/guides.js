@@ -118,13 +118,14 @@ export const GUIDES = {
     },
 };
 
+/** 8 cards — row 1: KYC, Invite, Card, Withdraw · row 2: ₹500, Fund, Tasks, Business */
 export const HOME_GUIDE_CARDS = [
-    { slug: 'kyc', label: 'How to do KYC?', icon: 'ClipboardCheck', iconBg: 'bg-violet-50', iconColor: 'text-violet-500' },
-    { slug: 'invite', label: 'How to Invite?', icon: 'UserPlus', iconBg: 'bg-emerald-50', iconColor: 'text-emerald-500' },
-    { slug: 'card', label: 'Create Withdrawal Card', icon: 'CreditCard', iconBg: 'bg-amber-50', iconColor: 'text-amber-500' },
-    { slug: 'withdraw', label: 'How to Withdraw?', icon: 'Wallet', iconBg: 'bg-sky-50', iconColor: 'text-sky-500' },
-    { slug: 'earn500', label: 'Earn ₹500 Daily', icon: 'TrendingUp', iconBg: 'bg-[#FFF5F0]', iconColor: 'text-[#462211]' },
-    { slug: 'fund', label: 'Open Future Fund', icon: 'Landmark', iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
-    { slug: 'tasks', label: 'Complete Tasks', icon: 'ListChecks', iconBg: 'bg-violet-50', iconColor: 'text-violet-500' },
-    { slug: 'business', label: 'Start a Business', icon: 'Building2', iconBg: 'bg-[#FFF5F0]', iconColor: 'text-[#462211]' },
+    { slug: 'kyc', label: 'How to do KYC?', icon: 'ClipboardCheck', iconBg: 'bg-violet-50', iconColor: 'text-violet-600' },
+    { slug: 'invite', label: 'How to Invite?', icon: 'UserPlus', iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
+    { slug: 'card', label: 'Create Withdrawal Card', icon: 'CreditCard', iconBg: 'bg-amber-50', iconColor: 'text-amber-600' },
+    { slug: 'withdraw', label: 'How to Withdraw?', icon: 'Wallet', iconBg: 'bg-sky-50', iconColor: 'text-sky-600' },
+    { slug: 'earn500', label: 'Earn ₹500 Daily', icon: 'TrendingUp', iconBg: 'bg-orange-50', iconColor: 'text-orange-600' },
+    { slug: 'fund', label: 'Open Future Fund', icon: 'PiggyBank', iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
+    { slug: 'tasks', label: 'Complete Tasks', icon: 'ListChecks', iconBg: 'bg-violet-50', iconColor: 'text-violet-600' },
+    { slug: 'business', label: 'Start a Business', icon: 'Building2', iconBg: 'bg-[#FFF5F0]', iconColor: 'text-[#C2520A]' },
 ];
