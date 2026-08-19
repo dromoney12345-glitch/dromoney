@@ -8,7 +8,7 @@ import {
 } from '../../shared/utils/referral';
 
 const inputClass =
-    'w-full bg-white text-[#462211] font-medium pl-11 pr-4 py-3 rounded-xl border border-[#E5E7EB] focus:border-[#462211]/40 focus:outline-none transition-all placeholder:text-[#C4B5A8] text-[14px]';
+    'w-full bg-white text-[#462211] font-medium pl-11 pr-4 py-2.5 rounded-xl border border-[#E5E7EB] focus:border-[#462211]/40 focus:outline-none transition-all placeholder:text-[#C4B5A8] text-[13px]';
 
 const Register = () => {
     const navigate = useNavigate();
@@ -200,8 +200,8 @@ const Register = () => {
             )}
 
             {step === 1 ? (
-                <form onSubmit={handleSendOTP} className="space-y-3">
-                    <div className="space-y-3">
+                <form onSubmit={handleSendOTP} className="space-y-2.5">
+                    <div className="space-y-2">
                         <div className="space-y-1">
                             <label className="text-[11px] font-medium text-[#7A5648] ml-0.5">Full Name</label>
                             <div className="relative">
@@ -288,7 +288,7 @@ const Register = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#462211] hover:bg-[#5a2d1a] disabled:opacity-50 text-white py-3.5 rounded-xl font-medium text-[14px] transition-all active:scale-[0.99] flex items-center justify-center gap-2 mt-1"
+                        className="w-full bg-[#462211] hover:bg-[#5a2d1a] disabled:opacity-50 text-white py-3 rounded-xl font-medium text-[13px] transition-all active:scale-[0.99] flex items-center justify-center gap-2"
                     >
                         {loading ? <Loader2 size={18} className="animate-spin" /> : 'Sign Up'}
                     </button>

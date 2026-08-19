@@ -27,34 +27,31 @@ const AuthLayout = () => {
                 <ChevronLeft size={24} strokeWidth={2.2} />
             </button>
 
-            <div className="relative z-10 flex flex-col flex-1 px-4 pt-10 pb-8 max-w-md mx-auto w-full">
-                {/* Logo — horizontal, matches mockup */}
-                <div className="flex flex-col items-center mb-3">
-                    <div className="flex items-center gap-2.5">
-                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#E8C4A0] to-[#C4956A] flex items-center justify-center shadow-sm border border-[#EDE4DC] overflow-hidden shrink-0">
-                            <img src={logoImg} alt="" className="w-9 h-9 object-contain" />
+            <div className="relative z-10 flex flex-col flex-1 px-4 pt-8 pb-4 max-w-md mx-auto w-full">
+                <div className="flex flex-col items-center mb-2">
+                    <div className="flex items-center gap-2">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#E8C4A0] to-[#C4956A] flex items-center justify-center shadow-sm border border-[#EDE4DC] overflow-hidden shrink-0">
+                            <img src={logoImg} alt="" className="w-7 h-7 object-contain" />
                         </div>
-                        <span className="text-[22px] font-semibold text-[#462211] tracking-tight leading-none">
+                        <span className="text-[20px] font-semibold text-[#462211] tracking-tight leading-none">
                             Dromoney
                         </span>
                     </div>
-                    <p className="text-[10px] text-[#7A5648] mt-1.5 tracking-wide">— From Jangu Group —</p>
+                    <p className="text-[9px] text-[#7A5648] mt-1 tracking-wide">— From Jangu Group —</p>
                 </div>
 
                 <AuthHeroBanner />
 
-                {/* Welcome — English only (not inside banner graphic) */}
-                <div className="text-center mb-4 px-2">
-                    <h2 className="text-[16px] font-semibold text-[#462211] leading-snug">
+                <div className="text-center mb-2.5 px-2">
+                    <h2 className="text-[15px] font-semibold text-[#462211] leading-snug">
                         Welcome to Dromoney
                     </h2>
-                    <p className="text-[12px] text-[#7A5648] mt-1 leading-relaxed">
+                    <p className="text-[11px] text-[#7A5648] mt-0.5 leading-relaxed">
                         Learn, earn and unlock opportunities
                     </p>
                 </div>
 
-                {/* Form card */}
-                <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgba(70,34,17,0.08)] border border-[#EDE4DC]/60 p-4 flex-1">
+                <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgba(70,34,17,0.08)] border border-[#EDE4DC]/60 p-3.5 flex-1">
                     {!hideAuthTabs && (
                         <div className="flex border-b border-[#EDE4DC] mb-4">
                             <Link

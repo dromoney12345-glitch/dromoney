@@ -143,31 +143,24 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
             }
         }
     }
-    const baseCoins = submission.coinsReward || task.coinsReward || 2;
-    const coinsToAdd = baseCoins * factor;
+    const baseAmount = submission.coinsReward || task.coinsReward || 2;
+    const inrEarned = Math.round(baseAmount * factor * 100) / 100;
 
-    // Remove conversion logic
-    // Update balances
-    user.coins.balance += coinsToAdd;
-    user.coins.lifetimeCoins += coinsToAdd;
+    const { creditEarning } = require('../utils/walletLedger');
+    if (inrEarned > 0) {
+        await creditEarning(user, inrEarned, {
+            source: factor > 1 ? `Task Earning (Boosted): ${task.title}` : `Task Earning: ${task.title}`,
+            inviteHold: false,
+            createTx: true,
+        });
+    }
 
-    // Track completion uniformly for 24-hour cycle
     user.dailyTaskCompletions.push({
         taskId: task._id,
         completedAt: new Date()
     });
 
     await user.save();
-
-    // Record Transaction Logs
-    await Transaction.create({
-        user: user._id,
-        type: 'credit',
-        currency: 'COIN',
-        amount: coinsToAdd,
-        source: factor > 1 ? `Processing Rewards: Task Approved: ${task.title}` : `Task Approved: ${task.title}`,
-        status: 'Success'
-    });
 
     // Check for High Value Milestones & Notify Admins
     try {

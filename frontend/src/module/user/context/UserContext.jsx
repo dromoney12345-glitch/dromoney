@@ -14,7 +14,7 @@ const INITIAL_USER_STATE = {
     mongoId: '',
     isPaid: false,
     earnings: { today: 0, total: 0, referral: 0 },
-    coins: { total: 0, history: [] },
+    
     referrals: { count: 0, code: '', link: '' },
     wallet: { balance: 0, pendingBalance: 0, virtualBalance: 0, transactions: [] },
     withdrawalCard: { status: 'none' },
@@ -215,10 +215,7 @@ export const UserProvider = ({ children }) => {
                 total: dbUser.wallet?.lifetimeEarnings || 0,
                 referral: dbUser.wallet?.referralEarnings || 0
             },
-            coins: {
-                total: dbUser.coins?.balance || 0,
-                history: transactions.filter(t => t.currency === 'COIN')
-            },
+            
             referrals: {
                 count: dbUser.referralCount || 0,
                 code: dbUser.referralCode,
@@ -344,23 +341,26 @@ export const UserProvider = ({ children }) => {
         }
     };
 
-    const addCoins = async (amount, source, taskId) => {
+    const addEarning = async (amount, source, taskId) => {
         try {
-            const res = await api.post('/user/wallet/add-coins', { amount, source, taskId });
-            // Immediately update local coin balance from the server-confirmed value
-            // This avoids calling refreshUserProfile() which was hitting /auth/me → 401 → auto-logout
-            if (res?.data?.newCoinBalance !== undefined) {
+            const res = await api.post('/user/wallet/add-earning', { amount, source, taskId });
+            if (res?.data) {
                 setUserData(prev => ({
                     ...prev,
-                    coins: { ...prev.coins, total: res.data.newCoinBalance },
+                    wallet: {
+                        ...prev.wallet,
+                        balance: res.data.newWalletBalance ?? prev.wallet.balance,
+                        pendingBalance: res.data.newPendingBalance ?? prev.wallet.pendingBalance,
+                        virtualBalance: res.data.newVirtualBalance ?? prev.wallet.virtualBalance,
+                    },
                     completedTasks: res.data.completedTasks || prev.completedTasks,
                     dailyTaskCompletions: res.data.dailyTaskCompletions || prev.dailyTaskCompletions
                 }));
             }
-            return { success: true };
+            return { success: true, data: res?.data };
         } catch (err) {
-            console.error('addCoins error:', err);
-            return { success: false, message: err.message || 'Failed to add coins' };
+            console.error('addEarning error:', err);
+            return { success: false, message: err.message || 'Failed to add earning' };
         }
     };
 
@@ -422,10 +422,8 @@ export const UserProvider = ({ children }) => {
         logout,
         unlockPlatform,
         completeCourse,
-        addCoins,
-        updateCoinBalance: (newBalance) => {
-            setUserData(prev => ({ ...prev, coins: { ...prev.coins, total: newBalance } }));
-        },
+        addEarning,
+        addCoins: addEarning,
         requestWithdrawal,
         addNotification,
         refreshUserProfile,

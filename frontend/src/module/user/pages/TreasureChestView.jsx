@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
-import { ChevronLeft, Gift, Coins, Sparkles, Trophy, Star } from 'lucide-react';
+import { ChevronLeft, Gift, IndianRupee, Sparkles, Trophy, Star } from 'lucide-react';
 
 const TreasureChestView = () => {
     const { id } = useParams();
@@ -35,9 +35,6 @@ const TreasureChestView = () => {
                  const res = await addCoins(baseReward, 'Treasure Chest Found', task._id || task.id);
                  if (res && res.success) {
                      taskStorage.markComplete(task._id || task.id);
-                 } else {
-                     // Still marked as step 2 to show UI, but won't trigger coin addition locally
-                     // We could optionally show an alert here: alert(res?.message || 'Already claimed')
                  }
             }
         }, 1500);
@@ -84,7 +81,7 @@ const TreasureChestView = () => {
                                 {step === 2 && selectedIdx === i ? (
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-amber-400 blur-2xl opacity-40 animate-pulse"></div>
-                                        <Coins size={60} className="text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]" />
+                                        <IndianRupee size={60} className="text-amber-400 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]" />
                                     </div>
                                 ) : (
                                     <Gift size={48} className={`${selectedIdx === i ? 'text-indigo-400' : 'text-slate-500'}`} />
@@ -100,7 +97,7 @@ const TreasureChestView = () => {
                             {step === 2 && selectedIdx === i && (
                                 <div className="absolute -bottom-4 bg-emerald-500 px-4 py-2 rounded-full shadow-2xl animate-in fade-in slide-in-from-top-2">
                                     <span className="text-[11px] font-medium text-white uppercase tracking-widest">
-                                        +{isTaskBoosterActive ? (task.reward || 0) * 12 : task.reward} Coins
+                                        +₹{isTaskBoosterActive ? (task.reward || 0) * 12 : task.reward}
                                     </span>
                                 </div>
                             )}

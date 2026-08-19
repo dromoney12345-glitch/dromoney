@@ -164,13 +164,8 @@ const AdPlayer = () => {
                     <ChevronLeft size={20} />
                 </button>
                 <div className="flex items-center gap-2">
-                    <div className="bg-[#0F172A]/80 backdrop-blur-md border border-slate-800/80 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
-                        <Coins size={13} className="text-amber-400 fill-amber-400" />
-                        <span className="text-[12px] font-medium text-white leading-none">{userData?.coins?.total || userData?.coins?.balance || 0}</span>
-                    </div>
-                    <div className="bg-amber-600/10 backdrop-blur-md border border-amber-600/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
-                        <Coins size={13} className="text-amber-500 fill-amber-500" />
-                        <span className="text-[11px] font-medium text-amber-500 uppercase tracking-wider leading-none">Reward: {ad.coinsReward} Coins</span>
+                    <div className="bg-[#462211]/80 backdrop-blur-md border border-[#462211]/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
+                        <span className="text-[11px] font-medium text-white uppercase tracking-wider leading-none">Reward: ₹{ad.coinsReward}</span>
                     </div>
                 </div>
             </header>

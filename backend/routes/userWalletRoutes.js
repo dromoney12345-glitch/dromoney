@@ -1,5 +1,5 @@
 const express = require('express');
-const { getBalance, addCoins, requestWithdrawal, getTransactions } = require('../controllers/walletController');
+const { getBalance, addEarning, addCoins, requestWithdrawal, getTransactions } = require('../controllers/walletController');
 const { protect } = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -13,6 +13,7 @@ router.post('/payout-webhook', (req, res) => {
 router.use(protect); // All other wallet routes are protected
 
 router.get('/balance', getBalance);
+router.post('/add-earning', addEarning);
 router.post('/add-coins', addCoins);
 router.post('/withdraw', requestWithdrawal);
 router.get('/transactions', getTransactions);

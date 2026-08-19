@@ -11,7 +11,7 @@ const INITIAL_TASKS = [
         id: '1', 
         type: 'Web', 
         title: 'Visit Website Page', 
-        description: 'Stay for 15s to earn coins.', 
+        description: 'Stay for 15s to earn rewards.', 
         reward: 1, 
         icon: 'Monitor',
         config: { url: 'https://google.com', timer: 15 }
@@ -20,7 +20,7 @@ const INITIAL_TASKS = [
         id: '2', 
         type: 'Video', 
         title: 'Watch Video Task', 
-        description: 'Watch this short video to gain coins.', 
+        description: 'Watch this short video to earn rewards.', 
         reward: 1, 
         icon: 'Youtube',
         config: { url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', timer: 30 }

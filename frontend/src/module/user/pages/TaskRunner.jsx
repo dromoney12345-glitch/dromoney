@@ -240,16 +240,14 @@ const TaskRunner = () => {
         const result = await addCoins(rewardAmount, task.title, taskId);
         
         if (!result || !result.success) {
-            // Coins failed — show error, reset to verify so user can try again
-            alert(result?.message || 'Failed to add coins. Please try again.');
+            alert(result?.message || 'Failed to add earning. Please try again.');
             setStatus('verify');
             return;
         }
-        // Persist completion state only if coins were successfully added
         taskStorage.markComplete(taskId);
         
         if (userData.isTaskBoosterActive) {
-            setToast({ message: `Task completed! ${taskMultiplier}X Booster Applied! +${rewardAmount * taskMultiplier} Coins`, type: 'success' });
+            setToast({ message: `Task completed! ${taskMultiplier}X Booster Applied! +₹${rewardAmount * taskMultiplier}`, type: 'success' });
             setTimeout(() => { setToast(null); navigate('/user/earn'); }, 2000);
         } else {
             setTimeout(() => navigate('/user/earn'), 2000);
@@ -277,12 +275,8 @@ const TaskRunner = () => {
                     <p className="text-[9px] text-sky-400 font-medium uppercase tracking-widest leading-none mt-1">Live Task Mode</p>
 
                 </div>
-                <div className="bg-amber-500/10 px-3 py-1.5 rounded-full border border-amber-500/20 shadow-inner shrink-0 flex items-center gap-2">
-                    <div className="flex items-center gap-1 border-r border-amber-500/20 pr-2 mr-0.5">
-                        <Coins size={12} className="text-amber-400" />
-                        <span className="font-medium text-amber-400 text-xs">{userData.coins.total}</span>
-                    </div>
-                    <span className="font-medium text-amber-400 text-xs">+{userData.isTaskBoosterActive ? (task.coinsReward || task.reward) * taskMultiplier : (task.coinsReward || task.reward)} Coin {userData.isTaskBoosterActive && `(${taskMultiplier}X Boost)`}</span>
+                <div className="bg-[#462211]/10 px-3 py-1.5 rounded-full border border-[#462211]/20 shadow-inner shrink-0 flex items-center gap-1">
+                    <span className="font-medium text-[#B3591C] text-xs">+₹{userData.isTaskBoosterActive ? (task.coinsReward || task.reward) * taskMultiplier : (task.coinsReward || task.reward)} {userData.isTaskBoosterActive && `(${taskMultiplier}X)`}</span>
                 </div>
             </div>
 

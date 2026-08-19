@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import {
-    UserPlus, IndianRupee, ClipboardList, Rocket, ChevronRight, Loader2,
+    UserPlus, IndianRupee, ClipboardList, Rocket, ChevronRight, ChevronLeft, Loader2,
     Wallet, Clock, Lock
 } from 'lucide-react';
 import api from '../../shared/services/api';
@@ -88,8 +88,14 @@ const Income = () => {
     const reward = inviteAmount || 200;
 
     return (
-        <div className="flex flex-col min-h-full bg-[#FCF8F5] font-poppins px-3 pt-2 pb-5">
-            <h1 className="text-[20px] font-bold text-slate-900 text-center mb-3 tracking-tight">Income</h1>
+        <div className="flex flex-col min-h-full bg-[#FCF8F5] font-poppins pb-5">
+            <div className="bg-white px-4 py-2.5 flex items-center gap-3 sticky top-0 z-40 border-b border-[#EDE4DC]">
+                <button onClick={() => navigate(-1)} className="text-[#462211] active:scale-95 transition-all">
+                    <ChevronLeft size={22} strokeWidth={2.2} />
+                </button>
+                <h1 className="text-[17px] font-semibold text-[#462211] tracking-tight">Income</h1>
+            </div>
+            <div className="px-3 pt-2"></div>
 
             <div className="space-y-2.5">
                 <OptionCard

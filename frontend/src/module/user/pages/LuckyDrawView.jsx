@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Trophy, Sparkles, Coins, Star, Gift, ArrowRight } from 'lucide-react';
+import { ChevronLeft, Trophy, Sparkles, IndianRupee, Star, Gift, ArrowRight } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
 
 const DEFAULT_PRIZES = [
-    { label: '10 Coins', coins: 10, cash: 0, bg: 'bg-indigo-500/10 text-indigo-400', color: 'text-indigo-400' },
-    { label: '25 Coins', coins: 25, cash: 0, bg: 'bg-emerald-500/10 text-emerald-400', color: 'text-emerald-400' },
-    { label: '50 Coins', coins: 50, cash: 0, bg: 'bg-sky-500/10 text-sky-400', color: 'text-sky-400' },
-    { label: '15 Coins', coins: 15, cash: 0, bg: 'bg-amber-500/10 text-amber-400', color: 'text-amber-400' },
-    { label: '100 Coins', coins: 100, cash: 0, bg: 'bg-rose-500/10 text-rose-400', color: 'text-rose-400' },
-    { label: '20 Coins', coins: 20, cash: 0, bg: 'bg-amber-500/10 text-amber-400', color: 'text-amber-400' },
-    { label: '30 Coins', coins: 30, cash: 0, bg: 'bg-violet-500/10 text-violet-400', color: 'text-violet-400' },
-    { label: '75 Coins', coins: 75, cash: 0, bg: 'bg-amber-500/10 text-amber-400', color: 'text-amber-400' }
+    { label: '₹10', coins: 10, cash: 0, bg: 'bg-indigo-500/10 text-indigo-400', color: 'text-indigo-400' },
+    { label: '₹25', coins: 25, cash: 0, bg: 'bg-emerald-500/10 text-emerald-400', color: 'text-emerald-400' },
+    { label: '₹50', coins: 50, cash: 0, bg: 'bg-sky-500/10 text-sky-400', color: 'text-sky-400' },
+    { label: '₹15', coins: 15, cash: 0, bg: 'bg-amber-500/10 text-amber-400', color: 'text-amber-400' },
+    { label: '₹100', coins: 100, cash: 0, bg: 'bg-rose-500/10 text-rose-400', color: 'text-rose-400' },
+    { label: '₹20', coins: 20, cash: 0, bg: 'bg-amber-500/10 text-amber-400', color: 'text-amber-400' },
+    { label: '₹30', coins: 30, cash: 0, bg: 'bg-violet-500/10 text-violet-400', color: 'text-violet-400' },
+    { label: '₹75', coins: 75, cash: 0, bg: 'bg-amber-500/10 text-amber-400', color: 'text-amber-400' }
 ];
 
 const LuckyDrawView = () => {
@@ -90,7 +90,7 @@ const LuckyDrawView = () => {
     })) : DEFAULT_PRIZES.map(p => {
         // If it's a task, override the default prizes with the actual task reward
         if (taskReward !== null) {
-             return { ...p, label: `${taskReward} Coins`, coins: taskReward, cash: 0 };
+             return { ...p, label: `₹${taskReward}`, coins: taskReward, cash: 0 };
         }
         return p;
     });
@@ -190,7 +190,7 @@ const LuckyDrawView = () => {
                     <div className="space-y-3">
                         <h2 className="text-3xl font-medium leading-tight">Try Your Luck!</h2>
                         <p className="text-white/60 font-medium text-sm leading-relaxed max-w-xs">
-                            Pick a ticket and reveal your prize. Win cash up to ₹1000 or bonus coins!
+                            Pick a ticket and reveal your prize. Win cash up to ₹1000!
                         </p>
                     </div>
 
@@ -288,8 +288,8 @@ const LuckyDrawView = () => {
                     {prize?.coins > 0 && (
                         <div className="flex flex-col items-center justify-center gap-1 bg-white/90 rounded-2xl p-3 shadow-md">
                             <div className="flex items-center gap-2">
-                                <Coins size={20} className="text-amber-500 fill-amber-500" />
-                                <span className="text-[13px] font-bold text-slate-800">+{prize.coins} Coins added to wallet</span>
+                                <IndianRupee size={20} className="text-amber-500" />
+                                <span className="text-[13px] font-bold text-slate-800">+₹{prize.coins} added to wallet</span>
                             </div>
                         </div>
                     )}

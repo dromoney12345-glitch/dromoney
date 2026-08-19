@@ -53,14 +53,14 @@ const GoldProductionView = () => {
         // Reward user
         const reward = event?.config?.coinReward || 50;
         await addCoins(reward, `Gold Production: ${event?.title || 'Mining'}`, id);
-        addNotification('Production Complete', `You produced ${reward} Gold Coins!`, 'success');
+        addNotification('Production Complete', `You produced ₹${reward} Gold Rewards!`, 'success');
         
         // Save submission
         try {
             await api.post(`/user/data/events/${id}/submit`, {
                 score: reward,
-                result: `Mined ${reward} coins`,
-                prize: `${reward} Coins`
+                result: `Earned ₹${reward}`,
+                prize: `₹${reward}`
             });
         } catch(e) {}
     };
@@ -84,7 +84,7 @@ const GoldProductionView = () => {
                 </div>
 
                 <div className="space-y-2 max-w-xs">
-                    <h2 className="text-2xl font-bold text-amber-400">Mine Gold Coins</h2>
+                    <h2 className="text-2xl font-bold text-amber-400">Mine Gold Rewards</h2>
                     <p className="text-sm text-slate-300">Tap to start production and extract your rewards from the event mine.</p>
                 </div>
 

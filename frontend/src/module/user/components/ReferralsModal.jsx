@@ -40,12 +40,12 @@ const ReferralsModal = ({ isOpen, onClose, referralCount = 0 }) => {
 
     return (
         <div
-            className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-slate-900/45 p-3 sm:p-4"
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/45 p-4"
             onClick={onClose}
         >
             <div
-                className="relative bg-white w-full max-w-[360px] rounded-2xl shadow-2xl animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200 flex flex-col overflow-hidden"
-                style={{ maxHeight: 'min(72dvh, 520px)' }}
+                className="relative bg-white w-full max-w-[360px] rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col overflow-hidden"
+                style={{ maxHeight: 'min(80dvh, 520px)' }}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}

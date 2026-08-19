@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import {
     ChevronLeft, ChevronDown, Trophy, Users, Gift,
-    Sparkles, Zap, Coins, Clock, Lightbulb, Rocket, Award, CheckCircle2, AlertCircle, RefreshCw
+    Sparkles, Zap, IndianRupee, Clock, Lightbulb, Rocket, Award, CheckCircle2, AlertCircle, RefreshCw
 } from 'lucide-react';
 import UnlockModal from '../components/UnlockModal';
 import PaymentModal from '../components/PaymentModal';
@@ -11,7 +11,7 @@ import { eventStorage } from '../../shared/services/eventStorage';
 import api from '../../shared/services/api';
 
 const Events = () => {
-    const { userData, addCoins, addNotification, refreshUserProfile, updateCoinBalance } = useUser();
+    const { userData, addCoins, addNotification, refreshUserProfile } = useUser();
     const [isUnlockOpen, setIsUnlockOpen] = useState(false);
     const [isBoosterExpanded, setIsBoosterExpanded] = useState(false);
     const [isPaymentOpen, setIsPaymentOpen] = useState(false);
@@ -157,11 +157,6 @@ const Events = () => {
         try {
             const res = await api.post(`/user/data/events/${id}/join`);
             if (res.success) {
-                if (res.newCoinBalance !== undefined) {
-                    updateCoinBalance(res.newCoinBalance);
-                }
-                
-                // Refresh profile to see updated coins
                 await refreshUserProfile(false);
                 
                 // Save joined status locally and update state
@@ -228,7 +223,7 @@ const Events = () => {
                     tagBadge: 'bg-amber-100/80 text-amber-700 border border-amber-300/50',
                     statsBg: 'bg-white/60 border border-amber-200/40',
                     button: 'bg-amber-500 hover:bg-amber-600 text-slate-900 shadow-amber-200 font-bold',
-                    accentIcon: <Coins size={14} className="text-amber-600" />
+                    accentIcon: <IndianRupee size={14} className="text-amber-600" />
                 };
             default:
                 return {
@@ -243,69 +238,61 @@ const Events = () => {
     };
 
     return (
-        <div className="flex flex-col bg-[#F8FAFC] pb-24 font-['Poppins']">
+        <div className="flex flex-col bg-[#FCF8F5] pb-24 font-poppins">
             <UnlockModal isOpen={isUnlockOpen} onClose={() => setIsUnlockOpen(false)} />
             
-            {/* Header — flush to top, no gap */}
-            <div className="bg-gradient-to-br from-slate-950 via-blue-900 to-slate-900 px-4 pt-3 pb-4 shadow-lg sticky top-0 z-40 relative overflow-hidden">
-                <div className="absolute -right-10 -top-10 w-24 h-24 bg-white/5 rounded-full blur-3xl"></div>
-                
-                <div className="flex items-center justify-between relative z-10">
-                    <div className="flex items-center gap-3">
-                        <button 
-                            onClick={() => navigate(-1)}
-                            className="w-8 h-8 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/10 active:scale-95 transition-all cursor-pointer"
-                        >
-                            <ChevronLeft size={18} />
-                        </button>
-                        <div className="flex flex-col text-left">
-                            <h1 className="text-base text-white tracking-tight leading-none">Events</h1>
-                            <p className="text-[9px] text-blue-300 opacity-80 uppercase tracking-widest mt-0.5">Win Big Rewards</p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <button onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-7 h-7 flex items-center justify-center bg-white/10 text-white rounded-full border border-white/20 active:scale-95 transition-all">
-                            <RefreshCw size={12} className={isRefreshingCoins ? 'animate-spin' : ''} />
-                        </button>
-                        <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
-                            <Coins size={12} className="text-yellow-400 fill-yellow-400" />
-                            <span className="text-[12px] text-white">{userData.coins.total}</span>
-                        </div>
-                    </div>
+            {/* Header */}
+            <div className="bg-white px-4 py-2.5 flex items-center justify-between sticky top-0 z-40 border-b border-[#EDE4DC]">
+                <div className="flex items-center gap-3">
+                    <button 
+                        onClick={() => navigate(-1)}
+                        className="text-[#462211] active:scale-95 transition-all cursor-pointer"
+                    >
+                        <ChevronLeft size={22} strokeWidth={2.2} />
+                    </button>
+                    <h1 className="text-[17px] font-semibold text-[#462211] tracking-tight">Events</h1>
                 </div>
 
-                {/* Trophy Banner */}
-                <div className="mt-2.5 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-2.5 flex items-center gap-3">
-                    <div className="w-9 h-9 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center shadow-lg shrink-0">
-                        <Trophy size={18} className="text-white" />
+                <div className="flex items-center gap-2">
+                    <button onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-8 h-8 flex items-center justify-center bg-[#FFF5F0] text-[#9A8478] rounded-lg border border-[#EDE4DC] active:scale-95 transition-all">
+                        <RefreshCw size={14} className={isRefreshingCoins ? 'animate-spin' : ''} />
+                    </button>
+                    <div className="flex items-center gap-1.5 bg-[#FFF5F0] px-3 py-1.5 rounded-lg border border-[#EDE4DC]">
+                        <span className="text-[13px] font-semibold text-[#462211]">₹{userData?.wallet?.balance || 0}</span>
                     </div>
-                    <div className="flex-1 text-left">
-                        <h2 className="text-[12px] text-white leading-none">Join & Win Prizes!</h2>
-                        <p className="text-[8px] text-blue-100 opacity-60 mt-0.5">Use coins to participate and earn huge Cash payouts.</p>
-                    </div>
+                </div>
+            </div>
+
+            {/* Trophy Banner */}
+            <div className="mx-3 mt-3 bg-[#462211] rounded-xl p-3 flex items-center gap-3">
+                <div className="w-9 h-9 bg-[#B3591C] rounded-lg flex items-center justify-center shrink-0">
+                    <Trophy size={18} className="text-white" />
+                </div>
+                <div className="flex-1 text-left">
+                    <h2 className="text-[12px] text-white font-semibold leading-none">Join & Win Prizes!</h2>
+                    <p className="text-[9px] text-white/60 mt-0.5">Participate and earn huge Cash payouts.</p>
                 </div>
             </div>
 
             {/* Eligibility Progress Bar */}
             <div className="px-3 pt-3 w-full">
-                <div className="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 shadow-xl">
+                <div className="bg-white border border-[#EDE4DC] rounded-2xl p-4 shadow-[0_2px_12px_rgba(70,34,17,0.06)]">
                     <div className="flex justify-between items-center mb-2">
-                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Mega Event Eligibility</span>
-                        <span className="text-[10px] font-extrabold text-amber-400 font-['Poppins']">
-                            {userData?.coins?.total || 0} / 500 Coins Collected
+                        <span className="text-[9px] text-[#7A5648] font-bold uppercase tracking-widest">Mega Event Eligibility</span>
+                        <span className="text-[10px] font-extrabold text-[#B3591C]">
+                            ₹{userData?.wallet?.balance || 0} Balance
                         </span>
                     </div>
-                    <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-700/50">
+                    <div className="w-full bg-[#F3E8E0] h-2.5 rounded-full overflow-hidden border border-[#EDE4DC]">
                         <div 
-                            className="bg-gradient-to-r from-amber-500 to-yellow-400 h-full rounded-full transition-all duration-500" 
-                            style={{ width: `${Math.min(100, ((userData?.coins?.total || 0) / 500) * 100)}%` }}
+                            className="bg-gradient-to-r from-[#B3591C] to-[#D4783A] h-full rounded-full transition-all duration-500" 
+                            style={{ width: `${Math.min(100, ((userData?.wallet?.balance || 0) / 500) * 100)}%` }}
                         ></div>
                     </div>
-                    <p className="text-[8.5px] text-slate-400 font-semibold mt-2 leading-tight uppercase tracking-wider">
-                        {userData?.coins?.total >= 500 
-                            ? '🎉 Eligible! You have enough coins to enter Sunday Mega Event.' 
-                            : `⚠️ Need ${500 - (userData?.coins?.total || 0)} more Coins to unlock Sunday Mega Event.`
+                    <p className="text-[8.5px] text-[#7A5648] font-semibold mt-2 leading-tight uppercase tracking-wider">
+                        {(userData?.wallet?.balance || 0) >= 500 
+                            ? '🎉 Eligible! You have enough balance to enter Sunday Mega Event.' 
+                            : `⚠️ Need ₹${500 - (userData?.wallet?.balance || 0)} more to unlock Sunday Mega Event.`
                         }
                     </p>
                 </div>
@@ -319,8 +306,8 @@ const Events = () => {
                     return (
                         <div className="space-y-2.5">
                             <div className="flex justify-between items-center px-1">
-                                <h2 className="text-[10px] text-amber-600 font-bold uppercase tracking-[0.2em] flex items-center gap-1">👑 Sunday Mega Event</h2>
-                                <span className="bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider border border-amber-200 animate-pulse">Sunday 8:00 PM</span>
+                                <h2 className="text-[10px] text-[#B3591C] font-bold uppercase tracking-[0.2em] flex items-center gap-1">👑 Sunday Mega Event</h2>
+                                <span className="bg-[#FFF5F0] text-[#B3591C] px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider border border-[#EDE4DC] animate-pulse">Sunday 8:00 PM</span>
                             </div>
                             <div className="flex flex-col gap-2.5">
                                 {megaEvents.map((event) => {
@@ -353,18 +340,18 @@ const Events = () => {
                                                         if (isJoined) navigateToEvent(event);
                                                         else handleJoinEvent(event);
                                                     }}
-                                                    disabled={(isComingSoon && !isJoined) || isJoining || (!isJoined && (userData?.coins?.total || 0) < 500)}
+                                                    disabled={(isComingSoon && !isJoined) || isJoining || (!isJoined && (userData?.wallet?.balance || 0) < 500)}
                                                     className={`ml-2 px-3 py-2 rounded-xl text-[9px] tracking-widest uppercase transition-all active:scale-95 shrink-0 cursor-pointer ${
                                                         isJoined
                                                             ? 'bg-emerald-500 text-white'
-                                                            : (!isJoined && (userData?.coins?.total || 0) < 500)
+                                                            : (!isJoined && (userData?.wallet?.balance || 0) < 500)
                                                             ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                                                             : isComingSoon
                                                             ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                                                             : theme.button
                                                     }`}
                                                 >
-                                                    {isJoined ? '✓ Joined' : (!isJoined && (userData?.coins?.total || 0) < 500) ? 'Locked' : isComingSoon ? 'Soon' : 'Join'}
+                                                    {isJoined ? '✓ Joined' : (!isJoined && (userData?.wallet?.balance || 0) < 500) ? 'Locked' : isComingSoon ? 'Soon' : 'Join'}
                                                 </button>
                                             </div>
 
@@ -373,8 +360,7 @@ const Events = () => {
                                                 <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
                                                     <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Entry</p>
                                                     <div className="flex items-center gap-0.5">
-                                                        <Coins size={9} className="text-amber-500 fill-amber-500" />
-                                                        <span className="text-[10px] text-slate-700">{feeDisplay}</span>
+                                                        <span className="text-[10px] text-slate-700">₹{feeDisplay}</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
@@ -407,8 +393,8 @@ const Events = () => {
                 {/* Normal Live Events Section */}
                 <div className="space-y-2.5">
                     <div className="flex justify-between items-center px-1">
-                        <h2 className="text-[10px] text-slate-400 uppercase tracking-[0.2em]">Active Live Events</h2>
-                        <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full text-[8px] uppercase tracking-wider border border-emerald-100 animate-pulse">Live</span>
+                        <h2 className="text-[10px] text-[#7A5648] uppercase tracking-[0.2em]">Active Live Events</h2>
+                        <span className="bg-[#FFF5F0] text-[#B3591C] px-2 py-0.5 rounded-full text-[8px] uppercase tracking-wider border border-[#EDE4DC] animate-pulse">Live</span>
                     </div>
                     
                     <div className="flex flex-col gap-2.5">
@@ -416,10 +402,10 @@ const Events = () => {
                             const normalEvents = eventList.filter(e => !e.isMega);
                             if (normalEvents.length === 0) {
                                 return (
-                                    <div className="bg-white border border-slate-100 rounded-2xl p-8 text-center shadow-sm">
-                                        <Trophy size={28} className="text-slate-200 mx-auto mb-2" />
-                                        <h3 className="text-[12px] text-slate-600 mb-1">No Live Events</h3>
-                                        <p className="text-[9px] text-slate-400 uppercase tracking-wider">Check back soon!</p>
+                                    <div className="bg-white border border-[#EDE4DC] rounded-2xl p-8 text-center shadow-[0_2px_12px_rgba(70,34,17,0.06)]">
+                                        <Trophy size={28} className="text-[#D4C4B8] mx-auto mb-2" />
+                                        <h3 className="text-[12px] text-[#462211] mb-1">No Live Events</h3>
+                                        <p className="text-[9px] text-[#7A5648] uppercase tracking-wider">Check back soon!</p>
                                     </div>
                                 );
                             }
@@ -470,10 +456,9 @@ const Events = () => {
                                         <div className={`mx-3 mb-3 grid grid-cols-4 gap-0 rounded-xl overflow-hidden border ${theme.statsBg}`}>
                                             <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
                                                 <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Entry</p>
-                                                <div className="flex items-center gap-0.5">
-                                                    <Coins size={9} className="text-amber-500 fill-amber-500" />
-                                                    <span className="text-[10px] text-slate-700">{feeDisplay}</span>
-                                                </div>
+                                                    <div className="flex items-center gap-0.5">
+                                                        <span className="text-[10px] text-slate-700">₹{feeDisplay}</span>
+                                                    </div>
                                             </div>
                                             <div className="flex flex-col items-center justify-center py-2 px-1 border-r border-slate-100/60">
                                                 <p className="text-[7px] text-slate-400 uppercase tracking-wide mb-0.5">Prize</p>
@@ -502,21 +487,21 @@ const Events = () => {
                 </div>
 
                 {/* Support Booster */}
-                <div className="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-lg">
+                <div className="bg-[#462211] border border-[#5a2d1a] rounded-2xl overflow-hidden shadow-lg">
                     <div className="p-3.5 flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
-                            <div className="w-9 h-9 bg-amber-400/20 rounded-xl flex items-center justify-center border border-amber-400/20 shrink-0">
-                                <Zap size={18} className="text-amber-400 fill-amber-400" />
+                            <div className="w-9 h-9 bg-[#B3591C]/30 rounded-xl flex items-center justify-center border border-[#B3591C]/30 shrink-0">
+                                <Zap size={18} className="text-[#F5C28A] fill-[#F5C28A]" />
                             </div>
                             <div className="text-left">
                                 <h4 className="text-[12px] text-white leading-none mb-0.5">{supportBooster.title}</h4>
-                                <p className="text-[8px] text-slate-400">{supportBooster.subtitle}</p>
+                                <p className="text-[8px] text-white/50">{supportBooster.subtitle}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setIsBoosterExpanded(!isBoosterExpanded)}
-                                className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${isBoosterExpanded ? 'bg-amber-400 text-slate-900 rotate-180' : 'bg-white/5 text-white/40 border border-white/10'}`}
+                                className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${isBoosterExpanded ? 'bg-[#B3591C] text-white rotate-180' : 'bg-white/10 text-white/40 border border-white/10'}`}
                             >
                                 <ChevronDown size={14} />
                             </button>
@@ -526,7 +511,7 @@ const Events = () => {
                                 className={`px-3 py-2 rounded-lg text-[9px] tracking-widest uppercase shadow-lg active:scale-95 transition-all cursor-pointer ${
                                     userData.isSupportBoosterActive
                                         ? 'bg-emerald-600/80 text-white cursor-not-allowed'
-                                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                        : 'bg-[#B3591C] hover:bg-[#D4783A] text-white'
                                 }`}
                             >
                                 {userData.isSupportBoosterActive ? '✓ Active' : 'Buy'}
@@ -535,27 +520,26 @@ const Events = () => {
                     </div>
 
                     {isBoosterExpanded && (
-                        <div className="bg-white/5 border-t border-white/5 p-3.5 space-y-2.5 animate-in slide-in-from-top-4 duration-300">
+                        <div className="bg-white/5 border-t border-white/10 p-3.5 space-y-2.5 animate-in slide-in-from-top-4 duration-300">
                             {supportBooster.benefits.map((item, i) => {
                                 const icons = [<Zap size={13} />, <Lightbulb size={13} />, <Rocket size={13} />, <Award size={13} />];
-                                const colors = ["text-amber-400", "text-yellow-400", "text-orange-400", "text-blue-400"];
+                                const colors = ["text-[#F5C28A]", "text-[#D4A574]", "text-[#B3591C]", "text-[#E8A87C]"];
                                 return (
                                     <div key={i} className="flex items-center gap-2.5 text-left">
-                                        <div className={`w-7 h-7 bg-white/5 rounded-lg flex items-center justify-center shrink-0 ${colors[i % colors.length]}`}>
+                                        <div className={`w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center shrink-0 ${colors[i % colors.length]}`}>
                                             {icons[i % icons.length]}
                                         </div>
                                         <div>
                                             <h4 className="text-[10px] text-white leading-tight">Benefit {i + 1}</h4>
-                                            <p className="text-[8px] text-slate-400 mt-0.5">{item}</p>
+                                            <p className="text-[8px] text-white/50 mt-0.5">{item}</p>
                                         </div>
                                     </div>
                                 );
                             })}
                         </div>
                     )}
-                    {/* Disclaimer */}
-                    <div className="bg-slate-950 p-2 text-center border-t border-slate-800">
-                        <p className="text-[8px] text-slate-500 font-medium uppercase tracking-widest leading-relaxed">
+                    <div className="bg-[#3a1a0d] p-2 text-center border-t border-[#5a2d1a]">
+                        <p className="text-[8px] text-white/40 font-medium uppercase tracking-widest leading-relaxed">
                             This pass is a utility service intended solely to improve task efficiency and user experience.
                         </p>
                     </div>

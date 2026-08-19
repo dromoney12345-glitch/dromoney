@@ -9,7 +9,8 @@ import {
     ArrowDownLeft, 
     RefreshCcw, 
     History as HistoryIcon,
-    MoreHorizontal
+    MoreHorizontal,
+    ChevronLeft
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,7 +24,14 @@ const History = () => {
             <div className="absolute top-[-5%] left-[-5%] w-[40%] h-[30%] bg-emerald-100/30 blur-[100px] rounded-full"></div>
             <div className="absolute top-[15%] right-[-5%] w-[40%] h-[30%] bg-sky-100/30 blur-[100px] rounded-full"></div>
 
-            <div className="relative z-10 p-4 flex flex-col gap-6 mt-4">
+            <div className="relative z-10 bg-white px-4 py-2.5 flex items-center gap-3 sticky top-0 z-40 border-b border-[#EDE4DC]">
+                <button onClick={() => navigate(-1)} className="text-[#462211] active:scale-95 transition-all">
+                    <ChevronLeft size={22} strokeWidth={2.2} />
+                </button>
+                <h1 className="text-[17px] font-semibold text-[#462211] tracking-tight">History</h1>
+            </div>
+
+            <div className="relative z-10 p-4 flex flex-col gap-6">
                 
                 {/* --- Debit Card Styled Wallet Section --- */}
                 <div className="relative group perspective-1000">
@@ -54,9 +62,9 @@ const History = () => {
 
                             {/* Middle: Balance */}
                             <div className="mt-2">
-                                <p className="text-white/50 text-[10px] uppercase tracking-widest mb-1">Available Coins</p>
+                                <p className="text-white/50 text-[10px] uppercase tracking-widest mb-1">Wallet Balance</p>
                                 <h3 className="text-white text-3xl font-medium tracking-tight">
-                                    {userData?.coins?.total?.toLocaleString() || '0'} <span className="text-sm font-normal opacity-50 ml-1">C</span>
+                                    ₹{Number(userData?.wallet?.balance || 0).toFixed(2)}
                                 </h3>
                             </div>
 
@@ -102,7 +110,7 @@ const History = () => {
                     </div>
 
                     <div className="flex flex-col">
-                        {(!userData?.coins?.history || userData?.coins?.history.length === 0) ? (
+                        {(!userData?.wallet?.transactions || userData?.wallet?.transactions.length === 0) ? (
                             <div className="bg-white/60 backdrop-blur-sm border border-slate-100 p-8 text-center shadow-sm">
                                 <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-100">
                                     <HistoryIcon className="text-slate-300" size={24} />
@@ -111,9 +119,9 @@ const History = () => {
                                 <p className="text-[11px] text-slate-400 mt-1">Transactions will appear here.</p>
                             </div>
                         ) : (
-                            userData.coins.history.map((item, index) => (
+                            userData.wallet.transactions.map((item, index) => (
                                 <div 
-                                    key={item.id || index} 
+                                    key={item._id || index} 
                                     className="bg-white p-3.5 flex items-center justify-between shadow-sm border-b border-slate-100 last:border-b-0 group hover:bg-slate-50 transition-colors"
                                 >
                                     <div className="flex items-center gap-3">
@@ -130,13 +138,15 @@ const History = () => {
                                         </div>
                                         <div>
                                             <h4 className="text-[13px] font-medium text-slate-800">{item.source || 'Transaction'}</h4>
-                                            <p className="text-[10px] font-normal text-slate-400 mt-0.5">{item.date}</p>
+                                            <p className="text-[10px] font-normal text-slate-400 mt-0.5">
+                                                {item.date ? new Date(item.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Just now'}
+                                            </p>
                                         </div>
                                     </div>
 
                                     <div className="text-right">
                                         <p className={`text-[14px] font-medium ${item.type === 'credit' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                                            {item.type === 'credit' ? '+' : '-'}{item.amount?.toLocaleString()} C
+                                            {item.type === 'credit' ? '+' : '-'}₹{Number(item.amount).toFixed(2)}
                                         </p>
                                         <MoreHorizontal size={12} className="text-slate-300 ml-auto mt-0.5" />
                                     </div>

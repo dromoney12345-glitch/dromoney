@@ -7,7 +7,7 @@ import {
     ChevronLeft, ChevronRight, ChevronDown,
     Monitor, Play, Lightbulb, Disc, MessageCircle,
     Camera, ThumbsUp, MessageSquare, Link2,
-    Coins, Bell, ClipboardList, TrendingUp, AlertCircle, Rocket, Zap, CheckCircle2, RefreshCw
+    Bell, ClipboardList, TrendingUp, AlertCircle, Rocket, Zap, CheckCircle2, RefreshCw
 } from 'lucide-react';
 import UnlockModal from '../components/UnlockModal';
 import PaymentModal from '../components/PaymentModal';
@@ -199,17 +199,9 @@ const Earn = () => {
                     </button>
                     <h1 className="text-[17px] font-semibold text-[#462211] tracking-tight">Tasks</h1>
                 </div>
-                <div className="flex items-center gap-2">
-                    <button onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-8 h-8 flex items-center justify-center bg-[#FFF5F0] text-[#9A8478] rounded-lg border border-[#EDE4DC] active:scale-95 transition-all">
-                        <RefreshCw size={14} className={isRefreshingCoins ? 'animate-spin' : ''} />
-                    </button>
-                    <div className="flex items-center gap-1.5 bg-[#FFF5F0] px-3 py-1.5 rounded-lg border border-[#EDE4DC]">
-                        <div className="w-5 h-5 bg-[#B3591C] rounded-full flex items-center justify-center">
-                            <Coins size={11} className="text-white" />
-                        </div>
-                        <span className="text-[13px] font-semibold text-[#462211]">{userData.coins?.total || 0}</span>
-                    </div>
-                </div>
+                <button onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-8 h-8 flex items-center justify-center bg-[#FFF5F0] text-[#9A8478] rounded-lg border border-[#EDE4DC] active:scale-95 transition-all">
+                    <RefreshCw size={14} className={isRefreshingCoins ? 'animate-spin' : ''} />
+                </button>
             </div>
 
             <div className="flex-1 overflow-y-auto pb-4">
@@ -296,45 +288,7 @@ const Earn = () => {
                                     </p>
                                 </div>
 
-                                <div className="flex flex-col items-end gap-1.5 min-w-[80px] shrink-0">
-                                    {(() => {
-                                        const getTaskOptionName = (type) => {
-                                            switch (type) {
-                                                case 'Quiz': return 'Task Quiz';
-                                                case 'Spin': return 'Lucky Draw';
-                                                case 'Memory': return 'Memory Master';
-                                                case 'Treasure': return 'Treasure Chest';
-                                                case 'Scratch': return 'Scratch Card';
-                                                case 'Tapper': return 'Speed Tapper';
-                                                case 'Watch':
-                                                case 'Video': return 'Watch & Earn';
-                                                default: return 'General Tasks';
-                                            }
-                                        };
-                                        const taskOptionName = getTaskOptionName(task.type);
-                                        const isWatchTask = task.type === 'Video' || task.type === 'Watch';
-                                        const watchEnabledByAdmin = Array.isArray(boostersConfig?.task) &&
-                                            boostersConfig.task.some((t) => String(t).toLowerCase().includes('watch'));
-                                        const apply3x = isTaskBoosterActive &&
-                                            (!isWatchTask || watchEnabledByAdmin) &&
-                                            (!boostersConfig?.task?.length || boostersConfig.task.includes(taskOptionName));
-                                        const baseCoins = task.coinsReward || task.reward || 0;
-                                        const displayCoins = apply3x ? baseCoins * taskMultiplier : baseCoins;
-
-                                        return (
-                                            <div className="flex flex-col items-end">
-                                                <span className="text-[10px] font-bold text-[#462211] whitespace-nowrap">
-                                                    {displayCoins} Coins
-                                                </span>
-                                                {apply3x && (
-                                                    <span className="text-[8px] font-bold text-[#B3591C] whitespace-nowrap bg-[#FFF5F0] px-1 py-0.5 rounded border border-[#EDE4DC] mt-0.5">
-                                                        {taskMultiplier}x Boost
-                                                    </span>
-                                                )}
-                                            </div>
-                                        );
-                                    })()}
-                                    
+                                <div className="flex flex-col items-end gap-1.5 shrink-0">
                                     {!isCompleted ? (
                                         <button className="px-3 py-1.5 bg-[#462211] hover:bg-[#5D2E17] text-white text-[10px] font-semibold uppercase tracking-wider rounded-lg shadow-sm transition-all active:scale-95 leading-none min-w-[72px] text-center">
                                             {task.type === 'Spin' ? 'Spin Now' : (task.type === 'Proof' || task.type === 'Download' || task.type === 'Sponsored') ? 'Upload' : 'Complete'}
@@ -361,7 +315,7 @@ const Earn = () => {
                 <div className="mx-3 mt-3 bg-[#462211] py-3.5 px-4 rounded-xl flex items-center justify-center gap-2">
                     <ClipboardList size={16} className="text-white/80" />
                     <span className="text-[12px] font-semibold text-white tracking-wide uppercase">
-                        Complete tasks and earn coins!
+                        Complete tasks and earn rewards!
                     </span>
                 </div>
 
@@ -399,7 +353,7 @@ const Earn = () => {
                                     desc: 'Exclusive booster perk'
                                 }))
                                 : [
-                                    { icon: <Coins size={14} className="text-[#B3591C]" />, bg: 'bg-[#FFF5F0]', title: `${taskMultiplier}X Coins on Tasks`, desc: `1 task = ${taskMultiplier} coins` },
+                                    { icon: <Rocket size={14} className="text-[#B3591C]" />, bg: 'bg-[#FFF5F0]', title: `${taskMultiplier}X Rewards on Tasks`, desc: `Boosted task rewards` },
                                     { icon: <Zap size={14} className="text-[#462211]" />, bg: 'bg-[#F8EDE4]', title: 'Fast Rewards Processing', desc: 'Priority handling' },
                                     { icon: <CheckCircle2 size={14} className="text-[#5D2E17]" />, bg: 'bg-[#F3E8E0]', title: 'Priority Task Verification', desc: 'Get verified first' },
                                 ]

@@ -5,13 +5,12 @@ const User = require('../models/User');
 // It resets the Coins and Boosters for all users automatically
 const startWeeklySeasonCron = () => {
     cron.schedule('59 23 * * 0', async () => {
-        console.log('Running Weekly Season Reset Cron Job...');
+        console.log('Running Weekly Booster Reset Cron Job...');
         try {
             const result = await User.updateMany(
-                {}, // Target all users
+                {},
                 {
                     $set: { 
-                        'coins.balance': 0, 
                         isBoosterActive: false,
                         isSupportBoosterActive: false,
                         isTaskBoosterActive: false,
@@ -22,9 +21,9 @@ const startWeeklySeasonCron = () => {
                 }
             );
 
-            console.log(`Successfully reset coins and boosters for ${result.modifiedCount} users for the new week.`);
+            console.log(`Successfully reset boosters for ${result.modifiedCount} users for the new week.`);
         } catch (error) {
-            console.error('Error in Weekly Season Reset Cron Job:', error);
+            console.error('Error in Weekly Booster Reset Cron Job:', error);
         }
     });
 
@@ -39,7 +38,7 @@ const startWeeklySeasonCron = () => {
             if (dayOfWeek === 4) { // Thursday (3 days before Sunday)
                 await sendBroadcastNotification({
                     title: '👑 Sunday Mega Event coming soon!',
-                    body: 'Mega Event में 3 दिन बचे हैं! बूस्टर लें और 12x कॉइन कमाएं।',
+                    body: 'Mega Event is 3 days away! Get a booster and earn 12x rewards.',
                     data: {
                         type: 'mega_event_reminder',
                         link: '/user/events'
@@ -49,7 +48,7 @@ const startWeeklySeasonCron = () => {
             } else if (dayOfWeek === 6) { // Saturday (1 day before Sunday)
                 await sendBroadcastNotification({
                     title: '⏳ Mega Event Tomorrow!',
-                    body: 'सिर्फ 24 घंटे! 500 कॉइन का टारगेट पूरा करें।',
+                    body: 'Only 24 hours left! Complete the target to win big.',
                     data: {
                         type: 'mega_event_reminder',
                         link: '/user/events'

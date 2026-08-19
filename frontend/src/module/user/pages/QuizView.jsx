@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, CheckCircle2, XCircle, Timer, Trophy, Coins, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
+import { ChevronLeft, CheckCircle2, XCircle, Timer, Trophy, IndianRupee, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
@@ -129,7 +129,7 @@ const QuizView = () => {
                 const submitRes = await api.post(`/user/data/events/${id}/submit`, {
                     score: s,
                     result: `${s}/${totalQ}`,
-                    prize: `${coinPrize} Coins`,
+                    prize: `₹${coinPrize}`,
                     timeTaken: calculatedTimeTaken
                 });
                 if (submitRes?.supportBoosterConsumed) {
@@ -167,7 +167,7 @@ const QuizView = () => {
                     <div className="space-y-4">
                         <h2 className="text-3xl font-medium text-slate-800 leading-tight">Ready for the challenge?</h2>
                         <p className="text-slate-500 font-medium max-w-xs mx-auto text-sm leading-relaxed uppercase tracking-tighter">
-                            Answer {totalQ || 5} simple questions and win up to {totalQ * 10 || 50} coins in your wallet instantly!
+                            Answer {totalQ || 5} simple questions and win up to ₹{totalQ * 10 || 50} in your wallet instantly!
                         </p>
                     </div>
 
@@ -305,11 +305,11 @@ const QuizView = () => {
                     
                     <div className="flex items-center justify-center gap-3 bg-amber-50 border border-amber-100/50 p-3.5 rounded-2xl">
                         <div className="bg-amber-400 p-2 rounded-xl">
-                            <Coins size={18} className="text-white fill-white" />
+                            <IndianRupee size={18} className="text-white" />
                         </div>
                         <div className="text-left">
                             <p className="text-[9px] font-medium text-amber-600 uppercase leading-none mb-1">Total Prize</p>
-                            <p className="text-lg font-medium text-slate-800 tracking-tight leading-none">+{score * 10} Coins</p>
+                            <p className="text-lg font-medium text-slate-800 tracking-tight leading-none">+₹{score * 10}</p>
                         </div>
                     </div>
                 </div>

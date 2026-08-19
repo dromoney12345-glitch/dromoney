@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { 
     ChevronLeft, Wallet as WalletIcon, IndianRupee, ArrowUpRight, 
-    ArrowDownLeft, History, Filter, AlertCircle, Coins, 
+    ArrowDownLeft, History, Filter, AlertCircle, 
     ChevronRight, CheckCircle2, Info, X, Building, Clock, Loader2, ShieldCheck, Users, FileText
 } from 'lucide-react';
 import UnlockModal from '../components/UnlockModal';
@@ -13,13 +13,13 @@ const Wallet = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { userData, requestWithdrawal, addNotification, refreshUserProfile } = useUser();
-    const { wallet, coins, name, isPaid, withdrawalCard } = userData;
+    const { wallet, name, isPaid, withdrawalCard } = userData;
     const pendingAmt = Number(wallet?.pendingBalance || 0);
     const virtualAmt = Number(wallet?.virtualBalance || 0);
     const virtualUnlocked = !!isPaid && withdrawalCard?.status === 'active';
     const [pane, setPane] = useState(location.state?.pane === 'pending' ? 'pending' : 'virtual');
     const [pendingFilter, setPendingFilter] = useState('All');
-    const [activeTab, setActiveTab] = useState('cash'); // 'cash' or 'coins'
+    const [activeTab, setActiveTab] = useState('cash');
     const [amount, setAmount] = useState('');
     const [isUnlockOpen, setIsUnlockOpen] = useState(false);
     const [filter, setFilter] = useState('All'); // 'All', 'Earning', 'Payout'
@@ -286,17 +286,11 @@ const Wallet = () => {
         }
     };
 
-    const filteredTransactions = activeTab === 'cash' 
-        ? (wallet.transactions || []).filter(tx => {
-            if (filter === 'Earning') return tx.type === 'credit';
-            if (filter === 'Payout') return tx.type === 'withdrawal' || tx.type === 'debit';
-            return true;
-        })
-        : (coins.history || []).filter(tx => {
-            if (filter === 'Earning') return tx.type === 'credit';
-            if (filter === 'Payout') return tx.type === 'debit';
-            return true;
-        });
+    const filteredTransactions = (wallet.transactions || []).filter(tx => {
+        if (filter === 'Earning') return tx.type === 'credit';
+        if (filter === 'Payout') return tx.type === 'withdrawal' || tx.type === 'debit';
+        return true;
+    });
 
     const pendingFilteredTransactions = (wallet.transactions || []).filter((tx) => {
         const t = `${tx.source || ''} ${tx.title || ''}`.toLowerCase();
@@ -537,23 +531,7 @@ const Wallet = () => {
                 </div>
             )}
 
-            {/* --- Compact Switcher --- */}
-            <div className="flex bg-slate-200/50 p-1 rounded-lg border border-slate-200/50">
-                <button 
-                    onClick={() => { setActiveTab('cash'); setFilter('All'); }}
-                    className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 transition-all ${activeTab === 'cash' ? 'bg-white text-[#462211] shadow-sm' : 'text-slate-500 font-medium'}`}
-                >
-                    <IndianRupee size={14} />
-                    <span className="text-[9px] uppercase font-medium tracking-wider">Cash</span>
-                </button>
-                <button 
-                    onClick={() => { setActiveTab('coins'); setFilter('All'); }}
-                    className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 transition-all ${activeTab === 'coins' ? 'bg-white text-amber-500 shadow-sm' : 'text-slate-500 font-medium'}`}
-                >
-                    <Coins size={14} />
-                    <span className="text-[9px] uppercase font-medium tracking-wider">Coins</span>
-                </button>
-            </div>
+            
 
             {/* --- My Cards Heading --- */}
             <div className="flex items-center justify-between px-1 mt-0.5">
@@ -584,9 +562,7 @@ const Wallet = () => {
                         <div>
                             <p className="text-[8px] text-white/55">Wallet Balance</p>
                             <p className="text-[20px] font-medium text-white tracking-tight">
-                                {activeTab === 'cash'
-                                    ? `₹ ${Number(wallet.balance).toFixed(2)}`
-                                    : coins.total.toLocaleString()}
+                                {`₹ ${Number(wallet.balance).toFixed(2)}`}
                             </p>
                             <p className="text-[10px] font-medium text-white/90 uppercase tracking-wider mt-0.5">{name || 'USER'}</p>
                         </div>
@@ -620,8 +596,7 @@ const Wallet = () => {
             </div>
 
             {/* --- Withdrawal Section --- */}
-            {activeTab === 'cash' && (
-                <div id="withdraw-section" className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm flex flex-col gap-3">
+            <div id="withdraw-section" className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm flex flex-col gap-3">
                     {/* Header with Fee Information */}
                     <div className="flex items-center justify-between border-b border-slate-50 pb-2.5">
                         <h3 className="text-[13px] font-medium text-slate-800 flex items-center gap-1.5">
@@ -745,7 +720,6 @@ const Wallet = () => {
                         </button>
                     </div>
                 </div>
-            )}
 
             {/* --- Wallet Actions --- */}
             <div className="px-1 mt-1">
@@ -798,7 +772,7 @@ const Wallet = () => {
                         <History size={14} className="text-[#462211]" /> History
                     </h3>
                     <div className="flex bg-slate-200/50 p-0.5 rounded-md border border-slate-200/50">
-                        {['All', activeTab === 'cash' ? 'In' : 'Tasks', activeTab === 'cash' ? 'Out' : 'Spent'].map((tab, idx) => (
+                        {['All', 'In', 'Out'].map((tab, idx) => (
                             <button
                                 key={tab}
                                 onClick={() => setFilter(['All', 'Earning', 'Payout'][idx])}
@@ -834,13 +808,11 @@ const Wallet = () => {
                                 </div>
                                 <div className="text-right">
                                     <p className={`text-[13px] font-medium tracking-tighter ${tx.type === 'credit' ? 'text-emerald-500' : 'text-slate-900'}`}>
-                                        {tx.type === 'credit' ? '+' : '-'}{activeTab === 'cash' ? '₹' : ''}{Number(tx.amount).toFixed(2)}
+                                        {tx.type === 'credit' ? '+' : '-'}₹{Number(tx.amount).toFixed(2)}
                                     </p>
-                                    {activeTab === 'cash' && (
-                                        <span className={`text-[7px] font-medium px-1 py-0.5 rounded tracking-widest uppercase inline-block mt-1 ${tx.status === 'Success' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                                            {tx.status}
-                                        </span>
-                                    )}
+                                    <span className={`text-[7px] font-medium px-1 py-0.5 rounded tracking-widest uppercase inline-block mt-1 ${tx.status === 'Success' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                                        {tx.status}
+                                    </span>
                                 </div>
                             </div>
                         ))

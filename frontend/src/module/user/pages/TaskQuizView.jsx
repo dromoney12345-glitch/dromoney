@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, CheckCircle2, XCircle, Timer, Trophy, Coins, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
+import { ChevronLeft, CheckCircle2, XCircle, Timer, Trophy, IndianRupee, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import { eventStorage } from '../../shared/services/eventStorage';
 import { taskStorage } from '../../shared/services/taskStorage';
@@ -82,7 +82,7 @@ const TaskQuizView = () => {
                 if (res && res.success) {
                     taskStorage.markComplete(id);
                 } else {
-                    alert(res?.message || 'Failed to add coins. Please try again later.');
+                    alert(res?.message || 'Failed to add reward. Please try again later.');
                 }
             } else {
                 taskStorage.markComplete(id);
@@ -107,7 +107,7 @@ const TaskQuizView = () => {
                     
                     <h2 className="text-3xl font-medium text-slate-800 leading-tight mb-3">Ready for challenge?</h2>
                     <p className="text-slate-500 font-medium max-w-xs mx-auto text-xs leading-relaxed uppercase tracking-tighter mb-8">
-                        Answer 10 simple questions correctly to win your coin reward instantly! 
+                        Answer 10 simple questions correctly to win your reward instantly! 
                     </p>
 
                     <div className="grid grid-cols-2 gap-4 w-full max-w-xs mx-auto">
@@ -235,7 +235,7 @@ const TaskQuizView = () => {
                         <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 w-full max-w-xs space-y-4">
                             <div className="flex items-center justify-center gap-3">
                                 <div className="bg-amber-100 p-2 rounded-xl">
-                                    <Coins size={20} className="text-amber-600 fill-amber-600" />
+                                    <IndianRupee size={20} className="text-amber-600" />
                                 </div>
                                 <div className="text-left">
                                     <div className="flex items-center gap-2 mb-1">
@@ -248,7 +248,7 @@ const TaskQuizView = () => {
                                 </div>
                                 <div className="text-right">
                                     <div className="font-medium text-amber-500 text-sm">
-                                        +{isTaskBoosterActive ? reward * 12 : reward} Coin
+                                        +₹{isTaskBoosterActive ? reward * 12 : reward}
                                     </div>
                                 </div>
                             </div>

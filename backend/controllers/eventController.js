@@ -102,18 +102,16 @@ exports.joinEvent = asyncHandler(async (req, res, next) => {
         });
     }
 
-    // Check Mega Event eligibility
-    if (event.isMega && user.coins.balance < 500) {
-        return next(new ErrorResponse('You need at least 500 coins to unlock the Mega Event', 400));
+    // Check wallet balance for entry fee
+    const entryFee = event.fee || 0;
+    if (entryFee > 0) {
+        const userBalance = user.wallet?.balance || 0;
+        if (userBalance < entryFee) {
+            return next(new ErrorResponse('Insufficient wallet balance to join', 400));
+        }
+        user.wallet.balance -= entryFee;
+        user.wallet.virtualBalance = Math.max(0, (user.wallet.virtualBalance || 0) - entryFee);
     }
-
-    // Check coins for entry fee
-    if (user.coins.balance < event.fee) {
-        return next(new ErrorResponse('Not enough coins to join', 400));
-    }
-
-    // Deduct coins
-    user.coins.balance -= event.fee;
     await user.save();
 
     // Create participant record
@@ -312,61 +310,35 @@ exports.updateParticipantStatus = asyncHandler(async (req, res, next) => {
         const event = participant.event;
         const prizeStr = (prizeNote || participant.prize || event?.prize || '').toString();
 
-        let coinsToAdd = 0;
         let cashToAdd = 0;
 
-        if (/coin/i.test(prizeStr)) {
-            const coinMatch = prizeStr.replace(/,/g, '').match(/(\d+(\.\d+)?)/);
-            coinsToAdd = coinMatch ? parseFloat(coinMatch[1]) : 0;
-        } else {
-            // Prefer explicit note amount; else 1st-place share of configured event pool
-            cashToAdd = parseMoneyAmount(prizeNote);
-            if (cashToAdd <= 0) cashToAdd = parseMoneyAmount(prizeStr);
+        cashToAdd = parseMoneyAmount(prizeNote);
+        if (cashToAdd <= 0) cashToAdd = parseMoneyAmount(prizeStr);
 
-            if (cashToAdd <= 0 && event) {
-                const Settings = require('../models/Settings');
-                const settings = await Settings.findOne();
-                const coinRate = settings?.coinRate || 0.1;
-                const count = await EventParticipant.countDocuments({ event: event._id });
-                const totalPool = resolveEventCashPool(event, count, coinRate);
-                const dist = computeEventDistribution(totalPool, 1, Math.max(0, count - 1));
-                cashToAdd = dist.winnerAmounts[0] || 0;
-            }
+        if (cashToAdd <= 0 && event) {
+            const Settings = require('../models/Settings');
+            const settings = await Settings.findOne();
+            const count = await EventParticipant.countDocuments({ event: event._id });
+            const totalPool = resolveEventCashPool(event, count, 1);
+            const dist = computeEventDistribution(totalPool, 1, Math.max(0, count - 1));
+            cashToAdd = dist.winnerAmounts[0] || 0;
         }
 
-        if (coinsToAdd > 0 || cashToAdd > 0) {
+        if (cashToAdd > 0) {
             const factor = await getSupportPrizeFactor(user, event);
             const Transaction = require('../models/Transaction');
-            const awardLabel = prizeNote || prizeStr || `₹${cashToAdd}`;
 
-            if (coinsToAdd > 0) {
-                coinsToAdd = coinsToAdd * factor;
-                if (!user.coins) user.coins = { balance: 0, lifetimeCoins: 0 };
-                user.coins.balance = (user.coins.balance || 0) + coinsToAdd;
-                user.coins.lifetimeCoins = (user.coins.lifetimeCoins || 0) + coinsToAdd;
-                await Transaction.create({
-                    user: user._id,
-                    type: 'credit',
-                    currency: 'COIN',
-                    amount: coinsToAdd,
-                    source: factor > 1
-                        ? `Event Reward (Booster ${factor}x): ${event.title}`
-                        : `Event Reward: ${event.title}`,
-                });
-            }
-            if (cashToAdd > 0) {
-                cashToAdd = Math.round(cashToAdd * factor * 100) / 100;
-                creditWalletInr(user, cashToAdd);
-                await Transaction.create({
-                    user: user._id,
-                    type: 'credit',
-                    currency: 'INR',
-                    amount: cashToAdd,
-                    source: factor > 1
-                        ? `Event Reward (Booster ${factor}x): ${event.title}`
-                        : `Event Reward: ${event.title}`,
-                });
-            }
+            cashToAdd = Math.round(cashToAdd * factor * 100) / 100;
+            creditWalletInr(user, cashToAdd);
+            await Transaction.create({
+                user: user._id,
+                type: 'credit',
+                currency: 'INR',
+                amount: cashToAdd,
+                source: factor > 1
+                    ? `Event Reward (Booster ${factor}x): ${event.title}`
+                    : `Event Reward: ${event.title}`,
+            });
             await user.save();
 
             try {
@@ -413,10 +385,6 @@ exports.approveWinners = asyncHandler(async (req, res, next) => {
         return res.status(200).json({ success: true, message: 'No participants to reward.' });
     }
 
-    const Settings = require('../models/Settings');
-    const settings = await Settings.findOne();
-    const coinRate = settings?.coinRate || 0.1;
-
     // Sort: higher score, then faster time
     participants.sort((a, b) => {
         if (b.score !== a.score) return (b.score || 0) - (a.score || 0);
@@ -426,7 +394,7 @@ exports.approveWinners = asyncHandler(async (req, res, next) => {
     const top3 = participants.slice(0, 3);
     const rest = participants.slice(3);
 
-    const totalPool = resolveEventCashPool(event, participants.length, coinRate);
+    const totalPool = resolveEventCashPool(event, participants.length, 1);
     const {
         prizePool,
         adminProfit,

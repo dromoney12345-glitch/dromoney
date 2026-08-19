@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-    ChevronLeft, Trophy, Sparkles, Coins, ArrowRight, Brain, Clock, 
+    ChevronLeft, Trophy, Sparkles, IndianRupee, ArrowRight, Brain, Clock, 
     RefreshCcw, Star, Zap, Heart, Ghost, Gem, Smile, Rocket, HelpCircle
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
@@ -173,7 +173,7 @@ const MemoryMasterView = () => {
                     api.post(`/user/data/events/${id}/submit`, {
                         score: timeLeft,
                         result: `${timeLeft}s remaining`,
-                        prize: `${reward} Coins`,
+                        prize: `₹${reward}`,
                         timeTaken: maxTime - timeLeft
                     }).then(async (res) => {
                         if (res?.supportBoosterConsumed && refreshUserProfile) {
@@ -208,12 +208,6 @@ const MemoryMasterView = () => {
                     <h1 className="text-xl font-medium tracking-tight uppercase">🧩 Memory Master</h1>
                 </header>
 
-                <div className="absolute top-6 right-6">
-                    <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full border border-white/15 backdrop-blur-md">
-                        <Coins size={14} className="text-yellow-300 fill-yellow-300" />
-                        <span className="text-sm font-medium text-white">{userData?.coins?.total || 0}</span>
-                    </div>
-                </div>
 
                 <div className="flex-1 flex flex-col items-center justify-center space-y-8 text-center pt-10">
                     <div className="relative">
@@ -226,9 +220,9 @@ const MemoryMasterView = () => {
                     </div>
 
                     <div className="space-y-3">
-                        <h2 className="text-4xl font-medium leading-tight bg-gradient-to-r from-white to-indigo-300 bg-clip-text text-transparent">Train Your Brain,<br />Win Coins!</h2>
+                        <h2 className="text-4xl font-medium leading-tight bg-gradient-to-r from-white to-indigo-300 bg-clip-text text-transparent">Train Your Brain,<br />Win Rewards!</h2>
                         <p className="text-white/60 font-medium text-sm max-w-xs mx-auto leading-relaxed">
-                            Match all {cardIcons.length} pairs of cards as fast as you can. Every second saved gives you more coins! 🧠✨
+                            Match all {cardIcons.length} pairs of cards as fast as you can. Every second saved gives you more rewards! 🧠✨
                         </p>
                     </div>
 
@@ -280,7 +274,7 @@ const MemoryMasterView = () => {
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <span className="text-indigo-400 mt-0.5">3.</span>
-                                    <span>Faster completion = More coins rewarded!</span>
+                                    <span>Faster completion = Higher rewards!</span>
                                 </li>
                             </ul>
                             <button
@@ -308,12 +302,6 @@ const MemoryMasterView = () => {
                     </div>
                 </div>
 
-                <div className="absolute top-6 right-6 z-20">
-                    <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full border border-white/15 backdrop-blur-md">
-                        <Coins size={14} className="text-yellow-300 fill-yellow-300" />
-                        <span className="text-sm font-medium text-white">{userData?.coins?.total || 0}</span>
-                    </div>
-                </div>
 
                 <div className="flex items-center gap-3">
                     <div className="bg-white/5 rounded-2xl p-3 border border-white/10 text-center min-w-[70px] relative">
@@ -406,7 +394,7 @@ const MemoryMasterView = () => {
                         <div className="bg-white/5 p-5 rounded-[2rem] border border-white/10">
                             <p className="text-[9px] font-medium text-white/40 uppercase mb-1">Prize</p>
                             <div className="flex items-center justify-center gap-1.5">
-                                <Coins size={14} className="text-amber-400" />
+                                <IndianRupee size={14} className="text-amber-400" />
                                 <p className="text-2xl font-medium text-white">
                                     +{(!isEvent && isTaskBoosterActive) ? taskReward * 12 : taskReward}
                                 </p>

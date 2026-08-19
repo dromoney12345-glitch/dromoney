@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Pencil, User, ShieldCheck, Users, Headset, MessageSquare,
-    ChevronRight, LogOut, Mail, Phone, Flag, Loader2, X, Send
+    ChevronRight, ChevronLeft, LogOut, Mail, Phone, Flag, Loader2, X, Send
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import api from '../../shared/services/api';
@@ -93,16 +93,23 @@ const Profile = () => {
     ];
 
     return (
-        <div className="flex flex-col min-h-full bg-[#FCF8F5] font-poppins px-3 pt-2 pb-6">
+        <div className="flex flex-col min-h-full bg-[#FCF8F5] font-poppins pb-6">
+            <div className="bg-white px-4 py-2.5 flex items-center gap-3 sticky top-0 z-40 border-b border-[#EDE4DC]">
+                <button onClick={() => navigate(-1)} className="text-[#462211] active:scale-95 transition-all">
+                    <ChevronLeft size={22} strokeWidth={2.2} />
+                </button>
+                <h1 className="text-[17px] font-semibold text-[#462211] tracking-tight">Profile</h1>
+            </div>
+            <div className="px-3 pt-2"></div>
             <KycModal isOpen={isKycOpen} onClose={() => setIsKycOpen(false)} />
             <ReferralsModal isOpen={isReferralsOpen} onClose={() => setIsReferralsOpen(false)} referralCount={inviteCount} />
             <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
             <EditProfileModal isOpen={isEditProfileOpen} onClose={() => setIsEditProfileOpen(false)} userData={userData} updateProfileData={updateProfileData} addNotification={addNotification} />
 
             {isReportOpen && (
-                <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/40" onClick={() => setIsReportOpen(false)} />
-                    <div className="relative w-full max-w-md mx-3 mb-4 bg-white rounded-2xl p-4 shadow-2xl">
+                    <div className="relative w-full max-w-sm bg-white rounded-2xl p-4 shadow-2xl">
                         <div className="flex items-center justify-between mb-3">
                             <h3 className="text-[13px] font-medium text-slate-800 tracking-tight uppercase">Report a problem</h3>
                             <button type="button" onClick={() => setIsReportOpen(false)} className="text-slate-400">

@@ -474,7 +474,7 @@ const BusinessIdeas = () => {
                     </div>
                 </div>
 
-                <div className="fixed bottom-24 left-4 right-4 z-50 max-w-md mx-auto space-y-2">
+                <div className="sticky bottom-0 left-0 right-0 z-50 bg-[#FCF8F5] px-3 pt-2 pb-4 space-y-2 border-t border-[#EDE4DC]">
                     {canAccessHub ? (
                         <button
                             type="button"
@@ -896,7 +896,7 @@ const BusinessIdeas = () => {
                     </div>
                 </div>
 
-                <div className="fixed bottom-24 left-4 right-4 z-50 max-w-md mx-auto">
+                <div className="sticky bottom-0 left-0 right-0 z-50 bg-[#FCF8F5] px-3 pt-2 pb-4 border-t border-[#EDE4DC]">
                     <button
                         type="button"
                         onClick={() => navigate(`/user/business-ideas/${ideaId}`)}

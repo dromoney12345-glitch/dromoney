@@ -115,7 +115,7 @@ const UserLayout = () => {
                             boxShadow: '0 2px 8px rgba(70,34,17,0.08), inset 0 2px 4px rgba(255,255,255,0.7)',
                         }}
                     >
-                        <img src={LogoImg} alt="Dromoney" className="w-[28px] h-[28px] object-contain" draggable={false} />
+                        <img src={LogoImg} alt="Dromoney" className="w-[34px] h-[34px] object-contain" draggable={false} />
                     </div>
                     <div className="flex flex-col justify-center">
                         <span className="text-[16px] font-bold text-[#1A1A1A] leading-none tracking-tight">Dromoney</span>

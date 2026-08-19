@@ -55,9 +55,9 @@ exports.getStats = async (req, res, next) => {
         // 4. Verification Queue
         const pendingKycCount = await User.countDocuments({ 'kyc.status': 'Pending' });
 
-        // 5. Coins in Market
-        const totalCoins = await User.aggregate([
-            { $group: { _id: null, total: { $sum: '$coins.balance' } } }
+        // 5. Total Wallet Balance in circulation
+        const totalWalletBalance = await User.aggregate([
+            { $group: { _id: null, total: { $sum: '$wallet.balance' } } }
         ]);
 
         // 6. Active Earners (Users who earned something)
@@ -69,7 +69,7 @@ exports.getStats = async (req, res, next) => {
                 stats: [
                     { label: 'Active Users', value: activeUsersCount.toLocaleString(), trend: 'Live', color: 'from-sky-500 to-indigo-600' },
                     { label: 'Total Revenue', value: `₹${totalGrossRevenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: 'Live', color: 'from-emerald-500 to-teal-600' },
-                    { label: 'Coins in Market', value: (totalCoins[0]?.total || 0).toLocaleString(), trend: 'Active', color: 'from-amber-400 to-orange-600' },
+                    { label: 'Wallet Balance', value: `₹${(totalWalletBalance[0]?.total || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: 'Active', color: 'from-amber-400 to-orange-600' },
                     { label: 'Pending Payouts', value: `₹${(pendingWithdrawals[0]?.total || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: `${pendingWithdrawals[0]?.count || 0} requests`, color: 'from-rose-500 to-pink-600' }
                 ],
                 conversionFunnel: [

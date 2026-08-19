@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
-import { ChevronLeft, Zap, Trophy, Coins, Timer, MousePointer2 } from 'lucide-react';
+import { ChevronLeft, Zap, Trophy, IndianRupee, Timer, MousePointer2 } from 'lucide-react';
 
 const SpeedTapperView = () => {
     const { id } = useParams();
@@ -146,10 +146,10 @@ const SpeedTapperView = () => {
                 <div className="bg-amber-50 border border-amber-100 p-6 rounded-[2.5rem] w-full max-w-sm flex items-center gap-4 relative overflow-hidden">
                     {/* Decorative Coins */}
                     <div className="absolute -right-4 -bottom-4 opacity-5 rotate-12">
-                        <Coins size={80} className="text-amber-500" />
+                        <IndianRupee size={80} className="text-amber-500" />
                     </div>
                     <div className="w-12 h-12 bg-amber-400 rounded-2xl flex items-center justify-center shrink-0 border border-amber-500 shadow-lg shadow-amber-200/50">
-                        <Coins size={24} className="text-white" />
+                        <IndianRupee size={24} className="text-white" />
                     </div>
                     <div>
                         <div className="flex items-center gap-2">
@@ -161,7 +161,7 @@ const SpeedTapperView = () => {
                             )}
                         </div>
                         <p className="text-xl font-medium text-amber-600 mt-0.5">
-                            +{isTaskBoosterActive ? (task.coinsReward || task.reward || 0) * 12 : (task.coinsReward || task.reward || 0)} Coins
+                            +₹{isTaskBoosterActive ? (task.coinsReward || task.reward || 0) * 12 : (task.coinsReward || task.reward || 0)}
                         </p>
                     </div>
                 </div>

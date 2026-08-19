@@ -5,16 +5,14 @@ import api from '../../shared/services/api';
 const EventsReport = () => {
     const [eventsData, setEventsData] = useState([]);
     const [profitsData, setProfitsData] = useState([]);
-    const [coinRate, setCoinRate] = useState(0.10);
     const [loading, setLoading] = useState(true);
 
     const fetchReportData = async () => {
         setLoading(true);
         try {
-            const [eventsRes, profitsRes, settingsRes] = await Promise.all([
+            const [eventsRes, profitsRes] = await Promise.all([
                 api.get('/admin/events'),
-                api.get('/admin/profits'),
-                api.get('/admin/settings')
+                api.get('/admin/profits')
             ]);
             
             if (eventsRes.success) {
@@ -22,9 +20,6 @@ const EventsReport = () => {
             }
             if (profitsRes.success) {
                 setProfitsData(profitsRes.data);
-            }
-            if (settingsRes.success && settingsRes.data) {
-                setCoinRate(settingsRes.data.coinRate || 0.10);
             }
         } catch (err) {
             console.error('Failed to load events report', err);
@@ -144,8 +139,7 @@ const EventsReport = () => {
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {eventsData.length > 0 ? eventsData.map((e) => {
-                                const totalPoolCoins = (e.participantsCount || 0) * e.fee;
-                                const totalPoolCash = totalPoolCoins * coinRate;
+                                const totalPoolCash = (e.participantsCount || 0) * e.fee;
                                 return (
                                     <tr key={e._id} className="hover:bg-slate-50/50 transition-colors">
                                         <td className="px-6 py-3">
@@ -162,7 +156,7 @@ const EventsReport = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-3 text-center font-semibold text-slate-700 text-[13px] tabular-nums">
-                                            {e.fee} <span className="text-[10px] text-slate-400 font-medium ml-1">Coins</span>
+                                            ₹{e.fee}
                                         </td>
                                         <td className="px-6 py-3 text-center font-bold text-amber-500 text-[13px] tabular-nums">
                                             ₹{totalPoolCash.toFixed(2)}

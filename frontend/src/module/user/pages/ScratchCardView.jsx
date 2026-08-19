@@ -2,17 +2,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
-import { ChevronLeft, Sparkles, Coins, Trophy, Quote, CheckCircle2, Star } from 'lucide-react';
+import { ChevronLeft, Sparkles, IndianRupee, Trophy, Quote, CheckCircle2, Star } from 'lucide-react';
 
 const QUOTES = [
     "Consistency is the key to big earnings!",
-    "Success starts with a single coin.",
+    "Success starts with a single step.",
     "Your hard work today is your profit tomorrow.",
     "Small steps lead to massive results.",
     "Dream big, earn bigger!",
     "Financial freedom starts with small tasks.",
     "Stay focused and keep growing!",
-    "Every coin counts towards your goal."
+    "Every reward counts towards your goal."
 ];
 
 const ScratchCard = ({ rewardPerCard, quote, onComplete, isTaskBoosterActive }) => {
@@ -93,9 +93,9 @@ const ScratchCard = ({ rewardPerCard, quote, onComplete, isTaskBoosterActive }) 
         >
             <div className={`flex flex-col items-center justify-center transition-all duration-700 ${isScratched ? 'opacity-100 scale-100' : 'opacity-10 scale-95'}`}>
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-1 shadow-2xl ${isScratched ? 'bg-white/20' : 'bg-amber-50'}`}>
-                    <Coins size={18} className={isScratched ? 'text-white' : 'text-amber-500'} />
+                    <IndianRupee size={18} className={isScratched ? 'text-white' : 'text-amber-500'} />
                 </div>
-                <p className={`text-[15px] font-medium tracking-tight ${isScratched ? 'text-white' : 'text-slate-800'}`}>+{rewardPerCard} Coins</p>
+                <p className={`text-[15px] font-medium tracking-tight ${isScratched ? 'text-white' : 'text-slate-800'}`}>+₹{rewardPerCard}</p>
                 {isTaskBoosterActive && isScratched && (
                     <span className="text-[7px] font-bold text-sky-200 uppercase bg-black/20 px-1 py-0.5 rounded">3X Boost</span>
                 )}

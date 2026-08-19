@@ -702,7 +702,6 @@ const ParticipantsTab = ({ events, onShowToast }) => {
     const [sortBy, setSortBy] = useState('timeTaken');
     const [searchQuery, setSearchQuery] = useState('');
     const [participants, setParticipants] = useState([]);
-    const [coinRate, setCoinRate] = useState(0.10);
     const [awardNote, setAwardNote] = useState('');
     const [awardingId, setAwardingId] = useState(null);
     const [viewingParticipant, setViewingParticipant] = useState(null);
@@ -716,13 +715,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
     const fetchParticipants = async () => {
         if (!selectedEventId) return;
         try {
-            const [res, settingsRes] = await Promise.all([
-                api.get(`/admin/events/${selectedEventId}/participants`),
-                api.get('/admin/settings')
-            ]);
-            if (settingsRes.success && settingsRes.data) {
-                setCoinRate(settingsRes.data.coinRate || 0.10);
-            }
+            const res = await api.get(`/admin/events/${selectedEventId}/participants`);
             if (res.success && res.data) {
                 setParticipants(res.data.map(p => ({
                     ...p,
@@ -934,7 +927,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                             <button
                                 onClick={() => { 
                                     setAwardingId(fastestParticipant.id); 
-                                    setAwardNote(`₹${(dynamicPrize * coinRate).toFixed(2)} (Winner with speed of ${fastestParticipant.timeTaken}s)`); 
+                                    setAwardNote(`₹${dynamicPrize.toFixed(2)} (Winner with speed of ${fastestParticipant.timeTaken}s)`); 
                                 }}
                                 className="bg-white text-orange-600 hover:bg-orange-50 px-4.5 py-2.5 rounded-xl text-[9px] font-medium uppercase tracking-normal active:scale-95 transition-all shadow-md cursor-pointer"
                             >
@@ -1051,10 +1044,10 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                                         if (p.prize) {
                                                             if (p.prize.includes('₹')) return p.prize;
                                                             const num = parseFloat(p.prize.replace(/[^\d.]/g, ''));
-                                                            if (!isNaN(num)) return `₹${(num * coinRate).toFixed(2)}`;
+                                                            if (!isNaN(num)) return `₹${num.toFixed(2)}`;
                                                             return p.prize;
                                                         }
-                                                        return `₹${(dynamicPrize * coinRate).toFixed(2)}`;
+                                                        return `₹${dynamicPrize.toFixed(2)}`;
                                                     })() : 'No Prize'}
                                                 </p>
                                             </div>
@@ -1068,7 +1061,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                                         onClick={(e) => { 
                                                             e.stopPropagation(); 
                                                             setAwardingId(awardingId === p.id ? null : p.id); 
-                                                            setAwardNote(`₹${(dynamicPrize * coinRate).toFixed(2)} (Admin Awarded)`);
+                                                            setAwardNote(`₹${dynamicPrize.toFixed(2)} (Admin Awarded)`);
                                                         }}
                                                         className="flex items-center gap-1 px-2 py-1 bg-sky-50 text-sky-600 rounded-lg text-[8px] font-bold uppercase tracking-normal hover:bg-sky-100 active:scale-95 transition-all border border-sky-100"
                                                     >
@@ -1155,10 +1148,10 @@ const ParticipantsTab = ({ events, onShowToast }) => {
                                             if (viewingParticipant.prize) {
                                                 if (viewingParticipant.prize.includes('₹')) return viewingParticipant.prize;
                                                 const num = parseFloat(viewingParticipant.prize.replace(/[^\d.]/g, ''));
-                                                if (!isNaN(num)) return `₹${(num * coinRate).toFixed(2)}`;
+                                                if (!isNaN(num)) return `₹${num.toFixed(2)}`;
                                                 return viewingParticipant.prize;
                                             }
-                                            return `₹${(dynamicPrize * coinRate).toFixed(2)}`;
+                                            return `₹${dynamicPrize.toFixed(2)}`;
                                         })() : 'No Prize'}
                                     </p>
                                 </div>

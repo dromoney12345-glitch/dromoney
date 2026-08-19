@@ -182,12 +182,11 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
         }
     }
 
-    const totalAwardedCoins = baseReward * factor;
+    // Direct INR — coinsReward field is now treated as INR amount
+    const inrEarned = Math.round(baseReward * factor * 100) / 100;
 
     const Settings = require('../models/Settings');
     const settings = await Settings.findOne() || {};
-    const coinRate = Number(settings.coinRate) || 0.1;
-    const inrEarned = Math.round(totalAwardedCoins * coinRate * 100) / 100;
     const poolPercent = Number(settings.futureFundPoolPercent) || 30;
     const adRevenue = Number(settings.adRevenuePerView) || 0.5;
 
@@ -212,37 +211,18 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
         });
     }
 
-    // Update User
-    user.coins.balance += totalAwardedCoins;
-    user.coins.lifetimeCoins += totalAwardedCoins;
-
     user.lifetimeAdsWatched = (user.lifetimeAdsWatched || 0) + 1;
     user.watchedAds.push(adId);
     user.dailyAdCount += 1;
 
-    // Keep Watch & Earn daily counter in sync (Flutter reward path uses these fields)
     user.todayRewardCount = (user.todayRewardCount || 0) + 1;
     user.lastRewardAt = new Date();
 
-    // Define random gap/cooldown between 30 and 60 seconds
     const cooldownSeconds = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
     user.nextAdAvailableAt = new Date(Date.now() + cooldownSeconds * 1000);
 
     await user.save();
 
-    // 7. Record Transactions
-    await Transaction.create({
-        user: user._id,
-        type: 'credit',
-        currency: 'COIN',
-        amount: totalAwardedCoins,
-        source: `Watched Ad: ${ad.title}`,
-        status: 'Success'
-    });
-
-    // removed INR transaction
-
-    // 8. Update Ad view count
     ad.viewCount += 1;
     await ad.save();
 
@@ -250,10 +230,8 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
         success: true,
         message: 'Reward claimed successfully!',
         data: {
-            coinsAwarded: totalAwardedCoins,
             inrEarned,
             walletDestination: walletCredit?.destination || null,
-            newCoinBalance: user.coins.balance,
             newWalletBalance: user.wallet.balance,
             newPendingBalance: user.wallet.pendingBalance,
             newVirtualBalance: user.wallet.virtualBalance,

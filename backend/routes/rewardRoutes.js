@@ -129,16 +129,17 @@ router.post('/claim', async (req, res) => {
             }
         }
         
-        const rewardAmount = BASE_REWARD * factor;
+        // amount is directly in INR
+        const rewardAmount = Math.round(BASE_REWARD * factor * 100) / 100;
 
-        // Apply reward
-        if (!user.coins) user.coins = { balance: 0, lifetimeCoins: 0 };
         if (!user.wallet) user.wallet = { balance: 0, lifetimeEarnings: 0, todayEarnings: 0 };
 
-        user.coins.balance = (user.coins.balance || 0) + rewardAmount;
-        user.coins.lifetimeCoins = (user.coins.lifetimeCoins || 0) + rewardAmount;
-
-        // Conversion logic removed
+        const { creditEarning } = require('../utils/walletLedger');
+        const walletCredit = await creditEarning(user, rewardAmount, {
+            source: 'Ad Earning: Reward Ad',
+            inviteHold: false,
+            createTx: true,
+        });
 
         user.lastRewardAt = new Date();
         user.todayRewardCount = (user.todayRewardCount || 0) + 1;
@@ -152,23 +153,12 @@ router.post('/claim', async (req, res) => {
             rewardedAt: new Date()
         });
 
-        // Record Transaction
-        const Transaction = require('../models/Transaction');
-        await Transaction.create({
-            user: user._id,
-            type: 'credit',
-            currency: 'COIN',
-            amount: rewardAmount,
-            source: 'Watched Reward Ad',
-            status: 'Success'
-        });
-
-        // Removed INR transaction
-
         res.json({
             success: true,
             message: 'Reward claimed successfully',
-            coins: user.coins.balance
+            inrEarned: rewardAmount,
+            walletDestination: walletCredit?.destination || null,
+            newWalletBalance: user.wallet.balance
         });
     } catch (err) {
         console.error(err);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Coins, MonitorPlay, Sparkles, TrendingUp, RefreshCw, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { ChevronLeft, Clock, IndianRupee, MonitorPlay, Sparkles, TrendingUp, RefreshCw, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
 import UnlockModal from '../components/UnlockModal';
@@ -52,7 +52,7 @@ const WatchAndEarn = () => {
         try {
             const claimRes = await api.post('/reward/claim');
             if (claimRes.success) {
-                showToast('Reward earned! Coins added successfully.');
+                showToast('Reward earned! Amount added to wallet.');
             } else {
                 showToast(claimRes.message || 'Could not claim reward.', 'error');
             }
@@ -144,6 +144,16 @@ const WatchAndEarn = () => {
                 </div>
             )}
 
+            {/* Header with back button */}
+            <div className="bg-white px-4 py-2.5 flex items-center justify-between sticky top-0 z-40 border-b border-[#EDE4DC]">
+                <div className="flex items-center gap-3">
+                    <button onClick={() => navigate(-1)} className="text-[#462211] active:scale-95 transition-all">
+                        <ChevronLeft size={22} strokeWidth={2.2} />
+                    </button>
+                    <h1 className="text-[17px] font-semibold text-[#462211] tracking-tight">Watch & Earn</h1>
+                </div>
+            </div>
+
             <div className="bg-[#FCF8F5] px-4 pt-3 pb-4 relative">
                 <div className="flex justify-between items-center">
                     <div className="space-y-0.5">
@@ -151,8 +161,7 @@ const WatchAndEarn = () => {
                             <Sparkles size={9} className="text-[#462211]" />
                             <span className="text-[8px] text-[#462211] uppercase tracking-widest">Bonus Daily Ads</span>
                         </div>
-                        <h1 className="text-[18px] text-[#462211] leading-tight font-medium">Watch & Earn</h1>
-                        <p className="text-[#7A5648] text-[10px]">Get extra coins daily!</p>
+                        <p className="text-[#7A5648] text-[10px]">Earn extra income daily!</p>
                         {showTaskBoosterOnWatch && (
                             <span className="inline-block mt-1 text-[8px] font-medium text-[#462211] bg-[#F3E8E0] px-1.5 py-0.5 rounded">
                                 Task Booster active on Watch & Earn
@@ -163,10 +172,6 @@ const WatchAndEarn = () => {
                         <button type="button" onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-8 h-8 flex items-center justify-center bg-[#F3E8E0] text-[#462211] rounded-full active:scale-95 transition-all">
                             <RefreshCw size={14} className={isRefreshingCoins ? 'animate-spin' : ''} />
                         </button>
-                        <div className="flex items-center gap-1 bg-[#F3E8E0] px-2.5 py-1 rounded-full">
-                            <Coins size={11} className="text-[#462211]" />
-                            <span className="text-[11px] text-[#462211]">{userData?.coins?.total || userData?.coins?.balance || 0}</span>
-                        </div>
                         <div className="w-9 h-9 bg-[#462211] rounded-xl flex items-center justify-center">
                             <MonitorPlay size={18} className="text-white" />
                         </div>
@@ -208,7 +213,7 @@ const WatchAndEarn = () => {
                                 <div className="flex justify-between items-start mb-3">
                                     <div>
                                         <h3 className="text-slate-800 text-[14px] font-medium">Reward Ad</h3>
-                                        <p className="text-slate-500 text-[11px]">Reward: {status?.rewardAmount || 5} Coins</p>
+                                        <p className="text-slate-500 text-[11px]">Reward: ₹{status?.rewardAmount || 5}</p>
                                     </div>
                                     <div className="bg-amber-50 text-amber-600 px-2.5 py-1 rounded-lg border border-amber-100 flex items-center gap-1.5">
                                         <RefreshCw size={12} className="animate-spin" />
@@ -229,8 +234,8 @@ const WatchAndEarn = () => {
                                         <div>
                                             <h3 className="text-slate-800 text-[15px] font-medium">Reward Ad</h3>
                                             <div className="flex items-center gap-1 mt-1">
-                                                <Coins size={12} className="text-amber-500 fill-amber-500" />
-                                                <p className="text-amber-600 text-[12px] font-medium">Reward: {status?.rewardAmount || 5} Coins</p>
+                                                <IndianRupee size={12} className="text-[#B3591C]" />
+                                                <p className="text-[#B3591C] text-[12px] font-medium">Reward: ₹{status?.rewardAmount || 5}</p>
                                             </div>
                                         </div>
                                         <div className="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1.5">

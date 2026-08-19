@@ -7,7 +7,6 @@ const CoinsAndTasks = () => {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(false);
     const [saveLoading, setSaveLoading] = useState(false);
-    const [coinValue, setCoinValue] = useState(0.1);
     const [dailyLimit, setDailyLimit] = useState(100);
     const [activeTab, setActiveTab] = useState('tasks');
     
@@ -41,7 +40,6 @@ const CoinsAndTasks = () => {
         try {
             const response = await api.get('/admin/settings');
             if (response.success) {
-                setCoinValue(response.data.coinRate || 0.1);
                 setDailyLimit(response.data.maxCoinsPerDay || 100);
                 setTaskWindowStart(response.data.taskWindowStart || '00:00');
                 setTaskWindowEnd(response.data.taskWindowEnd || '23:59');
@@ -133,7 +131,6 @@ const CoinsAndTasks = () => {
         setSaveLoading(true);
         try {
             const response = await api.put('/admin/settings', {
-                coinRate: Math.max(0, Number(coinValue) || 0),
                 maxCoinsPerDay: Math.max(0, Number(dailyLimit) || 0),
                 taskWindowStart,
                 taskWindowEnd,
@@ -154,14 +151,14 @@ const CoinsAndTasks = () => {
 
     return (
         <div className="p-4 animate-in fade-in duration-500">
-            <PageHeader title="Coins & Tasks" subtitle="Manage daily tasks and coin economy settings" />
+            <PageHeader title="Task Rewards" subtitle="Manage daily tasks and reward settings" />
 
             {/* Tabs */}
             <div className="flex gap-2 mb-6">
                 {['tasks', 'settings'].map(t => (
                     <button key={t} onClick={() => setActiveTab(t)}
                         className={`px-5 py-2.5 rounded-xl text-[11px] font-medium uppercase tracking-normal transition-all ${activeTab === t ? 'bg-sky-500 text-white shadow-sm' : 'bg-white text-slate-400 border border-slate-100'}`}>
-                        {t === 'tasks' ? '📋 Tasks' : '⚙️ Coin Settings'}
+                        {t === 'tasks' ? '📋 Tasks' : '⚙️ Task Settings'}
                     </button>
                 ))}
             </div>
@@ -203,7 +200,7 @@ const CoinsAndTasks = () => {
                                             ))}
                                         </div>
                                         <div className="mt-2 text-[10px] font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-lg inline-flex items-center gap-1 border border-amber-100/50">
-                                            <Coins size={12} /> {task.coinsReward || task.reward} Coins Reward
+                                            <Coins size={12} /> ₹{task.coinsReward || task.reward} Reward
                                         </div>
                                     </div>
                                 </div>
@@ -218,22 +215,14 @@ const CoinsAndTasks = () => {
             ) : (
                 <div className="space-y-4">
                     <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-4">
-                        <h3 className="text-sm font-medium text-slate-800 uppercase tracking-normal mb-5 flex items-center gap-2"><Coins size={16} className="text-amber-500" /> Coin Economy</h3>
+                        <h3 className="text-sm font-medium text-slate-800 uppercase tracking-normal mb-5 flex items-center gap-2"><Coins size={16} className="text-amber-500" /> Task Settings</h3>
                         <div className="space-y-5">
                             <div>
-                                <label className="text-[11px] font-medium text-slate-500 uppercase tracking-normal">1 Coin = ₹</label>
-                                <div className="flex items-center gap-3 mt-2">
-                                    <input type="number" step="0.01" min="0" value={coinValue} onChange={e => setCoinValue(e.target.value)}
-                                        className="w-32 border border-slate-200 rounded-xl px-4 py-2.5 text-lg font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
-                                    <span className="text-sm font-medium text-slate-400">rupees per coin</span>
-                                </div>
-                            </div>
-                            <div>
-                                <label className="text-[11px] font-medium text-slate-500 uppercase tracking-normal">Max Coins Per Day</label>
+                                <label className="text-[11px] font-medium text-slate-500 uppercase tracking-normal">Max Rewards Per Day</label>
                                 <div className="flex items-center gap-3 mt-2">
                                     <input type="number" min="0" value={dailyLimit} onChange={e => setDailyLimit(e.target.value)}
                                         className="w-32 border border-slate-200 rounded-xl px-4 py-2.5 text-lg font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
-                                    <span className="text-sm font-medium text-slate-400">coins/day limit per user</span>
+                                    <span className="text-sm font-medium text-slate-400">rewards/day limit per user</span>
                                 </div>
                             </div>
 
@@ -374,7 +363,7 @@ const CoinsAndTasks = () => {
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-medium text-slate-600 block mb-1">Coins Reward <span className="text-rose-500">*</span></label>
+                                    <label className="text-xs font-medium text-slate-600 block mb-1">Reward (₹) <span className="text-rose-500">*</span></label>
                                     <div className="relative">
                                         <Coins size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500" />
                                         <input type="number" min="1" value={newTaskData.reward} onChange={e => setNewTaskData({...newTaskData, reward: Math.max(1, e.target.value)})} className="w-full border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />

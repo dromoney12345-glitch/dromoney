@@ -7,11 +7,11 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const { getLastRenewalTick } = require('../utils/taskRenewal');
 
-// @desc    Get user wallet and coin balance
+// @desc    Get user wallet balance
 // @route   GET /api/user/wallet/balance
 // @access  Private
 exports.getBalance = asyncHandler(async (req, res, next) => {
-    const user = await User.findById(req.user.id).select('wallet coins isPaid withdrawalCard');
+    const user = await User.findById(req.user.id).select('wallet isPaid withdrawalCard');
     const {
         migrateWalletSplits,
         ensureWithdrawalCardShape,
@@ -47,10 +47,11 @@ exports.getBalance = asyncHandler(async (req, res, next) => {
     });
 });
 
-// @desc    Add coins and convert to INR automatically
-// @route   POST /api/user/wallet/add-coins
+// @desc    Add earning (direct INR) for completing a task/activity
+// @route   POST /api/user/wallet/add-earning
+// @route   POST /api/user/wallet/add-coins  (backward-compat alias)
 // @access  Private
-exports.addCoins = asyncHandler(async (req, res, next) => {
+exports.addEarning = asyncHandler(async (req, res, next) => {
     const { amount, source, taskId } = req.body;
     const user = await User.findById(req.user.id);
 
@@ -63,13 +64,11 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
     let task = null;
     let isEventReward = false;
 
-    // Check if already completed
     if (taskId) {
         if (mongoose.Types.ObjectId.isValid(taskId)) {
             task = await Task.findById(taskId);
             
             if (!task) {
-                // If not a Task, check if it's an Event
                 const Event = require('../models/Event');
                 const event = await Event.findById(taskId);
                 if (event) {
@@ -88,7 +87,6 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
                         return next(new ErrorResponse('You have already claimed the reward for this event today', 400));
                     }
                     
-                    // Mark as awarded so they can't claim again today
                     if (participant) {
                         participant.prizeStatus = 'Awarded';
                         await participant.save();
@@ -114,7 +112,6 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
                 }
             }
         } else if (!isEventReward) {
-            // It's a mock task from frontend (e.g., id "1", "2", "3"). Treat as daily task.
             const settings = await Settings.findOne() || {};
             const lastRenewalTick = getLastRenewalTick(settings);
             
@@ -128,8 +125,7 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         }
     }
 
-    // ₹49 Task Booster — NEVER on events. Only on tasks listed in admin applicableTasks.
-    // Watch & Earn / ads only if admin explicitly added "Watch & Earn" (or similar).
+    // Task Booster — NEVER on events
     let factor = 1;
     const sourceLower = (source || '').toLowerCase();
     const looksLikeEventPrize =
@@ -148,7 +144,6 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         const allowed = (taskBooster?.applicableTasks || []).map((t) => String(t).toLowerCase());
 
         if (allowed.length === 0) {
-            // No admin list → apply only to non-video general tasks
             isApplicable = task && task.type !== 'Video' && task.type !== 'Watch';
         } else {
             const matchesSource = allowed.some((t) => sourceLower.includes(t));
@@ -189,11 +184,11 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
             }
         }
     }
-    const totalAwardedCoins = amount * factor;
+
+    // amount is now directly in INR (coinsReward field treated as INR)
+    const inrEarned = Math.round(amount * factor * 100) / 100;
 
     const settings = await Settings.findOne() || {};
-    const coinRate = Number(settings.coinRate) || 0.1;
-    const inrEarned = Math.round(totalAwardedCoins * coinRate * 100) / 100;
     const poolPercent = Number(settings.futureFundPoolPercent) || 30;
     const taskRevenue = Number(settings.taskRevenuePerTask) || 1.0;
 
@@ -218,14 +213,9 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
         });
     }
 
-    // Update User — coins + wallet
-    user.coins.balance += totalAwardedCoins;
-    user.coins.lifetimeCoins += totalAwardedCoins;
-
-    // Track completed tasks dynamically in database
+    // Track completed tasks
     if (taskId) {
         if ((task && task.isDaily) || !task) {
-            // Add to daily completions (both real daily tasks and mock tasks)
             if (!user.dailyTaskCompletions) {
                 user.dailyTaskCompletions = [];
             }
@@ -235,7 +225,6 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
             });
             user.lifetimeTasksCompleted = (user.lifetimeTasksCompleted || 0) + 1;
         } else {
-            // Add to one-time completed tasks
             if (!user.completedTasks) {
                 user.completedTasks = [];
             }
@@ -247,30 +236,22 @@ exports.addCoins = asyncHandler(async (req, res, next) => {
 
     await user.save();
 
-    // Record Transaction
-    await Transaction.create({
-        user: user._id,
-        type: 'credit',
-        currency: 'COIN',
-        amount: totalAwardedCoins,
-        source: factor > 1 ? `Processing Rewards: ${source}` : source,
-    });
-
     res.status(200).json({
         success: true,
         data: {
-            coinsAwarded: totalAwardedCoins,
             inrEarned,
             walletDestination: walletCredit?.destination || null,
             newWalletBalance: user.wallet.balance,
             newPendingBalance: user.wallet.pendingBalance,
             newVirtualBalance: user.wallet.virtualBalance,
-            newCoinBalance: user.coins.balance,
             completedTasks: user.completedTasks,
             dailyTaskCompletions: user.dailyTaskCompletions
         }
     });
 });
+
+// Backward compatibility alias
+exports.addCoins = exports.addEarning;
 
 // @desc    Request withdrawal
 // @route   POST /api/user/wallet/withdraw
