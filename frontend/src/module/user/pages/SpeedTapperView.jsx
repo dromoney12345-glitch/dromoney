@@ -7,9 +7,7 @@ import { ChevronLeft, Zap, Trophy, IndianRupee, Timer, MousePointer2 } from 'luc
 const SpeedTapperView = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addCoins, userData, boostersConfig } = useUser();
-    const isTaskBoosterActive = userData?.isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes('Speed Tapper'));
-    const isSupportBoosterActive = userData?.isSupportBoosterActive && (!boostersConfig?.support?.length || boostersConfig.support.includes('Speed Tapper'));
+    const { addCoins } = useUser();
     const [task, setTask] = useState(null);
     
     const [taps, setTaps] = useState(0);
@@ -17,7 +15,7 @@ const SpeedTapperView = () => {
     const [timeLeft, setTimeLeft] = useState(0);
     
     const target = 25;
-    const duration = isSupportBoosterActive ? 13 : 10;
+    const duration = 10;
 
     useEffect(() => {
         const allTasks = taskStorage.getTasks();
@@ -152,16 +150,9 @@ const SpeedTapperView = () => {
                         <IndianRupee size={24} className="text-white" />
                     </div>
                     <div>
-                        <div className="flex items-center gap-2">
-                            <p className="text-[11px] font-medium text-amber-800 tracking-tight leading-tight uppercase">Reward on success</p>
-                            {isTaskBoosterActive && (
-                                <span className="bg-sky-500/10 text-sky-600 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest border border-sky-500/20">
-                                    Speed Rewards
-                                </span>
-                            )}
-                        </div>
+                        <p className="text-[11px] font-medium text-amber-800 tracking-tight leading-tight uppercase">Reward on success</p>
                         <p className="text-xl font-medium text-amber-600 mt-0.5">
-                            +₹{isTaskBoosterActive ? (task.coinsReward || task.reward || 0) * 12 : (task.coinsReward || task.reward || 0)}
+                            +₹{task ? (task.coinsReward || task.reward || 0) : 0}
                         </p>
                     </div>
                 </div>

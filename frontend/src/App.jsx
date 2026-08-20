@@ -236,7 +236,7 @@ function App() {
               <Route path="marketing" element={<Marketing />} />
               <Route path="marketing-history" element={<MarketingHistory />} />
               <Route path="history" element={<Navigate to="/user/wallet" replace />} />
-              <Route path="events" element={<Events />} />
+              <Route path="events" element={<Navigate to="/user/home" replace />} />
               <Route path="wallet" element={<Wallet />} />
               <Route path="profile" element={<Profile />} />
               <Route path="business-ideas" element={<BusinessIdeas />} />

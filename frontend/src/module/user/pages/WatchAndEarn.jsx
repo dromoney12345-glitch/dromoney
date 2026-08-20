@@ -8,10 +8,7 @@ import { showFlutterRewardedAd, isFlutterApp } from '../../shared/utils/flutterA
 
 const WatchAndEarn = () => {
     const navigate = useNavigate();
-    const { userData, refreshUserProfile, boostersConfig } = useUser();
-    const watchBoosterEnabled = Array.isArray(boostersConfig?.task) &&
-        boostersConfig.task.some((t) => String(t).toLowerCase().includes('watch'));
-    const showTaskBoosterOnWatch = !!(userData?.isTaskBoosterActive && watchBoosterEnabled);
+    const { userData, refreshUserProfile } = useUser();
     const [status, setStatus] = useState(null);
     const [loading, setLoading] = useState(true);
     const [calling, setCalling] = useState(false);
@@ -162,11 +159,6 @@ const WatchAndEarn = () => {
                             <span className="text-[8px] text-[#462211] uppercase tracking-widest">Bonus Daily Ads</span>
                         </div>
                         <p className="text-[#7A5648] text-[10px]">Earn extra income daily!</p>
-                        {showTaskBoosterOnWatch && (
-                            <span className="inline-block mt-1 text-[8px] font-medium text-[#462211] bg-[#F3E8E0] px-1.5 py-0.5 rounded">
-                                Task Booster active on Watch & Earn
-                            </span>
-                        )}
                     </div>
                     <div className="flex items-center gap-2">
                         <button type="button" onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-8 h-8 flex items-center justify-center bg-[#F3E8E0] text-[#462211] rounded-full active:scale-95 transition-all">

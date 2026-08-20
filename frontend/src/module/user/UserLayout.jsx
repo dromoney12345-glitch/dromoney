@@ -322,21 +322,22 @@ const UserLayout = () => {
                         const isActive = item.label === 'Business'
                             ? location.pathname.includes('business')
                             : location.pathname === item.path;
-                        const activeCls = 'text-[#462211]';
-                        const activeShadow = 'bg-[#FFF5F0] shadow-[0_4px_12px_rgba(70,34,17,0.12)]';
+                        const isProminent = item.label === 'Income' || item.label === 'Business';
+                        const activeCls = 'text-[#462211] font-bold';
+                        const activeShadow = 'bg-[#FFF5F0] shadow-[0_4px_12px_rgba(70,34,17,0.12)] border border-[#EDE4DC]';
                         return (
                             <button
                                 key={idx}
                                 onClick={() => navigate(item.path)}
                                 className="flex-1 h-full flex items-center justify-center"
                             >
-                                <div className={`flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-1.5 rounded-xl ${isActive ? activeShadow : ''}`}>
+                                <div className={`flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-1 px-1.5 rounded-xl transition-all ${isActive ? activeShadow : ''}`}>
                                     <Icon
-                                        size={18}
-                                        className={isActive ? activeCls : 'text-slate-400'}
-                                        strokeWidth={isActive ? 2.4 : 2}
+                                        size={isProminent ? 26 : 18}
+                                        className={isActive ? activeCls : isProminent ? 'text-[#C2520A]' : 'text-slate-400'}
+                                        strokeWidth={isProminent ? 2.3 : isActive ? 2.2 : 2}
                                     />
-                                    <span className={`text-[10px] font-semibold tracking-wide ${isActive ? activeCls : 'text-slate-400'}`}>
+                                    <span className={`text-[10px] tracking-tight ${isActive ? activeCls : isProminent ? 'text-[#8A4214] font-bold' : 'text-slate-400 font-medium'}`}>
                                         {item.label}
                                     </span>
                                 </div>

@@ -7,8 +7,7 @@ import { ChevronLeft, Gift, IndianRupee, Sparkles, Trophy, Star } from 'lucide-r
 const TreasureChestView = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addCoins, userData, boostersConfig } = useUser();
-    const isTaskBoosterActive = userData?.isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes('Treasure Chest'));
+    const { addCoins } = useUser();
     const [task, setTask] = useState(null);
     
     const [step, setStep] = useState(0); // 0: Start, 1: Picked, 2: Reveal
@@ -97,7 +96,7 @@ const TreasureChestView = () => {
                             {step === 2 && selectedIdx === i && (
                                 <div className="absolute -bottom-4 bg-emerald-500 px-4 py-2 rounded-full shadow-2xl animate-in fade-in slide-in-from-top-2">
                                     <span className="text-[11px] font-medium text-white uppercase tracking-widest">
-                                        +₹{isTaskBoosterActive ? (task.reward || 0) * 12 : task.reward}
+                                        +₹{task?.reward || 0}
                                     </span>
                                 </div>
                             )}
@@ -112,9 +111,6 @@ const TreasureChestView = () => {
                            <Trophy size={40} className="mx-auto mb-3 text-amber-400 animate-bounce" />
                            <h3 className="text-xl font-medium text-white">Reward Claimed!</h3>
                            <p className="text-[11px] font-medium text-white/40 uppercase mt-1">Excellent choice, traveler!</p>
-                           {isTaskBoosterActive && (
-                               <p className="text-[10px] font-bold text-sky-400 uppercase mt-2">3X Boost Applied</p>
-                           )}
                         </div>
                         
                         <button

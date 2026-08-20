@@ -19,9 +19,7 @@ const TaskQuizView = () => {
     const [currentStep, setCurrentStep] = useState(0); // 0: Start, 1: Questions, 2: Result
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [selectedOption, setSelectedOption] = useState(null);
-    const isSupportBoosterActive = userData?.isSupportBoosterActive && (!boostersConfig?.support?.length || boostersConfig.support.includes('Task Quiz'));
-    const isTaskBoosterActive = userData?.isTaskBoosterActive && (!boostersConfig?.task?.length || boostersConfig.task.includes('Task Quiz'));
-    const [timeLeft, setTimeLeft] = useState(isSupportBoosterActive ? 13 : 10);
+    const [timeLeft, setTimeLeft] = useState(10);
     const [score, setScore] = useState(0);
     const [isAnswered, setIsAnswered] = useState(false);
     const [isEventClosed, setIsEventClosed] = useState(false);
@@ -115,14 +113,9 @@ const TaskQuizView = () => {
                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none mb-2">Questions</p>
                             <p className="text-lg font-medium text-slate-800">10</p>
                         </div>
-                        <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden">
-                            {userData?.isSupportBoosterActive && (
-                                <div className="absolute top-0 right-0 bg-amber-400 text-slate-900 text-[7px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-widest">
-                                    +3s Booster
-                                </div>
-                            )}
+                        <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-sm">
                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none mb-2">Time/Ques</p>
-                            <p className="text-lg font-medium text-slate-800">{userData?.isSupportBoosterActive ? '13s' : '10s'}</p>
+                            <p className="text-lg font-medium text-slate-800">10s</p>
                         </div>
                     </div>
                 </div>
@@ -238,17 +231,12 @@ const TaskQuizView = () => {
                                     <IndianRupee size={20} className="text-amber-600" />
                                 </div>
                                 <div className="text-left">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <p className="text-[10px] font-medium text-amber-600 uppercase leading-none">Task Reward</p>
-                                        {isTaskBoosterActive && (
-                                            <span className="text-[10px] font-medium text-amber-500 uppercase tracking-widest ml-2 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">3X Boosted</span>
-                                        )}
-                                    </div>
-                                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-normal">Completed under 5s</p>
+                                    <p className="text-[10px] font-medium text-amber-600 uppercase leading-none mb-1">Task Reward</p>
+                                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-normal">Completed Quiz</p>
                                 </div>
                                 <div className="text-right">
                                     <div className="font-medium text-amber-500 text-sm">
-                                        +₹{isTaskBoosterActive ? reward * 12 : reward}
+                                        +₹{reward}
                                     </div>
                                 </div>
                             </div>

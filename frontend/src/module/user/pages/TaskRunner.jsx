@@ -80,26 +80,7 @@ const TaskRunner = () => {
             }
         };
 
-        const loadBoosterData = async () => {
-            try {
-                const res = await api.get('/public/boosters');
-                if (res.success && res.data) {
-                    const taskBooster = res.data.find(b => b.type === 'task');
-                    if (taskBooster && taskBooster.benefits) {
-                        for (const b of taskBooster.benefits) {
-                            const match = b.match(/(\d+)x/i);
-                            if (match) {
-                                setTaskMultiplier(parseInt(match[1]));
-                                break;
-                            }
-                        }
-                    }
-                }
-            } catch (err) {}
-        };
-
         loadTask();
-        loadBoosterData();
     }, [id]);
 
     useEffect(() => {
@@ -245,13 +226,8 @@ const TaskRunner = () => {
             return;
         }
         taskStorage.markComplete(taskId);
-        
-        if (userData.isTaskBoosterActive) {
-            setToast({ message: `Task completed! ${taskMultiplier}X Booster Applied! +₹${rewardAmount * taskMultiplier}`, type: 'success' });
-            setTimeout(() => { setToast(null); navigate('/user/earn'); }, 2000);
-        } else {
-            setTimeout(() => navigate('/user/earn'), 2000);
-        }
+        setToast({ message: `Task completed! +₹${rewardAmount}`, type: 'success' });
+        setTimeout(() => { setToast(null); navigate('/user/earn'); }, 1500);
     };
 
     return (
@@ -273,10 +249,9 @@ const TaskRunner = () => {
                 <div className="flex-1 truncate">
                     <h1 className="text-base font-medium text-white truncate">{task.title}</h1>
                     <p className="text-[9px] text-sky-400 font-medium uppercase tracking-widest leading-none mt-1">Live Task Mode</p>
-
                 </div>
                 <div className="bg-[#462211]/10 px-3 py-1.5 rounded-full border border-[#462211]/20 shadow-inner shrink-0 flex items-center gap-1">
-                    <span className="font-medium text-[#B3591C] text-xs">+₹{userData.isTaskBoosterActive ? (task.coinsReward || task.reward) * taskMultiplier : (task.coinsReward || task.reward)} {userData.isTaskBoosterActive && `(${taskMultiplier}X)`}</span>
+                    <span className="font-medium text-[#B3591C] text-xs">+₹{task.coinsReward || task.reward || 0}</span>
                 </div>
             </div>
 

@@ -3,12 +3,57 @@ import {
     Sparkles, Rocket, Plus, Trash2,
     Save, Layout, Palette, Type,
     ChevronRight, ChevronLeft, Info, CheckCircle2,
-    Trophy, Users, MousePointer2, FileText, Briefcase, Upload
+    Trophy, Users, MousePointer2, FileText, Briefcase, Upload, Compass,
+    ArrowUp, ArrowDown, RefreshCw, ShieldCheck, ListChecks,
+    UserPlus, CreditCard, TrendingUp, Zap, Building2, Wallet,
+    HelpCircle, Flame, Gift, ArrowRight, X
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { contentStorage } from '../../shared/services/contentStorage';
 import api from '../../shared/services/api';
 import { useAdmin } from '../context/AdminContext';
+
+const ICON_MAP = {
+    ShieldCheck, ListChecks, UserPlus, CreditCard, TrendingUp,
+    Sparkles, Zap, Trophy, MousePointer2, Building2, Wallet,
+    CheckCircle2, HelpCircle, Flame, Gift, Compass
+};
+
+const DEFAULT_EXPLORE_GUIDE = {
+    badge: 'YOUR GROWTH OUR GUIDANCE',
+    title: 'Complete Platform Guide & Growth Steps',
+    subtitle: 'Learn how to maximize your daily income, unlock wallets, and build steady earnings with Dromoney.',
+    logoUrl: 'https://res.cloudinary.com/dncw1hfix/image/upload/v1776323215/dromoney/WhatsApp_Image_2026-04-28_at_10.52.49_PM-removebg-preview.png',
+    ctaText: 'Start Earning Now',
+    nextRoute: '/user/earn',
+    points: [
+        {
+            title: '🚀 Dromoney कैसे काम करता है?',
+            text: '❇️ Dromoney में आपका स्वागत है! Dromoney एक Learning, Part-Time Opportunity, Business Guidance और Support Platform है। यहाँ यूजर नई चीज़ें सीख सकता है, Part-Time Opportunities को समझ सकता है, Business Ideas देख सकता है, SHME Ecosystem के माध्यम से अपना बिज़नेस शुरू करने की जानकारी प्राप्त कर सकता है और Community Activities में भाग ले सकता है。\n\n⚠️ Dromoney किसी भी प्रकार की निश्चित कमाई (Guaranteed Income), निश्चित लाभ (Guaranteed Profit) या व्यवसाय में सफलता की गारंटी नहीं देता। परिणाम प्रत्येक यूजर की मेहनत, कौशल, भागीदारी और परिस्थितियों पर निर्भर करते हैं।',
+            icon: 'Sparkles'
+        },
+        {
+            title: '📱 1. Account बनाएं & KYC करें',
+            text: 'Dromoney इस्तेमाल करने के लिए सबसे पहले Account बनाना होता है। आप Mobile Number और OTP से Login कर सकते हैं। इसके बाद अपना 1-Step Aadhaar Verification पूरा करके सभी इनकम प्रोजेक्ट्स का फ्री एक्सेस अनलॉक करें।',
+            icon: 'ShieldCheck'
+        },
+        {
+            title: '🏠 2. Home Page & Opportunities',
+            text: 'Login करने के बाद Home Page दिखाई देता है। यहाँ आपको मिलता है:\n• 🎯 Part-Time Income Modules & Daily Tasks\n• 💼 Business Content & Exclusive Ideas\n• 🚀 Future Fund & Growth Boosters\n• 🎁 Daily Quizzes, Video Watching & Rewards',
+            icon: 'ListChecks'
+        },
+        {
+            title: '👥 3. Invite Friends & Referrals',
+            text: 'अपना पर्सनल रेफरल लिंक दोस्तों के साथ शेयर करें। जब वे KYC पूरा करके विड्रॉल कार्ड बनाते हैं, तो आपके वॉलेट में रेफरल रिवॉर्ड इंसटेंट ऐड हो जाता है।',
+            icon: 'UserPlus'
+        },
+        {
+            title: '💳 4. Withdrawal & Security',
+            text: 'कमाई हुई राशि को आप अपने Bank Account या UPI में आसानी से विड्रॉ कर सकते हैं। लाइफटाइम विड्रॉल कार्ड अनलॉक करके डायरेक्ट पेआउट्स प्राप्त करें।',
+            icon: 'CreditCard'
+        }
+    ]
+};
 
 const MarketingManager = () => {
     const { addNotification } = useAdmin();
@@ -46,7 +91,7 @@ const MarketingManager = () => {
             gradient: 'from-amber-400 to-orange-500',
             iconName: 'Sparkles',
             ctaText: 'Explore Now',
-            path: '/user/home',
+            path: '/user/guide/explore-now',
             imageUrl: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=640&q=80',
             isActive: true
         };
@@ -184,10 +229,116 @@ const MarketingManager = () => {
         }
     };
 
+    // ── All User Guides List & CMS ──
+    const ALL_GUIDES_LIST = [
+        { id: 'explore-now', label: 'Explore Now Guide', dbKey: 'explore_now_guide', icon: Compass },
+        { id: 'kyc', label: 'How to do KYC?', dbKey: 'guide_kyc', icon: ShieldCheck },
+        { id: 'invite', label: 'How to Invite?', dbKey: 'guide_invite', icon: UserPlus },
+        { id: 'card', label: 'Create Withdrawal Card', dbKey: 'guide_card', icon: CreditCard },
+        { id: 'withdraw', label: 'How to Withdraw?', dbKey: 'guide_withdraw', icon: Wallet },
+        { id: 'earn500', label: 'Earn ₹500 Daily', dbKey: 'guide_earn500', icon: TrendingUp },
+        { id: 'fund', label: 'Open Future Fund', dbKey: 'guide_fund', icon: Sparkles },
+        { id: 'tasks', label: 'Complete Tasks', dbKey: 'guide_tasks', icon: ListChecks },
+        { id: 'business', label: 'Start a Business', dbKey: 'guide_business', icon: Building2 },
+    ];
+
+    const [selectedGuideId, setSelectedGuideId] = useState('explore-now');
+    const [exploreGuide, setExploreGuide] = useState(DEFAULT_EXPLORE_GUIDE);
+    const [isSavingGuide, setIsSavingGuide] = useState(false);
+
+    const fetchGuideData = async (guideId) => {
+        const guideMeta = ALL_GUIDES_LIST.find(g => g.id === guideId) || ALL_GUIDES_LIST[0];
+        try {
+            const res = await api.get(`/public/content/${guideMeta.dbKey}`);
+            if (res && res.success && res.data) {
+                const guideContent = res.data.data || res.data;
+                const isDummy = guideContent.title === 'Default Title' && guideContent.description === 'Content pending admin setup.';
+                if (guideContent && typeof guideContent === 'object' && !isDummy && (guideContent.title || guideContent.content)) {
+                    setExploreGuide({
+                        badge: guideContent.badge || 'YOUR GROWTH OUR GUIDANCE',
+                        title: guideContent.title || guideMeta.label,
+                        subtitle: guideContent.subtitle || guideContent.description || '',
+                        logoUrl: guideContent.logoUrl || '',
+                        ctaText: guideContent.ctaText || 'Start Earning Now',
+                        nextRoute: guideContent.nextRoute || guideContent.next || '/user/earn',
+                        content: guideContent.content || (Array.isArray(guideContent.points) ? guideContent.points.map(p => typeof p === 'string' ? p : `${p.title}\n${p.text}`).join('\n\n') : ''),
+                        points: Array.isArray(guideContent.points) ? guideContent.points : []
+                    });
+                    return;
+                }
+            }
+        } catch (err) {
+            console.error('Error fetching guide:', err);
+        }
+        // Fallback default
+        if (guideId === 'explore-now') {
+            setExploreGuide(DEFAULT_EXPLORE_GUIDE);
+        } else {
+            setExploreGuide({
+                badge: 'YOUR GROWTH OUR GUIDANCE',
+                title: guideMeta.label,
+                subtitle: `Learn all steps about ${guideMeta.label}`,
+                logoUrl: '',
+                ctaText: 'Continue',
+                nextRoute: '/user/earn',
+                content: `🚀 ${guideMeta.label}\nDetailed guidance and step-by-step instructions for ${guideMeta.label}.`,
+                points: []
+            });
+        }
+    };
+
+    const handleSelectGuide = (guideId) => {
+        setSelectedGuideId(guideId);
+        fetchGuideData(guideId);
+    };
+
+    const handleSaveExploreGuide = async () => {
+        setIsSavingGuide(true);
+        const guideMeta = ALL_GUIDES_LIST.find(g => g.id === selectedGuideId) || ALL_GUIDES_LIST[0];
+        try {
+            const payload = {
+                key: guideMeta.dbKey,
+                title: exploreGuide.title || guideMeta.label,
+                description: exploreGuide.subtitle || 'User Guide Content',
+                data: exploreGuide
+            };
+            const res = await api.post('/admin/content', payload);
+            if (res && res.success) {
+                addNotification("Success", `"${guideMeta.label}" Published Successfully!`, "success");
+                fetchGuideData(selectedGuideId);
+            } else {
+                addNotification("Error", res?.message || "Failed to save guide.", "error");
+            }
+        } catch (err) {
+            console.error(err);
+            addNotification("Error", "Failed to save guide.", "error");
+        } finally {
+            setIsSavingGuide(false);
+        }
+    };
+
+    const handleLoadDefaultTemplate = () => {
+        if (window.confirm("Reset this guide to recommended default template?")) {
+            fetchGuideData(selectedGuideId);
+            addNotification("Info", "Default template loaded. Click 'Save Guide' to publish.", "info");
+        }
+    };
+
+    const movePoint = (index, direction) => {
+        const points = [...(exploreGuide.points || [])];
+        const targetIndex = index + direction;
+        if (targetIndex < 0 || targetIndex >= points.length) return;
+        const temp = points[index];
+        points[index] = points[targetIndex];
+        points[targetIndex] = temp;
+        setExploreGuide({ ...exploreGuide, points });
+    };
+
     useEffect(() => {
         fetchBanners();
         fetchLifetimePromo();
         fetchAllMarketingData();
+        fetchGuideData(selectedGuideId);
     }, []);
 
     // ── Future Features Data (Image 1 & 2) ──
@@ -199,31 +350,336 @@ const MarketingManager = () => {
     const [futureFeaturesTitle, setFutureFeaturesTitle] = useState("Future and Option");
     const [futureFeaturesSubtitle, setFutureFeaturesSubtitle] = useState("Upcoming earning opportunities");
 
-    // Old Storage effects removed
-
     return (
-        <div className="p-4 animate-in fade-in duration-700 bg-slate-50/50 min-h-screen">
-            <PageHeader title="Marketing & Promos" subtitle="Home top banner and promotions" />
-
-            {/* Sub-navigation Tabs */}
-            <div className="flex gap-2 mb-6 mt-6 bg-white p-2 rounded-lg border border-slate-100 shadow-sm w-fit">
-                {[
-                    { id: 'menu', label: 'Menu Pages', icon: FileText },
-                    { id: 'banners', label: 'Home Banners', icon: Layout },
-                    { id: 'lifetime', label: 'Lifetime Promo', icon: Rocket },
-                    { id: 'future', label: 'Future and Option', icon: Sparkles },
-                ].map(tab => (
-                    <button
-                        key={tab.id}
-                        onClick={() => handleTabChange(tab.id)}
-                        className={`flex items-center gap-3 px-8 py-3.5 rounded-lg font-medium text-[11px] uppercase tracking-normal transition-all ${activeTab === tab.id ? 'bg-[#0F172A] text-white shadow-xl shadow-slate-200' : 'text-slate-400 hover:bg-slate-50'}`}
-                    >
-                        <tab.icon size={14} /> {tab.label}
-                    </button>
-                ))}
+        <div className="p-3.5 animate-in fade-in duration-500 bg-slate-50 min-h-screen font-poppins">
+            {/* Compact Top Header & Tab Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-3 bg-white px-4 py-2.5 rounded-xl border border-slate-200/70 shadow-xs">
+                <div>
+                    <h1 className="text-[16px] font-semibold text-slate-900 leading-tight">Marketing & Guides</h1>
+                    <p className="text-[11px] text-slate-500">Manage home banner and all user learning guides</p>
+                </div>
+                <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg">
+                    {[
+                        { id: 'banners', label: 'Home Banners', icon: Layout },
+                        { id: 'explore_guide', label: 'User Guides', icon: Compass },
+                    ].map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => handleTabChange(tab.id)}
+                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-md font-medium text-[11.5px] transition-all ${activeTab === tab.id ? 'bg-white text-slate-900 shadow-xs font-semibold' : 'text-slate-500 hover:text-slate-800'}`}
+                        >
+                            <tab.icon size={13} /> {tab.label}
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            <div className="animate-in slide-in-from-bottom-4 duration-500 pb-20">
+            <div className="pb-12">
+                {/* ── USER GUIDES CMS ── */}
+                {activeTab === 'explore_guide' && (
+                    <div className="space-y-3">
+                        {/* Compact Guide Selector Bar */}
+                        <div className="bg-white rounded-xl border border-slate-200/70 p-1.5 shadow-xs flex items-center gap-1 overflow-x-auto custom-scrollbar">
+                            {ALL_GUIDES_LIST.map((g) => {
+                                const Icon = g.icon;
+                                const isSelected = selectedGuideId === g.id;
+                                return (
+                                    <button
+                                        key={g.id}
+                                        type="button"
+                                        onClick={() => handleSelectGuide(g.id)}
+                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] whitespace-nowrap transition-all ${isSelected ? 'bg-slate-900 text-white font-medium shadow-xs' : 'bg-transparent text-slate-600 hover:bg-slate-100 font-normal'}`}
+                                    >
+                                        <Icon size={12} className={isSelected ? 'text-white' : 'text-slate-400'} />
+                                        <span>{g.label}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-3.5">
+                            {/* Editor Side */}
+                            <div className="space-y-3">
+                                <div className="bg-white rounded-xl border border-slate-200/70 shadow-xs p-4 space-y-3.5">
+                                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                                        <div className="flex items-center gap-2.5">
+                                            <div className="w-8 h-8 bg-slate-100 text-slate-700 rounded-lg flex items-center justify-center">
+                                                <Compass size={16} />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-[13px] font-semibold text-slate-900">
+                                                    {ALL_GUIDES_LIST.find(g => g.id === selectedGuideId)?.label || 'Guide Editor'}
+                                                </h3>
+                                                <span className="text-[10px] text-slate-400 font-mono">
+                                                    Key: {ALL_GUIDES_LIST.find(g => g.id === selectedGuideId)?.dbKey}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            disabled={isSavingGuide}
+                                            onClick={handleSaveExploreGuide}
+                                            className="bg-slate-900 hover:bg-black text-white px-4 py-1.5 rounded-lg text-[11.5px] font-medium shadow-xs flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50"
+                                        >
+                                            <Save size={12} /> {isSavingGuide ? 'Saving...' : 'Save Guide'}
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-3 text-[11.5px]">
+                                        {/* Header Logo & Target Route */}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div className="space-y-1">
+                                                <label className="text-[11px] font-medium text-slate-600">Header Logo Image</label>
+                                                <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-lg p-1">
+                                                    {exploreGuide.logoUrl ? (
+                                                        <div className="relative shrink-0">
+                                                            <img src={exploreGuide.logoUrl} alt="Logo" className="w-7 h-7 object-contain rounded border border-slate-200 bg-white p-0.5" />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setExploreGuide({ ...exploreGuide, logoUrl: '' })}
+                                                                className="absolute -top-1 -right-1 bg-rose-500 text-white rounded-full w-3 h-3 flex items-center justify-center text-[7px]"
+                                                                title="Remove logo"
+                                                            >
+                                                                <X size={7} />
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="w-7 h-7 rounded bg-slate-200/50 flex items-center justify-center text-slate-400 shrink-0">
+                                                            <Upload size={11} />
+                                                        </div>
+                                                    )}
+                                                    <input
+                                                        value={exploreGuide.logoUrl || ''}
+                                                        onChange={(e) => setExploreGuide({ ...exploreGuide, logoUrl: e.target.value })}
+                                                        placeholder="Paste image URL..."
+                                                        className="w-full bg-transparent text-[11px] text-slate-800 outline-none min-w-0 px-1 font-normal"
+                                                    />
+                                                    <label className="inline-flex items-center gap-1 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 px-2 py-1 rounded text-[10px] font-medium cursor-pointer shrink-0 transition-colors shadow-2xs">
+                                                        <Upload size={10} /> Upload
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            className="hidden"
+                                                            onChange={async (e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (!file) return;
+                                                                try {
+                                                                    const form = new FormData();
+                                                                    form.append('file', file);
+                                                                    const res = await api.post('/admin/upload', form, {
+                                                                        headers: { 'Content-Type': 'multipart/form-data' }
+                                                                    });
+                                                                    if (res.success && res.url) {
+                                                                        setExploreGuide({ ...exploreGuide, logoUrl: res.url });
+                                                                        addNotification('Success', 'Logo uploaded successfully!', 'success');
+                                                                    }
+                                                                } catch {
+                                                                    addNotification('Error', 'Upload failed.', 'error');
+                                                                }
+                                                                e.target.value = '';
+                                                            }}
+                                                        />
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <label className="text-[11px] font-medium text-slate-600">Button Target Route</label>
+                                                <input
+                                                    value={exploreGuide.nextRoute || ''}
+                                                    onChange={(e) => setExploreGuide({ ...exploreGuide, nextRoute: e.target.value })}
+                                                    placeholder="e.g. /user/earn"
+                                                    className="w-full bg-slate-50 border border-slate-200/80 rounded-lg px-3 py-1.5 text-[11.5px] font-normal text-slate-800 outline-none focus:bg-white focus:border-slate-400 transition-colors"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Top Badge & CTA Button Text */}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div className="space-y-1">
+                                                <label className="text-[11px] font-medium text-slate-600">Top Badge Tag</label>
+                                                <input
+                                                    value={exploreGuide.badge || ''}
+                                                    onChange={(e) => setExploreGuide({ ...exploreGuide, badge: e.target.value })}
+                                                    placeholder="e.g. YOUR GROWTH OUR GUIDANCE"
+                                                    className="w-full bg-slate-50 border border-slate-200/80 rounded-lg px-3 py-1.5 text-[11.5px] font-normal text-slate-800 outline-none focus:bg-white focus:border-slate-400 transition-colors"
+                                                />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-[11px] font-medium text-slate-600">Button Text</label>
+                                                <input
+                                                    value={exploreGuide.ctaText || ''}
+                                                    onChange={(e) => setExploreGuide({ ...exploreGuide, ctaText: e.target.value })}
+                                                    placeholder="e.g. Start Earning Now"
+                                                    className="w-full bg-slate-50 border border-slate-200/80 rounded-lg px-3 py-1.5 text-[11.5px] font-normal text-slate-800 outline-none focus:bg-white focus:border-slate-400 transition-colors"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Main Title & Subtitle */}
+                                        <div className="space-y-1">
+                                            <label className="text-[11px] font-medium text-slate-600">Guide Title</label>
+                                            <input
+                                                value={exploreGuide.title || ''}
+                                                onChange={(e) => setExploreGuide({ ...exploreGuide, title: e.target.value })}
+                                                placeholder="e.g. Complete Platform Guide & Growth Steps"
+                                                className="w-full bg-slate-50 border border-slate-200/80 rounded-lg px-3 py-1.5 text-[12px] font-medium text-slate-800 outline-none focus:bg-white focus:border-slate-400 transition-colors"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <label className="text-[11px] font-medium text-slate-600">Guide Subtitle</label>
+                                            <textarea
+                                                value={exploreGuide.subtitle || ''}
+                                                onChange={(e) => setExploreGuide({ ...exploreGuide, subtitle: e.target.value })}
+                                                placeholder="Brief summary of the guide..."
+                                                className="w-full bg-slate-50 border border-slate-200/80 rounded-lg px-3 py-1.5 text-[11.5px] font-normal text-slate-700 h-12 outline-none focus:bg-white focus:border-slate-400 transition-colors resize-none leading-relaxed"
+                                            />
+                                        </div>
+
+                                        {/* Complete Guide Content */}
+                                        <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                                            <div className="flex items-center justify-between">
+                                                <label className="text-[11px] font-medium text-slate-700">Guide Content (Hindi / English)</label>
+                                                <div className="flex items-center gap-1.5">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const hindiTemplate = `🚀 Dromoney कैसे काम करता है?\n❇️ Dromoney में आपका स्वागत है! Dromoney एक Learning, Part-Time Opportunity, Business Guidance और Support Platform है। यहाँ यूजर नई चीज़ें सीख सकता है, Part-Time Opportunities को समझ सकता है, Business Ideas देख सकता है, SHME Ecosystem के माध्यम से अपना बिज़नेस शुरू करने की जानकारी प्राप्त कर सकता है और Community Activities में भाग ले सकता है।\n\n⚠️ Dromoney किसी भी प्रकार की निश्चित कमाई (Guaranteed Income), निश्चित लाभ (Guaranteed Profit) या व्यवसाय में सफलता की गारंटी नहीं देता। परिणाम प्रत्येक यूजर की मेहनत, कौशल, भागीदारी और परिस्थितियों पर निर्भर करते हैं।\n\n📱 1. Account बनाएं & KYC करें\nDromoney इस्तेमाल करने के लिए सबसे पहले Account बनाना होता है। आप Mobile Number और OTP से Login कर सकते हैं। इसके बाद अपना 1-Step Aadhaar Verification पूरा करके सभी इनकम प्रोजेक्ट्स का फ्री एक्सेस अनलॉक करें।\n\n🏠 2. Home Page & Opportunities\nLogin करने के बाद Home Page दिखाई देता है। यहाँ आपको मिलता है:\n• 🎯 Part-Time Income Modules & Daily Tasks\n• 💼 Business Content & Exclusive Ideas\n• 🚀 Future Fund & Growth Boosters\n• 🎁 Daily Quizzes, Video Watching & Rewards\n• 👥 Community Guidelines & Help Desk\n\n👥 3. Invite Friends & Referrals\nअपना पर्सनल रेफरल लिंक दोस्तों के साथ शेयर करें। जब वे KYC पूरा करके विड्रॉल कार्ड बनाते हैं, तो आपके वॉलेट में रेफरल रिवॉर्ड इंसटेंट ऐड हो जाता है।\n\n💼 4. Part-Time Income & Business Guidance\nDromoney Users को अलग-अलग प्रकार की Opportunities को Explore करने का मौका देता है। आप Daily Tasks, Video Watching, Quizzes, Brand Promotion और Refer & Earn के माध्यम से Rewards Earn कर सकते हैं।\n\n💳 5. Withdrawal & Security\nकमाई हुई राशि को आप अपने Bank Account या UPI में आसानी से विड्रॉ कर सकते हैं। लाइफटाइम विड्रॉल कार्ड अनलॉक करके डायरेक्ट पेआउट्स प्राप्त करें। Withdrawal के लिए KYC Verification और Security Protocol का पालन करना अनिवार्य है।`;
+                                                            setExploreGuide({ ...exploreGuide, content: hindiTemplate });
+                                                        }}
+                                                        className="bg-slate-100 text-slate-700 hover:bg-slate-200 px-2 py-0.5 rounded text-[10px] font-medium transition-colors"
+                                                    >
+                                                        🇮🇳 Hindi
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const englishTemplate = `🚀 How Dromoney Works\nWelcome to Dromoney! Dromoney is a comprehensive Learning, Part-Time Opportunity, Business Guidance, and Support Platform. Here you can explore smart part-time earning opportunities, access exclusive business ideas, and participate in community rewards.\n\n⚠️ Disclaimer: Dromoney does not guarantee fixed income or profits. Earnings depend entirely on your effort, skills, and active participation.\n\n📱 1. Create Account & Complete KYC\nGetting started is quick and easy. Sign up using your mobile number and OTP. Complete your simple 1-Step Aadhaar verification to unlock instant access to high-paying income projects.\n\n🏠 2. Explore Home Dashboard\nOnce logged in, explore top earning opportunities:\n• 🎯 Part-Time Income Modules & Daily Tasks\n• 💼 Exclusive Business Ideas & Guidance\n• 🚀 Future Fund Profit Share & Multiplier Boosters\n• 🎁 Daily Quizzes, Video Ads & Extra Rewards\n\n👥 3. Refer Friends & Earn Rewards\nShare your unique referral invite link with friends. When they complete KYC and unlock their withdrawal card, instant referral rewards are credited to your matching wallet.\n\n💳 4. Instant Withdrawals & Security\nWithdraw your verified earnings directly to your UPI ID or Bank Account with 100% transparency and end-to-end encryption.`;
+                                                            setExploreGuide({ ...exploreGuide, content: englishTemplate });
+                                                        }}
+                                                        className="bg-slate-100 text-slate-700 hover:bg-slate-200 px-2 py-0.5 rounded text-[10px] font-medium transition-colors"
+                                                    >
+                                                        🌐 English
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <textarea
+                                                value={exploreGuide.content || (exploreGuide.points?.length ? exploreGuide.points.map(p => `${p.title}\n${p.text}`).join('\n\n') : '')}
+                                                onChange={(e) => setExploreGuide({ ...exploreGuide, content: e.target.value })}
+                                                placeholder="Write or paste your guide content here..."
+                                                className="w-full bg-slate-50 border border-slate-200/80 rounded-lg p-3 text-[11.5px] font-normal text-slate-800 h-56 outline-none focus:bg-white focus:border-slate-400 transition-colors resize-y leading-relaxed font-sans"
+                                            />
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            disabled={isSavingGuide}
+                                            onClick={handleSaveExploreGuide}
+                                            className="w-full mt-1 bg-slate-900 hover:bg-black text-white py-2.5 rounded-lg text-[11.5px] font-medium shadow-xs flex items-center justify-center gap-1.5 transition-all active:scale-98 disabled:opacity-50"
+                                        >
+                                            <Save size={13} /> {isSavingGuide ? 'Saving...' : 'Save & Publish Guide'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* App Live Preview Side */}
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between text-[11px] font-medium text-slate-500 px-1">
+                                    <span>Mobile App Live Preview</span>
+                                    <span className="text-[10px] text-slate-400">Live Render</span>
+                                </div>
+                                <div className="bg-[#FCF8F5] rounded-2xl border-4 border-slate-800 shadow-md p-3 min-h-[520px] max-h-[600px] flex flex-col font-poppins relative overflow-hidden">
+                                    {/* Mobile Header */}
+                                    <div className="bg-[#F3E8E0] -mx-3 -mt-3 p-3 rounded-b-xl mb-2.5 border-b border-[#EDE4DC]">
+                                        <div className="flex items-center justify-between mb-1.5">
+                                            <div className="w-6 h-6 rounded-full bg-white/90 border border-[#EDE4DC] flex items-center justify-center text-[#462211]">
+                                                <ChevronLeft size={14} />
+                                            </div>
+                                            {exploreGuide.logoUrl && (
+                                                <div className="h-6 px-1.5 rounded bg-white/90 border border-[#EDE4DC] flex items-center gap-1">
+                                                    <img src={exploreGuide.logoUrl} alt="" className="h-3.5 w-auto object-contain" />
+                                                    <span className="text-[8px] font-semibold text-[#462211]">Guide</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <span className="text-[7.5px] font-semibold uppercase tracking-wider bg-[#462211]/10 text-[#462211] px-1.5 py-0.5 rounded inline-block mb-0.5">
+                                            {exploreGuide.badge || 'YOUR GROWTH OUR GUIDANCE'}
+                                        </span>
+                                        <h2 className="text-[13px] font-semibold text-[#462211] leading-tight">
+                                            {exploreGuide.title || 'Guide Title'}
+                                        </h2>
+                                        {exploreGuide.subtitle && (
+                                            <p className="text-[9.5px] text-[#7A5648] mt-0.5 font-normal leading-relaxed">
+                                                {exploreGuide.subtitle}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Single Sheet Content */}
+                                    <div className="flex-1 overflow-y-auto pr-1 -mt-1 custom-scrollbar">
+                                        <div className="bg-white rounded-xl border border-[#EDE4DC] shadow-2xs p-2.5 space-y-2.5 text-[9.5px] text-[#7A5648] leading-relaxed">
+                                            {(() => {
+                                                const contentStr = exploreGuide.content || (exploreGuide.points?.length ? exploreGuide.points.map(p => `${p.title}\n${p.text}`).join('\n\n') : '');
+                                                if (!contentStr) {
+                                                    return <p className="text-center text-slate-400 text-xs py-6">No content added yet</p>;
+                                                }
+                                                const blocks = contentStr.split(/\n\s*\n/).filter(b => b.trim().length > 0);
+                                                return blocks.map((block, idx) => {
+                                                    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+                                                    const firstLine = lines[0] || '';
+                                                    const isHeading = lines.length > 1 && (
+                                                        /^(\u{1F300}-\u{1FAFF}|[#•\d]|\*|\s*🎯|\s*🚀|\s*📱|\s*🏠|\s*💼|\s*💳|\s*👥|\s*⚠️|\s*❇️|\s*🎁)/u.test(firstLine) ||
+                                                        firstLine.length < 60
+                                                    );
+
+                                                    if (isHeading) {
+                                                        const headerText = lines[0];
+                                                        const bodyLines = lines.slice(1);
+                                                        return (
+                                                            <div key={idx} className={`space-y-0.5 ${idx > 0 ? 'pt-1.5 border-t border-[#EDE4DC]/40' : ''}`}>
+                                                                <h5 className="text-[10px] font-semibold text-[#462211] leading-tight">{headerText.replace(/^#+\s*/, '')}</h5>
+                                                                <div className="space-y-0.5 text-[9px] text-[#7A5648] font-normal leading-relaxed">
+                                                                    {bodyLines.map((line, lIdx) => (
+                                                                        <p key={lIdx} className={line.startsWith('•') || line.startsWith('-') ? 'pl-1 text-[#462211] font-medium' : ''}>{line}</p>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    }
+
+                                                    const isWarning = block.includes('⚠️') || block.toLowerCase().includes('guarantee');
+
+                                                    return (
+                                                        <div
+                                                            key={idx}
+                                                            className={isWarning ? 'p-1.5 bg-[#FFF8F2] border-l-2 border-[#B3591C] rounded-r text-[9px] text-[#644234] font-normal' : 'text-[9.5px] text-[#7A5648] font-normal whitespace-pre-line'}
+                                                        >
+                                                            {block}
+                                                        </div>
+                                                    );
+                                                });
+                                            })()}
+                                        </div>
+                                    </div>
+
+                                    {/* Simulated CTA */}
+                                    <div className="mt-2 pt-1.5 border-t border-[#EDE4DC] space-y-0.5">
+                                        <div className="w-full bg-[#462211] text-white py-2 rounded-full text-center text-[10px] font-semibold flex items-center justify-center gap-1 shadow-xs">
+                                            <span>{exploreGuide.ctaText || 'Start Earning Now'}</span>
+                                            <ArrowRight size={11} />
+                                        </div>
+                                        <div className="w-full text-center text-[9px] font-medium text-[#7A5648]">
+                                            Back to Home
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* ── NEW: INFO PAGES CMS ── */}
                 {activeTab === 'menu' && infoPages && infoPages[selectedPage] && (
@@ -557,10 +1013,23 @@ const MarketingManager = () => {
                                                 }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-3.5 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" placeholder="e.g. Upgrade Now" />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Action Link (Path)</label>
-                                                <input value={banner.path} onChange={(e) => {
+                                                <div className="flex items-center justify-between">
+                                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Action Link (Path)</label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const newB = [...banners];
+                                                            newB[idx].path = '/user/guide/explore-now';
+                                                            setBanners(newB);
+                                                        }}
+                                                        className="text-[9.5px] font-bold text-amber-600 hover:text-amber-700 uppercase tracking-wide underline"
+                                                    >
+                                                        Set Explore Guide Path
+                                                    </button>
+                                                </div>
+                                                <input value={banner.path || ''} onChange={(e) => {
                                                     const newB = [...banners]; newB[idx].path = e.target.value; setBanners(newB);
-                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-3.5 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" placeholder="e.g. /user/profile" />
+                                                }} className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-3.5 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" placeholder="e.g. /user/guide/explore-now" />
                                             </div>
                                         </div>
                                     </div>

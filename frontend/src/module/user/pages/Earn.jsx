@@ -34,12 +34,8 @@ const ICON_MAP = {
 import api from '../../shared/services/api';
 
 const Earn = () => {
-    const { userData, refreshUserProfile, boostersConfig, fetchNotifications } = useUser();
-    const { isPaid, isBoosterActive } = userData;
-    const isTaskBoosterActive = userData?.isTaskBoosterActive;
+    const { userData, refreshUserProfile, fetchNotifications } = useUser();
     const [isUnlockOpen, setIsUnlockOpen] = useState(false);
-    const [isBoosterExpanded, setIsBoosterExpanded] = useState(false);
-    const [isPaymentOpen, setIsPaymentOpen] = useState(false);
     const navigate = useNavigate();
     const [isRefreshingCoins, setIsRefreshingCoins] = useState(false);
 
@@ -69,8 +65,6 @@ const Earn = () => {
     const [loading, setLoading] = useState(true);
     const [settings, setSettings] = useState(null);
     const [isWithinWindow, setIsWithinWindow] = useState(true);
-    const [boosterData, setBoosterData] = useState({ title: '₹49 Daily Boost Pass', subtitle: 'Priority Enabled', price: 49, benefits: [] });
-    const [taskMultiplier, setTaskMultiplier] = useState(12);
 
     const loadTasks = async () => {
         try {
@@ -90,41 +84,6 @@ const Earn = () => {
 
     useEffect(() => {
         loadTasks();
-        
-        const loadBoosters = async () => {
-            try {
-                const res = await api.get('/public/boosters');
-                if (res.success && res.data) {
-                    const taskBooster = res.data.find(b => b.type === 'task');
-                    if (taskBooster) {
-                        const pricePrefix = `₹${taskBooster.price} `;
-                        if (!taskBooster.title.includes('₹')) {
-                            taskBooster.title = pricePrefix + taskBooster.title;
-                        }
-                        let parsedMultiplier = 12;
-                        if (taskBooster.benefits) {
-                            for (const b of taskBooster.benefits) {
-                                const match = b.match(/(\d+)x/i);
-                                if (match) {
-                                    parsedMultiplier = parseInt(match[1]);
-                                    break;
-                                }
-                            }
-                        }
-                        setTaskMultiplier(parsedMultiplier);
-
-                        setBoosterData({
-                            title: taskBooster.title,
-                            subtitle: taskBooster.subtitle || 'Priority Enabled',
-                            price: taskBooster.price || 49,
-                            benefits: taskBooster.benefits || []
-                        });
-                    }
-                }
-            } catch (err) {}
-        };
-
-        loadBoosters();
         loadSettings();
 
         const timer = setInterval(() => {
@@ -319,73 +278,8 @@ const Earn = () => {
                     </span>
                 </div>
 
-                {/* Booster Card */}
-                <div className="mx-3 mt-3 bg-[#FFF5F0] border border-[#EDE4DC] rounded-2xl overflow-hidden">
-                    <div className="px-4 py-3 flex items-center justify-between">
-                        <div className="flex flex-col">
-                            <h4 className="text-[13px] font-semibold text-[#462211] tracking-tight leading-none mb-1">{boosterData.title}</h4>
-                            <p className="text-[9px] font-semibold text-[#B3591C] uppercase tracking-widest">{boosterData.subtitle}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => setIsBoosterExpanded(!isBoosterExpanded)}
-                                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 border ${isBoosterExpanded ? 'bg-[#F8EDE4] text-[#462211] border-[#EDE4DC] rotate-180' : 'bg-white text-[#9A8478] border-[#EDE4DC]'}`}
-                            >
-                                <ChevronDown size={16} />
-                            </button>
-                            <button
-                                onClick={() => !userData.isTaskBoosterActive && setIsPaymentOpen(true)}
-                                disabled={userData.isTaskBoosterActive}
-                                className={`${userData.isTaskBoosterActive ? 'bg-[#F3E8E0] text-[#9A8478] cursor-not-allowed' : 'bg-[#B3591C] hover:bg-[#9E4E18] text-white shadow-md'} px-3.5 py-2 rounded-xl text-[10px] font-semibold tracking-tight active:scale-95 transition-all`}
-                            >
-                                {userData.isTaskBoosterActive ? 'Already Active' : 'Buy Now'}
-                            </button>
-                        </div>
-                    </div>
-
-                    {isBoosterExpanded && (
-                        <div className="bg-white border-t border-[#EDE4DC] px-4 py-3 space-y-2.5">
-                            {(boosterData.benefits && boosterData.benefits.length > 0 
-                                ? boosterData.benefits.map((benefitStr) => ({
-                                    icon: <Rocket size={14} className="text-[#B3591C]" />, 
-                                    bg: 'bg-[#FFF5F0]', 
-                                    title: benefitStr, 
-                                    desc: 'Exclusive booster perk'
-                                }))
-                                : [
-                                    { icon: <Rocket size={14} className="text-[#B3591C]" />, bg: 'bg-[#FFF5F0]', title: `${taskMultiplier}X Rewards on Tasks`, desc: `Boosted task rewards` },
-                                    { icon: <Zap size={14} className="text-[#462211]" />, bg: 'bg-[#F8EDE4]', title: 'Fast Rewards Processing', desc: 'Priority handling' },
-                                    { icon: <CheckCircle2 size={14} className="text-[#5D2E17]" />, bg: 'bg-[#F3E8E0]', title: 'Priority Task Verification', desc: 'Get verified first' },
-                                ]
-                            ).map((b, i) => (
-                                <div key={i} className="flex items-center gap-2.5">
-                                    <div className={`w-7 h-7 ${b.bg} rounded-lg flex items-center justify-center shrink-0 border border-[#EDE4DC]`}>
-                                        {b.icon}
-                                    </div>
-                                    <div>
-                                        <h5 className="text-[11px] font-semibold text-[#462211] leading-tight">{b.title}</h5>
-                                        <p className="text-[9px] font-medium text-[#9A8478] leading-none">{b.desc}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
                 <div className="h-6"></div>
             </div>
-
-            <PaymentModal
-                isOpen={isPaymentOpen}
-                onClose={() => setIsPaymentOpen(false)}
-                amount={Math.round(boosterData.price * 1.04 * 100) / 100}
-                type="TASK_BOOSTER"
-                plan={boosterData.title}
-                onSuccess={() => {
-                    setIsPaymentOpen(false);
-                    setIsBoosterExpanded(false);
-                }}
-            />
         </div>
     );
 };

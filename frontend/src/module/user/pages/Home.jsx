@@ -31,32 +31,27 @@ const ICON_MAP = {
     ClipboardCheck, UserPlus, CreditCard, Wallet, TrendingUp, PiggyBank, ListChecks, Building2,
 };
 
-const PROMO_BANNER_PATTERN = /booster|multiply|coin|affiliate|contest|jackpot|event|upgrade|3x|₹200|live contest|earn ₹/i;
-
 const FALLBACK_BANNER = {
     tag: 'Your Growth',
     title: 'Our Guidance',
     subtitle: 'Dromoney is your trusted platform to learn, grow and earn online with smart opportunities.',
     ctaText: 'Explore Now',
-    path: '',
+    path: '/user/guide/explore-now',
     imageUrl: homeHeroPerson,
 };
 
-const isPromoBanner = (banner) => {
-    const text = `${banner?.tag || ''} ${banner?.title || ''} ${banner?.subtitle || ''}`;
-    return PROMO_BANNER_PATTERN.test(text);
-};
-
 const resolveHomeBanner = (list) => {
-    const heroes = (list || []).filter((b) => !isPromoBanner(b));
-    const preferred = heroes.find(
-        (b) => /your growth/i.test(b.tag || '') || /our guidance/i.test(b.title || '')
-    );
-    const picked = preferred || heroes[0];
-    if (!picked) return FALLBACK_BANNER;
+    if (!list || !list.length) return FALLBACK_BANNER;
+    const active = list.find((b) => b.isActive) || list[0];
+    if (!active) return FALLBACK_BANNER;
     return {
-        ...picked,
-        imageUrl: picked.imageUrl || homeHeroPerson,
+        ...active,
+        tag: active.tag || 'Your Growth',
+        title: active.title || 'Our Guidance',
+        subtitle: active.subtitle || '',
+        ctaText: active.ctaText || 'Explore Now',
+        path: active.path || '/user/guide/explore-now',
+        imageUrl: active.imageUrl || homeHeroPerson,
     };
 };
 
@@ -92,17 +87,18 @@ const Home = () => {
         load();
     }, []);
 
-    const handleCta = () => {
-        const path = banner.path || '';
-        if (!path || path === '/user/home') {
-            helpsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const handleCta = (e) => {
+        if (e) e.stopPropagation();
+        const rawPath = (banner?.path || '').trim();
+        if (!rawPath || rawPath === '/user/home' || rawPath.includes('home') || rawPath.includes('helps') || rawPath.includes('explore')) {
+            navigate('/user/guide/explore-now');
             return;
         }
-        if (path.startsWith('http')) {
-            window.open(path, '_blank', 'noopener,noreferrer');
+        if (rawPath.startsWith('http')) {
+            window.open(rawPath, '_blank', 'noopener,noreferrer');
             return;
         }
-        navigate(path);
+        navigate(rawPath);
     };
 
     const openWhatsApp = () => {
@@ -113,36 +109,38 @@ const Home = () => {
     return (
         <div className="flex flex-col min-h-full bg-white font-poppins pb-2">
             {/* Hero banner — Your Growth / Our Guidance */}
-            <section className="mb-2.5 bg-[#FDF8F5] overflow-hidden relative min-h-[138px] shadow-[0_2px_14px_rgba(70,34,17,0.07)] home-hero-enter">
-                <div className="absolute right-[12%] bottom-[-8%] w-[72%] max-w-[140px] aspect-square rounded-full bg-[#F0E0D0]/55 home-hero-glow pointer-events-none" />
+            <section
+                onClick={handleCta}
+                className="mx-2.5 mt-2.5 mb-4 bg-[#FAF3EC] rounded-2xl border border-[#F0E5DA] overflow-hidden relative min-h-[220px] shadow-[0_4px_16px_rgba(70,34,17,0.06)] cursor-pointer"
+            >
+                <div className="absolute right-[6%] bottom-[-5%] w-[75%] max-w-[190px] aspect-square rounded-full bg-[#EAD8C7]/50 pointer-events-none" />
 
-                <div className="relative z-10 py-3.5 flex items-stretch min-h-[138px]">
-                    <div className="flex-1 min-w-0 flex flex-col justify-center pl-3 pr-1">
-                        <h1 className="text-[17px] font-bold text-[#1A1A1A] leading-[1.12] tracking-tight">
+                <div className="relative z-10 py-6 px-4.5 flex items-stretch min-h-[220px]">
+                    <div className="flex-1 min-w-0 flex flex-col justify-center pr-1 z-20">
+                        <h1 className="text-[21px] font-extrabold text-[#1E1B18] leading-[1.12] tracking-tight">
                             {banner.tag || 'Your Growth'}
                         </h1>
-                        <h2 className="text-[17px] font-bold text-[#B3591C] leading-[1.12] tracking-tight">
+                        <h2 className="text-[21px] font-extrabold text-[#C2520A] leading-[1.12] tracking-tight">
                             {banner.title || 'Our Guidance'}
                         </h2>
-                        <p className="text-[9.5px] text-slate-500 mt-1.5 leading-[1.45] line-clamp-3 pr-0.5 font-medium">
-                            {banner.subtitle}
+                        <p className="text-[10.5px] text-[#7A5648] mt-2.5 leading-[1.48] line-clamp-3 font-medium">
+                            {banner.subtitle || 'Dromoney is your trusted platform to learn, grow and earn online with smart opportunities.'}
                         </p>
                         <button
                             type="button"
                             onClick={handleCta}
-                            className="mt-2.5 inline-flex items-center gap-1 bg-[#B3591C] hover:bg-[#9E4E18] text-white text-[9.5px] font-semibold px-3.5 py-[7px] rounded-full w-fit active:scale-95 transition-all duration-200 shadow-[0_2px_8px_rgba(179,89,28,0.35)]"
+                            className="mt-4 inline-flex items-center gap-1.5 bg-[#C2520A] hover:bg-[#A84305] text-white text-[11px] font-semibold px-5 py-2.5 rounded-full w-fit active:scale-95 transition-all shadow-[0_2px_10px_rgba(194,82,10,0.3)]"
                         >
-                            {banner.ctaText || 'Explore Now'}
-                            <ArrowRight size={11} strokeWidth={2.5} />
+                            <span>{banner.ctaText || 'Explore Now'}</span>
+                            <ArrowRight size={13} strokeWidth={2.5} />
                         </button>
                     </div>
 
-                    <div className="w-[44%] max-w-[158px] shrink-0 self-end flex items-end justify-center overflow-hidden relative pr-1">
+                    <div className="w-[48%] max-w-[195px] shrink-0 self-end flex items-end justify-center overflow-hidden relative">
                         <img
                             src={banner.imageUrl || homeHeroPerson}
                             alt=""
-                            className="h-[138px] w-auto max-w-none object-cover object-bottom select-none pointer-events-none home-hero-person relative z-10 mix-blend-multiply scale-105"
-                            style={{ clipPath: 'inset(0 4px 0 4px)' }}
+                            className="h-[220px] w-auto max-w-none object-cover object-bottom select-none pointer-events-none relative z-10 mix-blend-multiply scale-105"
                             draggable={false}
                         />
                     </div>
@@ -151,12 +149,12 @@ const Home = () => {
 
             {/* 4 × 2 compact guide grid */}
             <section ref={helpsRef} className="px-2.5 pb-1">
-                <div className="text-center mb-2">
-                    <h3 className="text-[13px] font-bold text-slate-900 leading-snug">
+                <div className="text-center mb-2.5">
+                    <h3 className="text-[13.5px] font-bold text-slate-900 leading-snug">
                         How{' '}
                         <span className="relative inline-block">
                             Dromoney
-                            <span className="absolute left-0 right-0 -bottom-0.5 h-[2px] bg-[#B3591C] rounded-full" />
+                            <span className="absolute left-0 right-0 -bottom-0.5 h-[2px] bg-[#C2520A] rounded-full" />
                         </span>{' '}
                         Helps?
                     </h3>
