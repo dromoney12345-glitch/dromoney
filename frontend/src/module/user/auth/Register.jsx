@@ -8,7 +8,7 @@ import {
 } from '../../shared/utils/referral';
 
 const inputClass =
-    'w-full bg-white text-[#462211] font-medium pl-11 pr-4 py-2.5 rounded-xl border border-[#E5E7EB] focus:border-[#462211]/40 focus:outline-none transition-all placeholder:text-[#C4B5A8] text-[13px]';
+    'w-full bg-white text-[#462211] font-medium pl-10 pr-3.5 py-2 rounded-xl border border-[#E5E7EB] focus:border-[#462211]/40 focus:outline-none transition-all placeholder:text-[#C4B5A8] text-[12.5px]';
 
 const Register = () => {
     const navigate = useNavigate();
@@ -270,9 +270,9 @@ const Register = () => {
                         </div>
 
                         <div className="space-y-1">
-                            <label className="text-[11px] font-medium text-[#7A5648] ml-0.5">Mobile Number</label>
+                            <label className="text-[10.5px] font-medium text-[#7A5648] ml-0.5">Mobile Number</label>
                             <div className="relative">
-                                <Smartphone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A89890]" size={18} />
+                                <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A89890]" size={16} />
                                 <input
                                     type="tel"
                                     placeholder="10-digit mobile"
@@ -288,17 +288,10 @@ const Register = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#462211] hover:bg-[#5a2d1a] disabled:opacity-50 text-white py-3 rounded-xl font-medium text-[13px] transition-all active:scale-[0.99] flex items-center justify-center gap-2"
+                        className="w-full bg-[#462211] hover:bg-[#5a2d1a] disabled:opacity-50 text-white py-2.5 rounded-xl font-medium text-[13px] transition-all active:scale-[0.99] flex items-center justify-center gap-2 mt-1"
                     >
-                        {loading ? <Loader2 size={18} className="animate-spin" /> : 'Sign Up'}
+                        {loading ? <Loader2 size={16} className="animate-spin" /> : 'Sign Up'}
                     </button>
-
-                    <p className="text-center text-[11px] text-[#A89890] pt-1">
-                        Already have an account?{' '}
-                        <Link to="/user/auth/login" className="text-[#462211] font-medium underline underline-offset-2">
-                            Login
-                        </Link>
-                    </p>
                 </form>
             ) : (
                 <form onSubmit={handleVerifyOTP} className="space-y-4 animate-in slide-in-from-right duration-500">

@@ -1,5 +1,7 @@
 const express = require('express');
 const { protect } = require('../middleware/authMiddleware');
+const { rewardLimiter } = require('../middleware/rateLimiter');
+const idempotency = require('../middleware/idempotency');
 const User = require('../models/User');
 const RewardHistory = require('../models/RewardHistory');
 const Settings = require('../models/Settings');
@@ -76,7 +78,7 @@ router.get('/status', async (req, res) => {
 // @desc    Claim reward after watching ad
 // @route   POST /api/reward/claim
 // @access  Private
-router.post('/claim', async (req, res) => {
+router.post('/claim', rewardLimiter, idempotency(), async (req, res) => {
     try {
         const user = req.user;
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });

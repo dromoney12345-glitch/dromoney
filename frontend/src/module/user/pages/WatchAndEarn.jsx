@@ -205,7 +205,6 @@ const WatchAndEarn = () => {
                                 <div className="flex justify-between items-start mb-3">
                                     <div>
                                         <h3 className="text-slate-800 text-[14px] font-medium">Reward Ad</h3>
-                                        <p className="text-slate-500 text-[11px]">Reward: ₹{status?.rewardAmount || 5}</p>
                                     </div>
                                     <div className="bg-amber-50 text-amber-600 px-2.5 py-1 rounded-lg border border-amber-100 flex items-center gap-1.5">
                                         <RefreshCw size={12} className="animate-spin" />
@@ -225,10 +224,6 @@ const WatchAndEarn = () => {
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
                                             <h3 className="text-slate-800 text-[15px] font-medium">Reward Ad</h3>
-                                            <div className="flex items-center gap-1 mt-1">
-                                                <IndianRupee size={12} className="text-[#B3591C]" />
-                                                <p className="text-[#B3591C] text-[12px] font-medium">Reward: ₹{status?.rewardAmount || 5}</p>
-                                            </div>
                                         </div>
                                         <div className="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1.5">
                                             <CheckCircle size={12} />

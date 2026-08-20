@@ -111,36 +111,36 @@ const Home = () => {
             {/* Hero banner — Your Growth / Our Guidance */}
             <section
                 onClick={handleCta}
-                className="mx-2.5 mt-2.5 mb-4 bg-[#FAF3EC] rounded-2xl border border-[#F0E5DA] overflow-hidden relative min-h-[220px] shadow-[0_4px_16px_rgba(70,34,17,0.06)] cursor-pointer"
+                className="mx-2.5 mt-2.5 mb-4 bg-[#FAF3EC] rounded-2xl border border-[#F0E5DA] overflow-hidden relative min-h-[195px] shadow-[0_4px_16px_rgba(70,34,17,0.06)] cursor-pointer"
             >
-                <div className="absolute right-[6%] bottom-[-5%] w-[75%] max-w-[190px] aspect-square rounded-full bg-[#EAD8C7]/50 pointer-events-none" />
+                <div className="absolute right-[4%] bottom-[-5%] w-[68%] max-w-[170px] aspect-square rounded-full bg-[#EAD8C7]/50 pointer-events-none" />
 
-                <div className="relative z-10 py-6 px-4.5 flex items-stretch min-h-[220px]">
-                    <div className="flex-1 min-w-0 flex flex-col justify-center pr-1 z-20">
-                        <h1 className="text-[21px] font-extrabold text-[#1E1B18] leading-[1.12] tracking-tight">
+                <div className="relative z-10 py-5 px-4 flex items-stretch min-h-[195px]">
+                    <div className="flex-1 min-w-0 flex flex-col justify-center pr-1.5 z-20">
+                        <h1 className="text-[20px] font-extrabold text-[#1E1B18] leading-[1.12] tracking-tight">
                             {banner.tag || 'Your Growth'}
                         </h1>
-                        <h2 className="text-[21px] font-extrabold text-[#C2520A] leading-[1.12] tracking-tight">
+                        <h2 className="text-[20px] font-extrabold text-[#C2520A] leading-[1.12] tracking-tight">
                             {banner.title || 'Our Guidance'}
                         </h2>
-                        <p className="text-[10.5px] text-[#7A5648] mt-2.5 leading-[1.48] line-clamp-3 font-medium">
+                        <p className="text-[10px] text-[#7A5648] mt-2 leading-[1.45] line-clamp-3 font-medium">
                             {banner.subtitle || 'Dromoney is your trusted platform to learn, grow and earn online with smart opportunities.'}
                         </p>
                         <button
                             type="button"
                             onClick={handleCta}
-                            className="mt-4 inline-flex items-center gap-1.5 bg-[#C2520A] hover:bg-[#A84305] text-white text-[11px] font-semibold px-5 py-2.5 rounded-full w-fit active:scale-95 transition-all shadow-[0_2px_10px_rgba(194,82,10,0.3)]"
+                            className="mt-3.5 inline-flex items-center gap-1.5 bg-[#C2520A] hover:bg-[#A84305] text-white text-[10.5px] font-semibold px-4.5 py-2 rounded-full w-fit active:scale-95 transition-all shadow-[0_2px_10px_rgba(194,82,10,0.3)]"
                         >
                             <span>{banner.ctaText || 'Explore Now'}</span>
-                            <ArrowRight size={13} strokeWidth={2.5} />
+                            <ArrowRight size={12} strokeWidth={2.5} />
                         </button>
                     </div>
 
-                    <div className="w-[48%] max-w-[195px] shrink-0 self-end flex items-end justify-center overflow-hidden relative">
+                    <div className="w-[45%] max-w-[170px] shrink-0 self-end flex items-end justify-end relative">
                         <img
                             src={banner.imageUrl || homeHeroPerson}
                             alt=""
-                            className="h-[220px] w-auto max-w-none object-cover object-bottom select-none pointer-events-none relative z-10 mix-blend-multiply scale-105"
+                            className="max-h-[195px] w-full object-contain object-bottom select-none pointer-events-none relative z-10 mix-blend-multiply"
                             draggable={false}
                         />
                     </div>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import {
     UserPlus, IndianRupee, ClipboardList, Rocket, ChevronRight, ChevronLeft, Loader2,
-    Wallet, Clock, Lock
+    Wallet, Clock, Lock, MonitorPlay
 } from 'lucide-react';
 import api from '../../shared/services/api';
 
@@ -124,6 +124,15 @@ const Income = () => {
                     title="Work Daily, Start Earning"
                     subtitle="Complete company tasks and earn every day."
                     onClick={() => navigate('/user/guide/daily')}
+                />
+                <OptionCard
+                    icon={MonitorPlay}
+                    iconBg="bg-[#FFF5F0]"
+                    iconColor="text-[#462211]"
+                    arrowBg="bg-[#FFF5F0]"
+                    title="Watch & Earn"
+                    subtitle="Watch daily bonus ads and earn instant wallet income."
+                    onClick={() => navigate('/user/watch')}
                 />
             </div>
 

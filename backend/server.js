@@ -64,11 +64,8 @@ app.use(cors({
 // app.use(mongoSanitize()); // Sanitize data
 
 // Rate limiting
-const limiter = rateLimit({
-    windowMs: 10 * 60 * 1000, // 10 mins
-    max: 1000 // limit each IP to 1000 requests per windowMs
-});
-app.use('/api/', limiter);
+const { generalApiLimiter } = require('./middleware/rateLimiter');
+app.use('/api/', generalApiLimiter);
 
 const userAuth = require('./routes/userAuthRoutes');
 const userWallet = require('./routes/userWalletRoutes');

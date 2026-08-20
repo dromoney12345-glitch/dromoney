@@ -38,8 +38,11 @@ router.use(protect); // Secure all routes
 const { submitFeedback } = require('../controllers/feedbackController');
 const { submitReport } = require('../controllers/reportController');
 
+const { walletLimiter, rewardLimiter } = require('../middleware/rateLimiter');
+const idempotency = require('../middleware/idempotency');
+
 router.patch('/kyc', upload.single('document'), updateKyc);
-router.post('/unlock', unlockPlatform);
+router.post('/unlock', walletLimiter, idempotency(), unlockPlatform);
 router.post('/complete-course', completeCourse);
 router.post('/promotions', submitPromotion);
 router.get('/promotions', getMyPromotions);
@@ -47,26 +50,26 @@ router.get('/referrals', getReferrals);
 router.patch('/profile', updateProfile);
 router.patch('/photo', upload.single('photo'), updateProfilePhoto);
 router.post('/future-fund/progress', updateFutureFundProgress);
-router.post('/future-fund/unlock', unlockFutureFund);
+router.post('/future-fund/unlock', walletLimiter, idempotency(), unlockFutureFund);
 router.get('/future-fund/status', getFutureFundStatus);
 router.post('/future-fund/activity', pingFutureFundActivity);
 router.get('/future-fund/estimation', getFutureFundEstimation);
 router.get('/withdrawal-card', getWithdrawalCard);
 router.post('/feedback', submitFeedback);
 router.post('/reports', submitReport);
-router.post('/business-ideas/unlock', unlockIdea);
-router.post('/ads/reward', rewardUserForAd);
+router.post('/business-ideas/unlock', walletLimiter, idempotency(), unlockIdea);
+router.post('/ads/reward', rewardLimiter, idempotency(), rewardUserForAd);
 router.post('/events/:id/join', joinEvent);
 router.post('/events/:id/submit', submitResult);
 router.delete('/notifications', clearPersonalNotifications);
 
 // Razorpay & Payment Routes
-router.post('/razorpay/create-order', createOrder);
-router.post('/razorpay/verify', verifyPayment);
-router.post('/manual-payment', upload.single('screenshot'), submitManualPayment);
+router.post('/razorpay/create-order', walletLimiter, idempotency(), createOrder);
+router.post('/razorpay/verify', walletLimiter, idempotency(), verifyPayment);
+router.post('/manual-payment', walletLimiter, upload.single('screenshot'), submitManualPayment);
 router.get('/manual-payment/check', checkPendingManualPayment);
 
-router.post('/tasks/submit', submitTask);
+router.post('/tasks/submit', rewardLimiter, idempotency(), submitTask);
 router.post('/upload', uploadMiddleware, uploadToCloud);
 
 module.exports = router;

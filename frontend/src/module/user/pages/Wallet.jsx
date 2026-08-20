@@ -321,10 +321,14 @@ const Wallet = () => {
                 <>
                     <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
-                            <button type="button" onClick={() => setPane('virtual')} className="text-[#462211] active:scale-90 shrink-0">
-                                <ChevronLeft size={22} strokeWidth={2.2} />
+                            <button
+                                type="button"
+                                onClick={() => setPane('virtual')}
+                                className="w-8 h-8 rounded-full bg-white border border-[#EDE4DC] flex items-center justify-center text-[#462211] active:scale-95 shadow-sm shrink-0"
+                            >
+                                <ChevronLeft size={18} strokeWidth={2.5} />
                             </button>
-                            <h1 className="text-[16px] font-medium text-[#462211]">Pending Wallet</h1>
+                            <h1 className="text-[16px] font-semibold text-[#462211]">Pending Wallet</h1>
                         </div>
                         <button
                             type="button"
@@ -467,7 +471,16 @@ const Wallet = () => {
             ) : (
                 <>
             <div className="flex items-center justify-between gap-2">
-                <h1 className="text-[16px] font-medium text-[#462211]">Virtual Wallet</h1>
+                <div className="flex items-center gap-2 min-w-0">
+                    <button
+                        type="button"
+                        onClick={() => navigate(-1)}
+                        className="w-8 h-8 rounded-full bg-white border border-[#EDE4DC] flex items-center justify-center text-[#462211] active:scale-95 shadow-sm shrink-0"
+                    >
+                        <ChevronLeft size={18} strokeWidth={2.5} />
+                    </button>
+                    <h1 className="text-[16px] font-semibold text-[#462211]">Virtual Wallet</h1>
+                </div>
                 <button
                     type="button"
                     onClick={() => setPane('pending')}

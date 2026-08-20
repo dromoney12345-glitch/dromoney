@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
     Bell, Home as HomeIcon, User, HelpCircle, Building2, Rocket, X, CheckCircle2, 
-    AlertCircle, Info, Sparkles, Headset, TrendingUp, Briefcase, Share2, MoreVertical, Menu
+    AlertCircle, Info, Sparkles, Headset, TrendingUp, Briefcase, Share2, MoreVertical, Menu, MonitorPlay
 } from 'lucide-react';
 import { useUser } from './context/UserContext';
 import api from '../shared/services/api';
@@ -265,6 +265,7 @@ const UserLayout = () => {
                         <div className="h-px bg-[#EDE4DC] mx-3 mb-1.5"></div>
 
                         {[
+                            { icon: MonitorPlay, label: 'Watch & Earn', path: '/user/watch' },
                             { icon: User, label: 'Settings', path: '/user/profile' },
                             { icon: HelpCircle, label: 'How It Works', path: '/user/info/how-it-works' },
                             { icon: Sparkles, label: 'Benefits', path: '/user/info/benefits' },

@@ -7,7 +7,7 @@ import {
     ChevronLeft, ChevronRight, ChevronDown,
     Monitor, Play, Lightbulb, Disc, MessageCircle,
     Camera, ThumbsUp, MessageSquare, Link2,
-    Bell, ClipboardList, TrendingUp, AlertCircle, Rocket, Zap, CheckCircle2, RefreshCw
+    Bell, ClipboardList, TrendingUp, AlertCircle, Rocket, Zap, CheckCircle2, RefreshCw, MonitorPlay
 } from 'lucide-react';
 import UnlockModal from '../components/UnlockModal';
 import PaymentModal from '../components/PaymentModal';
@@ -164,24 +164,39 @@ const Earn = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto pb-4">
-                {/* Summary Card */}
-                <div className="mx-3 mt-3 bg-white px-4 py-3.5 border border-[#EDE4DC] shadow-[0_2px_12px_rgba(70,34,17,0.06)] rounded-2xl flex items-center justify-between">
-                    <div>
-                        <p className="text-[13px] font-semibold text-[#462211] tracking-tight flex items-center gap-1.5">
-                            Daily Tasks
-                            <span className="text-[#B3591C] font-semibold">Available: {totalCount}</span>
-                        </p>
-                        <div className="flex items-center gap-3 mt-1">
-                            <span className="text-[11px] font-medium text-[#9A8478]">
-                                Done: <span className="text-emerald-600 font-semibold">{completedCount}</span>
-                            </span>
-                            <span className="text-[11px] font-medium text-[#9A8478]">
-                                Left: <span className="text-[#B3591C] font-semibold">{remainingCount}</span>
+                {/* Top 2 Earning Cards: Watch & Earn + Daily Tasks */}
+                <div className="grid grid-cols-2 gap-2.5 mx-3 mt-3">
+                    {/* Watch & Earn Card */}
+                    <div
+                        onClick={() => navigate('/user/watch')}
+                        className="bg-white rounded-2xl p-3 border border-[#EDE4DC] shadow-[0_2px_10px_rgba(70,34,17,0.05)] cursor-pointer active:scale-95 transition-all relative overflow-hidden group hover:border-[#B3591C]/40"
+                    >
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="w-9 h-9 rounded-xl bg-[#FFF5F0] text-[#B3591C] flex items-center justify-center border border-[#EDE4DC]">
+                                <MonitorPlay size={18} />
+                            </div>
+                            <span className="text-[9px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                                Live
                             </span>
                         </div>
+                        <h3 className="text-[13px] font-bold text-[#462211] leading-tight">Watch & Earn</h3>
+                        <p className="text-[9.5px] text-[#7A5648] mt-0.5 leading-snug">Bonus Daily Ads</p>
                     </div>
-                    <div className="w-11 h-11 bg-[#FFF5F0] rounded-xl flex items-center justify-center border border-[#EDE4DC] shrink-0">
-                        <ClipboardList size={20} className="text-[#B3591C]" />
+
+                    {/* Daily Tasks Card */}
+                    <div
+                        className="bg-[#FFF5F0] rounded-2xl p-3 border-2 border-[#C2520A] shadow-[0_2px_10px_rgba(194,82,10,0.08)] relative overflow-hidden cursor-default"
+                    >
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="w-9 h-9 rounded-xl bg-[#462211] text-white flex items-center justify-center">
+                                <ClipboardList size={18} />
+                            </div>
+                            <span className="text-[9px] font-semibold text-[#C2520A] bg-white px-2 py-0.5 rounded-full border border-[#EDE4DC]">
+                                {remainingCount} Left
+                            </span>
+                        </div>
+                        <h3 className="text-[13px] font-bold text-[#462211] leading-tight">Daily Tasks</h3>
+                        <p className="text-[9.5px] text-[#7A5648] mt-0.5 leading-snug">{completedCount}/{totalCount} Completed</p>
                     </div>
                 </div>
 

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { GUIDES } from '../data/guides';
 import api from '../../shared/services/api';
+import defaultLogo from '../../../assets/WhatsApp_Image_2026-04-28_at_10.52.49_PM-removebg-preview.png';
 
 const ICON_MAP = {
     ShieldCheck, ListChecks, UserPlus, CreditCard, TrendingUp,
@@ -140,12 +141,18 @@ const GuidePage = () => {
                     >
                         <ChevronLeft size={20} strokeWidth={2.5} />
                     </button>
-                    {guide.logoUrl && (
-                        <div className="h-9 px-2.5 rounded-xl bg-white/90 shadow-xs border border-[#EDE4DC] flex items-center justify-center gap-1.5">
-                            <img src={guide.logoUrl} alt="Logo" className="h-6 w-auto object-contain" />
-                            <span className="text-[10px] font-bold text-[#462211] uppercase tracking-wider">Guide</span>
-                        </div>
-                    )}
+                    <div className="h-9 px-2.5 rounded-xl bg-white/90 shadow-xs border border-[#EDE4DC] flex items-center justify-center gap-1.5">
+                        <img
+                            src={guide.logoUrl || defaultLogo}
+                            onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = defaultLogo;
+                            }}
+                            alt="Dromoney"
+                            className="h-6 w-auto object-contain"
+                        />
+                        <span className="text-[10px] font-bold text-[#462211] uppercase tracking-wider">Guide</span>
+                    </div>
                 </div>
 
                 <div className="relative z-10">
