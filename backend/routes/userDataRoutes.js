@@ -18,10 +18,11 @@ const {
 } = require('../controllers/userController');
 const { submitTask } = require('../controllers/taskSubmissionController');
 const { unlockIdea } = require('../controllers/businessIdeaController');
-const { createOrder, verifyPayment, submitManualPayment, checkPendingManualPayment } = require('../controllers/razorpayController');
+const { createOrder, verifyPayment, submitManualPayment, checkPendingManualPayment, getPaymentQuote } = require('../controllers/razorpayController');
 const { rewardUserForAd } = require('../controllers/adController');
 const { joinEvent, submitResult } = require('../controllers/eventController');
 const { protect } = require('../middleware/authMiddleware');
+const { getOfferwallSession } = require('../controllers/offerwallController');
 const upload = require('../middleware/upload');
 const { uploadToCloud, uploadMiddleware } = require('../controllers/adminUploadController');
 
@@ -47,6 +48,7 @@ router.post('/complete-course', completeCourse);
 router.post('/promotions', submitPromotion);
 router.get('/promotions', getMyPromotions);
 router.get('/referrals', getReferrals);
+router.get('/offerwall', getOfferwallSession);
 router.patch('/profile', updateProfile);
 router.patch('/photo', upload.single('photo'), updateProfilePhoto);
 router.post('/future-fund/progress', updateFutureFundProgress);
@@ -64,6 +66,7 @@ router.post('/events/:id/submit', submitResult);
 router.delete('/notifications', clearPersonalNotifications);
 
 // Razorpay & Payment Routes
+router.get('/payment-quote', getPaymentQuote);
 router.post('/razorpay/create-order', walletLimiter, idempotency(), createOrder);
 router.post('/razorpay/verify', walletLimiter, idempotency(), verifyPayment);
 router.post('/manual-payment', walletLimiter, upload.single('screenshot'), submitManualPayment);

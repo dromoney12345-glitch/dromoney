@@ -254,7 +254,6 @@ const Settings = () => {
                                         {[
                                             { label: 'Referral Commission', field: 'referralCommission', unit: '₹', icon: '🎁', info: 'Direct sale bonus' },
                                             { label: 'Minimum Payout', field: 'minWithdrawal', unit: '₹', icon: '🏧', info: 'Withdrawal limit' },
-                                            { label: 'Ad Reward', field: 'adRewardCoins', unit: '₹', icon: '💰', info: 'Reward per Watch Ad', step: 0.01 },
                                             { label: 'Ad Cooldown', field: 'adCooldownSeconds', unit: 's', icon: '⏱️', info: 'Wait time between ads', step: 1 },
                                             { label: 'Max Daily Ads', field: 'adMaxDailyLimit', unit: 'ads', icon: '🎬', info: 'Limit per user', step: 1 }
                                         ].map((item, idx) => (
@@ -364,6 +363,40 @@ const Settings = () => {
                                         >
                                             <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-all duration-300 shadow-sm ${config.referralSystemEnabled ? 'translate-x-8' : ''}`}></div>
                                         </button>
+                                    </div>
+                                    <div className="p-4 bg-amber-50 rounded-xl border border-amber-100 flex items-center justify-between gap-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-amber-600 shadow-sm">
+                                                <Coins size={24} />
+                                            </div>
+                                            <div>
+                                                <p className="text-[13px] font-medium text-amber-950 tracking-tight">AyeT Offerwall</p>
+                                                <p className="text-[11px] font-medium text-amber-800/70 mt-1">Show Offers & Surveys in the user app. Keep off until AyeT placement is active.</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleChange('offerwallEnabled', !config.offerwallEnabled)}
+                                            className={`relative w-16 h-8 rounded-full transition-all duration-300 ${config.offerwallEnabled ? 'bg-amber-500 shadow-lg shadow-amber-200' : 'bg-slate-200'}`}
+                                        >
+                                            <div className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-all duration-300 shadow-sm ${config.offerwallEnabled ? 'translate-x-8' : ''}`}></div>
+                                        </button>
+                                    </div>
+                                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                        <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal ml-1">Offerwall user share</label>
+                                        <div className="relative mt-2">
+                                            <input
+                                                type="number"
+                                                min={0}
+                                                max={100}
+                                                step={1}
+                                                value={config.offerwallUserSharePercent ?? 100}
+                                                onChange={(e) => handleChange('offerwallUserSharePercent', e.target.value)}
+                                                className="w-full bg-white border border-slate-200 rounded-lg pl-5 pr-12 py-4 text-lg font-medium text-emerald-600 focus:outline-none focus:border-emerald-500 transition-all"
+                                            />
+                                            <span className="absolute right-5 top-1/2 -translate-y-1/2 font-medium text-slate-400">%</span>
+                                        </div>
+                                        <p className="text-[10px] font-medium text-slate-400 mt-3 ml-1 uppercase tracking-tight opacity-60">Percent of AyeT currency_amount credited to the user (100 = full amount)</p>
                                     </div>
                                 </div>
                             )}

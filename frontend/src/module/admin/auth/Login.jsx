@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-    Mail, Lock, Eye, EyeOff, LogIn, 
-    ArrowRight
-} from 'lucide-react';
+import { Mail, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import logo from '../../../assets/WhatsApp_Image_2026-04-28_at_10.52.49_PM-removebg-preview.png';
 
@@ -13,14 +10,19 @@ const AdminLogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(true);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!rememberMe) {
+            setError('Please keep “Keep me signed in” ticked so you stay logged in on this device.');
+            return;
+        }
         setError('');
         setLoading(true);
-        const result = await adminLogin(email, password);
+        const result = await adminLogin(email, password, rememberMe);
         setLoading(false);
         if (result.success) {
             navigate('/admin/dashboard');
@@ -30,161 +32,143 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-[#050b1a] p-4 relative overflow-hidden" style={{ fontFamily: "'Roboto', sans-serif" }}>
-            {/* Google Fonts Import */}
-            <style>
-                {`@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');`}
-            </style>
+        <div
+            className="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden"
+            style={{ background: 'linear-gradient(165deg, #FFF9F3 0%, #FCF8F5 42%, #F3E8E0 100%)', fontFamily: "'Poppins', sans-serif" }}
+        >
+            <div className="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-[#E8C4A0]/40 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-28 -right-20 w-96 h-96 rounded-full bg-[#D4A574]/25 blur-3xl pointer-events-none" />
 
-            {/* Background Atmosphere */}
-            <div className="absolute top-0 left-0 w-full h-full">
-                <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[150px]"></div>
-            </div>
-
-            <div className="w-full max-w-[800px] min-h-[500px] bg-white rounded-2xl overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.5)] flex flex-col md:flex-row transition-all duration-500 relative z-10">
-                
-                {/* ── Left Section: Welcome ── */}
-                <div className="flex-1 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] relative overflow-hidden flex flex-col justify-center px-10 py-6 text-white">
-                    {/* Dynamic Background Elements */}
-                    <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-indigo-600/20 rounded-full blur-[80px] animate-pulse"></div>
-                    <div className="absolute bottom-[-5%] left-[-5%] w-[250px] h-[250px] bg-sky-500/20 rounded-full blur-[60px]"></div>
-                    
-                    {/* Glassmorphic Spheres */}
-                    <div className="absolute top-[15%] left-[-20px] w-44 h-44 bg-gradient-to-br from-white/10 to-transparent rounded-full backdrop-blur-[2px] border border-white/10 shadow-2xl"></div>
-                    <div className="absolute bottom-[20%] right-[-30px] w-32 h-32 bg-gradient-to-tr from-indigo-500/30 to-transparent rounded-full backdrop-blur-[1px] border border-white/5 shadow-xl"></div>
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-white/5 rounded-full pointer-events-none opacity-20"></div>
+            <div className="w-full max-w-[880px] bg-white/90 backdrop-blur-sm rounded-[28px] overflow-hidden shadow-[0_24px_80px_rgba(70,34,17,0.14)] border border-[#EDE4DC] flex flex-col md:flex-row relative z-10">
+                <div className="flex-1 bg-gradient-to-br from-[#5D2E17] via-[#462211] to-[#3A1C0E] relative overflow-hidden flex flex-col justify-center px-10 py-12 text-white">
+                    <div className="absolute top-[-20%] right-[-15%] w-64 h-64 rounded-full bg-[#E8C4A0]/15 blur-2xl" />
+                    <div className="absolute bottom-[-10%] left-[-10%] w-48 h-48 rounded-full bg-white/10 blur-2xl" />
 
                     <div className="relative z-10 space-y-8">
-                        <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left-4 duration-700">
-                            <div className="p-1.5 bg-white/5 rounded-xl backdrop-blur-md border border-white/10">
-                                <img src={logo} alt="Dromoney" className="w-10 h-10 object-contain brightness-0 invert" />
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-2xl bg-[#FFF9F3] flex items-center justify-center shadow-inner">
+                                <img src={logo} alt="Dromoney" className="w-9 h-9 object-contain" />
                             </div>
-                            <span className="text-xl font-medium tracking-tighter uppercase text-white/90">Dromoney</span>
+                            <div>
+                                <p className="text-lg font-semibold tracking-wide uppercase leading-none">Dromoney</p>
+                                <p className="text-[10px] text-[#E8C4A0] uppercase tracking-[0.22em] mt-1">Admin Panel</p>
+                            </div>
                         </div>
-                        
-                        <div className="space-y-1">
-                            <h1 className="text-5xl font-medium tracking-tight leading-none text-white animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">WELCOME</h1>
-                            <p className="text-base font-medium text-indigo-400 uppercase tracking-[0.3em] pl-1 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">Admin Gateway</p>
+
+                        <div>
+                            <h1 className="text-4xl md:text-5xl font-semibold tracking-tight leading-none">Welcome</h1>
+                            <p className="text-sm text-[#E8C4A0] uppercase tracking-[0.28em] mt-3">Secure access</p>
                         </div>
-                        
-                        <p className="text-[13px] text-slate-400 max-w-[280px] leading-relaxed font-medium animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-                            Secure institutional access to the Dromoney financial core.
+
+                        <p className="text-[13px] text-white/70 max-w-[280px] leading-relaxed">
+                            Sign in to manage users, KYC, wallets, tasks, and Future Fund — same cream look as the live app.
                         </p>
 
-                        <div className="pt-6 animate-in fade-in duration-1000 delay-500">
-                             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 text-[10px] font-medium text-slate-300 uppercase tracking-normal">
-                                <CheckCircle2 size={12} className="text-emerald-500" /> System Status: Online
-                             </div>
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-[10px] font-medium uppercase tracking-wider">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                            System online
                         </div>
                     </div>
                 </div>
 
-                {/* ── Right Section: Sign In Form ── */}
-                <div className="flex-1 bg-white p-6 py-6 flex flex-col justify-center relative">
-                    <div className="max-w-[300px] w-full mx-auto space-y-8">
-                        <div className="space-y-1">
-                            <h2 className="text-3xl font-medium text-slate-900 tracking-tight">Sign in</h2>
-                            <p className="text-xs text-slate-400 font-medium">Enter your authorized credentials.</p>
+                <div className="flex-1 bg-[#FFFCF9] p-8 md:p-10 flex flex-col justify-center relative">
+                    <div className="max-w-[340px] w-full mx-auto">
+                        <div className="mb-8">
+                            <h2 className="text-2xl font-semibold text-[#462211] tracking-tight">Sign in</h2>
+                            <p className="text-[13px] text-[#7A5648] mt-1">Enter your admin email and password.</p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
-                            {/* Dummy inputs to prevent browser autofill/autocomplete */}
-                            <input type="text" name="prevent_autofill_email" style={{ display: 'none' }} tabIndex="-1" autoComplete="new-password" />
-                            <input type="password" name="prevent_autofill_pass" style={{ display: 'none' }} tabIndex="-1" autoComplete="new-password" />
-
-                            <div className="space-y-6">
-                                {/* Email Field */}
-                                <div className="relative group">
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors duration-300">
-                                        <Mail size={20} />
-                                    </div>
+                        <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
+                            <div>
+                                <label className="text-[11px] font-medium uppercase tracking-wide text-[#7A5648] ml-1">Email</label>
+                                <div className="relative mt-1.5">
+                                    <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#C4A99A]" />
                                     <input
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="Authorized Email Address"
-                                        className="w-full bg-transparent border-b-2 border-slate-100 py-4 pl-10 text-[15px] font-medium text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-indigo-600 transition-all duration-300"
+                                        placeholder="admin@dromoney.com"
+                                        className="w-full bg-white border border-[#EDE4DC] rounded-xl py-3 pl-10 pr-3 text-[14px] text-[#462211] placeholder:text-[#C4B5A8] outline-none focus:border-[#462211] focus:ring-2 focus:ring-[#E8C4A0]/50"
                                         required
-                                        autoComplete="new-password"
+                                        autoComplete="username"
                                     />
                                 </div>
+                            </div>
 
-                                {/* Password Field */}
-                                <div className="relative group">
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors duration-300">
-                                        <Lock size={20} />
-                                    </div>
+                            <div>
+                                <label className="text-[11px] font-medium uppercase tracking-wide text-[#7A5648] ml-1">Password</label>
+                                <div className="relative mt-1.5">
+                                    <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#C4A99A]" />
                                     <input
-                                        type={showPassword ? "text" : "password"}
+                                        type={showPassword ? 'text' : 'password'}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        placeholder="Secure Password"
-                                        className="w-full bg-transparent border-b-2 border-slate-100 py-4 pl-10 pr-20 text-[15px] font-medium text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-indigo-600 transition-all duration-300"
+                                        placeholder="••••••••"
+                                        className="w-full bg-white border border-[#EDE4DC] rounded-xl py-3 pl-10 pr-16 text-[14px] text-[#462211] placeholder:text-[#C4B5A8] outline-none focus:border-[#462211] focus:ring-2 focus:ring-[#E8C4A0]/50"
                                         required
-                                        autoComplete="new-password"
+                                        autoComplete="current-password"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-0 top-1/2 -translate-y-1/2 text-[11px] font-medium text-indigo-600 hover:text-indigo-800 uppercase tracking-normal transition-all px-2 py-1 rounded-md hover:bg-indigo-50"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold uppercase tracking-wide text-[#B3591C]"
                                     >
-                                        {showPassword ? 'HIDE' : 'SHOW'}
+                                        {showPassword ? 'Hide' : 'Show'}
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Remember Me Only */}
-                            <div className="flex items-center">
-                                <label className="flex items-center gap-2 text-[12px] font-medium text-slate-400 cursor-pointer group hover:text-slate-600 transition-colors">
-                                    <input type="checkbox" className="w-4 h-4 rounded border-slate-200 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 transition-all" />
-                                    Keep me signed in
-                                </label>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="space-y-4 pt-6">
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full bg-[#0f172a] hover:bg-slate-800 text-white py-3.5 rounded-xl text-[14px] font-medium transition-all active:scale-[0.98] shadow-lg shadow-slate-200 flex items-center justify-center gap-2 group"
-                                >
-                                    {loading ? (
-                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                    ) : (
-                                        <>
-                                            Sign in
-                                            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                        </>
-                                    )}
-                                </button>
-                                
-
-                            </div>
+                            <label className="flex items-start gap-3 p-3.5 rounded-xl bg-[#FCF8F5] border-2 border-[#462211]/25 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={rememberMe}
+                                    onChange={(e) => {
+                                        setRememberMe(e.target.checked);
+                                        if (e.target.checked) setError('');
+                                    }}
+                                    className="mt-0.5 w-4 h-4 rounded accent-[#462211] shrink-0"
+                                    required
+                                />
+                                <span>
+                                    <span className="flex items-center gap-1.5 text-[13px] font-semibold text-[#462211]">
+                                        <ShieldCheck size={14} />
+                                        Keep me signed in
+                                        <span className="text-[9px] uppercase tracking-wide bg-[#462211] text-white px-1.5 py-0.5 rounded">Required</span>
+                                    </span>
+                                    <span className="block text-[11px] text-[#7A5648] mt-0.5 leading-snug">
+                                        Stay logged in on this device. Unticking this will block sign-in.
+                                    </span>
+                                </span>
+                            </label>
 
                             {error && (
-                                <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl animate-in fade-in slide-in-from-top-1">
-                                    <p className="text-center text-[12px] font-medium text-rose-500">{error}</p>
-                                </div>
+                                <p className="text-[12px] font-medium text-rose-600 bg-rose-50 border border-rose-100 rounded-xl px-3 py-2">{error}</p>
                             )}
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-[#462211] hover:bg-[#5D2E17] text-white py-3.5 rounded-xl text-[14px] font-semibold transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-2"
+                            >
+                                {loading ? (
+                                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                ) : (
+                                    <>
+                                        Sign in
+                                        <ArrowRight size={16} />
+                                    </>
+                                )}
+                            </button>
                         </form>
                     </div>
 
-                    <p className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[10px] font-medium text-slate-200 uppercase tracking-[0.4em] whitespace-nowrap">
-                        © 2026 DROMONEY INTEL SYSTEMS
+                    <p className="text-center text-[10px] font-medium text-[#C4A99A] uppercase tracking-[0.18em] mt-10">
+                        © 2026 Dromoney
                     </p>
                 </div>
             </div>
         </div>
     );
 };
-
-// Supporting Icons
-const CheckCircle2 = ({ size, className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-        <polyline points="22 4 12 14.01 9 11.01" />
-    </svg>
-);
 
 export default AdminLogin;

@@ -41,15 +41,15 @@ export const MOCK_USER = {
 };
 
 export const TASKS = [
-  { id: 1, title: "Visit Business Idea Page", description: "Explore the business idea page", reward: "+1 Coin", actionText: "Complete", icon: "Monitor" },
-  { id: 2, title: "Watch a Short Video", description: "Watch a video till the end", reward: "+1 Coin", actionText: "Complete", icon: "Youtube" },
-  { id: 3, title: "Answer a Simple Quiz", description: "Answer a quick question", reward: "+1 Coin", actionText: "Complete", icon: "Lightbulb" },
-  { id: 4, title: "Spin the Wheel", description: "Spin the wheel to win coins", reward: "Win Up To 5 Coins", actionText: "Spin Now >", actionType: "highlighted", icon: "Disc" },
-  { id: 5, title: "Share Our Platform", description: "Share our link via WhatsApp", reward: "+1 Coin", actionText: "Complete", icon: "MessageCircle" },
-  { id: 6, title: "Upload Story for Us", description: "Upload our site story on Instagram", reward: "+2 Coins", actionText: "Complete", icon: "Instagram" },
-  { id: 7, title: "Like & Follow Us", description: "Like and follow our page", reward: "+2 Coins", actionText: "Complete", icon: "ThumbsUp" },
-  { id: 8, title: "Comment on Our Post", description: "Write a comment on our post", reward: "+1 Coin", actionText: "Complete", icon: "MessageSquare" },
-  { id: 9, title: "Open & Explore Link", description: "Open and explore an external site", reward: "+1 Coin", actionText: "Upload Proof", actionType: "highlighted", icon: "Link" },
+  { id: 1, title: "Visit Business Idea Page", description: "Explore the business idea page", reward: "Complete", actionText: "Complete", icon: "Monitor" },
+  { id: 2, title: "Watch a Short Video", description: "Watch a video till the end", reward: "Complete", actionText: "Complete", icon: "Youtube" },
+  { id: 3, title: "Answer a Simple Quiz", description: "Answer a quick question", reward: "Complete", actionText: "Complete", icon: "Lightbulb" },
+  { id: 4, title: "Spin the Wheel", description: "Spin the wheel as a task", reward: "Play", actionText: "Spin Now >", actionType: "highlighted", icon: "Disc" },
+  { id: 5, title: "Share Our Platform", description: "Share our link via WhatsApp", reward: "Complete", actionText: "Complete", icon: "MessageCircle" },
+  { id: 6, title: "Upload Story for Us", description: "Upload our site story on Instagram", reward: "Complete", actionText: "Complete", icon: "Instagram" },
+  { id: 7, title: "Like & Follow Us", description: "Like and follow our page", reward: "Complete", actionText: "Complete", icon: "ThumbsUp" },
+  { id: 8, title: "Comment on Our Post", description: "Write a comment on our post", reward: "Complete", actionText: "Complete", icon: "MessageSquare" },
+  { id: 9, title: "Open & Explore Link", description: "Open and explore an external site", reward: "Complete", actionText: "Upload Proof", actionType: "highlighted", icon: "Link" },
 ];
 
 export const EVENTS = [
@@ -60,7 +60,7 @@ export const EVENTS = [
 export const NOTIFICATIONS = [
   { id: 1, title: "Payment Received", message: "₹200 referral bonus credited for Sumeet.", time: "2m ago", type: "success" },
   { id: 2, title: "Booster Expiring", message: "Your Monthly Booster expires in 2 days. Renew now!", time: "1h ago", type: "warning" },
-  { id: 3, title: "New Event Active", message: "Mega Quiz is now open for registration. Join with 50 Coins.", time: "3h ago", type: "info" },
+  { id: 3, title: "New Event Active", message: "Mega Quiz is now open for registration.", time: "3h ago", type: "info" },
   { id: 4, title: "Welcome to Platform", message: "Start sharing your link to earn big rewards.", time: "1d ago", type: "success" },
 ];
 

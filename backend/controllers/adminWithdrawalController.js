@@ -1,6 +1,5 @@
 const Withdrawal = require('../models/Withdrawal');
 const User = require('../models/User');
-const { sendNotificationToUser } = require('./fcmController');
 
 // @desc    Get all withdrawal requests
 // @route   GET /api/admin/withdrawals
@@ -17,9 +16,22 @@ exports.getWithdrawals = async (req, res) => {
             .populate('user', 'name phone email wallet')
             .sort({ createdAt: -1 });
 
+        const statsRows = await Withdrawal.aggregate([
+            { $group: { _id: '$status', total: { $sum: '$amount' } } },
+        ]);
+        const stats = { total: 0, approved: 0, pending: 0, rejected: 0 };
+        statsRows.forEach((row) => {
+            const key = String(row._id || '').toLowerCase();
+            if (key === 'approved') stats.approved = row.total;
+            else if (key === 'pending') stats.pending = row.total;
+            else if (key === 'rejected') stats.rejected = row.total;
+            stats.total += row.total;
+        });
+
         res.json({
             success: true,
-            data: withdrawals
+            data: withdrawals,
+            stats,
         });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
@@ -47,7 +59,8 @@ exports.updateWithdrawalStatus = async (req, res) => {
             return res.status(404).json({ success: false, message: "User associated with this withdrawal not found" });
         }
 
-        const totalDeduction = withdrawal.amount + 5;
+        const { WITHDRAWAL_FEE } = require('../utils/moneyQuotes');
+        const totalDeduction = Number(withdrawal.amount) + WITHDRAWAL_FEE;
 
         // Balance Check & Deduction first if Approved
         if (status === 'Approved') {
@@ -124,14 +137,12 @@ exports.updateWithdrawalStatus = async (req, res) => {
                 ? `Your withdrawal request of ₹${withdrawal.amount} has been successfully approved & transferred.`
                 : `Your withdrawal request of ₹${withdrawal.amount} was rejected. Reason: ${remarks || 'Incorrect details or document mismatch.'}`;
 
-            await sendNotificationToUser(withdrawal.user, {
-                title: pushTitle,
-                body: pushBody,
-                data: {
-                    type: 'withdrawal',
-                    link: '/user/wallet'
-                }
-            });
+            const { notifyJourney } = require('../utils/userJourneyPush');
+            await notifyJourney(
+                withdrawal.user,
+                status === 'Approved' ? 'withdraw_approved' : 'withdraw_rejected',
+                { title: pushTitle, body: pushBody }
+            );
         }
 
         // Emit real-time Socket event to notify user's frontend
@@ -223,7 +234,8 @@ exports.bulkApproveWithdrawals = async (req, res) => {
                     continue;
                 }
 
-                const totalDeduction = withdrawal.amount + 5;
+                const { WITHDRAWAL_FEE } = require('../utils/moneyQuotes');
+        const totalDeduction = Number(withdrawal.amount) + WITHDRAWAL_FEE;
 
                 // Balance Check & Deduction
                 if (user.wallet.balance < totalDeduction) {
@@ -282,13 +294,10 @@ exports.bulkApproveWithdrawals = async (req, res) => {
                 }
 
                 // Send Push Notification
-                await sendNotificationToUser(withdrawal.user, {
+                const { notifyJourney } = require('../utils/userJourneyPush');
+                await notifyJourney(withdrawal.user, 'withdraw_approved', {
                     title: 'Withdrawal Approved! 🎉',
                     body: `Your withdrawal request of ₹${withdrawal.amount} has been successfully approved & transferred.`,
-                    data: {
-                        type: 'withdrawal',
-                        link: '/user/wallet'
-                    }
                 });
 
                 // Emit real-time Socket event

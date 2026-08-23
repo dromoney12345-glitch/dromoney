@@ -11,6 +11,10 @@ const generalApiLimiter = rateLimit({
     max: Number(process.env.RATE_LIMIT_GENERAL_MAX) || 500,
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (req) => {
+        const path = String(req.originalUrl || req.url || '');
+        return path.includes('/api/public/offerwall/');
+    },
     message: {
         success: false,
         message: 'Too many requests from this IP. Please try again after a few minutes.'

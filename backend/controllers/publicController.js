@@ -1,17 +1,19 @@
 const Settings = require('../models/Settings');
 const User = require('../models/User');
+const { extractReferralCode } = require('../utils/referralCode');
 
 // @desc    Get Public Settings (Subset of settings for users)
 // @route   GET /api/public/settings
 // @access  Public
 exports.getPublicSettings = async (req, res) => {
     try {
-        const settings = await Settings.findOne().select('appName contactEmail contactPhone adminUpiId qrScannerImage bankDetails referralSystemEnabled referralCommission referralLinkBaseUrl registrationFee minWithdrawal futureFundDailyTasksTarget futureFundWatchAdTarget futureFundEventsTarget futureFundBoostersTarget futureFundSalesTarget futureFundDaysTarget futureFundActivityMinutes businessPlans maintenanceMode registrationOpen taskWindowStart taskWindowEnd taskRenewalHours');
+        const settings = await Settings.findOne().select('appName contactEmail contactPhone adminUpiId qrScannerImage bankDetails referralSystemEnabled referralCommission referralLinkBaseUrl registrationFee minWithdrawal offerwallEnabled futureFundKycTarget futureFundDailyTasksTarget futureFundWatchAdTarget futureFundEventsTarget futureFundBoostersTarget futureFundSalesTarget futureFundDaysTarget futureFundActivityMinutes businessPlans maintenanceMode registrationOpen taskWindowStart taskWindowEnd taskRenewalHours');
         
         // Add fallbacks for existing documents that might not have newer schema fields
         const responseData = settings ? settings.toObject() : {
             referralCommission: 200,
             referralSystemEnabled: true,
+            offerwallEnabled: false,
             registrationFee: 499,
             businessPlans: [
                 {
@@ -27,8 +29,9 @@ exports.getPublicSettings = async (req, res) => {
                     ]
                 }
             ],
+            futureFundKycTarget: 10,
             futureFundDailyTasksTarget: 10,
-            futureFundWatchAdTarget: 5,
+            futureFundWatchAdTarget: 10,
             futureFundEventsTarget: 3,
             futureFundBoostersTarget: 1,
             futureFundSalesTarget: 10,
@@ -48,6 +51,18 @@ exports.getPublicSettings = async (req, res) => {
         if (settings && !responseData.futureFundActivityMinutes) {
             responseData.futureFundActivityMinutes = 15;
         }
+        if (settings && responseData.offerwallEnabled == null) {
+            responseData.offerwallEnabled = false;
+        }
+        if (settings && !responseData.futureFundKycTarget) {
+            responseData.futureFundKycTarget = responseData.futureFundSalesTarget || 10;
+        }
+        if (settings && !responseData.futureFundWatchAdTarget) {
+            responseData.futureFundWatchAdTarget = 10;
+        }
+        if (settings && !responseData.futureFundDailyTasksTarget) {
+            responseData.futureFundDailyTasksTarget = 10;
+        }
         
         res.status(200).json({
             success: true,
@@ -64,7 +79,11 @@ exports.getPublicSettings = async (req, res) => {
 exports.getReferrerName = async (req, res) => {
     try {
         const { code } = req.params;
-        const referrer = await User.findOne({ referralCode: code.toUpperCase() }).select('name');
+        const cleanCode = extractReferralCode(code);
+        if (!cleanCode) {
+            return res.status(404).json({ success: false, message: 'Invalid Invite Code' });
+        }
+        const referrer = await User.findOne({ referralCode: new RegExp(`^${cleanCode}$`, 'i') }).select('name');
         if (!referrer) {
             return res.status(404).json({ success: false, message: 'Invalid Referral Code' });
         }

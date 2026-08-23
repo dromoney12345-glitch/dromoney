@@ -93,14 +93,22 @@ const SettingsSchema = new mongoose.Schema({
         type: Number,
         default: 100
     },
+    offerwallEnabled: {
+        type: Boolean,
+        default: false
+    },
+    offerwallUserSharePercent: {
+        type: Number,
+        default: 100
+    },
     
     // Future Fund Rules & Targets
     futureFundKycTarget: { type: Number, default: 10 },
     futureFundSalesTarget: { type: Number, default: 10 },
     futureFundDaysTarget: { type: Number, default: 7 },
     futureFundActivityMinutes: { type: Number, default: 15 },
-    futureFundDailyTasksTarget: { type: Number, default: 50 },
-    futureFundWatchAdTarget: { type: Number, default: 50 },
+    futureFundDailyTasksTarget: { type: Number, default: 10 },
+    futureFundWatchAdTarget: { type: Number, default: 10 },
     futureFundEventsTarget: { type: Number, default: 3 },
     futureFundBoostersTarget: { type: Number, default: 1 },
     

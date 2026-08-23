@@ -54,7 +54,12 @@ exports.getEvents = asyncHandler(async (req, res, next) => {
         return {
             ...event.toObject(),
             participantsCount: totalParticipants,
-            awardedCount: awardedCount
+            awardedCount: awardedCount,
+            prizeBreakdown: require('../utils/moneyQuotes').quoteEventMoney({
+                fee: event.fee,
+                participantCount: totalParticipants,
+                pool: event.totalCashPoolINR,
+            }),
         };
     }));
 
@@ -287,9 +292,17 @@ exports.getEventParticipants = asyncHandler(async (req, res, next) => {
         .populate('user', 'name email phone')
         .sort('-createdAt');
 
+    const event = await Event.findById(req.params.id);
+    const prizePreview = require('../utils/moneyQuotes').quoteEventMoney({
+        fee: event?.fee,
+        participantCount: participants.length,
+        pool: event?.totalCashPoolINR,
+    });
+
     res.status(200).json({
         success: true,
         count: participants.length,
+        prizePreview,
         data: participants
     });
 });

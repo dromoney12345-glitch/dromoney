@@ -17,7 +17,8 @@ const Wallet = () => {
     const pendingAmt = Number(wallet?.pendingBalance || 0);
     const virtualAmt = Number(wallet?.virtualBalance || 0);
     const virtualUnlocked = !!isPaid && withdrawalCard?.status === 'active';
-    const [pane, setPane] = useState(location.state?.pane === 'pending' ? 'pending' : 'virtual');
+    const VIRTUAL_ACCOUNT_PATH = '/user/virtual-account';
+    const [pane, setPane] = useState(location.state?.pane === 'pending' ? 'pending' : (location.state?.pane === 'virtual' && virtualUnlocked ? 'virtual' : 'pending'));
     const [pendingFilter, setPendingFilter] = useState('All');
     const [activeTab, setActiveTab] = useState('cash');
     const [amount, setAmount] = useState('');
@@ -49,7 +50,9 @@ const Wallet = () => {
     const [referrals, setReferrals] = useState([]);
 
     const lockedReserve = Number(walletMeta.lockedReserve || withdrawalCard?.lockedReserve || 0);
-    const withdrawableAmt = Number(walletMeta.withdrawable ?? Math.max(0, virtualAmt - lockedReserve));
+    const withdrawableAmt = Number(walletMeta.withdrawable || 0);
+    const withdrawalFee = Number(walletMeta.withdrawalFee || 0);
+    const [withdrawQuote, setWithdrawQuote] = useState(null);
 
     const handleSettingClick = (id) => {
         if (id === 'withdraw') {
@@ -78,7 +81,10 @@ const Wallet = () => {
                 setWalletMeta({
                     withdrawable: Number(res.withdrawable ?? 0),
                     lockedReserve: Number(res.lockedReserve ?? 0),
+                    withdrawalFee: Number(res.withdrawalFee ?? 0),
+                    minWithdrawal: Number(res.minWithdrawal ?? minWithdrawal),
                 });
+                if (res.minWithdrawal) setMinWithdrawal(Number(res.minWithdrawal));
             }
         } catch (err) {
             console.error("Failed to load wallet status:", err);
@@ -137,10 +143,38 @@ const Wallet = () => {
     }, []);
 
     useEffect(() => {
-        if (location.state?.pane === 'pending' || location.state?.pane === 'virtual') {
-            setPane(location.state.pane);
+        const val = parseFloat(amount);
+        if (!amount || isNaN(val) || val <= 0) {
+            setWithdrawQuote(null);
+            return undefined;
         }
-    }, [location.state]);
+        const t = setTimeout(async () => {
+            try {
+                const res = await api.get(`/user/wallet/withdraw-quote?amount=${encodeURIComponent(val)}`);
+                if (res.success) setWithdrawQuote(res.data);
+            } catch (err) {
+                console.error('Failed to load withdraw quote', err);
+            }
+        }, 300);
+        return () => clearTimeout(t);
+    }, [amount]);
+
+    const goToVirtual = () => {
+        if (virtualUnlocked) setPane('virtual');
+        else navigate(VIRTUAL_ACCOUNT_PATH);
+    };
+
+    useEffect(() => {
+        const requested = location.state?.pane;
+        if (requested === 'pending') {
+            setPane('pending');
+            return;
+        }
+        if (requested === 'virtual') {
+            if (virtualUnlocked) setPane('virtual');
+            else navigate(VIRTUAL_ACCOUNT_PATH, { replace: true });
+        }
+    }, [location.state, virtualUnlocked, navigate]);
 
     // Listen to real-time status updates from UserContext socket events
     useEffect(() => {
@@ -165,7 +199,7 @@ const Wallet = () => {
 
     const handleWithdraw = async () => {
         if (!virtualUnlocked) {
-            navigate('/user/guide/card');
+            navigate(VIRTUAL_ACCOUNT_PATH);
             return;
         }
 
@@ -188,16 +222,15 @@ const Wallet = () => {
             return;
         }
 
-        // Add ₹5 transition fee
-        const totalDeduction = val + 5;
-
-        if (totalDeduction > wallet.balance) {
+        if (!withdrawQuote?.sufficient) {
             addNotification(
-                "Insufficient Balance", 
-                `You need ₹${totalDeduction} (₹${val} amount + ₹5 fee) to complete this transaction.`, 
+                "Insufficient Balance",
+                withdrawQuote?.shortfall > 0
+                    ? `Need ₹${withdrawQuote.totalDeduction} (amount + ₹${withdrawQuote.fee} fee).`
+                    : `Minimum redeem is ₹${withdrawQuote?.minWithdrawal || minWithdrawal}.`,
                 "warning"
             );
-            showToast(`Insufficient Balance: You need ₹${totalDeduction} to complete this transaction.`, "warning");
+            showToast(`Wait for quote or check amount. Total needed: ₹${withdrawQuote?.totalDeduction || ''}`, "warning");
             return;
         }
 
@@ -307,7 +340,7 @@ const Wallet = () => {
         if (ref.milestone === 'day14') return { text: '14-day warning', cls: 'text-red-700 bg-red-50' };
         if (ref.milestone === 'day7') return { text: '7-day penalty zone', cls: 'text-amber-700 bg-amber-50' };
         if (ref.milestone === 'day3_bonus') return { text: `${ref.daysLeft} days left · bonus window`, cls: 'text-[#462211] bg-[#FFF5F0]' };
-        if (ref.milestone === 'card_pending') return { text: `${ref.daysLeft} days left for card`, cls: 'text-[#462211] bg-[#FFF5F0]' };
+        if (ref.milestone === 'card_pending') return { text: `${ref.daysLeft} days left for Virtual Account`, cls: 'text-[#462211] bg-[#FFF5F0]' };
         return { text: 'Waiting for KYC', cls: 'text-slate-600 bg-slate-100' };
     };
 
@@ -317,13 +350,13 @@ const Wallet = () => {
         <div className="flex flex-col gap-2.5 p-3 animate-in fade-in duration-700 bg-[#FCF8F5] font-poppins">
             <UnlockModal isOpen={isUnlockOpen} onClose={() => setIsUnlockOpen(false)} />
 
-            {pane === 'pending' ? (
+            {(pane !== 'virtual' || !virtualUnlocked) ? (
                 <>
                     <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
                             <button
                                 type="button"
-                                onClick={() => setPane('virtual')}
+                                onClick={() => navigate(-1)}
                                 className="w-8 h-8 rounded-full bg-white border border-[#EDE4DC] flex items-center justify-center text-[#462211] active:scale-95 shadow-sm shrink-0"
                             >
                                 <ChevronLeft size={18} strokeWidth={2.5} />
@@ -332,10 +365,10 @@ const Wallet = () => {
                         </div>
                         <button
                             type="button"
-                            onClick={() => setPane('virtual')}
+                            onClick={goToVirtual}
                             className="bg-white border border-[#EDE4DC] text-[#462211] px-2.5 py-1.5 rounded-full text-[10px] font-medium flex items-center gap-1.5 shrink-0"
                         >
-                            <WalletIcon size={13} /> Virtual Wallet
+                            <WalletIcon size={13} /> Virtual Account
                         </button>
                     </div>
 
@@ -353,7 +386,7 @@ const Wallet = () => {
                         </div>
                         <div className="border-t border-[#E8D5C8] mt-3 pt-3">
                             <p className="text-[11px] text-[#7A5648] leading-snug">
-                                This is your pending balance. Amount from invites, tasks, ads or other earnings will be transferred to your Virtual Wallet.
+                                This is your pending balance. Amount from invites, tasks, ads or other earnings will be transferred to your Virtual Account after it is created.
                             </p>
                         </div>
                     </div>
@@ -364,11 +397,11 @@ const Wallet = () => {
                             <h3 className="text-[13px] font-medium text-[#462211]">Important Information</h3>
                         </div>
                         <ul className="space-y-1.5 text-[12px] text-[#462211] leading-snug list-disc pl-4">
-                            <li>Pending earnings stay here first before they move to your Virtual Wallet.</li>
-                            <li>Transfers to Virtual Wallet typically complete within 14–28 days.</li>
-                            <li>An active Withdrawal Card is required to redeem from Virtual Wallet.</li>
-                            <li>Invite earnings release when your invitee creates a Withdrawal Card.</li>
-                            <li>If invitee does not create card within 28 days, invite reward is removed.</li>
+                            <li>Pending Wallet stays open for life — you can view it anytime.</li>
+                            <li>Invite ₹200 is added to Pending when the invited user completes KYC.</li>
+                            <li>That ₹200 moves to Virtual Account only when they create a Virtual Account.</li>
+                            <li>Virtual Account opens only after you create it. Then you can withdraw.</li>
+                            <li>If they stay inactive for 28 days without a Virtual Account, the invite and ₹200 can be removed.</li>
                         </ul>
                     </div>
 
@@ -479,7 +512,7 @@ const Wallet = () => {
                     >
                         <ChevronLeft size={18} strokeWidth={2.5} />
                     </button>
-                    <h1 className="text-[16px] font-semibold text-[#462211]">Virtual Wallet</h1>
+                    <h1 className="text-[16px] font-semibold text-[#462211]">Virtual Account</h1>
                 </div>
                 <button
                     type="button"
@@ -493,7 +526,7 @@ const Wallet = () => {
             <div className="bg-white border border-[#EDE4DC] rounded-2xl p-3.5 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                     <div className="bg-[#FFF5F0] rounded-xl p-3">
-                        <p className="text-[9px] uppercase tracking-widest text-[#462211]">Virtual Wallet</p>
+                        <p className="text-[9px] uppercase tracking-widest text-[#462211]">Virtual Account</p>
                         <p className="text-lg font-medium text-[#462211] mt-1">₹{virtualAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                         <p className="text-[9px] text-slate-400 mt-0.5">{virtualUnlocked ? 'Total balance' : 'Locked'}</p>
                     </div>
@@ -510,7 +543,7 @@ const Wallet = () => {
                             <p className="text-[15px] font-medium text-emerald-700 mt-0.5">₹{withdrawableAmt.toFixed(2)}</p>
                         </div>
                         <div className="rounded-xl p-2.5 bg-[#FCF8F5]">
-                            <p className="text-[9px] text-[#7A5648]">Reserved (Card)</p>
+                            <p className="text-[9px] text-[#7A5648]">Reserved</p>
                             <p className="text-[15px] font-medium text-[#462211] mt-0.5">₹{lockedReserve.toFixed(2)}</p>
                         </div>
                     </div>
@@ -518,10 +551,10 @@ const Wallet = () => {
                 {!virtualUnlocked && (
                     <button
                         type="button"
-                        onClick={() => navigate('/user/guide/card')}
+                        onClick={() => navigate(VIRTUAL_ACCOUNT_PATH)}
                         className="mt-3 w-full bg-[#462211] text-white py-2.5 rounded-xl text-[11px] font-medium uppercase tracking-widest"
                     >
-                        Create Withdrawal Card
+                        Create Virtual Account
                     </button>
                 )}
             </div>
@@ -548,7 +581,7 @@ const Wallet = () => {
 
             {/* --- My Cards Heading --- */}
             <div className="flex items-center justify-between px-1 mt-0.5">
-                <h2 className="text-[15px] font-medium text-slate-800 tracking-tight">My Cards</h2>
+                <h2 className="text-[15px] font-medium text-slate-800 tracking-tight">My Account</h2>
             </div>
 
             <div className="relative rounded-2xl p-4 shadow-lg overflow-hidden bg-gradient-to-br from-[#6B2A12] via-[#8B3A18] to-[#4A1C0C]">
@@ -558,9 +591,9 @@ const Wallet = () => {
                     <div className="flex justify-between items-start">
                         <div>
                             <p className="text-[11px] font-medium text-white tracking-[0.18em]">DROMONEY</p>
-                            <p className="text-[8px] text-white/70 tracking-[0.16em] mt-0.5">WITHDRAWAL CARD</p>
+                            <p className="text-[8px] text-white/70 tracking-[0.16em] mt-0.5">VIRTUAL ACCOUNT</p>
                         </div>
-                        <p className="text-[8px] text-white/70 tracking-[0.14em]">WITHDRAWAL CARD</p>
+                        <p className="text-[8px] text-white/70 tracking-[0.14em]">VIRTUAL ACCOUNT</p>
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -616,24 +649,24 @@ const Wallet = () => {
                             Redeem Cash
                         </h3>
                         <span className="text-[11px] font-medium text-[#462211]">
-                            ₹5 Fee Added
+                            ₹{withdrawalFee || withdrawQuote?.fee || 0} Fee Added
                         </span>
                     </div>
 
                     {/* Dynamic Fee & Deduction Previewer */}
-                    {amount && !isNaN(parseFloat(amount)) && parseFloat(amount) > 0 && (
+                    {withdrawQuote && withdrawQuote.amount > 0 && (
                         <div className="bg-slate-50 rounded-lg p-3 border border-slate-100 space-y-1.5 animate-in slide-in-from-top-1 duration-300">
                             <div className="flex justify-between items-center text-[10px] font-medium text-slate-500">
                                 <span>Requested Amount:</span>
-                                <span className="text-slate-800">₹{parseFloat(amount).toFixed(2)}</span>
+                                <span className="text-slate-800">₹{Number(withdrawQuote.amount).toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between items-center text-[10px] font-medium text-slate-500">
                                 <span>Transaction Fee:</span>
-                                <span className="text-amber-600">+ ₹5.00</span>
+                                <span className="text-amber-600">+ ₹{Number(withdrawQuote.fee).toFixed(2)}</span>
                             </div>
                             <div className="border-t border-slate-200/60 pt-1.5 flex justify-between items-center text-[11px] text-slate-800">
                                 <span>Total Deducted from Wallet:</span>
-                                <span className="text-[#462211]">₹{(parseFloat(amount) + 5).toFixed(2)}</span>
+                                <span className="text-[#462211]">₹{Number(withdrawQuote.totalDeduction).toFixed(2)}</span>
                             </div>
                         </div>
                     )}
@@ -719,7 +752,7 @@ const Wallet = () => {
                                     ? 'bg-amber-50 text-amber-400 border border-amber-100 cursor-not-allowed'
                                     : cooldownRemaining > 0
                                     ? 'bg-rose-50 text-rose-400 border border-rose-100 cursor-not-allowed'
-                                    : (!isPaid) || (amount >= minWithdrawal && (Number(amount) + 5) <= wallet.balance)
+                                    : (!isPaid) || (withdrawQuote?.sufficient)
                                     ? 'bg-[#462211] text-white shadow-md active:scale-95 cursor-pointer'
                                     : 'bg-slate-200 text-white pointer-events-none'}`}
                         >
@@ -1082,7 +1115,7 @@ const Wallet = () => {
                             <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-2.5">
                                 {[
                                     { label: 'Daily Withdrawals', value: '1 per 24 hours' },
-                                    { label: 'Transaction Fee', value: '₹5 per withdrawal' },
+                                    { label: 'Transaction Fee', value: `₹${withdrawalFee || 0} per withdrawal` },
                                     { label: 'Processing Time', value: '1–3 business days' },
                                     { label: 'Payment Method', value: 'Bank Transfer only' },
                                 ].map((row, i) => (

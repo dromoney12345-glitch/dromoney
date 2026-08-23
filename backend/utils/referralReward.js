@@ -16,7 +16,8 @@ async function commissionAmount() {
 }
 
 /**
- * After invitee KYC: credit ₹200 into referrer's PENDING wallet (held).
+ * After invitee KYC: hold ₹200 in the referrer's Pending Wallet.
+ * Releases to Virtual only when the invitee creates a Withdrawal Card.
  */
 async function creditReferralOnKyc(userDoc) {
     if (!userDoc?._id) return { credited: false, reason: 'no_user' };
@@ -32,43 +33,60 @@ async function creditReferralOnKyc(userDoc) {
     if (!referrer) return { credited: false, reason: 'referrer_missing' };
     if (String(referrer._id) === String(user._id)) return { credited: false, reason: 'self_referral' };
 
+    const existing = await ReferralTransaction.findOne({ referredUser: user._id });
+    if (existing) return { credited: false, reason: 'already_credited' };
+
+    const inviteeHasCard = !!user.isPaid;
+
     try {
-        await ReferralTransaction.create({
+        const tx = await ReferralTransaction.create({
             referrer: referrer._id,
             referredUser: user._id,
             amount: commission,
-            status: 'Pending',
+            status: inviteeHasCard ? 'Completed' : 'Pending',
         });
-
-        migrateWalletSplits(referrer);
-        await creditEarning(referrer, commission, {
-            source: `Invite hold: ${user.name}`,
-            inviteHold: true,
-            createTx: true,
-        });
-        referrer.referralCount = (referrer.referralCount || 0) + 1;
-        referrer.wallet.referralEarnings = (Number(referrer.wallet.referralEarnings) || 0) + commission;
-        referrer.notifications = referrer.notifications || [];
-        referrer.notifications.push({
-            title: 'Invite ₹200 Pending',
-            message: `${user.name} completed KYC. ₹${commission} is in Pending Wallet until they unlock Virtual Wallet.`,
-            type: 'success',
-            isRead: false,
-        });
-        await referrer.save({ validateBeforeSave: false });
 
         try {
-            const { sendNotificationToUser } = require('../controllers/fcmController');
-            await sendNotificationToUser(referrer._id, {
-                title: 'Invite ₹200 Pending',
-                body: `${user.name} completed KYC. ₹${commission} is held in Pending Wallet.`,
-                data: { type: 'commission', link: '/user/wallet' },
+            migrateWalletSplits(referrer);
+            await creditEarning(referrer, commission, {
+                source: inviteeHasCard
+                    ? `Invite reward: ${user.name}`
+                    : `Invite reward (pending): ${user.name}`,
+                inviteHold: !inviteeHasCard,
+                forceVirtual: inviteeHasCard,
+                createTx: true,
+            });
+            referrer.referralCount = (referrer.referralCount || 0) + 1;
+            referrer.wallet.referralEarnings = (Number(referrer.wallet.referralEarnings) || 0) + commission;
+            referrer.notifications = referrer.notifications || [];
+            referrer.notifications.push({
+                title: inviteeHasCard ? 'Invite ₹200 credited' : 'Invite ₹200 in Pending',
+                message: inviteeHasCard
+                    ? `${user.name} completed KYC and has a Virtual Account. ₹${commission} is in your Virtual Account.`
+                    : `${user.name} completed KYC. ₹${commission} is in your Pending Wallet. It moves to Virtual Account when they create one.`,
+                type: 'success',
+                isRead: false,
+            });
+            await referrer.save({ validateBeforeSave: false });
+        } catch (creditErr) {
+            await ReferralTransaction.deleteOne({ _id: tx._id }).catch(() => {});
+            throw creditErr;
+        }
+
+        try {
+            const { notifyJourney } = require('./userJourneyPush');
+            await notifyJourney(referrer._id, inviteeHasCard ? 'invite_virtual' : 'invite_pending', {
+                skipInApp: true,
+                body: inviteeHasCard
+                    ? `${user.name} completed KYC. ₹${commission} is in your Virtual Account.`
+                    : `${user.name} completed KYC. ₹${commission} is in Pending until they create a Virtual Account.`,
             });
         } catch (pushErr) {
             console.error('Referral push failed:', pushErr.message);
         }
 
-        return { credited: true, amount: commission, held: true };
+        console.log(`[REFERRAL] ₹${commission} to referrer ${referrer._id} after KYC of ${user._id} (${inviteeHasCard ? 'virtual' : 'pending hold'})`);
+        return { credited: true, amount: commission, held: !inviteeHasCard };
     } catch (err) {
         if (err.code === 11000) {
             return { credited: false, reason: 'already_credited' };
@@ -106,6 +124,16 @@ async function releaseReferralToVirtual(userDoc) {
         isRead: false,
     });
     await referrer.save({ validateBeforeSave: false });
+
+    try {
+        const { notifyJourney } = require('./userJourneyPush');
+        await notifyJourney(referrer._id, 'invite_virtual', {
+            skipInApp: true,
+            body: `₹${moved} moved from Pending Wallet to Virtual Wallet.`,
+        });
+    } catch (pushErr) {
+        console.error('Invite virtual push failed:', pushErr.message);
+    }
 
     await Transaction.create({
         user: referrer._id,
@@ -148,6 +176,17 @@ async function clawbackInvite(userDoc) {
             isRead: false,
         });
         await referrer.save({ validateBeforeSave: false });
+        try {
+            const { notifyJourney } = require('./userJourneyPush');
+            await notifyJourney(referrer._id, 'account_hold', {
+                skipInApp: true,
+                title: 'Invite Removed',
+                body: `An invited user stayed inactive. ₹${tx.amount} was removed.`,
+                link: '/user/wallet',
+            });
+        } catch (pushErr) {
+            console.error('Invite clawback push failed:', pushErr.message);
+        }
     }
 
     tx.status = 'Failed';
@@ -182,8 +221,7 @@ async function applyDay7Penalty(userDoc) {
     return { applied: true, penalty };
 }
 
-// Keep old name so existing payment callers still work — now it only
-// releases held invite when Virtual Wallet is unlocked.
+// Payment callers: invitee Withdrawal Card unlocks the held ₹200 Pending → Virtual.
 async function creditReferralOnQualifiedUnlock(userDoc) {
     const user = await User.findById(userDoc._id).select('name referredBy isPaid kyc');
     if (!user) return { credited: false, reason: 'no_user' };

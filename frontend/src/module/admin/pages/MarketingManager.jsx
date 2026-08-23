@@ -44,12 +44,12 @@ const DEFAULT_EXPLORE_GUIDE = {
         },
         {
             title: '👥 3. Invite Friends & Referrals',
-            text: 'अपना पर्सनल रेफरल लिंक दोस्तों के साथ शेयर करें। जब वे KYC पूरा करके विड्रॉल कार्ड बनाते हैं, तो आपके वॉलेट में रेफरल रिवॉर्ड इंसटेंट ऐड हो जाता है।',
+            text: 'अपना पर्सनल रेफरल लिंक दोस्तों के साथ शेयर करें। जब वे KYC पूरा करके Virtual Account बनाते हैं, तो आपके वॉलेट में रेफरल रिवॉर्ड इंसटेंट ऐड हो जाता है।',
             icon: 'UserPlus'
         },
         {
             title: '💳 4. Withdrawal & Security',
-            text: 'कमाई हुई राशि को आप अपने Bank Account या UPI में आसानी से विड्रॉ कर सकते हैं। लाइफटाइम विड्रॉल कार्ड अनलॉक करके डायरेक्ट पेआउट्स प्राप्त करें।',
+            text: 'कमाई हुई राशि को आप अपने Bank Account या UPI में आसानी से विड्रॉ कर सकते हैं। Virtual Account बनाकर डायरेक्ट पेआउट्स प्राप्त करें।',
             icon: 'CreditCard'
         }
     ]
@@ -234,7 +234,7 @@ const MarketingManager = () => {
         { id: 'explore-now', label: 'Explore Now Guide', dbKey: 'explore_now_guide', icon: Compass },
         { id: 'kyc', label: 'How to do KYC?', dbKey: 'guide_kyc', icon: ShieldCheck },
         { id: 'invite', label: 'How to Invite?', dbKey: 'guide_invite', icon: UserPlus },
-        { id: 'card', label: 'Create Withdrawal Card', dbKey: 'guide_card', icon: CreditCard },
+        { id: 'card', label: 'Create Virtual Account', dbKey: 'guide_card', icon: CreditCard },
         { id: 'withdraw', label: 'How to Withdraw?', dbKey: 'guide_withdraw', icon: Wallet },
         { id: 'earn500', label: 'Earn ₹500 Daily', dbKey: 'guide_earn500', icon: TrendingUp },
         { id: 'fund', label: 'Open Future Fund', dbKey: 'guide_fund', icon: Sparkles },

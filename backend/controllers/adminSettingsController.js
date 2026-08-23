@@ -47,6 +47,24 @@ exports.updateSettings = asyncHandler(async (req, res) => {
         updateData.minWithdrawal = Math.max(0, Number(updateData.minWithdrawal) || 0);
     }
 
+    if (updateData.offerwallUserSharePercent !== undefined) {
+        const pct = Number(updateData.offerwallUserSharePercent);
+        updateData.offerwallUserSharePercent = Math.min(100, Math.max(0, Number.isFinite(pct) ? pct : 100));
+    }
+
+    if (updateData.offerwallEnabled !== undefined) {
+        updateData.offerwallEnabled = !!updateData.offerwallEnabled;
+    }
+
+    ['futureFundKycTarget', 'futureFundWatchAdTarget', 'futureFundDailyTasksTarget'].forEach((key) => {
+        if (updateData[key] !== undefined) {
+            updateData[key] = Math.max(1, Number(updateData[key]) || 1);
+        }
+    });
+    if (updateData.futureFundKycTarget !== undefined) {
+        updateData.futureFundSalesTarget = updateData.futureFundKycTarget;
+    }
+
     if (!settings) {
         settings = await Settings.create(updateData);
     } else {

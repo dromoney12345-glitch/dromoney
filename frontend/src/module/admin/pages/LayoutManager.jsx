@@ -24,10 +24,10 @@ const LayoutManager = () => {
             ]
         },
         {
-            id: 2, label: 'Daily Tasks', headline: 'COLLECT REWARD COINS', dbKey: 'menu_layout_tasks',
+            id: 2, label: 'Daily Tasks', headline: 'COMPLETE DAILY TASKS', dbKey: 'menu_layout_tasks',
             steps: [
-                { title: 'COMPLETE TASKS', desc: 'रोजाना simple tasks को पूरा करें और reward coins earn करें।' },
-                { title: 'REDEEM FOR CASH', desc: 'इन coins को आप बाद में real cash में convert kar sakte hain।' }
+                { title: 'COMPLETE TASKS', desc: 'रोजाना simple tasks को पूरा करें। Tasks पर coin या instant wallet credit नहीं मिलता।' },
+                { title: 'WALLET IN RUPEES', desc: 'App में coin system नहीं है। Invite और approved earning rupees में wallet में जाती है।' }
             ]
         },
         {
@@ -35,14 +35,6 @@ const LayoutManager = () => {
             steps: [
                 { title: 'PLATFORM STAKE', desc: 'एक बार eligible होने पर, आपको platform के profits में हिस्सा मिलेगा।' },
                 { title: 'MONTHLY PAYOUTS', desc: 'Profit share har mahine aapke wallet mein auto-credit hoga.' }
-            ]
-        },
-        {
-            id: 4, label: 'Events & Contests', headline: 'WIN BIG PRIZES', dbKey: 'menu_layout_events',
-            steps: [
-                { title: 'WEEKLY CONTESTS', desc: 'Har hafte naye Exciting Events live hote hain, jo limited time ke liye hote hain.' },
-                { title: 'MEGA JACKPOTS', desc: 'Contests mein bhag lekar aap ₹500 tak ka instant cash aur exciting prizes jeet sakte hain।' },
-                { title: 'LEADERBOARD REWARDS', desc: 'Top earners ko special bonuses aur verification badges diye jaate hain।' }
             ]
         },
     ]);
@@ -299,7 +291,7 @@ const LayoutManager = () => {
                 <div className="space-y-1">
                     <h1 className="text-4xl font-medium text-[#462211] tracking-tight uppercase">Layout Manager</h1>
                     <p className="text-[12px] font-medium text-[#7A5648] uppercase tracking-normal flex items-center gap-2">
-                        <Layout size={14} className="text-[#B3591C]" /> System UI & Onboarding Course CMS
+                        <Layout size={14} className="text-[#B3591C]" /> App layout, home guides, and legal pages
                     </p>
                 </div>
 

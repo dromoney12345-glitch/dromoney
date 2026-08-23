@@ -26,20 +26,20 @@ const FutureFundAdmin = () => {
 
     // ── CMS States ──
     const [cms, setCms] = useState({
-        description: "Future Fund is a long-term earning opportunity. Once activated, users become eligible for cash rewards derived from platform profits.",
-        guideline: "App use karne par time automatically count hoga. 15 minut pura hone par 1 din complete mana jayega"
+        description: "Future Fund unlocks after 3 actions: invited friends complete KYC, watch ad videos, and finish small tasks. After activation, users can earn daily profit share.",
+        guideline: "User app: complete KYC invites + ad videos + small tasks, then tap Activate Fund. Daily ads/tasks after that grow the fund."
     });
     const [editingCms, setEditingCms] = useState(false);
 
     // ── Global Rules (Now fully dynamic linked to DB Settings) ──
     const [rules, setRules] = useState({
-        targetSales: 10,
-        targetDays: 7,
-        dailyTargetMinutes: 15,
+        futureFundKycTarget: 10,
+        futureFundWatchAdTarget: 10,
         futureFundDailyTasksTarget: 10,
-        futureFundWatchAdTarget: 5,
-        futureFundEventsTarget: 3,
-        futureFundBoostersTarget: 1
+        ffTier1TasksLimit: 5,
+        ffTier1AdsLimit: 5,
+        ffTier1ProfitPercent: 60,
+        ffTier2ProfitPercent: 40
     });
     const [editingRules, setEditingRules] = useState(false);
     const [loadingSettings, setLoadingSettings] = useState(true);
@@ -76,11 +76,9 @@ const FutureFundAdmin = () => {
                         id: u._id,
                         name: u.name,
                         email: u.email,
-                        sales: u.referralCount || 0,
-                        days: u.futureFund?.progress || 0,
-                        minsToday: 0, // not tracked per-user on server yet
+                        progress: Number(u.futureFund?.progress) || 0,
                         stage: u.futureFund?.status === 'active' ? 'Active' : 'Locked',
-                        history7d: null // will be fetched on demand
+                        history7d: null
                     }));
                     setUsersData(mapped);
                 }
@@ -139,13 +137,9 @@ const FutureFundAdmin = () => {
                 const res = await api.get('/admin/settings');
                 if (res.success && res.data) {
                     setRules({
-                        targetSales: Number(res.data.futureFundSalesTarget) || 10,
-                        targetDays: Number(res.data.futureFundDaysTarget) || 7,
-                        dailyTargetMinutes: Number(res.data.futureFundActivityMinutes) || 15,
+                        futureFundKycTarget: Number(res.data.futureFundKycTarget) || Number(res.data.futureFundSalesTarget) || 10,
+                        futureFundWatchAdTarget: Number(res.data.futureFundWatchAdTarget) || 10,
                         futureFundDailyTasksTarget: Number(res.data.futureFundDailyTasksTarget) || 10,
-                        futureFundWatchAdTarget: Number(res.data.futureFundWatchAdTarget) || 5,
-                        futureFundEventsTarget: Number(res.data.futureFundEventsTarget) || 3,
-                        futureFundBoostersTarget: Number(res.data.futureFundBoostersTarget) || 1,
                         ffTier1TasksLimit: Number(res.data.ffTier1TasksLimit) || 5,
                         ffTier1AdsLimit: Number(res.data.ffTier1AdsLimit) || 5,
                         ffTier1ProfitPercent: Number(res.data.ffTier1ProfitPercent) || 60,
@@ -164,14 +158,14 @@ const FutureFundAdmin = () => {
     // Save Rules API Update
     const handleSaveRules = async () => {
         try {
+            const kycTarget = Math.max(1, Number(rules.futureFundKycTarget) || 10);
+            const adsTarget = Math.max(1, Number(rules.futureFundWatchAdTarget) || 10);
+            const tasksTarget = Math.max(1, Number(rules.futureFundDailyTasksTarget) || 10);
             const res = await api.put('/admin/settings', {
-                futureFundSalesTarget: Number(rules.targetSales),
-                futureFundDaysTarget: Number(rules.targetDays),
-                futureFundActivityMinutes: Number(rules.dailyTargetMinutes),
-                futureFundDailyTasksTarget: Number(rules.futureFundDailyTasksTarget),
-                futureFundWatchAdTarget: Number(rules.futureFundWatchAdTarget),
-                futureFundEventsTarget: Number(rules.futureFundEventsTarget),
-                futureFundBoostersTarget: Number(rules.futureFundBoostersTarget),
+                futureFundKycTarget: kycTarget,
+                futureFundSalesTarget: kycTarget,
+                futureFundWatchAdTarget: adsTarget,
+                futureFundDailyTasksTarget: tasksTarget,
                 ffTier1TasksLimit: Number(rules.ffTier1TasksLimit),
                 ffTier1AdsLimit: Number(rules.ffTier1AdsLimit),
                 ffTier1ProfitPercent: Number(rules.ffTier1ProfitPercent),
@@ -221,12 +215,7 @@ const FutureFundAdmin = () => {
     };
 
     // ── Logic ──
-    const calculateProgress = (user) => {
-        const salesProgress = Math.min((user.sales / rules.targetSales) * 100, 100);
-        const daysProgress = Math.min((user.days / rules.targetDays) * 100, 100);
-        const activityProgress = Math.min((user.minsToday / rules.dailyTargetMinutes) * 100, 100);
-        return Math.floor((salesProgress + daysProgress + activityProgress) / 3);
-    };
+    const calculateProgress = (user) => Math.min(100, Math.max(0, Number(user.progress) || 0));
 
     const filteredUsers = usersData.filter(u => u.name.toLowerCase().includes(search.toLowerCase()));
 
@@ -269,7 +258,7 @@ const FutureFundAdmin = () => {
                 <AdminStatCard label="Total Users" value={usersData.length} change="Platform wide" icon={UserCheck} color="bg-indigo-600" />
                 <AdminStatCard label="Active Stages" value={usersData.filter(u => u.stage === 'Active').length} change="Monetized" icon={TrendingUp} color="bg-sky-500" />
                 <AdminStatCard label="Eligible Today" value={usersData.filter(u => u.stage === 'Eligible').length} change="Move Forward ready" icon={Award} color="bg-emerald-500" />
-                <AdminStatCard label="Criteria Goal" value={`${rules.targetSales}/${rules.targetDays}/${rules.dailyTargetMinutes}`} change="Referral/Days/Mins" icon={LayoutDashboard} color="bg-amber-500" />
+                <AdminStatCard label="Unlock Goals" value={`${rules.futureFundKycTarget}/${rules.futureFundWatchAdTarget}/${rules.futureFundDailyTasksTarget}`} change="KYC / Ads / Tasks" icon={LayoutDashboard} color="bg-amber-500" />
             </div>
 
             {poolSummary && (
@@ -312,7 +301,7 @@ const FutureFundAdmin = () => {
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2.5">
                                 <div className="w-8 h-8 bg-emerald-50 rounded-md flex items-center justify-center text-emerald-600"><CheckCircle2 size={15} /></div>
-                                <h2 className="text-[13px] font-bold text-slate-800 uppercase tracking-widest leading-none">Milestones & Targets</h2>
+                                <h2 className="text-[13px] font-bold text-slate-800 uppercase tracking-widest leading-none">Activation Criteria</h2>
                             </div>
                             <button 
                                 onClick={() => {
@@ -328,12 +317,12 @@ const FutureFundAdmin = () => {
                             </button>
                         </div>
 
-                        {/* Milestone Targets Row */}
+                        {/* Unlock criteria — matches user Future Fund screen */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
                             {[
-                                { label: 'Sales Target', key: 'targetSales', icon: Users, color: 'text-indigo-500' },
-                                { label: 'Active Days', key: 'targetDays', icon: Calendar, color: 'text-sky-500' },
-                                { label: 'Daily Mins', key: 'dailyTargetMinutes', icon: Clock, color: 'text-amber-500', suffix: ' M' }
+                                { label: 'KYC Invites', key: 'futureFundKycTarget', icon: Users, color: 'text-indigo-500' },
+                                { label: 'Ad Videos', key: 'futureFundWatchAdTarget', icon: TrendingUp, color: 'text-emerald-500' },
+                                { label: 'Small Tasks', key: 'futureFundDailyTasksTarget', icon: Award, color: 'text-amber-500' }
                             ].map((rule) => {
                                 const Icon = rule.icon || TrendingUp;
                                 return (
@@ -354,32 +343,9 @@ const FutureFundAdmin = () => {
                             })}
                         </div>
 
-                        {/* Today's Activity Target Configuration */}
-                        <div>
-                            <h3 className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-3">Today's Activity Progress Targets</h3>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                {[
-                                    { label: 'Daily Tasks', key: 'futureFundDailyTasksTarget', color: 'text-blue-500' },
-                                    { label: 'Watch Ads', key: 'futureFundWatchAdTarget', color: 'text-emerald-500' },
-                                    { label: 'Events Target', key: 'futureFundEventsTarget', color: 'text-amber-500' },
-                                    { label: 'Boosters Target', key: 'futureFundBoostersTarget', color: 'text-rose-500' }
-                                ].map((act) => (
-                                    <div key={act.key} className="bg-slate-50/50 border border-slate-100 p-3.5 rounded-lg">
-                                        <p className="text-[8px] font-medium text-slate-400 uppercase tracking-tight mb-1.5 leading-none">{act.label}</p>
-                                        {editingRules ? (
-                                            <input 
-                                                type="number" 
-                                                value={rules[act.key] === undefined ? '' : rules[act.key].toString()} 
-                                                onChange={(e) => setRules({ ...rules, [act.key]: e.target.value === '' ? '' : Number(e.target.value) })} 
-                                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-sm font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-500" 
-                                            />
-                                        ) : (
-                                            <p className={`text-lg font-medium ${act.color} leading-none`}>{rules[act.key]}</p>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <p className="text-[10px] text-slate-500 leading-relaxed mb-4">
+                            These 3 numbers are the same activation criteria shown in the user app (e.g. 10 KYC, 50 ads, 50 tasks). After unlock, ads/tasks on the active screen use the same ad and task targets.
+                        </p>
 
                         {/* Profit Distribution Tiers */}
                         <div className="mt-5 border-t border-slate-100 pt-5">
@@ -410,7 +376,7 @@ const FutureFundAdmin = () => {
                     </div>
                     
                     <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-100 text-[10px] text-slate-400 font-medium leading-normal">
-                        These dynamic settings configure the targets shown in the User's Active Future Fund screen and are saved directly into the database.
+                        These 3 targets match the user app unlock screen: invited KYC, ad videos, and small tasks. Save writes them to the database used by the live Future Fund page.
                     </div>
                 </div>
             </div>
@@ -420,7 +386,7 @@ const FutureFundAdmin = () => {
                 <div className="p-4 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-indigo-100 font-medium">FF</div>
-                        <div><h2 className="text-sm font-medium text-slate-800 uppercase tracking-normal">User Progress Tracker</h2><p className="text-[10px] text-slate-400 font-medium uppercase tracking-tighter leading-none mt-1">Milestone Stages</p></div>
+                        <div><h2 className="text-sm font-medium text-slate-800 uppercase tracking-normal">User Progress Tracker</h2><p className="text-[10px] text-slate-400 font-medium uppercase tracking-tighter leading-none mt-1">KYC + Ads + Tasks</p></div>
                     </div>
                     <div className="relative w-full md:w-80">
                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none" />

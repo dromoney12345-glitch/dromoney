@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
-import { ChevronLeft, Sparkles, IndianRupee, Trophy, Quote, CheckCircle2, Star } from 'lucide-react';
+import { ChevronLeft, Sparkles, Trophy, Quote, CheckCircle2, Star } from 'lucide-react';
 
 const QUOTES = [
     "Consistency is the key to big earnings!",
@@ -15,7 +15,7 @@ const QUOTES = [
     "Every reward counts towards your goal."
 ];
 
-const ScratchCard = ({ rewardPerCard, quote, onComplete, isTaskBoosterActive }) => {
+const ScratchCard = ({ quote, onComplete }) => {
     const canvasRef = useRef(null);
     const [isScratched, setIsScratched] = useState(false);
     const [isDrawing, setIsDrawing] = useState(false);
@@ -93,9 +93,9 @@ const ScratchCard = ({ rewardPerCard, quote, onComplete, isTaskBoosterActive }) 
         >
             <div className={`flex flex-col items-center justify-center transition-all duration-700 ${isScratched ? 'opacity-100 scale-100' : 'opacity-10 scale-95'}`}>
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-1 shadow-2xl ${isScratched ? 'bg-white/20' : 'bg-amber-50'}`}>
-                    <IndianRupee size={18} className={isScratched ? 'text-white' : 'text-amber-500'} />
+                    <Sparkles size={18} className={isScratched ? 'text-white' : 'text-amber-500'} />
                 </div>
-                <p className={`text-[15px] font-medium tracking-tight ${isScratched ? 'text-white' : 'text-slate-800'}`}>+₹{rewardPerCard}</p>
+                <p className={`text-[15px] font-medium tracking-tight ${isScratched ? 'text-white' : 'text-slate-800'}`}>Done</p>
                 <div className={`h-[1px] w-8 my-1.5 ${isScratched ? 'bg-white/30' : 'bg-slate-100'}`}></div>
                 <p className={`text-[9px] font-medium italic leading-tight px-1 ${isScratched ? 'text-white/80' : 'text-slate-400'}`}>"{quote}"</p>
             </div>
@@ -145,8 +145,7 @@ const ScratchCardView = () => {
             }
             return next;
         });
-        const baseReward = Math.floor((task?.coinsReward || task?.reward || 0) / 3) || 1;
-        addCoins(baseReward, 'Scratch Card Reward', (completedCount + 1 === 3) ? (task?._id || task?.id) : undefined);
+        addCoins(0, 'Scratch Card Reward', (completedCount + 1 === 3) ? (task?._id || task?.id) : undefined);
     };
 
     if (!task) return null;
@@ -184,11 +183,9 @@ const ScratchCardView = () => {
 
                 <div className="grid grid-cols-3 gap-3 w-full">
                     {[0, 1, 2].map((i) => {
-                        const baseRewardPerCard = Math.ceil((task.coinsReward || task.reward || 0) / 3);
                         return (
                             <ScratchCard 
                                 key={i} 
-                                rewardPerCard={baseRewardPerCard} 
                                 quote={randomQuotes[i] || ""}
                                 onComplete={handleCardFinish} 
                             />

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
-import { ChevronLeft, CheckCircle2, Play, UploadCloud, Link as LinkIcon, Loader2, Image as ImageIcon, Coins, Camera, XCircle, MessageCircle, Send, Copy, Share2 } from 'lucide-react';
+import { ChevronLeft, CheckCircle2, Play, UploadCloud, Link as LinkIcon, Loader2, Image as ImageIcon, Camera, XCircle, MessageCircle, Send, Copy, Share2 } from 'lucide-react';
 
 const Facebook = ({ size, className }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -196,8 +196,7 @@ const TaskRunner = () => {
                     // 2. Submit the task with the uploaded image URL
                     const submissionRes = await api.post('/user/data/tasks/submit', {
                         taskId: task._id || task.id,
-                        proofImage: uploadRes.url,
-                        coinsReward: task.coinsReward || task.reward || 0
+                        proofImage: uploadRes.url
                     });
 
                     if (submissionRes.success) {
@@ -215,18 +214,16 @@ const TaskRunner = () => {
         }
 
         setStatus('completed');
-        let rewardAmount = task.coinsReward || task.reward || 0;
-        
         const taskId = task._id || task.id;
-        const result = await addCoins(rewardAmount, task.title, taskId);
+        const result = await addCoins(0, task.title, taskId);
         
         if (!result || !result.success) {
-            alert(result?.message || 'Failed to add earning. Please try again.');
+            alert(result?.message || 'Failed to complete task. Please try again.');
             setStatus('verify');
             return;
         }
         taskStorage.markComplete(taskId);
-        setToast({ message: `Task completed! +₹${rewardAmount}`, type: 'success' });
+        setToast({ message: 'Task completed!', type: 'success' });
         setTimeout(() => { setToast(null); navigate('/user/earn'); }, 1500);
     };
 
@@ -249,9 +246,6 @@ const TaskRunner = () => {
                 <div className="flex-1 truncate">
                     <h1 className="text-base font-medium text-white truncate">{task.title}</h1>
                     <p className="text-[9px] text-sky-400 font-medium uppercase tracking-widest leading-none mt-1">Live Task Mode</p>
-                </div>
-                <div className="bg-[#462211]/10 px-3 py-1.5 rounded-full border border-[#462211]/20 shadow-inner shrink-0 flex items-center gap-1">
-                    <span className="font-medium text-[#B3591C] text-xs">+₹{task.coinsReward || task.reward || 0}</span>
                 </div>
             </div>
 
@@ -295,7 +289,7 @@ const TaskRunner = () => {
                                         <CheckCircle2 size={40} className="text-emerald-400" />
                                     </div>
                                     <h3 className="text-xl font-medium text-white uppercase tracking-tight mb-2">Task Successfully Completed!</h3>
-                                    <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-8">You can now claim your reward</p>
+                                    <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-8">You can now complete this task</p>
                                     
                                     <button 
                                         onClick={submitTask}

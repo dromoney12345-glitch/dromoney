@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Loader2, Smartphone, Lock, User, Mail, Gift, ShieldCheck } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import {
     extractReferralCode,
+    savePendingReferralCode,
+    getPendingReferralCode,
     clearPendingReferralCode,
+    fetchFlutterInstallReferrer,
 } from '../../shared/utils/referral';
 
 const inputClass =
@@ -12,6 +15,7 @@ const inputClass =
 
 const Register = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { register, sendRegisterOtp } = useUser();
 
     const [loading, setLoading] = useState(false);
@@ -37,7 +41,7 @@ const Register = () => {
         }
         setCheckingReferral(true);
         try {
-            const res = await fetch(`/api/public/referrer/${code}`);
+            const res = await fetch(`/api/public/referrer/${encodeURIComponent(code)}`);
             const data = await res.json();
             if (data.success && data.name) {
                 setReferrerName(data.name);
@@ -98,10 +102,29 @@ const Register = () => {
     };
 
     useEffect(() => {
-        clearPendingReferralCode();
-        setFormData((prev) => ({ ...prev, referral: '' }));
-        setReferralCode('');
-        setReferrerName('');
+        let cancelled = false;
+
+        const applyInitialInvite = async () => {
+            const fromQuery =
+                searchParams.get('invite') ||
+                searchParams.get('ref') ||
+                searchParams.get('referral') ||
+                searchParams.get('code') ||
+                '';
+            const flutterCode = await fetchFlutterInstallReferrer();
+            const initial =
+                extractReferralCode(fromQuery) ||
+                flutterCode ||
+                getPendingReferralCode();
+
+            if (cancelled || !initial) return;
+            savePendingReferralCode(initial);
+            applyReferralInput(initial, { showCode: true });
+        };
+
+        applyInitialInvite();
+        return () => { cancelled = true; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -233,7 +256,7 @@ const Register = () => {
                         </div>
 
                         <div className="space-y-1">
-                            <label className="text-[11px] font-medium text-[#7A5648] ml-0.5">Referral (Optional)</label>
+                            <label className="text-[11px] font-medium text-[#7A5648] ml-0.5">Invite code (Optional)</label>
                             <div className="relative">
                                 <Gift className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A89890]" size={18} />
                                 <input
@@ -242,7 +265,7 @@ const Register = () => {
                                     autoCapitalize="characters"
                                     autoCorrect="off"
                                     spellCheck={false}
-                                    placeholder="Paste Play Store invite link"
+                                    placeholder="Invite code or paste invite link"
                                     value={formData.referral}
                                     onChange={(e) => handleReferralChange(e.target.value)}
                                     onPaste={handleReferralPaste}
@@ -251,20 +274,20 @@ const Register = () => {
                                 />
                             </div>
                             {checkingReferral && (
-                                <div className="text-[10px] text-[#A89890] ml-1 mt-1 animate-pulse">Verifying referral code...</div>
+                                <div className="text-[10px] text-[#A89890] ml-1 mt-1 animate-pulse">Verifying invite code...</div>
                             )}
                             {referralCode && referrerName && (
                                 <div className="mt-1.5 px-3 py-2 bg-[#E8F5EE] rounded-xl border border-[#C6E7D4] flex items-center gap-2 text-emerald-700 text-[10px] font-medium">
                                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                    Code {referralCode} · Referred By: {referrerName}
+                                    Invite code {referralCode} · Invited by: {referrerName}
                                 </div>
                             )}
                             {referralCode && !referrerName && !checkingReferral && (
-                                <div className="text-[10px] text-[#7A5648] ml-1 mt-1">Referral code: {referralCode}</div>
+                                <div className="text-[10px] text-[#7A5648] ml-1 mt-1">Invite code: {referralCode}</div>
                             )}
                             {formData.referral && !referralCode && !checkingReferral && (
                                 <div className="text-[10px] text-rose-500 ml-1 mt-1">
-                                    Invalid link. Paste the Play Store invite link from Marketing.
+                                    Invalid invite code or link. You can leave this blank.
                                 </div>
                             )}
                         </div>

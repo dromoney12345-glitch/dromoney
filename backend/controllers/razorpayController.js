@@ -14,54 +14,92 @@ const razorpay = new Razorpay({
     key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// @desc    Create Razorpay Order
-// @route   POST /api/user/data/razorpay/create-order
-// @access  Private
-exports.createOrder = asyncHandler(async (req, res, next) => {
-    const { amount, type, ideaId, planName: reqPlanName, planDuration: reqPlanDuration, durationInDays: reqDurationInDays } = req.body; // amount in INR
-    const user = await User.findById(req.user.id);
+const {
+    quotePayment,
+    BOOSTER_FEE_PERCENT,
+    SUPPORT_CHAT_RENEWAL_FEE,
+    DEFAULT_UNLOCK_FEE,
+} = require('../utils/moneyQuotes');
 
-    let finalAmount = 499; // Default for platform unlock
-    let planName = 'Lifetime Access';
-    let pType = 'PLATFORM_UNLOCK';
-    let durationDays = reqDurationInDays || 30;
+async function resolvePaymentQuote({ type, ideaId, planName, user }) {
+    const settings = (await Settings.findOne()) || {};
 
     if (type === 'BUSINESS_IDEA_UNLOCK') {
         const idea = await BusinessIdea.findById(ideaId);
-        if (!idea) return next(new ErrorResponse('Business Idea not found', 404));
-        if (user.unlockedIdeas.includes(ideaId)) return next(new ErrorResponse('Already unlocked', 400));
-        
-        finalAmount = Number(idea.price) > 0 ? Number(idea.price) : 199;
-        planName = `Unlock: ${idea.title}`;
-        pType = 'BUSINESS_IDEA_UNLOCK';
-    } else if (type === 'SUPPORT_CHAT_RENEWAL') {
-        finalAmount = 150;
-        planName = '3 Months Support Extension';
-        pType = 'SUPPORT_CHAT_RENEWAL';
-        durationDays = 90;
-    } else if (type === 'SUPPORT_BOOSTER' || type === 'TASK_BOOSTER') {
-        const isSupport = type === 'SUPPORT_BOOSTER';
-        
-        // Both boosters can be active simultaneously
+        if (!idea) return { error: 'Business Idea not found', status: 404 };
+        if (user?.unlockedIdeas?.map(String).includes(String(ideaId))) {
+            return { error: 'Already unlocked', status: 400 };
+        }
+        const q = quotePayment({ baseAmount: Number(idea.price) > 0 ? idea.price : 199, feePercent: 0 });
+        return { ...q, planName: `Unlock: ${idea.title}`, paymentType: type, durationDays: 30 };
+    }
+
+    if (type === 'SUPPORT_CHAT_RENEWAL') {
+        const q = quotePayment({ baseAmount: SUPPORT_CHAT_RENEWAL_FEE, feePercent: 0 });
+        return { ...q, planName: '3 Months Support Extension', paymentType: type, durationDays: 90 };
+    }
+
+    if (type === 'SUPPORT_BOOSTER' || type === 'TASK_BOOSTER') {
         const boosterType = type === 'SUPPORT_BOOSTER' ? 'support' : 'task';
         const Booster = require('../models/Booster');
         const booster = await Booster.findOne({ type: boosterType });
         const originalPrice = booster ? booster.price : (boosterType === 'support' ? 22 : 49);
-        
-        finalAmount = originalPrice * 1.04; // adding 4% markup
-        planName = booster ? booster.title : (boosterType === 'support' ? 'Support Booster' : 'Task Booster');
-        pType = type;
-        durationDays = 30;
-    } else if (type === 'BUSINESS_HUB_PLAN') {
-        const { planName: pName } = req.body;
-        finalAmount = amount;
-        planName = pName || 'Business Hub Plan';
-        pType = 'BUSINESS_HUB_PLAN';
-        durationDays = reqDurationInDays || 30;
-    } else {
-        if (user.isPaid) return next(new ErrorResponse('Platform already unlocked.', 400));
-        durationDays = 9999; // Lifetime
+        const q = quotePayment({ baseAmount: originalPrice, feePercent: BOOSTER_FEE_PERCENT });
+        return {
+            ...q,
+            planName: booster ? booster.title : (boosterType === 'support' ? 'Support Booster' : 'Task Booster'),
+            paymentType: type,
+            durationDays: 30,
+        };
     }
+
+    if (type === 'BUSINESS_HUB_PLAN') {
+        const plans = settings.businessPlans || [];
+        const plan = plans.find((p) => p.title === planName);
+        const q = quotePayment({ baseAmount: plan ? plan.price : 0, feePercent: 0 });
+        return {
+            ...q,
+            planName: planName || 'Business Hub Plan',
+            paymentType: type,
+            durationDays: plan?.durationInDays || 30,
+        };
+    }
+
+    if (user?.isPaid) return { error: 'Platform already unlocked.', status: 400 };
+    const unlockFee = Number(settings.registrationFee) || DEFAULT_UNLOCK_FEE;
+    const q = quotePayment({ baseAmount: unlockFee, feePercent: 0 });
+    return { ...q, planName: 'Lifetime Access', paymentType: 'PLATFORM_UNLOCK', durationDays: 9999 };
+}
+
+// @desc    Payable amount quote (display only — order is still created server-side)
+// @route   GET /api/user/data/payment-quote
+// @access  Private
+exports.getPaymentQuote = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+    const quote = await resolvePaymentQuote({
+        type: req.query.type,
+        ideaId: req.query.ideaId,
+        planName: req.query.planName,
+        user,
+    });
+    if (quote.error) return next(new ErrorResponse(quote.error, quote.status || 400));
+    res.status(200).json({ success: true, data: quote });
+});
+
+// @desc    Create Razorpay Order
+// @route   POST /api/user/data/razorpay/create-order
+// @access  Private
+exports.createOrder = asyncHandler(async (req, res, next) => {
+    const { type, ideaId, planName: reqPlanName } = req.body;
+    const user = await User.findById(req.user.id);
+
+    const quote = await resolvePaymentQuote({ type, ideaId, planName: reqPlanName, user });
+    if (quote.error) return next(new ErrorResponse(quote.error, quote.status || 400));
+
+    const finalAmount = quote.payableAmount;
+    const planName = quote.planName;
+    const pType = quote.paymentType;
+    const durationDays = quote.durationDays;
 
     // One pending entry per user + payment type; reuse live Razorpay order when possible
     const { assertNoDuplicatePayment, createPaymentOnce } = require('../utils/paymentGuards');
@@ -239,7 +277,9 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
         if (payment.paymentType === 'BUSINESS_IDEA_UNLOCK' && payment.businessIdea) {
             console.log(`[PAYMENT] Unlocking Business Idea ${payment.businessIdea} for user ${user._id}`);
             // Unlock Business Idea
-            if (!user.unlockedIdeas.includes(payment.businessIdea)) {
+            const ideaIdStr = payment.businessIdea.toString();
+            const already = (user.unlockedIdeas || []).some((id) => id && id.toString() === ideaIdStr);
+            if (!already) {
                 user.unlockedIdeas.push(payment.businessIdea);
                 await user.save();
             }
@@ -328,10 +368,10 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
                 status: 'Success'
             });
         } else {
-            console.log(`[PAYMENT] Unlocking Platform for user ${user._id}`);
-            
-            user.isPaid = true;
-            user.unlockedAt = new Date();
+            console.log(`[PAYMENT] Unlocking Virtual Account for user ${user._id}`);
+
+            const { activateVirtualWallet } = require('../utils/walletLedger');
+            await activateVirtualWallet(user);
             await user.save();
 
             try {
@@ -366,14 +406,8 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
                     }
                 });
             } else {
-                await sendNotificationToUser(user._id, {
-                    title: 'Platform Access Unlocked! 🚀',
-                    body: `Your payment for ${payment.plan || 'Lifetime Access'} is confirmed. Welcome to DroMoney Premium!`,
-                    data: {
-                        type: 'payment',
-                        link: '/user/home'
-                    }
-                });
+                const { notifyJourney } = require('../utils/userJourneyPush');
+                await notifyJourney(user._id, 'va_activated');
             }
         } catch (pushErr) {
             console.error('[FCM] Razorpay payment push failed:', pushErr.message);
@@ -476,6 +510,13 @@ exports.submitManualPayment = asyncHandler(async (req, res, next) => {
         createdAt: new Date()
     });
     await user.save();
+
+    try {
+        const { notifyJourney } = require('../utils/userJourneyPush');
+        await notifyJourney(user._id, 'va_payment_pending', { skipInApp: true });
+    } catch (pushErr) {
+        console.error('VA pending push failed:', pushErr.message);
+    }
 
     try {
         const { sendNotificationToAllAdmins } = require('./fcmController');

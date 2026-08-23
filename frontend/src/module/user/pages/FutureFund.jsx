@@ -182,33 +182,14 @@ const FutureFund = () => {
     const kycCurrent = Number(salesCriterion.current ?? 0);
     const kycTarget = Number(salesCriterion.target || 10);
     const adsCurrent = Number(activityCriterion.current ?? userData.lifetimeAdsWatched ?? 0);
-    const adsTarget = Number(activityCriterion.target || 50);
+    const adsTarget = Number(activityCriterion.target || 10);
     const tasksCurrent = Number(daysCriterion.current ?? userData.lifetimeTasksCompleted ?? 0);
-    const tasksTarget = Number(daysCriterion.target || 50);
+    const tasksTarget = Number(daysCriterion.target || 10);
     const criterionPct = (current, target) =>
         Math.round(Math.min(100, (Number(current) / Math.max(Number(target) || 1, 1)) * 100));
 
-    const realEarningsData = useMemo(() => {
-        const transactions = userData.wallet?.transactions || [];
-        const now = new Date();
-        const todayStart = new Date(now);
-        todayStart.setHours(0, 0, 0, 0);
-
-        const isFfTx = (tx) =>
-            tx.type === 'credit' &&
-            tx.status === 'Success' &&
-            /future fund|daily future fund distribution/i.test(String(tx.source || tx.title || ''));
-
-        const todayFF = transactions
-            .filter((tx) => isFfTx(tx) && new Date(tx.createdAt || tx.date) >= todayStart)
-            .reduce((sum, tx) => sum + (tx.amount || 0), 0);
-
-        const totalFF = transactions
-            .filter((tx) => isFfTx(tx))
-            .reduce((sum, tx) => sum + (tx.amount || 0), 0);
-
-        return { todayFF, totalFF };
-    }, [userData.wallet?.transactions]);
+    const todayFF = Number(ffStatus?.todayEarnings || 0);
+    const totalFF = Number(ffStatus?.lifetimeEarnings || 0);
 
     const handleMoveForward = async () => {
         if (!isEligible || unlocking) return;
@@ -238,7 +219,7 @@ const FutureFund = () => {
         },
         {
             icon: CreditCard,
-            text: 'Earnings are sent to your Withdrawal Card, from where you can withdraw.',
+            text: 'Earnings are sent to your Virtual Account, from where you can withdraw.',
         },
         {
             icon: Star,
@@ -305,14 +286,14 @@ const FutureFund = () => {
                                 <Wallet size={16} />
                             </div>
                             <p className="text-[10px] text-[#7A5648]">Today Earning</p>
-                            <p className="text-[22px] font-medium text-[#462211] leading-none mt-1">₹{formatMoney(realEarningsData.todayFF)}</p>
+                            <p className="text-[22px] font-medium text-[#462211] leading-none mt-1">₹{formatMoney(todayFF)}</p>
                         </div>
                         <div className="bg-white border border-[#EDE4DC] rounded-2xl p-3.5">
                             <div className="w-9 h-9 rounded-full bg-[#F3E8E0] text-[#462211] flex items-center justify-center mb-2">
                                 <IndianRupee size={16} />
                             </div>
                             <p className="text-[10px] text-[#7A5648]">Lifetime Earning</p>
-                            <p className="text-[22px] font-medium text-[#462211] leading-none mt-1">₹{formatMoney(realEarningsData.totalFF)}</p>
+                            <p className="text-[22px] font-medium text-[#462211] leading-none mt-1">₹{formatMoney(totalFF)}</p>
                         </div>
                     </div>
 

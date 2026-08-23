@@ -10,7 +10,9 @@ export const AdminProvider = ({ children }) => {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(false);
     const [notifications, setNotifications] = useState([]);
-    const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('dromoney_admin_token'));
+    const [isAuthenticated, setIsAuthenticated] = useState(
+        !!(localStorage.getItem('dromoney_admin_token') || sessionStorage.getItem('dromoney_admin_token'))
+    );
     const socketRef = useRef(null);
 
     // ── Socket connection for real-time admin alerts ──
@@ -82,11 +84,17 @@ export const AdminProvider = ({ children }) => {
         }
     };
 
-    const adminLogin = async (email, password) => {
+    const adminLogin = async (email, password, rememberMe = true) => {
         setLoading(true);
         try {
             const response = await api.post('/admin/auth/login', { email, password });
-            localStorage.setItem('dromoney_admin_token', response.token);
+            sessionStorage.removeItem('dromoney_admin_token');
+            localStorage.removeItem('dromoney_admin_token');
+            if (rememberMe) {
+                localStorage.setItem('dromoney_admin_token', response.token);
+            } else {
+                sessionStorage.setItem('dromoney_admin_token', response.token);
+            }
             setAdminData(response.admin);
             setIsAuthenticated(true);
             return { success: true };
@@ -99,6 +107,7 @@ export const AdminProvider = ({ children }) => {
 
     const adminLogout = () => {
         localStorage.removeItem('dromoney_admin_token');
+        sessionStorage.removeItem('dromoney_admin_token');
         setAdminData(null);
         setIsAuthenticated(false);
     };

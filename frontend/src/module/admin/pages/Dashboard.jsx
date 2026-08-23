@@ -118,15 +118,24 @@ const Dashboard = () => {
         }
     };
 
+    const adminStatPath = (s) => {
+        if (s.path) return s.path;
+        const label = String(s.label || '');
+        if (label.includes('User')) return '/admin/users';
+        if (label.includes('Revenue')) return '/admin/payments';
+        if (label.includes('Wallet') || label.includes('Payout')) return '/admin/withdrawals';
+        return '/admin/dashboard';
+    };
+
     // ── DATA SOURCES (Mapped to Live Stats if available) ──
     const displayStats = liveStats?.stats?.map(s => ({
         ...s,
         icon: s.label.includes('User') ? Users : s.label.includes('Revenue') ? TrendingUp : s.label.includes('Payout') ? Wallet : Zap,
-        path: s.label.includes('User') ? '/admin/users' : s.label.includes('Revenue') ? '/admin/payments' : s.label.includes('Payout') ? '/admin/withdrawals' : '/admin/tasks'
+        path: adminStatPath(s)
     })) || [
         { label: 'Active Users', value: '...', trend: 'Sync...', color: 'from-sky-500 to-indigo-600', icon: Users, path: '/admin/users' },
         { label: 'Total Revenue', value: '...', trend: 'Sync...', color: 'from-emerald-500 to-teal-600', icon: TrendingUp, path: '/admin/payments' },
-        { label: 'Coins in Market', value: '...', trend: 'Sync...', color: 'from-amber-400 to-orange-600', icon: Zap, path: '/admin/tasks' },
+        { label: 'Wallet Balance', value: '...', trend: 'Sync...', color: 'from-amber-400 to-orange-600', icon: Zap, path: '/admin/withdrawals' },
         { label: 'Pending Payouts', value: '...', trend: 'Sync...', color: 'from-rose-500 to-pink-600', icon: Wallet, path: '/admin/withdrawals' },
     ];
 
@@ -147,10 +156,9 @@ const Dashboard = () => {
         totalGrossRevenue: 0
     };
 
-    const monthlyTargetValue = 600000;
-    const currentRevenue = revenueBreakdown.totalGrossRevenue || 0;
-    const targetPercent = Math.min((currentRevenue / monthlyTargetValue) * 100, 100).toFixed(1);
-    const formattedCurrent = currentRevenue >= 100000 ? `₹${(currentRevenue/100000).toFixed(2)}L` : currentRevenue >= 1000 ? `₹${(currentRevenue/1000).toFixed(2)}k` : `₹${currentRevenue.toFixed(0)}`;
+    const revenueTarget = revenueBreakdown.revenueTarget || {};
+    const targetPercent = revenueTarget.percent ?? 0;
+    const formattedCurrent = revenueTarget.formattedCurrent || '₹0';
 
     const fraudAlerts = alerts || [];
     const kycQueue = queue || [];
@@ -188,7 +196,6 @@ const Dashboard = () => {
     const quickActions = [
         { label: 'Send Alert', icon: Bell, color: 'text-indigo-600', bg: 'bg-indigo-100/50', cardBg: 'bg-[#E2D4FD]', border: 'border-[#D4B8F9]', path: '/admin/notifications' },
         { label: 'Add Task', icon: Plus, color: 'text-emerald-600', bg: 'bg-emerald-100/50', cardBg: 'bg-[#FDF2D0]', border: 'border-[#F9E9B8]', path: '/admin/tasks' },
-        { label: 'New Event', icon: Sparkles, color: 'text-amber-600', bg: 'bg-amber-100/50', cardBg: 'bg-[#CFE2FD]', border: 'border-[#B8D5F9]', path: '/admin/events' },
         { label: 'Manage Ads', icon: PlayCircle, color: 'text-sky-600', bg: 'bg-sky-100/50', cardBg: 'bg-[#FDE2CF]', border: 'border-[#F9D4B8]', path: '/admin/watch-and-earn' },
         { label: 'Settings', icon: Settings, color: 'text-slate-600', bg: 'bg-slate-100/50', cardBg: 'bg-[#FDCFCF]', border: 'border-[#F9B8B8]', path: '/admin/settings' },
     ];
@@ -221,7 +228,7 @@ const Dashboard = () => {
 
             {/* ── QUICK ACTIONS HUB ── */}
             {/* The logic for navigation is explicitly absolute to avoid sub-route confusion */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {quickActions.map((action, i) => (
                     <div 
                         key={i}

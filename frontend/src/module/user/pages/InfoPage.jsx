@@ -71,7 +71,7 @@ const LOCAL_FALLBACKS = {
         sections: [
             { title: '1. Register & Verify', text: 'Create your account and complete a simple KYC to unlock all earning features safely. Your identity is verified through Aadhaar/PAN to ensure platform security.' },
             { title: '2. Explore Opportunities', text: 'Browse through affiliate projects, daily tasks, and exclusive business ideas tailored for you. Choose from multiple income streams.' },
-            { title: '3. Start Earning', text: 'Complete tasks or refer partners to accumulate coins and real cash in your dashboard. Track your progress in real-time.' },
+            { title: '3. Start Earning', text: 'Complete tasks, invite friends, and grow with Future Fund. Wallet uses rupees only — there is no coin balance.' },
             { title: '4. Instant Payouts', text: 'Withdraw your earnings directly to your bank account with our secure payment gateway. Get paid with 100% transparency.' }
         ]
     },

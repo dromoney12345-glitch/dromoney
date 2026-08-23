@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
-import { ChevronLeft, Gift, IndianRupee, Sparkles, Trophy, Star } from 'lucide-react';
+import { ChevronLeft, Gift, Sparkles, Trophy, Star } from 'lucide-react';
 
 const TreasureChestView = () => {
     const { id } = useParams();
@@ -30,8 +30,7 @@ const TreasureChestView = () => {
         setTimeout(async () => {
             setStep(2);
             if (idx === winningIdx || true) { // Logic: For now, always win to make client happy, or use random
-                 const baseReward = task.coinsReward || task.reward || 0;
-                 const res = await addCoins(baseReward, 'Treasure Chest Found', task._id || task.id);
+                 const res = await addCoins(0, 'Treasure Chest Found', task._id || task.id);
                  if (res && res.success) {
                      taskStorage.markComplete(task._id || task.id);
                  }
@@ -96,7 +95,7 @@ const TreasureChestView = () => {
                             {step === 2 && selectedIdx === i && (
                                 <div className="absolute -bottom-4 bg-emerald-500 px-4 py-2 rounded-full shadow-2xl animate-in fade-in slide-in-from-top-2">
                                     <span className="text-[11px] font-medium text-white uppercase tracking-widest">
-                                        +₹{task?.reward || 0}
+                                        Opened
                                     </span>
                                 </div>
                             )}
@@ -109,7 +108,7 @@ const TreasureChestView = () => {
                         <div className="bg-white/5 p-6 rounded-3xl border border-white/10 text-center relative overflow-hidden group">
                            <div className="absolute -top-10 -right-10 w-24 h-24 bg-amber-400/10 rounded-full blur-2xl"></div>
                            <Trophy size={40} className="mx-auto mb-3 text-amber-400 animate-bounce" />
-                           <h3 className="text-xl font-medium text-white">Reward Claimed!</h3>
+                           <h3 className="text-xl font-medium text-white">Chest Opened!</h3>
                            <p className="text-[11px] font-medium text-white/40 uppercase mt-1">Excellent choice, traveler!</p>
                         </div>
                         

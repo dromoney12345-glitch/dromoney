@@ -280,19 +280,19 @@ const Events = () => {
                     <div className="flex justify-between items-center mb-2">
                         <span className="text-[9px] text-[#7A5648] font-bold uppercase tracking-widest">Mega Event Eligibility</span>
                         <span className="text-[10px] font-extrabold text-[#B3591C]">
-                            ₹{userData?.wallet?.balance || 0} Balance
+                            ₹{userData?.megaEligibility?.balance ?? userData?.wallet?.balance ?? 0} Balance
                         </span>
                     </div>
                     <div className="w-full bg-[#F3E8E0] h-2.5 rounded-full overflow-hidden border border-[#EDE4DC]">
                         <div 
                             className="bg-gradient-to-r from-[#B3591C] to-[#D4783A] h-full rounded-full transition-all duration-500" 
-                            style={{ width: `${Math.min(100, ((userData?.wallet?.balance || 0) / 500) * 100)}%` }}
+                            style={{ width: `${userData?.megaEligibility?.progressPercent ?? 0}%` }}
                         ></div>
                     </div>
                     <p className="text-[8.5px] text-[#7A5648] font-semibold mt-2 leading-tight uppercase tracking-wider">
-                        {(userData?.wallet?.balance || 0) >= 500 
+                        {userData?.megaEligibility?.eligible
                             ? '🎉 Eligible! You have enough balance to enter Sunday Mega Event.' 
-                            : `⚠️ Need ₹${500 - (userData?.wallet?.balance || 0)} more to unlock Sunday Mega Event.`
+                            : `⚠️ Need ₹${userData?.megaEligibility?.remaining ?? 0} more to unlock Sunday Mega Event.`
                         }
                     </p>
                 </div>
@@ -559,7 +559,6 @@ const Events = () => {
             <PaymentModal 
                 isOpen={isPaymentOpen} 
                 onClose={() => setIsPaymentOpen(false)} 
-                amount={Math.round((supportBooster.price || 21) * 1.04 * 100) / 100}
                 plan={supportBooster.title} 
                 type="SUPPORT_BOOSTER"
                 onSuccess={handlePaymentSuccess} 

@@ -23,10 +23,11 @@ const FutureFundReport = () => {
         setAlertModal({ show: true, type, title, message });
     };
 
-    const fetchReport = async () => {
+    const fetchReport = async (previewAmount = '') => {
         try {
             setReportLoading(true);
-            const res = await api.get('/admin/users/future-fund/report');
+            const q = previewAmount ? `?previewAmount=${encodeURIComponent(previewAmount)}` : '';
+            const res = await api.get(`/admin/users/future-fund/report${q}`);
             if (res.success && res.data) {
                 setReportData(res.data);
             }
@@ -53,6 +54,11 @@ const FutureFundReport = () => {
         fetchReport();
         fetchHistory();
     }, []);
+
+    useEffect(() => {
+        const t = setTimeout(() => fetchReport(distributeAmount), 400);
+        return () => clearTimeout(t);
+    }, [distributeAmount]);
 
     // Distribution logic
     const handleDistribute = async () => {
@@ -236,12 +242,7 @@ const FutureFundReport = () => {
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {filteredData.map((user) => {
-                                    const totalPool = Number(distributeAmount) || 0;
-                                    const totalFixedProfit = reportData.reduce((acc, u) => acc + (u.overrideProfit || 0), 0);
-                                    const remainingPool = Math.max(0, totalPool - totalFixedProfit);
-
-                                    let baseProfit = (user.sharePercentage / 100) * remainingPool;
-                                    let estProfit = baseProfit + (user.overrideProfit || 0);
+                                    const estProfit = Number(user.estimatedProfit || 0);
 
                                     return (
                                         <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">

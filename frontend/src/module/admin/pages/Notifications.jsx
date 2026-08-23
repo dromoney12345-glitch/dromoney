@@ -136,7 +136,26 @@ const Notifications = () => {
                     <span className="text-xs font-semibold">{toast.message}</span>
                 </div>
             )}
-            <PageHeader title="Notifications" subtitle="Broadcast messages to all platform users" />
+            <PageHeader title="Notifications" subtitle="Broadcast plus 12 automatic phone alerts on every user journey step" />
+
+            <div className="mb-6 bg-white rounded-lg border border-slate-100 shadow-sm p-4">
+                <h3 className="text-[12px] font-medium text-slate-800 uppercase tracking-normal mb-3">12 phone notifications (FCM)</h3>
+                <p className="text-[11px] text-slate-500 mb-3">These fire on the user&apos;s phone at each step. If the app token is not saved yet, the push is queued and sent when the phone registers.</p>
+                <ol className="grid sm:grid-cols-2 gap-2 text-[12px] text-slate-700 font-medium">
+                    <li>1. Welcome after register</li>
+                    <li>2. KYC submitted</li>
+                    <li>3. KYC approved</li>
+                    <li>4. KYC rejected</li>
+                    <li>5. Virtual Account payment pending</li>
+                    <li>6. Virtual Account activated</li>
+                    <li>7. Invite ₹200 in Pending Wallet</li>
+                    <li>8. Invite ₹200 moved to Virtual</li>
+                    <li>9. Withdrawal requested</li>
+                    <li>10. Withdrawal approved</li>
+                    <li>11. Withdrawal rejected</li>
+                    <li>12. Account hold if Virtual Account is not created in 28 days</li>
+                </ol>
+            </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 {/* Compose / Edit */}

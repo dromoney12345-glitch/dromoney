@@ -17,9 +17,13 @@ exports.getBalance = asyncHandler(async (req, res, next) => {
         ensureWithdrawalCardShape,
         withdrawableVirtual,
     } = require('../utils/walletLedger');
+    const { quoteMegaEligibility, WITHDRAWAL_FEE } = require('../utils/moneyQuotes');
     migrateWalletSplits(user);
     ensureWithdrawalCardShape(user);
     await user.save({ validateBeforeSave: false });
+
+    const settings = await Settings.findOne();
+    const minWithdrawalLimit = settings ? settings.minWithdrawal : 100;
 
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const recentWithdrawal = await Withdrawal.findOne({
@@ -40,10 +44,34 @@ exports.getBalance = asyncHandler(async (req, res, next) => {
         virtualBalance: user.wallet.virtualBalance || 0,
         withdrawable: withdrawableVirtual(user),
         lockedReserve: user.withdrawalCard?.lockedReserve || 0,
+        withdrawalFee: WITHDRAWAL_FEE,
+        minWithdrawal: minWithdrawalLimit,
+        megaEligibility: quoteMegaEligibility(user.wallet?.balance),
         card: user.withdrawalCard,
         virtualUnlocked: !!user.isPaid,
         recentWithdrawal,
         pendingWithdrawal
+    });
+});
+
+// @desc    Quote withdrawal fee / total before user confirms
+// @route   GET /api/user/wallet/withdraw-quote
+// @access  Private
+exports.getWithdrawQuote = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id).select('wallet isPaid withdrawalCard');
+    if (!user) return next(new ErrorResponse('User not found', 404));
+
+    const { migrateWalletSplits, ensureWithdrawalCardShape, quoteUserWithdrawal } = require('../utils/walletLedger');
+    migrateWalletSplits(user);
+    ensureWithdrawalCardShape(user);
+
+    const settings = await Settings.findOne();
+    const minWithdrawalLimit = settings ? settings.minWithdrawal : 100;
+    const quote = quoteUserWithdrawal(user, req.query.amount, minWithdrawalLimit);
+
+    res.status(200).json({
+        success: true,
+        data: quote,
     });
 });
 
@@ -185,31 +213,23 @@ exports.addEarning = asyncHandler(async (req, res, next) => {
         }
     }
 
-    // amount is now directly in INR (coinsReward field treated as INR)
-    const inrEarned = Math.round(amount * factor * 100) / 100;
-
-    const settings = await Settings.findOne() || {};
-    const poolPercent = Number(settings.futureFundPoolPercent) || 30;
-    const taskRevenue = Number(settings.taskRevenuePerTask) || 1.0;
-
-    const { creditEarning } = require('../utils/walletLedger');
-    const { addPoolRevenue } = require('../utils/fundPool');
-
-    let walletCredit = null;
-    if (inrEarned > 0) {
-        walletCredit = await creditEarning(user, inrEarned, {
-            source: factor > 1 ? `Task Earning (${source})` : `Task Earning: ${source}`,
-            inviteHold: false,
-            createTx: true,
-        });
+    // Tasks / ads do not credit coins or INR. Event prizes use server prize only (never client amount).
+    let inrEarned = 0;
+    if (looksLikeEventPrize && taskId) {
+        const Event = require('../models/Event');
+        const { parseMoneyAmount } = require('../utils/eventPrizes');
+        const eventDoc = await Event.findById(taskId);
+        inrEarned = Math.round((Number(eventDoc?.config?.reward) || parseMoneyAmount(eventDoc?.prize) || 0) * 100) / 100;
     }
 
-    const poolShare = Math.round(taskRevenue * (poolPercent / 100) * 100) / 100;
-    if (poolShare > 0) {
-        await addPoolRevenue(poolShare, {
-            source: 'task',
-            note: `Task activity pool share (${source})`,
-            user: user._id,
+    const { creditEarning } = require('../utils/walletLedger');
+
+    let walletCredit = null;
+    if (looksLikeEventPrize && inrEarned > 0) {
+        walletCredit = await creditEarning(user, inrEarned, {
+            source: source || 'Event Prize',
+            inviteHold: false,
+            createTx: true,
         });
     }
 
@@ -293,14 +313,17 @@ exports.requestWithdrawal = asyncHandler(async (req, res, next) => {
     ensureWithdrawalCardShape(user);
 
     if (!user.isPaid || user.withdrawalCard?.status !== 'active') {
-        return next(new ErrorResponse('Unlock Virtual Wallet with a Withdrawal Card first.', 400));
+        return next(new ErrorResponse('Create a Virtual Account first to withdraw.', 400));
     }
 
-    const available = withdrawableVirtual(user);
-    const totalDeduction = Number(amount) + 5;
+    const { quoteUserWithdrawal } = require('../utils/walletLedger');
+    const { WITHDRAWAL_FEE } = require('../utils/moneyQuotes');
+    const quote = quoteUserWithdrawal(user, amount, minWithdrawalLimit);
+    const available = quote.withdrawable;
+    const totalDeduction = quote.totalDeduction;
 
-    if (available < totalDeduction) {
-        return next(new ErrorResponse(`Insufficient Virtual Wallet. Withdrawable ₹${available.toFixed(2)} after reserve. You need ₹${totalDeduction} (amount + ₹5 fee).`, 400));
+    if (!quote.sufficient) {
+        return next(new ErrorResponse(`Insufficient Virtual Wallet. Withdrawable ₹${available.toFixed(2)} after reserve. You need ₹${totalDeduction} (amount + ₹${quote.fee} fee).`, 400));
     }
 
     // 3. Check for any existing pending withdrawal request to prevent race conditions
@@ -325,7 +348,7 @@ exports.requestWithdrawal = asyncHandler(async (req, res, next) => {
         user: user._id,
         type: 'withdrawal',
         currency: 'INR',
-        amount: 5,
+        amount: WITHDRAWAL_FEE,
         source: 'Withdrawal Transaction Fee',
         status: 'Pending'
     });
@@ -354,6 +377,13 @@ exports.requestWithdrawal = asyncHandler(async (req, res, next) => {
         });
     } catch (pushErr) {
         console.error('Admin push notification failed for withdrawal request:', pushErr.message);
+    }
+
+    try {
+        const { notifyJourney } = require('../utils/userJourneyPush');
+        await notifyJourney(user._id, 'withdraw_requested');
+    } catch (pushErr) {
+        console.error('User withdrawal push failed:', pushErr.message);
     }
 
     res.status(200).json({

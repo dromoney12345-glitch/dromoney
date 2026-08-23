@@ -110,7 +110,7 @@ function getCardQuote(user, settings = {}) {
     const days = daysSince(start);
     let amount = 499;
     let credit = 0;
-    let note = 'Withdrawal Card — ₹499. Virtual Wallet unlock after admin approval.';
+    let note = 'Virtual Account — ₹499. Account opens after payment and admin approval.';
 
     if (days != null && days > 7) {
         amount = 550;
@@ -119,11 +119,11 @@ function getCardQuote(user, settings = {}) {
     } else if (days != null && days <= 3) {
         amount = 499;
         credit = 399;
-        note = '3-day activation: ₹100 platform charge. ₹399 will sit as a 6-month reserve in Virtual Wallet.';
+        note = '3-day activation: ₹100 platform charge. ₹399 will sit as a 6-month reserve in Virtual Account.';
     } else {
         amount = 499;
         credit = 0;
-        note = 'Standard Withdrawal Card. Payable ₹499.';
+        note = 'Standard Virtual Account. Payable ₹499.';
     }
 
     return { amount, credit, days, note, isRenewal: false, displayAmount: amount, reserveApplied: 0 };
@@ -138,14 +138,15 @@ function withdrawableVirtual(user) {
 /**
  * Credit INR earning.
  * Invite hold → Pending only.
+ * forceVirtual → Virtual wallet (and balance) even if card is not unlocked.
  * Other sources → Virtual if unlocked, else Pending.
  */
-async function creditEarning(user, amount, { source = 'Earning', inviteHold = false, createTx = true } = {}) {
+async function creditEarning(user, amount, { source = 'Earning', inviteHold = false, forceVirtual = false, createTx = true } = {}) {
     migrateWalletSplits(user);
     const value = Math.round(Number(amount) * 100) / 100;
     if (!value) return { destination: 'none', amount: 0 };
 
-    const toPending = inviteHold || !isVirtualUnlocked(user);
+    const toPending = forceVirtual ? false : (inviteHold || !isVirtualUnlocked(user));
     if (toPending) {
         user.wallet.pendingBalance = (Number(user.wallet.pendingBalance) || 0) + value;
     } else {
@@ -192,6 +193,28 @@ function deductVirtual(user, amount) {
     return true;
 }
 
+/** Deduct offerwall chargeback: pending first, then virtual/balance. Never throws. */
+function deductOfferwallCredit(user, amount) {
+    migrateWalletSplits(user);
+    let remaining = Math.round(Number(amount) * 100) / 100;
+    if (remaining <= 0) return 0;
+
+    const pending = Number(user.wallet.pendingBalance) || 0;
+    const fromPending = Math.min(pending, remaining);
+    user.wallet.pendingBalance = pending - fromPending;
+    remaining -= fromPending;
+
+    if (remaining > 0) {
+        const virtual = Number(user.wallet.virtualBalance) || 0;
+        const fromVirtual = Math.min(virtual, remaining);
+        user.wallet.virtualBalance = virtual - fromVirtual;
+        user.wallet.balance = Math.max(0, (Number(user.wallet.balance) || 0) - fromVirtual);
+        remaining -= fromVirtual;
+    }
+
+    return Math.round((Number(amount) - remaining) * 100) / 100;
+}
+
 function wipePendingEarnings(user) {
     migrateWalletSplits(user);
     const wiped = Number(user.wallet.pendingBalance) || 0;
@@ -217,13 +240,24 @@ async function activateVirtualWallet(user) {
     const credit = Number(user.withdrawalCard.quotedCredit) || 0;
     if (credit > 0) {
         await creditEarning(user, credit, {
-            source: 'Withdrawal Card opening credit',
+            source: 'Virtual Account opening credit',
             inviteHold: false,
             createTx: true,
         });
         user.withdrawalCard.lockedReserve = (Number(user.withdrawalCard.lockedReserve) || 0) + credit;
+        user.withdrawalCard.quotedCredit = 0;
     }
     return user.withdrawalCard;
+}
+
+function quoteUserWithdrawal(user, amount, minWithdrawal) {
+    const { quoteWithdrawal, WITHDRAWAL_FEE } = require('./moneyQuotes');
+    return quoteWithdrawal({
+        amount,
+        withdrawable: withdrawableVirtual(user),
+        minWithdrawal,
+        fee: WITHDRAWAL_FEE,
+    });
 }
 
 module.exports = {
@@ -234,9 +268,11 @@ module.exports = {
     ensureWithdrawalCardShape,
     getCardQuote,
     withdrawableVirtual,
+    quoteUserWithdrawal,
     creditEarning,
     transferPendingToVirtual,
     deductVirtual,
+    deductOfferwallCredit,
     wipePendingEarnings,
     activateVirtualWallet,
 };

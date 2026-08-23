@@ -19,7 +19,7 @@ const AdSchema = new mongoose.Schema({
     },
     coinsReward: {
         type: Number,
-        required: [true, 'Please add reward amount']
+        default: 0
     },
     status: {
         type: String,

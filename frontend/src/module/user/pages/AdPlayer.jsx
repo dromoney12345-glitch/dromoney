@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Play, Coins, CheckCircle2, ShieldCheck, MonitorPlay, Loader2, CheckCircle, XCircle } from 'lucide-react';
+import { ChevronLeft, Play, CheckCircle2, ShieldCheck, MonitorPlay, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import api from '../../shared/services/api';
 import UniversalVideoPlayer from '../../shared/components/UniversalVideoPlayer';
@@ -103,7 +103,7 @@ const AdPlayer = () => {
             if (res.success) {
                 completedRef.current = true;
                 setIsCompleted(true);
-                showToast('Reward claimed successfully!', 'success');
+                showToast('Ad completed successfully!', 'success');
                 await refreshUserProfile();
             } else {
                 showToast(res.message || 'Failed to claim reward', 'error');
@@ -163,11 +163,6 @@ const AdPlayer = () => {
                 <button type="button" onClick={() => navigate('/user/watch')} className="w-9 h-9 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/10 active:scale-90 transition-all">
                     <ChevronLeft size={20} />
                 </button>
-                <div className="flex items-center gap-2">
-                    <div className="bg-[#462211]/80 backdrop-blur-md border border-[#462211]/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
-                        <span className="text-[11px] font-medium text-white uppercase tracking-wider leading-none">Reward: ₹{ad.coinsReward}</span>
-                    </div>
-                </div>
             </header>
 
             <div className="flex-1 relative flex items-center justify-center overflow-hidden bg-black min-h-[40vh]">
@@ -233,13 +228,13 @@ const AdPlayer = () => {
                         </div>
 
                         <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex items-center gap-3.5 shadow-sm">
-                            <div className="w-11 h-11 bg-[#F59E0B]/10 border border-[#F59E0B]/20 rounded-full flex items-center justify-center shrink-0">
-                                <Coins size={18} className="text-amber-500 fill-amber-500" />
+                            <div className="w-11 h-11 bg-[#462211]/10 border border-[#462211]/20 rounded-full flex items-center justify-center shrink-0">
+                                <MonitorPlay size={18} className="text-[#462211]" />
                             </div>
                             <div>
-                                <p className="text-[9px] font-medium text-slate-400 uppercase tracking-wider leading-none mb-1.5">Total Earnings</p>
+                                <p className="text-[9px] font-medium text-slate-400 uppercase tracking-wider leading-none mb-1.5">Watch Time</p>
                                 <p className="text-[13px] font-medium text-slate-600 leading-none">
-                                    Earn <span className="text-indigo-600 font-medium">+{ad.coinsReward} coins</span> after {ad.duration}s
+                                    Watch the full {ad.duration}s video to complete
                                 </p>
                             </div>
                         </div>
@@ -247,7 +242,7 @@ const AdPlayer = () => {
                         <div className="bg-sky-50 border border-sky-100 p-3.5 rounded-xl flex items-start gap-3">
                             <ShieldCheck size={16} className="text-sky-500 shrink-0 mt-0.5" />
                             <p className="text-sky-800 font-medium text-[9px] leading-relaxed uppercase tracking-tight">
-                                Keep this screen open while watching. Reward is added only after the full timer completes.
+                                Keep this screen open while watching. Completion is counted only after the full timer completes.
                             </p>
                         </div>
                     </div>
@@ -257,14 +252,14 @@ const AdPlayer = () => {
                             <CheckCircle2 size={40} className="text-emerald-500" />
                         </div>
                         <div className="space-y-1">
-                            <h2 className="text-2xl font-medium text-slate-800 tracking-tight">Reward Claimed!</h2>
-                            <p className="text-slate-400 font-medium text-xs uppercase tracking-widest">Coins successfully added to wallet</p>
+                            <h2 className="text-2xl font-medium text-slate-800 tracking-tight">Ad Completed!</h2>
+                            <p className="text-slate-400 font-medium text-xs uppercase tracking-widest">You finished this video</p>
                         </div>
 
                         <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex items-center justify-between max-w-xs mx-auto gap-3">
                             <div className="text-center flex-1">
-                                <p className="text-[10px] font-medium text-emerald-600 uppercase">Received</p>
-                                <p className="text-2xl font-medium text-emerald-800 tracking-tighter">+{ad.coinsReward} <span className="text-sm">Coins</span></p>
+                                <p className="text-[10px] font-medium text-emerald-600 uppercase">Status</p>
+                                <p className="text-lg font-medium text-emerald-800 tracking-tight">Done</p>
                             </div>
                             <button type="button" onClick={() => navigate('/user/watch')} className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-xl text-xs font-medium uppercase tracking-widest shadow-lg shadow-emerald-200 transition-all active:scale-95 shrink-0">
                                 Next Ad

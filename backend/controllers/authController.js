@@ -18,8 +18,10 @@ exports.register = async (req, res, next) => {
         const { name, email, password, phone, otp } = req.body;
         const rawReferral =
             req.body.referralCode ||
+            req.body.inviteCode ||
             req.body.referral ||
             req.body.ref ||
+            req.body.invite ||
             '';
 
         if (!phone || !otp) {
@@ -72,8 +74,8 @@ exports.register = async (req, res, next) => {
             return next(new ErrorResponse('This email address is already registered.', 400));
         }
 
-        // Resolve referral (accepts code OR full invite / Play Store link)
-        // NOTE: Do NOT credit ₹200 here — commission pays only after KYC + ₹499 unlock
+        // Resolve invite code (accepts code OR full invite / Play Store link)
+        // ₹200 is credited to the referrer only after this user's KYC is approved
         let referredBy = null;
         const cleanCode = extractReferralCode(rawReferral);
 
@@ -94,7 +96,7 @@ exports.register = async (req, res, next) => {
                     console.warn(`[REFERRAL] Self-referral blocked for code: ${cleanCode}`);
                 } else {
                     referredBy = referrer._id;
-                    console.log(`[REFERRAL] Linked new user to referrer ${referrer._id} (code ${cleanCode}) — pay on KYC+₹499`);
+                    console.log(`[REFERRAL] Linked new user to referrer ${referrer._id} (code ${cleanCode}) — ₹200 on KYC approve`);
                 }
             }
         } else if (rawReferral) {
@@ -111,6 +113,13 @@ exports.register = async (req, res, next) => {
             phone: trimmedPhone || phone,
             referredBy: referredBy || undefined,
         });
+
+        try {
+            const { notifyJourney } = require('../utils/userJourneyPush');
+            await notifyJourney(user._id, 'welcome');
+        } catch (pushErr) {
+            console.error('Welcome push failed:', pushErr.message);
+        }
 
         sendTokenResponse(user, 201, res);
     } catch (err) {
@@ -416,9 +425,13 @@ exports.getMe = async (req, res, next) => {
             }
         }
 
+        const userObj = user.toObject();
+        const { quoteMegaEligibility } = require('../utils/moneyQuotes');
+        userObj.megaEligibility = quoteMegaEligibility(user.wallet?.balance);
+
         res.status(200).json({
             success: true,
-            data: user,
+            data: userObj,
             settings: {
                 referralLinkBaseUrl: settings.referralLinkBaseUrl || 'https://earningapp.com/join/'
             }

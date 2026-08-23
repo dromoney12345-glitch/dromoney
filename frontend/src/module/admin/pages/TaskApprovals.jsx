@@ -129,7 +129,7 @@ const TaskApprovals = () => {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-1.5 font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100/50 inline-flex">
-                                            <CheckCircle size={12} /> {sub.coinsReward} Coins
+                                            <CheckCircle size={12} /> Proof task
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
@@ -193,7 +193,7 @@ const TaskApprovals = () => {
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[10px] font-medium text-slate-400 uppercase tracking-normal mb-0.5">Reward</p>
-                                    <p className="text-[15px] font-medium text-amber-600">{selectedSubmission.coinsReward} Coins</p>
+                                    <p className="text-[15px] font-medium text-slate-700">Proof review</p>
                                 </div>
                             </div>
 

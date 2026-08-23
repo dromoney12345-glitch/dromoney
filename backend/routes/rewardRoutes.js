@@ -10,8 +10,6 @@ const router = express.Router();
 
 router.use(protect);
 
-const REWARD_AMOUNT = 5;
-
 const getISTDateString = (dateObj) => {
     return new Date(new Date(dateObj).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })).toDateString();
 };
@@ -67,7 +65,7 @@ router.get('/status', async (req, res) => {
             nextAdIn, // in seconds
             remainingAds,
             maxDailyLimit: MAX_DAILY_ADS,
-            rewardAmount: settings.adRewardCoins || 2
+            rewardAmount: 0
         });
     } catch (err) {
         console.error(err);
@@ -86,7 +84,6 @@ router.post('/claim', rewardLimiter, idempotency(), async (req, res) => {
         const settings = await Settings.findOne() || {};
         const MAX_DAILY_ADS = settings.adMaxDailyLimit || 10;
         const COOLDOWN_SECONDS = settings.adCooldownSeconds || 30;
-        const BASE_REWARD = settings.adRewardCoins || 2;
 
         await checkAndResetDailyLimit(user);
 
@@ -104,45 +101,7 @@ router.post('/claim', rewardLimiter, idempotency(), async (req, res) => {
             }
         }
 
-        // Booster Logic — only if admin added Watch & Earn to Task Booster applicableTasks
-        let factor = 1;
-
-        if (user.isTaskBoosterActive) {
-            const mongoose = require('mongoose');
-            const Booster = mongoose.models.Booster || require('../models/Booster');
-            const taskBooster = await Booster.findOne({ type: 'task' });
-            const allowed = (taskBooster?.applicableTasks || []).map((t) => String(t).toLowerCase());
-            const watchAllowed =
-                allowed.some((t) => t.includes('watch')) ||
-                allowed.includes('watch & earn') ||
-                allowed.includes('watch and earn');
-
-            if (watchAllowed) {
-                factor = 12;
-                if (taskBooster?.benefits) {
-                    for (const b of taskBooster.benefits) {
-                        const match = String(b).match(/(\d+)x/i);
-                        if (match) {
-                            factor = parseInt(match[1], 10);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        
-        // amount is directly in INR
-        const rewardAmount = Math.round(BASE_REWARD * factor * 100) / 100;
-
-        if (!user.wallet) user.wallet = { balance: 0, lifetimeEarnings: 0, todayEarnings: 0 };
-
-        const { creditEarning } = require('../utils/walletLedger');
-        const walletCredit = await creditEarning(user, rewardAmount, {
-            source: 'Ad Earning: Reward Ad',
-            inviteHold: false,
-            createTx: true,
-        });
-
+        // Watch & Earn does not credit coins or INR — only track ad completion
         user.lastRewardAt = new Date();
         user.todayRewardCount = (user.todayRewardCount || 0) + 1;
 
@@ -150,17 +109,16 @@ router.post('/claim', rewardLimiter, idempotency(), async (req, res) => {
 
         await RewardHistory.create({
             userId: user._id,
-            reward: rewardAmount,
+            reward: 0,
             adType: 'rewarded',
             rewardedAt: new Date()
         });
 
         res.json({
             success: true,
-            message: 'Reward claimed successfully',
-            inrEarned: rewardAmount,
-            walletDestination: walletCredit?.destination || null,
-            newWalletBalance: user.wallet.balance
+            message: 'Ad watched successfully',
+            inrEarned: 0,
+            newWalletBalance: user.wallet?.balance || 0
         });
     } catch (err) {
         console.error(err);

@@ -167,7 +167,12 @@ const Home = () => {
                             <button
                                 key={card.slug}
                                 type="button"
-                                onClick={() => navigate(`/user/guide/${card.slug}`)}
+                                onClick={() => {
+                                    const slug = String(card.slug || '');
+                                    const label = String(card.label || '');
+                                    const goesToCreate = slug === 'card' || slug === 'virtual-account' || /virtual account|withdrawal card/i.test(label);
+                                    navigate(goesToCreate ? '/user/virtual-account' : `/user/guide/${slug}`);
+                                }}
                                 className="bg-white rounded-xl px-1 py-2 border border-slate-100/80 shadow-[0_1px_6px_rgba(15,23,42,0.05)] active:scale-[0.97] flex flex-col items-center gap-1"
                             >
                                 <div className={`w-7 h-7 rounded-full ${card.iconBg} flex items-center justify-center shrink-0`}>

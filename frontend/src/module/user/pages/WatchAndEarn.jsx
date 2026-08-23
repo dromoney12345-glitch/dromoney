@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Clock, IndianRupee, MonitorPlay, Sparkles, TrendingUp, RefreshCw, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { ChevronLeft, Clock, MonitorPlay, Sparkles, TrendingUp, RefreshCw, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
 import UnlockModal from '../components/UnlockModal';
@@ -49,7 +49,7 @@ const WatchAndEarn = () => {
         try {
             const claimRes = await api.post('/reward/claim');
             if (claimRes.success) {
-                showToast('Reward earned! Amount added to wallet.');
+                showToast('Ad watched. No coins or cash are added for ads.');
             } else {
                 showToast(claimRes.message || 'Could not claim reward.', 'error');
             }
@@ -147,7 +147,7 @@ const WatchAndEarn = () => {
                     <button onClick={() => navigate(-1)} className="text-[#462211] active:scale-95 transition-all">
                         <ChevronLeft size={22} strokeWidth={2.2} />
                     </button>
-                    <h1 className="text-[17px] font-semibold text-[#462211] tracking-tight">Watch & Earn</h1>
+                    <h1 className="text-[17px] font-semibold text-[#462211] tracking-tight">Watch Ads</h1>
                 </div>
             </div>
 
@@ -156,9 +156,9 @@ const WatchAndEarn = () => {
                     <div className="space-y-0.5">
                         <div className="flex items-center gap-1.5 bg-[#F3E8E0] px-2 py-0.5 rounded-full w-fit">
                             <Sparkles size={9} className="text-[#462211]" />
-                            <span className="text-[8px] text-[#462211] uppercase tracking-widest">Bonus Daily Ads</span>
+                            <span className="text-[8px] text-[#462211] uppercase tracking-widest">Daily Ads</span>
                         </div>
-                        <p className="text-[#7A5648] text-[10px]">Earn extra income daily!</p>
+                        <p className="text-[#7A5648] text-[10px]">AdMob ads only — no coins or wallet credit</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <button type="button" onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-8 h-8 flex items-center justify-center bg-[#F3E8E0] text-[#462211] rounded-full active:scale-95 transition-all">
@@ -204,7 +204,7 @@ const WatchAndEarn = () => {
                             <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm relative overflow-hidden">
                                 <div className="flex justify-between items-start mb-3">
                                     <div>
-                                        <h3 className="text-slate-800 text-[14px] font-medium">Reward Ad</h3>
+                                        <h3 className="text-slate-800 text-[14px] font-medium">Daily Ad</h3>
                                     </div>
                                     <div className="bg-amber-50 text-amber-600 px-2.5 py-1 rounded-lg border border-amber-100 flex items-center gap-1.5">
                                         <RefreshCw size={12} className="animate-spin" />
@@ -223,7 +223,7 @@ const WatchAndEarn = () => {
                                 <div className="relative z-10">
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
-                                            <h3 className="text-slate-800 text-[15px] font-medium">Reward Ad</h3>
+                                            <h3 className="text-slate-800 text-[15px] font-medium">Daily Ad</h3>
                                         </div>
                                         <div className="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1.5">
                                             <CheckCircle size={12} />

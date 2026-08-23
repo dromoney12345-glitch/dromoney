@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
-import { ChevronLeft, Zap, Trophy, IndianRupee, Timer, MousePointer2 } from 'lucide-react';
+import { ChevronLeft, Zap, Trophy, Timer, MousePointer2 } from 'lucide-react';
 
 const SpeedTapperView = () => {
     const { id } = useParams();
@@ -55,8 +55,7 @@ const SpeedTapperView = () => {
 
     const handleWin = async () => {
         setStatus('won');
-        const rewardAmount = task.coinsReward || task.reward || 0;
-        await addCoins(rewardAmount, 'Speed Tapper Mastery', task._id || task.id);
+        await addCoins(0, 'Speed Tapper Mastery', task._id || task.id);
         taskStorage.markComplete(task._id || task.id);
     };
 
@@ -141,18 +140,14 @@ const SpeedTapperView = () => {
                     )}
                 </div>
 
-                <div className="bg-amber-50 border border-amber-100 p-6 rounded-[2.5rem] w-full max-w-sm flex items-center gap-4 relative overflow-hidden">
-                    {/* Decorative Coins */}
-                    <div className="absolute -right-4 -bottom-4 opacity-5 rotate-12">
-                        <IndianRupee size={80} className="text-amber-500" />
-                    </div>
-                    <div className="w-12 h-12 bg-amber-400 rounded-2xl flex items-center justify-center shrink-0 border border-amber-500 shadow-lg shadow-amber-200/50">
-                        <IndianRupee size={24} className="text-white" />
+                <div className="bg-[#FFF5F0] border border-[#EDE4DC] p-6 rounded-[2.5rem] w-full max-w-sm flex items-center gap-4 relative overflow-hidden">
+                    <div className="w-12 h-12 bg-[#462211] rounded-2xl flex items-center justify-center shrink-0">
+                        <Trophy size={24} className="text-white" />
                     </div>
                     <div>
-                        <p className="text-[11px] font-medium text-amber-800 tracking-tight leading-tight uppercase">Reward on success</p>
-                        <p className="text-xl font-medium text-amber-600 mt-0.5">
-                            +₹{task ? (task.coinsReward || task.reward || 0) : 0}
+                        <p className="text-[11px] font-medium text-[#462211] tracking-tight leading-tight uppercase">On success</p>
+                        <p className="text-xl font-medium text-[#462211] mt-0.5">
+                            Task complete
                         </p>
                     </div>
                 </div>
@@ -162,7 +157,7 @@ const SpeedTapperView = () => {
                         onClick={() => navigate('/user/earn')}
                         className="w-full max-w-sm bg-slate-900 text-white py-5 rounded-[2rem] font-medium uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all text-xs"
                     >
-                        Collect & Rewards
+                        Collect Reward
                     </button>
                 )}
             </div>

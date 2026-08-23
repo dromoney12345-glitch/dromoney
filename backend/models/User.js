@@ -210,6 +210,13 @@ const UserSchema = new mongoose.Schema({
         isRead: { type: Boolean, default: false },
         createdAt: { type: Date, default: Date.now }
     }],
+    pendingPushes: [{
+        step: String,
+        title: String,
+        body: String,
+        link: String,
+        createdAt: { type: Date, default: Date.now }
+    }],
     readBroadcasts: [{
         type: mongoose.Schema.ObjectId,
         ref: 'Notification'

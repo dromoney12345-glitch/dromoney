@@ -265,8 +265,8 @@ exports.updatePaymentStatus = async (req, res) => {
 
                     user.notifications = user.notifications || [];
                     user.notifications.push({
-                        title: 'Virtual Wallet Unlocked',
-                        message: 'Withdrawal Card approved. Virtual Wallet is now active for 6 months.',
+                        title: 'Virtual Account Unlocked',
+                        message: 'Virtual Account approved. It is now active for 6 months.',
                         type: 'success',
                         isRead: false
                     });
@@ -284,15 +284,8 @@ exports.updatePaymentStatus = async (req, res) => {
                     });
 
                     try {
-                        const { sendNotificationToUser } = require('./fcmController');
-                        await sendNotificationToUser(user._id, {
-                            title: 'Platform Access Unlocked! 🚀',
-                            body: `Your payment for ${payment.plan || 'Lifetime Access'} is confirmed. Welcome to DroMoney Premium!`,
-                            data: {
-                                type: 'payment',
-                                link: '/user/home'
-                            }
-                        });
+                        const { notifyJourney } = require('../utils/userJourneyPush');
+                        await notifyJourney(user._id, 'va_activated', { skipInApp: true });
                     } catch (pushErr) {
                         console.error('Push notification failed for payment activation:', pushErr.message);
                     }

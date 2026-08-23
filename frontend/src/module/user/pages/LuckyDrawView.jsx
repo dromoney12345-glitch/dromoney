@@ -90,7 +90,7 @@ const LuckyDrawView = () => {
     })) : DEFAULT_PRIZES.map(p => {
         // If it's a task, override the default prizes with the actual task reward
         if (taskReward !== null) {
-             return { ...p, label: `₹${taskReward}`, coins: taskReward, cash: 0 };
+             return { ...p, label: 'Win', coins: 0, cash: 0 };
         }
         return p;
     });
@@ -115,9 +115,11 @@ const LuckyDrawView = () => {
         setTimeout(async () => {
             setStep(2);
             const prize = activePrizes[winner];
-            if (prize.coins > 0) {
-                const reward = prize.coins;
-                await addCoins(reward, `Lucky Draw Prize`, id);
+            if (taskReward !== null) {
+                await addCoins(0, `Lucky Draw Prize`, id);
+            } else {
+                const inr = Number(prize.cash || prize.coins || 0);
+                if (inr > 0) await addCoins(inr, `Lucky Draw Prize`, id);
             }
             taskStorage.markComplete(id);
             addNotification('Lucky Draw Result!', `You won ${prize.label} in the Lucky Draw!`, 'success');
@@ -285,7 +287,7 @@ const LuckyDrawView = () => {
                 <div className={`w-full max-w-xs p-8 rounded-[3rem] border-2 text-center bg-white/10 border-white/20 animate-in zoom-in duration-500`}>
                     <p className="text-[10px] font-medium uppercase tracking-widest mb-3 opacity-70">Your Prize</p>
                     <p className="text-6xl font-medium mb-4">{prize?.label}</p>
-                    {prize?.coins > 0 && (
+                    {prize?.coins > 0 && taskReward === null && (
                         <div className="flex flex-col items-center justify-center gap-1 bg-white/90 rounded-2xl p-3 shadow-md">
                             <div className="flex items-center gap-2">
                                 <IndianRupee size={20} className="text-amber-500" />

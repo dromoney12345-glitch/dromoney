@@ -64,6 +64,7 @@ const Marketing = () => {
     };
 
     const handleInvite = async () => {
+        if (!referralCode || !referralLink) return;
         const shareText = `Hey! Join Dromoney and start earning 🚀\n\nInvite code: ${referralCode}\n\n${referralLink}`;
         if (navigator.share) {
             try {
@@ -136,6 +137,25 @@ const Marketing = () => {
                         </div>
                     </div>
 
+                    <div className="bg-[#FFF5F0] border border-[#EDE4DC] rounded-xl p-1 pl-3.5 flex items-center justify-between gap-2 mb-2">
+                        <div className="min-w-0">
+                            <p className="text-[9px] font-semibold text-[#B3591C] uppercase tracking-widest">Invite code</p>
+                            <p className="text-[13px] font-semibold text-[#462211] tracking-widest truncate">{referralCode || '—'}</p>
+                        </div>
+                        <button
+                            onClick={() => {
+                                if (!referralCode) return;
+                                navigator.clipboard.writeText(referralCode);
+                                setCopied(true);
+                                setTimeout(() => setCopied(false), 2000);
+                            }}
+                            className={`px-3.5 py-2 rounded-lg text-[10px] font-semibold uppercase tracking-widest transition-all active:scale-95 shrink-0
+                                ${copied ? 'bg-emerald-500 text-white' : 'bg-[#462211] text-white'}`}
+                        >
+                            {copied ? 'COPIED' : 'COPY'}
+                        </button>
+                    </div>
+
                     <div className="bg-[#FFF5F0] border border-[#EDE4DC] rounded-xl p-1 pl-3.5 flex items-center justify-between gap-2 mb-3.5">
                         <a href={referralLink} target="_blank" rel="noopener noreferrer" className="text-[11px] font-medium text-[#7A5648] truncate tracking-tight hover:text-[#B3591C] hover:underline">
                             {referralLink}
@@ -195,7 +215,7 @@ const Marketing = () => {
                 <div className="bg-[#FFF5F0] border border-[#EDE4DC] rounded-2xl p-3.5">
                     <h5 className="text-[11px] font-semibold text-[#462211] uppercase tracking-wider mb-1">How it works</h5>
                     <p className="text-[10px] font-medium text-[#7A5648] leading-relaxed">
-                        Share your link. When a friend completes KYC, ₹{rewardAmount} goes to your Pending Wallet. It releases to Virtual Wallet when they create a Withdrawal Card within 28 days.
+                        Share your invite code and link. After your friend completes KYC, ₹{rewardAmount} goes to your Pending Wallet. It moves to Virtual Account when they create one.
                     </p>
                 </div>
 

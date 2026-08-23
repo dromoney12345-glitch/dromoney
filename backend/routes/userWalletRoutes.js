@@ -1,5 +1,5 @@
 const express = require('express');
-const { getBalance, addEarning, addCoins, requestWithdrawal, getTransactions } = require('../controllers/walletController');
+const { getBalance, getWithdrawQuote, addEarning, addCoins, requestWithdrawal, getTransactions } = require('../controllers/walletController');
 const { protect } = require('../middleware/authMiddleware');
 const { walletLimiter } = require('../middleware/rateLimiter');
 const idempotency = require('../middleware/idempotency');
@@ -15,6 +15,7 @@ router.post('/payout-webhook', (req, res) => {
 router.use(protect); // All other wallet routes are protected
 
 router.get('/balance', getBalance);
+router.get('/withdraw-quote', getWithdrawQuote);
 router.post('/add-earning', walletLimiter, idempotency(), addEarning);
 router.post('/add-coins', walletLimiter, idempotency(), addCoins);
 router.post('/withdraw', walletLimiter, idempotency(), requestWithdrawal);

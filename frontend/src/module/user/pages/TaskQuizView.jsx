@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, CheckCircle2, XCircle, Timer, Trophy, IndianRupee, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
+import { ChevronLeft, CheckCircle2, XCircle, Timer, Trophy, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import { eventStorage } from '../../shared/services/eventStorage';
 import { taskStorage } from '../../shared/services/taskStorage';
@@ -14,7 +14,6 @@ const TaskQuizView = () => {
     const totalQ = QUESTIONS.length;
     
     const task = taskStorage.getTasks().find(t => String(t.id) === String(id));
-    const reward = task ? (task.coinsReward || task.reward || 1) : 1;
     
     const [currentStep, setCurrentStep] = useState(0); // 0: Start, 1: Questions, 2: Result
     const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -76,11 +75,11 @@ const TaskQuizView = () => {
         const completed = taskStorage.getCompletedTasks();
         if (!completed.includes(id)) {
             if (s === 10) {
-                const res = await addCoins(reward, `Task Quiz: ${task?.title}`, id);
+                const res = await addCoins(0, `Task Quiz: ${task?.title}`, id);
                 if (res && res.success) {
                     taskStorage.markComplete(id);
                 } else {
-                    alert(res?.message || 'Failed to add reward. Please try again later.');
+                    alert(res?.message || 'Failed to complete task. Please try again later.');
                 }
             } else {
                 taskStorage.markComplete(id);
@@ -226,20 +225,7 @@ const TaskQuizView = () => {
                         </div>
                         
                         <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 w-full max-w-xs space-y-4">
-                            <div className="flex items-center justify-center gap-3">
-                                <div className="bg-amber-100 p-2 rounded-xl">
-                                    <IndianRupee size={20} className="text-amber-600" />
-                                </div>
-                                <div className="text-left">
-                                    <p className="text-[10px] font-medium text-amber-600 uppercase leading-none mb-1">Task Reward</p>
-                                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-normal">Completed Quiz</p>
-                                </div>
-                                <div className="text-right">
-                                    <div className="font-medium text-amber-500 text-sm">
-                                        +₹{reward}
-                                    </div>
-                                </div>
-                            </div>
+                            <p className="text-[13px] font-medium text-slate-700">Quiz completed</p>
                         </div>
                     </>
                 ) : (

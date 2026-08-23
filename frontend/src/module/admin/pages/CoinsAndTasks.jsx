@@ -104,7 +104,7 @@ const CoinsAndTasks = () => {
             category: newTaskData.category,
             title: newTaskData.title,
             description: newTaskData.description,
-            coinsReward: Number(newTaskData.reward),
+            coinsReward: 0,
             link: newTaskData.link ? newTaskData.link.trim() : '',
             isDaily: newTaskData.isDaily,
             config: newTaskData.config
@@ -151,7 +151,7 @@ const CoinsAndTasks = () => {
 
     return (
         <div className="p-4 animate-in fade-in duration-500">
-            <PageHeader title="Task Rewards" subtitle="Manage daily tasks and reward settings" />
+            <PageHeader title="Daily Tasks" subtitle="Create and manage app tasks. Tasks do not credit coins or wallet cash." />
 
             {/* Tabs */}
             <div className="flex gap-2 mb-6">
@@ -199,9 +199,6 @@ const CoinsAndTasks = () => {
                                                 </span>
                                             ))}
                                         </div>
-                                        <div className="mt-2 text-[10px] font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-lg inline-flex items-center gap-1 border border-amber-100/50">
-                                            <Coins size={12} /> ₹{task.coinsReward || task.reward} Reward
-                                        </div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 shrink-0">
@@ -215,19 +212,10 @@ const CoinsAndTasks = () => {
             ) : (
                 <div className="space-y-4">
                     <div className="bg-white rounded-lg border border-slate-100 shadow-sm p-4">
-                        <h3 className="text-sm font-medium text-slate-800 uppercase tracking-normal mb-5 flex items-center gap-2"><Coins size={16} className="text-amber-500" /> Task Settings</h3>
+                        <h3 className="text-sm font-medium text-slate-800 uppercase tracking-normal mb-5 flex items-center gap-2">Task Windows</h3>
                         <div className="space-y-5">
-                            <div>
-                                <label className="text-[11px] font-medium text-slate-500 uppercase tracking-normal">Max Rewards Per Day</label>
-                                <div className="flex items-center gap-3 mt-2">
-                                    <input type="number" min="0" value={dailyLimit} onChange={e => setDailyLimit(e.target.value)}
-                                        className="w-32 border border-slate-200 rounded-xl px-4 py-2.5 text-lg font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500" />
-                                    <span className="text-sm font-medium text-slate-400">rewards/day limit per user</span>
-                                </div>
-                            </div>
+                            <p className="text-[12px] text-slate-500 font-medium">Tasks do not pay coins or INR. Set working hours and renewal only.</p>
 
-                            <hr className="border-slate-100 my-4" />
-                            <h3 className="text-sm font-medium text-slate-800 uppercase tracking-normal mb-3 flex items-center gap-2">🕒 Working Hours</h3>
                             
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
@@ -362,14 +350,6 @@ const CoinsAndTasks = () => {
                                     <input type="text" placeholder="e.g. https://instagram.com/dromoney" value={newTaskData.link} onChange={e => setNewTaskData({...newTaskData, link: e.target.value})} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 placeholder-slate-300 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
                                 </div>
 
-                                <div>
-                                    <label className="text-xs font-medium text-slate-600 block mb-1">Reward (₹) <span className="text-rose-500">*</span></label>
-                                    <div className="relative">
-                                        <Coins size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500" />
-                                        <input type="number" min="1" value={newTaskData.reward} onChange={e => setNewTaskData({...newTaskData, reward: Math.max(1, e.target.value)})} className="w-full border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
-                                    </div>
-                                </div>
-
                                 <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
                                     <input 
                                         type="checkbox" 
@@ -445,7 +425,7 @@ const CoinsAndTasks = () => {
                                 {/* Spin */}
                                 {newTaskType === 'Spin' && (
                                     <div>
-                                        <label className="text-[10px] text-slate-500">The wheel will automatically give rewards up to the Max Coins specified above.</label>
+                                        <label className="text-[10px] text-slate-500">The wheel is a task activity only. No coins or cash are awarded.</label>
                                     </div>
                                 )}
 

@@ -136,17 +136,9 @@ exports.updateKyc = asyncHandler(async (req, res, next) => {
         user.markModified('kyc');
         await user.save();
 
-        // Send Push Notification to User
         try {
-            const { sendNotificationToUser } = require('./fcmController');
-            await sendNotificationToUser(user._id, {
-                title: 'KYC Received 📑',
-                body: 'Your KYC documents are successfully received and are under review by our team.',
-                data: {
-                    type: 'kyc',
-                    link: '/user/profile'
-                }
-            });
+            const { notifyJourney } = require('../utils/userJourneyPush');
+            await notifyJourney(user._id, 'kyc_submitted', { skipInApp: true });
         } catch (pushErr) {
             console.error('Push notification failed for KYC submission:', pushErr.message);
         }
@@ -204,7 +196,7 @@ exports.unlockPlatform = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        message: 'Virtual Wallet unlocked',
+        message: 'Virtual Account unlocked',
         isPaid: user.isPaid
     });
 });
@@ -395,6 +387,26 @@ exports.getFutureFundStatus = asyncHandler(async (req, res, next) => {
         await user.save({ validateBeforeSave: false });
     }
 
+    const Transaction = require('../models/Transaction');
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const ffMatch = {
+        user: user._id,
+        type: 'credit',
+        status: 'Success',
+        source: { $regex: 'future fund', $options: 'i' },
+    };
+    const [todayAgg, lifeAgg] = await Promise.all([
+        Transaction.aggregate([
+            { $match: { ...ffMatch, createdAt: { $gte: todayStart } } },
+            { $group: { _id: null, total: { $sum: '$amount' } } },
+        ]),
+        Transaction.aggregate([
+            { $match: ffMatch },
+            { $group: { _id: null, total: { $sum: '$amount' } } },
+        ]),
+    ]);
+
     res.status(200).json({
         success: true,
         data: {
@@ -406,6 +418,8 @@ exports.getFutureFundStatus = asyncHandler(async (req, res, next) => {
             todayActivityMinutes: synced.activityCurrent,
             activeDaysCount: synced.daysCurrent,
             successfulSales: synced.salesCurrent,
+            todayEarnings: todayAgg[0]?.total || 0,
+            lifetimeEarnings: lifeAgg[0]?.total || 0,
         }
     });
 });
@@ -541,9 +555,12 @@ exports.getReferrals = asyncHandler(async (req, res, next) => {
         };
     });
 
+    const totalRevenue = referralsData.reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+
     res.status(200).json({
         success: true,
         count: referralsData.length,
+        totalRevenue,
         data: referralsData,
     });
 });
@@ -686,7 +703,7 @@ exports.getWithdrawalCard = asyncHandler(async (req, res, next) => {
             virtualBalance: user.wallet.virtualBalance || 0,
             withdrawable: withdrawableVirtual(user),
             lockedReserve: user.withdrawalCard?.lockedReserve || 0,
-            virtualUnlocked: !!user.isPaid,
+            virtualUnlocked: !!user.isPaid && user.withdrawalCard?.status === 'active',
         },
     });
 });

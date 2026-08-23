@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import {
     UserPlus, IndianRupee, ClipboardList, Rocket, ChevronRight, ChevronLeft, Loader2,
-    Wallet, Clock, Lock, MonitorPlay
+    Wallet, Clock, Lock, Gift
 } from 'lucide-react';
 import api from '../../shared/services/api';
 
@@ -38,6 +38,7 @@ const Income = () => {
     const virtual = Number(userData?.wallet?.virtualBalance ?? 0);
 
     const [inviteAmount, setInviteAmount] = useState(null);
+    const [offerwallEnabled, setOfferwallEnabled] = useState(false);
     const [futurePlan, setFuturePlan] = useState({
         title: 'Future Plan',
         subtitle: 'We are continuously bringing new earning opportunities for you.',
@@ -58,6 +59,7 @@ const Income = () => {
                 ]);
                 const commission = Number(settingsRes?.data?.referralCommission);
                 if (commission > 0) setInviteAmount(commission);
+                setOfferwallEnabled(!!settingsRes?.data?.offerwallEnabled);
 
                 const payload = cmsRes?.data?.data && typeof cmsRes.data.data === 'object'
                     ? cmsRes.data.data
@@ -73,38 +75,36 @@ const Income = () => {
             }
         };
         load();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     if (userLoading || status === 'pending' || status === 'rejected' || status === 'not started') {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center gap-3 bg-[#FCF8F5] font-poppins">
+            <div className="min-h-full flex flex-col items-center justify-center gap-3 bg-[#FCF8F5] font-poppins">
                 <Loader2 className="animate-spin text-[#462211]" size={28} />
                 <p className="text-[10px] uppercase tracking-widest text-slate-400">Verifying KYC...</p>
             </div>
         );
     }
 
-    const reward = inviteAmount || 200;
+    const reward = inviteAmount;
 
     return (
-        <div className="flex flex-col min-h-full bg-[#FCF8F5] font-poppins pb-5">
-            <div className="bg-white px-4 py-2.5 flex items-center gap-3 sticky top-0 z-40 border-b border-[#EDE4DC]">
-                <button onClick={() => navigate(-1)} className="text-[#462211] active:scale-95 transition-all">
+        <div className="flex flex-col min-h-full bg-[#FCF8F5] font-poppins pb-4">
+            <div className="bg-white px-3 sm:px-4 py-2.5 flex items-center gap-3 sticky top-0 z-40 border-b border-[#EDE4DC]">
+                <button type="button" onClick={() => navigate(-1)} className="text-[#462211] active:scale-95 transition-all">
                     <ChevronLeft size={22} strokeWidth={2.2} />
                 </button>
                 <h1 className="text-[17px] font-semibold text-[#462211] tracking-tight">Income</h1>
             </div>
-            <div className="px-3 pt-2"></div>
 
-            <div className="space-y-2.5">
+            <div className="px-3 pt-2.5 space-y-2.5">
                 <OptionCard
                     icon={UserPlus}
                     iconBg="bg-[#FFF5F0]"
                     iconColor="text-[#462211]"
                     arrowBg="bg-[#FFF5F0]"
-                    title={`Invite & Earn ₹${reward}`}
-                    subtitle={`Get anyone to download the app and earn ₹${reward} credit.`}
+                    title={reward != null ? `Invite & Earn ₹${reward}` : 'Invite & Earn'}
+                    subtitle={reward != null ? `₹${reward} goes to Pending after their KYC, then Virtual Account when they create one.` : 'Reward is credited after KYC, then to Virtual Account when they create one.'}
                     onClick={() => navigate('/user/guide/invite')}
                 />
                 <OptionCard
@@ -113,7 +113,7 @@ const Income = () => {
                     iconColor="text-emerald-600"
                     arrowBg="bg-emerald-50"
                     title="Future Fund"
-                    subtitle="Monetize quickly and start earning daily."
+                    subtitle="Build daily activity and grow with the fund."
                     onClick={() => navigate('/user/guide/fund')}
                 />
                 <OptionCard
@@ -122,87 +122,102 @@ const Income = () => {
                     iconColor="text-sky-600"
                     arrowBg="bg-sky-50"
                     title="Work Daily, Start Earning"
-                    subtitle="Complete company tasks and earn every day."
+                    subtitle="See how daily work and company tasks run."
                     onClick={() => navigate('/user/guide/daily')}
                 />
-                <OptionCard
-                    icon={MonitorPlay}
-                    iconBg="bg-[#FFF5F0]"
-                    iconColor="text-[#462211]"
-                    arrowBg="bg-[#FFF5F0]"
-                    title="Watch & Earn"
-                    subtitle="Watch daily bonus ads and earn instant wallet income."
-                    onClick={() => navigate('/user/watch')}
-                />
-            </div>
+                {offerwallEnabled ? (
+                    <OptionCard
+                        icon={Gift}
+                        iconBg="bg-[#FFF5F0]"
+                        iconColor="text-[#B3591C]"
+                        arrowBg="bg-[#FFF5F0]"
+                        title="Offers & Surveys"
+                        subtitle="Complete partner offers. Reward is added after confirmation."
+                        onClick={() => navigate('/user/offerwall')}
+                    />
+                ) : (
+                    <OptionCard
+                        icon={ClipboardList}
+                        iconBg="bg-[#FFF5F0]"
+                        iconColor="text-[#462211]"
+                        arrowBg="bg-[#FFF5F0]"
+                        title="Daily Tasks"
+                        subtitle="Complete in-app tasks. Watch ads stay separate and do not credit wallet."
+                        onClick={() => navigate('/user/earn')}
+                    />
+                )}
 
-            <div className="mt-2.5 bg-white rounded-2xl px-3.5 py-3 shadow-[0_4px_16px_rgba(15,23,42,0.05)] border border-slate-100/80">
-                <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-1.5">
-                        <Wallet size={16} className="text-[#462211]" />
-                        <span className="text-[14px] font-bold text-slate-900">Wallet</span>
+                <div className="bg-white rounded-2xl px-3.5 py-3 shadow-[0_4px_16px_rgba(15,23,42,0.05)] border border-slate-100/80">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-1.5">
+                            <Wallet size={16} className="text-[#462211]" />
+                            <span className="text-[14px] font-bold text-slate-900">Wallet</span>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/user/wallet', { state: { pane: 'pending' } })}
+                            className="text-[11px] font-semibold text-[#462211] flex items-center"
+                        >
+                            View Wallet <ChevronRight size={13} />
+                        </button>
                     </div>
-                    <button
-                        type="button"
-                        onClick={() => navigate('/user/wallet')}
-                        className="text-[11px] font-semibold text-[#462211] flex items-center"
-                    >
-                        View Wallet <ChevronRight size={13} />
-                    </button>
+
+                    <div className="grid grid-cols-2 divide-x divide-slate-100">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (virtualUnlocked) navigate('/user/wallet', { state: { pane: 'virtual' } });
+                                else navigate('/user/virtual-account');
+                            }}
+                            className="pr-3 text-left"
+                        >
+                            <div className="flex items-center gap-1 mb-1">
+                                <Wallet size={13} className="text-[#462211]" />
+                                <p className="text-[10px] text-slate-400">Virtual Account</p>
+                            </div>
+                            <p className="text-[18px] sm:text-[20px] font-bold text-[#462211] leading-none">₹{formatMoney(virtual)}</p>
+                            <p className="text-[10px] text-slate-400 mt-1.5 flex items-center gap-1">
+                                {virtualUnlocked ? 'Available Balance' : (
+                                    <>
+                                        <Lock size={10} /> Locked
+                                    </>
+                                )}
+                            </p>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/user/wallet', { state: { pane: 'pending' } })}
+                            className="pl-3 text-left"
+                        >
+                            <div className="flex items-center gap-1 mb-1">
+                                <Clock size={13} className="text-[#462211]" />
+                                <p className="text-[10px] text-slate-400">Pending Wallet</p>
+                            </div>
+                            <p className="text-[18px] sm:text-[20px] font-bold text-[#462211] leading-none">₹{formatMoney(pending)}</p>
+                            <p className="text-[10px] text-slate-400 mt-1.5">Always open</p>
+                        </button>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-2 divide-x divide-slate-100">
-                    <button
-                        type="button"
-                        onClick={() => navigate('/user/wallet', { state: { pane: 'virtual' } })}
-                        className="pr-3 text-left"
-                    >
-                        <div className="flex items-center gap-1 mb-1">
-                            <Wallet size={13} className="text-[#462211]" />
-                            <p className="text-[10px] text-slate-400">Virtual Account</p>
-                        </div>
-                        <p className="text-[20px] font-bold text-[#462211] leading-none">₹{formatMoney(virtual)}</p>
-                        <p className="text-[10px] text-slate-400 mt-1.5 flex items-center gap-1">
-                            {virtualUnlocked ? 'Available Balance' : (
-                                <>
-                                    <Lock size={10} /> Locked
-                                </>
-                            )}
-                        </p>
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => navigate('/user/wallet', { state: { pane: 'pending' } })}
-                        className="pl-3 text-left"
-                    >
-                        <div className="flex items-center gap-1 mb-1">
-                            <Clock size={13} className="text-[#462211]" />
-                            <p className="text-[10px] text-slate-400">Pending Account</p>
-                        </div>
-                        <p className="text-[20px] font-bold text-[#462211] leading-none">₹{formatMoney(pending)}</p>
-                        <p className="text-[10px] text-slate-400 mt-1.5">Will transfer in 7 – 14 days</p>
-                    </button>
-                </div>
+                <button
+                    type="button"
+                    onClick={() => navigate('/user/guide/options')}
+                    className="w-full bg-white rounded-2xl px-3 py-3 flex items-center gap-3 text-left shadow-[0_4px_16px_rgba(15,23,42,0.05)] border border-slate-100/80 active:scale-[0.99]"
+                >
+                    <div className="w-11 h-11 rounded-2xl bg-[#FFF5F0] flex items-center justify-center shrink-0">
+                        <Rocket size={20} className="text-[#462211]" strokeWidth={2.1} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="text-[14px] font-bold text-slate-900 leading-tight">{futurePlan.title}</h3>
+                        <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">{futurePlan.subtitle}</p>
+                    </div>
+                    <ChevronRight size={18} className="text-[#462211] shrink-0" />
+                </button>
+
+                <p className="text-center text-[11px] text-slate-400 pt-2 pb-1">
+                    from <span className="font-semibold text-slate-500">Jangu Group</span>
+                </p>
             </div>
-
-            <button
-                type="button"
-                onClick={() => navigate('/user/guide/options')}
-                className="mt-2.5 w-full bg-white rounded-2xl px-3 py-3 flex items-center gap-3 text-left shadow-[0_4px_16px_rgba(15,23,42,0.05)] border border-slate-100/80 active:scale-[0.99]"
-            >
-                <div className="w-11 h-11 rounded-2xl bg-[#FFF5F0] flex items-center justify-center shrink-0">
-                    <Rocket size={20} className="text-[#462211]" strokeWidth={2.1} />
-                </div>
-                <div className="flex-1 min-w-0">
-                    <h3 className="text-[14px] font-bold text-slate-900 leading-tight">{futurePlan.title}</h3>
-                    <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">{futurePlan.subtitle}</p>
-                </div>
-                <ChevronRight size={18} className="text-[#462211] shrink-0" />
-            </button>
-
-            <p className="text-center text-[11px] text-slate-400 mt-5">
-                from <span className="font-semibold text-slate-500">Jangu Group</span>
-            </p>
         </div>
     );
 };

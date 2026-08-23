@@ -21,6 +21,12 @@ exports.saveToken = asyncHandler(async (req, res, next) => {
         await User.findByIdAndUpdate(req.user.id, {
             $addToSet: { [field]: token }
         });
+        try {
+            const { flushPendingPushes } = require('../utils/userJourneyPush');
+            await flushPendingPushes(req.user.id);
+        } catch (flushErr) {
+            console.error('[FCM] Pending push flush failed:', flushErr.message);
+        }
     } else if (req.admin) {
         const Admin = require('../models/Admin');
         await Admin.findByIdAndUpdate(req.admin.id, {
@@ -101,11 +107,11 @@ exports.sendNotificationToUser = async (userId, payload) => {
         const isTest = payload.data?.type === 'test';
         const exists = await NotificationLog.findOne({ notificationId });
         if (exists && !isTest) {
-            return;
+            return true;
         }
 
         const user = await User.findById(userId);
-        if (!user) return;
+        if (!user) return false;
 
         // Combine all tokens
         let tokens = [...(user.fcmTokens || []), ...(user.fcmTokenMobile || [])];
@@ -113,7 +119,7 @@ exports.sendNotificationToUser = async (userId, payload) => {
         tokens = tokens.filter(t => t && t !== 'undefined' && t !== 'null');
 
         if (!tokens.length) {
-            return;
+            return false;
         }
 
         // 2. Send via Firebase
@@ -136,10 +142,12 @@ exports.sendNotificationToUser = async (userId, payload) => {
                     }
                 }
             },
-            data: {
-                ...payload.data,
-                notificationId
-            },
+            data: Object.fromEntries(
+                Object.entries({ ...(payload.data || {}), notificationId }).map(([k, v]) => [
+                    k,
+                    v === undefined || v === null ? '' : String(v),
+                ])
+            ),
             tokens: tokens
         };
 
@@ -184,8 +192,10 @@ exports.sendNotificationToUser = async (userId, payload) => {
             body: payload.body
         });
 
+        return true;
     } catch (error) {
         // Silently fail in production
+        return false;
     }
 };
 

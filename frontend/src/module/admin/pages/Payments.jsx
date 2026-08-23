@@ -149,13 +149,9 @@ const Payments = () => {
     };
 
     // Derived Stats — revenue from backend (one unlock per user, no double-count)
-    const totalCollected = revenueMeta.totalRevenue > 0
-        ? revenueMeta.totalRevenue
-        : paymentsList.filter(p => p.status === 'Success').reduce((acc, curr) => acc + Number(curr.amount.replace('₹', '')), 0);
+    const totalCollected = Number(revenueMeta.totalRevenue) || 0;
     const pendingCount = paymentsList.filter(p => p.status === 'Pending').length;
-    const successCount = revenueMeta.successCount > 0
-        ? revenueMeta.successCount
-        : paymentsList.filter(p => p.status === 'Success').length;
+    const successCount = Number(revenueMeta.successCount) || 0;
     const failedCount = paymentsList.filter(p => p.status === 'Failed').length;
 
     return (

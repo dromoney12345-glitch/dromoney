@@ -52,15 +52,9 @@ const Wallets = () => {
                     status: w.status
                 }));
                 setList(data);
-
-                const s = { total: 0, approved: 0, pending: 0, rejected: 0 };
-                response.data.forEach(x => {
-                    s.total += x.amount;
-                    if (x.status === 'Approved') s.approved += x.amount;
-                    if (x.status === 'Pending')  s.pending  += x.amount;
-                    if (x.status === 'Rejected') s.rejected += x.amount;
-                });
-                setStats(s);
+                if (response.stats) {
+                    setStats(response.stats);
+                }
             }
         } catch (err) {
             console.error(err);

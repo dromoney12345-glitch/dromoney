@@ -22,10 +22,13 @@ function extractReferralCode(value) {
     const raw = String(value).trim();
 
     const urlInText = raw.match(/https?:\/\/[^\s]+/i);
-    if (urlInText && !raw.startsWith('http')) {
+    if (urlInText && urlInText[0] !== raw) {
         const nested = extractReferralCode(urlInText[0]);
         if (nested) return nested;
     }
+
+    const labeled = raw.match(/invite\s*code\s*[:\-]\s*([A-Za-z0-9]+)/i);
+    if (labeled) return normalizeCode(labeled[1]);
 
     try {
         if (raw.includes('://') || raw.includes('play.google.com') || raw.startsWith('/')) {
@@ -37,7 +40,11 @@ function extractReferralCode(value) {
                 'https://dromoney.app'
             );
 
-            const refParam = url.searchParams.get('ref') || url.searchParams.get('referral') || url.searchParams.get('code');
+            const refParam =
+                url.searchParams.get('invite') ||
+                url.searchParams.get('ref') ||
+                url.searchParams.get('referral') ||
+                url.searchParams.get('code');
             if (refParam) return normalizeCode(refParam);
 
             const installReferrer = url.searchParams.get('referrer');

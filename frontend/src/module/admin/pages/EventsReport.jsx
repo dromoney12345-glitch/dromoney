@@ -139,7 +139,7 @@ const EventsReport = () => {
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {eventsData.length > 0 ? eventsData.map((e) => {
-                                const totalPoolCash = (e.participantsCount || 0) * e.fee;
+                                const totalPoolCash = Number(e.prizeBreakdown?.poolCash ?? 0);
                                 return (
                                     <tr key={e._id} className="hover:bg-slate-50/50 transition-colors">
                                         <td className="px-6 py-3">

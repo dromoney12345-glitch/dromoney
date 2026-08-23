@@ -125,36 +125,6 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('Task not found', 404));
     }
 
-    // Calculate coins to add (apply Booster if active, but not for Video/Watch tasks)
-    let factor = 1;
-    if ((user.isBoosterActive || user.isTaskBoosterActive) && task.type !== 'Video' && task.type !== 'Watch') {
-        const Booster = require('../models/Booster');
-        const taskBooster = await Booster.findOne({ type: 'task' });
-        if (!taskBooster || !taskBooster.applicableTasks || taskBooster.applicableTasks.length === 0 || taskBooster.applicableTasks.includes('General Tasks') || taskBooster.applicableTasks.includes(task.type)) {
-            factor = 12; // default
-            if (taskBooster && taskBooster.benefits) {
-                for (const b of taskBooster.benefits) {
-                    const match = b.match(/(\d+)x/i);
-                    if (match) {
-                        factor = parseInt(match[1]);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    const baseAmount = submission.coinsReward || task.coinsReward || 2;
-    const inrEarned = Math.round(baseAmount * factor * 100) / 100;
-
-    const { creditEarning } = require('../utils/walletLedger');
-    if (inrEarned > 0) {
-        await creditEarning(user, inrEarned, {
-            source: factor > 1 ? `Task Earning (Boosted): ${task.title}` : `Task Earning: ${task.title}`,
-            inviteHold: false,
-            createTx: true,
-        });
-    }
-
     user.dailyTaskCompletions.push({
         taskId: task._id,
         completedAt: new Date()
@@ -192,7 +162,7 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
         const { sendNotificationToUser } = require('./fcmController');
         await sendNotificationToUser(submission.user, {
             title: 'Task Approved! 🌟',
-            body: `Awesome work! Your task "${task.title}" has been approved. +${coinsToAdd} Coins added!`,
+            body: `Awesome work! Your task "${task.title}" has been approved.`,
             data: {
                 type: 'task',
                 link: '/user/earn'
@@ -204,7 +174,7 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        message: 'Submission approved and coins added to user'
+        message: 'Submission approved'
     });
 });
 

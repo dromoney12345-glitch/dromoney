@@ -66,7 +66,7 @@ exports.manageKYC = async (req, res, next) => {
             user.notifications = user.notifications || [];
             user.notifications.push({
                 title: "KYC Verified! ✅",
-                message: "KYC approved. Income page is now free to use. Create a Withdrawal Card to unlock Virtual Wallet.",
+                message: "KYC approved. Income page is now free to use. Create a Virtual Account to withdraw from Virtual.",
                 type: "success",
                 date: new Date()
             });
@@ -87,36 +87,25 @@ exports.manageKYC = async (req, res, next) => {
         user.markModified('kyc');
         await user.save();
 
-        // Invite ₹200 goes to referrer Pending Wallet after KYC
+        // Invite ₹200 → referrer Pending Wallet after KYC (Virtual after invitee card)
         if (status === 'Approved' || status === 'Verified') {
             try {
                 const { creditReferralOnKyc } = require('../utils/referralReward');
-                await creditReferralOnKyc(user);
+                const result = await creditReferralOnKyc(user);
+                console.log('[REFERRAL] KYC approve credit:', result);
             } catch (refErr) {
                 console.error('[REFERRAL] KYC approve credit failed:', refErr.message);
             }
         }
 
-        // Send Push Notification
         try {
-            const { sendNotificationToUser } = require('./fcmController');
+            const { notifyJourney } = require('../utils/userJourneyPush');
             if (status === 'Approved' || status === 'Verified') {
-                await sendNotificationToUser(user._id, {
-                    title: 'KYC Verified! ✅',
-                    body: 'Congratulations! Your KYC is successfully approved. All earning routes are unlocked.',
-                    data: {
-                        type: 'kyc',
-                        link: '/user/marketing'
-                    }
-                });
+                await notifyJourney(user._id, 'kyc_approved', { skipInApp: true });
             } else if (status === 'Rejected') {
-                await sendNotificationToUser(user._id, {
-                    title: 'KYC Rejected ⚠️',
-                    body: `KYC verification failed. Reason: ${rejectionReason || 'Invalid documents or blurred image'}. Click here to re-submit your details.`,
-                    data: {
-                        type: 'kyc',
-                        link: '/user/profile'
-                    }
+                await notifyJourney(user._id, 'kyc_rejected', {
+                    skipInApp: true,
+                    body: `KYC verification failed. Reason: ${rejectionReason || 'Invalid documents or blurred image'}. Tap to re-submit.`,
                 });
             }
         } catch (pushErr) {
@@ -299,11 +288,14 @@ exports.getFutureFundReport = async (req, res, next) => {
         }
 
         const reportData = scoredUsers.sort((a, b) => b.sharePercentage - a.sharePercentage);
+        const previewAmount = Number(req.query.previewAmount) || 0;
+        const { quoteFutureFundPreview } = require('../utils/moneyQuotes');
+        const data = quoteFutureFundPreview({ poolAmount: previewAmount, users: reportData });
 
         res.status(200).json({
             success: true,
-            count: reportData.length,
-            data: reportData
+            count: data.length,
+            data
         });
     } catch (err) {
         next(err);

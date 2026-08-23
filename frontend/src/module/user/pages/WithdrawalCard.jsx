@@ -52,7 +52,7 @@ const WithdrawalCard = () => {
                 <ChevronLeft size={22} />
             </button>
             <h1 className="text-[18px] font-semibold text-[#462211]">
-                {expired ? 'Renew Withdrawal Card' : 'Create Withdrawal Card'}
+                {expired ? 'Renew Virtual Account' : 'Create Virtual Account'}
             </h1>
             <p className="text-[12px] text-[#7A5648] mt-1">{quote.note}</p>
 
@@ -66,12 +66,12 @@ const WithdrawalCard = () => {
                         <div className="mt-3 bg-[#FFF5F0] rounded-xl p-3 flex items-start gap-2">
                             <Info size={14} className="text-[#462211] shrink-0 mt-0.5" />
                             <p className="text-[11px] text-[#7A5648] leading-snug">
-                                ₹{Number(card.lockedReserve).toFixed(0)} is reserved in your Virtual Wallet for card renewal and cannot be withdrawn.
+                                ₹{Number(card.lockedReserve).toFixed(0)} is reserved in your Virtual Account for renewal and cannot be withdrawn.
                             </p>
                         </div>
                     )}
-                    <button type="button" onClick={() => navigate('/user/wallet')} className="mt-4 w-full bg-[#462211] text-white py-3 rounded-xl text-[12px] uppercase tracking-widest">
-                        Open Wallet
+                    <button type="button" onClick={() => navigate('/user/wallet', { state: { pane: 'virtual' } })} className="mt-4 w-full bg-[#462211] text-white py-3 rounded-xl text-[12px] uppercase tracking-widest">
+                        Open Virtual Account
                     </button>
                 </div>
             ) : (
@@ -107,7 +107,7 @@ const WithdrawalCard = () => {
                         <div className="mt-4 bg-[#EEF7EE] rounded-2xl p-4 border border-emerald-100">
                             <p className="text-[12px] font-medium text-emerald-800">Early bonus</p>
                             <p className="text-[11px] text-emerald-700 mt-1 leading-snug">
-                                Pay within 3 days of KYC — ₹{quote.credit} will be credited to Virtual Wallet (reserved, non-withdrawable).
+                                Pay within 3 days of KYC — ₹{quote.credit} will be credited to Virtual Account (reserved, non-withdrawable).
                             </p>
                         </div>
                     )}
@@ -133,13 +133,23 @@ const WithdrawalCard = () => {
                 <PaymentModal
                     isOpen
                     onClose={() => setPayOpen(false)}
-                    plan={expired ? 'Withdrawal Card Renew' : 'Withdrawal Card'}
+                    plan={expired ? 'Virtual Account Renew' : 'Virtual Account'}
                     amount={quote.amount}
                     type="PLATFORM_UNLOCK"
                     onSuccess={async () => {
                         setPayOpen(false);
-                        await refreshUserProfile?.();
-                        navigate('/user/wallet');
+                        const profile = await refreshUserProfile?.();
+                        const unlocked = !!profile?.isPaid && profile?.withdrawalCard?.status === 'active';
+                        if (unlocked) {
+                            navigate('/user/wallet', { state: { pane: 'virtual' } });
+                            return;
+                        }
+                        try {
+                            const res = await api.get('/user/data/withdrawal-card');
+                            if (res.success) setData(res.data);
+                        } catch (err) {
+                            console.error(err);
+                        }
                     }}
                 />
             )}

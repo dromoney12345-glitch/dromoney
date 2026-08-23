@@ -12,13 +12,15 @@ function getIstDateString(date = new Date()) {
 
 function getTargets(settings = {}) {
     return {
-        kycTarget: Number(settings.futureFundKycTarget) || Number(settings.futureFundSalesTarget) || 10,
-        adsTarget: Number(settings.futureFundWatchAdTarget) >= 50
+        kycTarget: Number(settings.futureFundKycTarget) > 0
+            ? Number(settings.futureFundKycTarget)
+            : (Number(settings.futureFundSalesTarget) || 10),
+        adsTarget: Number(settings.futureFundWatchAdTarget) > 0
             ? Number(settings.futureFundWatchAdTarget)
-            : 50,
-        tasksTarget: Number(settings.futureFundDailyTasksTarget) >= 50
+            : 10,
+        tasksTarget: Number(settings.futureFundDailyTasksTarget) > 0
             ? Number(settings.futureFundDailyTasksTarget)
-            : 50,
+            : 10,
         salesTarget: Number(settings.futureFundKycTarget) || Number(settings.futureFundSalesTarget) || 10,
         daysTarget: Number(settings.futureFundDaysTarget) || 7,
         activityMinutesTarget: Number(settings.futureFundActivityMinutes) || 15,

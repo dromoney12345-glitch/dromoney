@@ -284,9 +284,9 @@ const OverviewTab = ({ events, onUpdateEvent, onDeleteEvent, onShowToast, onRefr
                                 )}
                                 {(isEditing ? editData.totalCashPoolINR : event.totalCashPoolINR) > 0 && (
                                     <p className="text-[8px] text-slate-400 mt-1 leading-snug">
-                                        Prize fund 50% = ₹{(((isEditing ? editData.totalCashPoolINR : event.totalCashPoolINR) || 0) * 0.5).toFixed(0)}
-                                        {' '}· 1st (of 3) ≈ ₹{(((isEditing ? editData.totalCashPoolINR : event.totalCashPoolINR) || 0) * 0.25).toFixed(0)}
-                                        {' '}· sole winner ≈ ₹{(((isEditing ? editData.totalCashPoolINR : event.totalCashPoolINR) || 0) * 0.5).toFixed(0)}
+                                        {isEditing
+                                            ? 'Save to refresh prize split from server.'
+                                            : `Prize fund = ₹${event.prizeBreakdown?.prizeFund ?? 0} · 1st ≈ ₹${event.prizeBreakdown?.firstPlace ?? 0} · sole winner ≈ ₹${event.prizeBreakdown?.soleWinner ?? 0}`}
                                     </p>
                                 )}
                             </div>
@@ -697,6 +697,7 @@ const ContentTab = ({ events, onRefreshEvents, onShowToast }) => {
 
 const ParticipantsTab = ({ events, onShowToast }) => {
     const [selectedEventId, setSelectedEventId] = useState('');
+    const [prizePreview, setPrizePreview] = useState({ dynamicPrize: 0 });
     const [timeFilter, setTimeFilter] = useState('all');
     const [statusFilter, setStatusFilter] = useState('all');
     const [sortBy, setSortBy] = useState('timeTaken');
@@ -717,6 +718,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
         try {
             const res = await api.get(`/admin/events/${selectedEventId}/participants`);
             if (res.success && res.data) {
+                if (res.prizePreview) setPrizePreview(res.prizePreview);
                 setParticipants(res.data.map(p => ({
                     ...p,
                     id: p._id,
@@ -815,7 +817,7 @@ const ParticipantsTab = ({ events, onShowToast }) => {
     const prizesAwarded = participants.filter(p => p.prizeStatus === 'Awarded').length;
     const topScore = participants.length > 0 ? Math.max(...participants.map(p => p.score || 0)) : 0;
     const selectedEvent = events.find(e => e.id === selectedEventId);
-    const dynamicPrize = selectedEvent ? Math.floor(Math.max(0, selectedEvent.fee || 0) * participants.length * 0.8) : 0;
+    const dynamicPrize = Number(prizePreview.dynamicPrize ?? selectedEvent?.prizeBreakdown?.dynamicPrize ?? 0);
 
     return (
         <div className="space-y-6">

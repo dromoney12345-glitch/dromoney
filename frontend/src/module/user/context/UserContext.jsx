@@ -190,20 +190,12 @@ export const UserProvider = ({ children }) => {
 
     const mapAndSetUserData = (dbUser, transactions = [], settings = {}) => {
         const inrTransactions = transactions.filter(t => t.currency === 'INR');
-        const dynamicWalletBalance = inrTransactions.reduce((acc, tx) => {
-            if (tx.type === 'credit' && tx.status === 'Success') {
-                return acc + (tx.amount || 0);
-            }
-            if (tx.type === 'withdrawal' && tx.status === 'Success') {
-                return acc - (tx.amount || 0);
-            }
-            return acc;
-        }, 0);
 
         setUserData({
             name: dbUser.name,
             id: `AFF-${dbUser.referralCode}`,
             mongoId: dbUser._id,
+            megaEligibility: dbUser.megaEligibility || null,
             email: dbUser.email,
             phone: dbUser.phone,
             isPaid: dbUser.isPaid,

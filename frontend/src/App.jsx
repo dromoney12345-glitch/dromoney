@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import UserLayout from './module/user/UserLayout';
 import Home from './module/user/pages/Home';
 import Earn from './module/user/pages/Earn';
-import Events from './module/user/pages/Events';
 import Profile from './module/user/pages/Profile';
 import Wallet from './module/user/pages/Wallet';
 import Income from './module/user/pages/Income';
@@ -47,8 +46,6 @@ import Affiliates from './module/admin/pages/Affiliates';
 import CoinsAndTasks from './module/admin/pages/CoinsAndTasks';
 import FutureFundAdmin from './module/admin/pages/FutureFundAdmin';
 import FutureFundReport from './module/admin/pages/FutureFundReport';
-import EventsAdmin from './module/admin/pages/Events';
-import EventsReport from './module/admin/pages/EventsReport';
 import BusinessContent from './module/admin/pages/BusinessContent';
 import Wallets from './module/admin/pages/Wallets';
 import NotificationsAdmin from './module/admin/pages/Notifications';
@@ -58,11 +55,11 @@ import KYC from './module/admin/pages/KYC';
 import Promotions from './module/admin/pages/Promotions';
 import WatchAndEarnAdmin from './module/admin/pages/WatchAndEarnAdmin';
 import LayoutManager from './module/admin/pages/LayoutManager';
-import DocumentsCMS from './module/admin/pages/DocumentsCMS';
 import MarketingManager from './module/admin/pages/MarketingManager';
 import AdminChatSupport from './module/admin/pages/ChatSupport';
 import TaskApprovals from './module/admin/pages/TaskApprovals';
 import ChatSupportPage from './module/user/pages/ChatSupportPage';
+import Offerwall from './module/user/pages/Offerwall';
 import { AdminProvider, useAdmin } from './module/admin/context/AdminContext';
 
 import { UserProvider, useUser } from './module/user/context/UserContext';
@@ -78,8 +75,8 @@ const ProtectedUserRoute = ({ children }) => {
   // Show a neutral splash instead of redirecting to login
   if (loading && !userData?.mongoId) {
     return (
-      <div className="min-h-screen bg-[#0f1d3a] flex flex-col items-center justify-center gap-4">
-        <div className="w-10 h-10 border-4 border-white/10 border-t-white/60 rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-[#FCF8F5] flex flex-col items-center justify-center gap-4">
+        <div className="w-10 h-10 border-4 border-[#EDE4DC] border-t-[#462211] rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -232,6 +229,7 @@ function App() {
               <Route path="income" element={<Income />} />
               <Route path="guide/:slug" element={<GuidePage />} />
               <Route path="withdrawal-card" element={<WithdrawalCard />} />
+              <Route path="virtual-account" element={<WithdrawalCard />} />
               <Route path="business" element={<BusinessIdeas />} />
               <Route path="marketing" element={<Marketing />} />
               <Route path="marketing-history" element={<MarketingHistory />} />
@@ -242,6 +240,7 @@ function App() {
               <Route path="business-ideas" element={<BusinessIdeas />} />
               <Route path="business-ideas/:ideaId?/:section?/:cardId?" element={<BusinessIdeas />} />
               <Route path="watch" element={<WatchAndEarn />} />
+              <Route path="offerwall" element={<Offerwall />} />
               <Route path="help" element={<HelpCenter />} />
               <Route path="future-fund" element={<FutureFund />} />
               <Route path="chat-support" element={<ChatSupportPage />} />
@@ -270,7 +269,7 @@ function App() {
             <Route path="/admin" element={<ProtectedAdminRoute><AdminLayout /></ProtectedAdminRoute>}>
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="kyc" element={<KYC />} />
-              <Route path="documents" element={<DocumentsCMS />} />
+              <Route path="documents" element={<Navigate to="/admin/layout" replace />} />
               <Route path="users" element={<Users />} />
               <Route path="payments" element={<Payments />} />
               <Route path="affiliates" element={<Affiliates />} />
@@ -279,8 +278,8 @@ function App() {
               <Route path="future-fund" element={<Navigate to="/admin/future-fund/settings" replace />} />
               <Route path="future-fund/settings" element={<FutureFundAdmin />} />
               <Route path="future-fund/report" element={<FutureFundReport />} />
-              <Route path="events" element={<EventsAdmin />} />
-              <Route path="events/report" element={<EventsReport />} />
+              <Route path="events" element={<Navigate to="/admin/dashboard" replace />} />
+              <Route path="events/report" element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="business-content" element={<BusinessContent />} />
               <Route path="withdrawals" element={<Wallets />} />
               <Route path="notifications" element={<NotificationsAdmin />} />

@@ -38,7 +38,7 @@ const INITIAL_TASKS = [
         id: '4', 
         type: 'Spin', 
         title: 'Spin Wheel Task', 
-        description: 'Try your luck and win coins!', 
+        description: 'Try your luck on the wheel!', 
         reward: 1, 
         icon: 'Disc',
         config: { min: 1, max: 10 }
@@ -74,7 +74,7 @@ const INITIAL_TASKS = [
         id: '8', 
         type: 'Scratch', 
         title: 'Magic Scratch Card', 
-        description: 'Rub to reveal hidden coins.', 
+        description: 'Rub to reveal hidden cards.', 
         reward: 1, 
         icon: 'Sparkles',
         config: { threshold: 80 }
@@ -86,7 +86,7 @@ const INITIAL_TASKS = [
         description: 'Share on WhatsApp / Social.', 
         reward: 1, 
         icon: 'MessageCircle',
-        config: { url: 'https://dromoney.com', text: 'Hey, join Dromoney and start earning daily coins!' }
+        config: { url: 'https://dromoney.com', text: 'Hey, join Dromoney and start earning daily!' }
     },
     { 
         id: '10', 

@@ -7,59 +7,63 @@ const RESERVED_CODES = new Set([
     'STORE', 'APPS', 'DETAILS', 'NULL', 'UNDEFINED', 'TRUE', 'FALSE',
 ]);
 
-/** Extract a referral code from pasted text, URL, or raw code. */
+function extractFromUrlString(rawUrl) {
+    try {
+        const cleanedUrl = String(rawUrl || '').replace(/[),.;]+$/g, '');
+        const url = new URL(
+            cleanedUrl.includes('://') || cleanedUrl.startsWith('/')
+                ? cleanedUrl
+                : `https://${cleanedUrl}`,
+            typeof window !== 'undefined' ? window.location.origin : 'https://dromoney.app'
+        );
+
+        const inviteParam =
+            url.searchParams.get('invite') ||
+            url.searchParams.get('ref') ||
+            url.searchParams.get('referral') ||
+            url.searchParams.get('code');
+        if (inviteParam) return normalizeCode(inviteParam);
+
+        const installReferrer = url.searchParams.get('referrer');
+        if (installReferrer) {
+            const decoded = decodeURIComponent(installReferrer);
+            const match =
+                decoded.match(/(?:^|[&?])ref=([A-Za-z0-9]+)/i) ||
+                decoded.match(/^([A-Za-z0-9]{4,12})$/);
+            if (match) return normalizeCode(match[1]);
+        }
+
+        const campaign = url.searchParams.get('pcampaignid') || '';
+        const campaignMatch = campaign.match(/web_share([A-Za-z0-9]{4,8})$/i);
+        if (campaignMatch) return normalizeCode(campaignMatch[1]);
+
+        const parts = url.pathname.split('/').filter(Boolean);
+        const joinIdx = parts.findIndex((p) => p.toLowerCase() === 'join');
+        if (joinIdx >= 0 && parts[joinIdx + 1]) return normalizeCode(parts[joinIdx + 1]);
+    } catch {
+        /* ignore */
+    }
+    return '';
+}
+
+/** Extract an invite code from pasted text, URL, or raw code. */
 export function extractReferralCode(value) {
     if (!value) return '';
     const raw = String(value).trim();
 
-    // If share message has a URL inside, prefer extracting from that URL
     const urlInText = raw.match(/https?:\/\/[^\s]+/i);
-    if (urlInText && !raw.startsWith('http') && !raw.includes('play.google.com') && !raw.startsWith('/')) {
-        const fromEmbedded = extractReferralCode(urlInText[0]);
-        if (fromEmbedded) return fromEmbedded;
+    if (urlInText) {
+        const fromUrl = extractFromUrlString(urlInText[0]);
+        if (fromUrl) return fromUrl;
     }
 
-    try {
-        if (raw.includes('://') || raw.startsWith('/') || raw.includes('play.google.com')) {
-            // Handle URLs that may have trailing punctuation from chat apps
-            const cleanedUrl = raw.replace(/[),.;]+$/g, '');
-            const url = new URL(
-                cleanedUrl.includes('://') || cleanedUrl.startsWith('/')
-                    ? cleanedUrl
-                    : `https://${cleanedUrl}`,
-                typeof window !== 'undefined' ? window.location.origin : 'https://dromoney.app'
-            );
+    const labeled = raw.match(/invite\s*code\s*[:\-]\s*([A-Za-z0-9]+)/i);
+    if (labeled) return normalizeCode(labeled[1]);
 
-            const refParam =
-                url.searchParams.get('ref') ||
-                url.searchParams.get('referral') ||
-                url.searchParams.get('code');
-            if (refParam) return normalizeCode(refParam);
-
-            // Play Store install referrer: referrer=ref%3DABC123
-            const installReferrer = url.searchParams.get('referrer');
-            if (installReferrer) {
-                const decoded = decodeURIComponent(installReferrer);
-                const match =
-                    decoded.match(/(?:^|[&?])ref=([A-Za-z0-9]+)/i) ||
-                    decoded.match(/^([A-Za-z0-9]{4,12})$/);
-                if (match) return normalizeCode(match[1]);
-            }
-
-            // Legacy broken links: ...&pcampaignid=web_shareHYM1SE
-            const campaign = url.searchParams.get('pcampaignid') || '';
-            const campaignMatch = campaign.match(/web_share([A-Za-z0-9]{4,8})$/i);
-            if (campaignMatch) return normalizeCode(campaignMatch[1]);
-
-            // Only take code from /join/CODE paths — never from /user/auth/register etc.
-            const parts = url.pathname.split('/').filter(Boolean);
-            const joinIdx = parts.findIndex((p) => p.toLowerCase() === 'join');
-            if (joinIdx >= 0 && parts[joinIdx + 1]) return normalizeCode(parts[joinIdx + 1]);
-
-            return '';
-        }
-    } catch {
-        // fall through to string parsing
+    if (raw.includes('://') || raw.startsWith('/') || raw.includes('play.google.com')) {
+        const fromUrl = extractFromUrlString(raw);
+        if (fromUrl) return fromUrl;
+        if (urlInText) return '';
     }
 
     if (/nhgfAFF-/i.test(raw)) {
@@ -68,7 +72,6 @@ export function extractReferralCode(value) {
     if (/AFF-/i.test(raw)) {
         return normalizeCode(raw.split(/AFF-/i).pop());
     }
-    // Pasted path like ".../join/ABC123"
     if (/\/join\//i.test(raw)) {
         return normalizeCode(raw.split(/\/join\//i).pop());
     }

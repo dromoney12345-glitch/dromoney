@@ -45,7 +45,7 @@ const ContestView = () => {
     // Dummy Quiz Questions
     const quizQuestions = [
         { q: "Which company owns the Affiliate Earn program?", a: ["Junkar", "Amazon", "Google", "Flipkart"], correct: 0 },
-        { q: "What is the daily login bonus reward?", a: ["5 Coins", "10 Coins", "1 Coin", "2 Coins"], correct: 2 }
+        { q: "What is added after a friend's KYC?", a: ["Pending Wallet", "Coins", "Crypto", "Gift card"], correct: 0 }
     ];
 
     if (!contest) return <div className="p-8 text-center text-white min-h-screen bg-slate-950">Event not found!</div>;

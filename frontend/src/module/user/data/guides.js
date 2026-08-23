@@ -23,13 +23,13 @@ Login करने के बाद Home Page दिखाई देता ह�
 • 👥 Community Guidelines & Help Desk
 
 👥 3. Invite Friends & Referrals
-अपना पर्सनल रेफरल लिंक दोस्तों के साथ शेयर करें। जब वे KYC पूरा करके विड्रॉल कार्ड बनाते हैं, तो आपके वॉलेट में रेफरल रिवॉर्ड इंसटेंट ऐड हो जाता है।
+अपना पर्सनल रेफरल लिंक दोस्तों के साथ शेयर करें। जब वे KYC पूरा करके Virtual Account बनाते हैं, तो आपके वॉलेट में रेफरल रिवॉर्ड इंसटेंट ऐड हो जाता है।
 
 💼 4. Part-Time Income & Business Guidance
 Dromoney Users को अलग-अलग प्रकार की Opportunities को Explore करने का मौका देता है। आप Daily Tasks, Video Watching, Quizzes, Brand Promotion और Refer & Earn के माध्यम से Rewards Earn कर सकते हैं।
 
 💳 5. Withdrawal & Security
-कमाई हुई राशि को आप अपने Bank Account या UPI में आसानी से विड्रॉ कर सकते हैं। लाइफटाइम विड्रॉल कार्ड अनलॉक करके डायरेक्ट पेआउट्स प्राप्त करें। Withdrawal के लिए KYC Verification और Security Protocol का पालन करना अनिवार्य है।`,
+कमाई हुई राशि को आप अपने Bank Account या UPI में आसानी से विड्रॉ कर सकते हैं। Virtual Account बनाकर डायरेक्ट पेआउट्स प्राप्त करें। Withdrawal के लिए KYC Verification और Security Protocol का पालन करना अनिवार्य है।`,
         points: []
     },
     invite: {
@@ -37,11 +37,11 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
         subtitle: 'Invite & Earn ₹200',
         next: '/user/marketing',
         points: [
-            'Copy or share your Invite link.',
-            'Your friend downloads the app and completes KYC.',
-            'After their KYC, ₹200 appears in your Pending Wallet.',
-            '₹200 moves to Virtual Wallet only after they create a Withdrawal Card and unlock it.',
-            'If the invited user stays inactive for 28 days, the invite and ₹200 can be removed.',
+            'Copy or share your Invite code and invite link.',
+            'Your friend signs up with that Invite code (optional for them) and completes KYC.',
+            'After their KYC is approved, ₹200 is added to your Pending Wallet.',
+            'That ₹200 moves to Virtual Account only when they create a Virtual Account.',
+            'If they stay inactive for 28 days without a Virtual Account, the invite and ₹200 are removed.',
         ],
     },
     fund: {
@@ -52,7 +52,7 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
             'To activate: 10 successful KYC, 50 ads watched, 50 tasks completed.',
             'Watch Advertisement and Complete Tasks stay at the top.',
             'You will see progress and a small earning animation — not coins.',
-            'After the fund is active, a daily share goes to Virtual Wallet if it is unlocked, else Pending.',
+            'After the fund is active, a daily share goes to Virtual Account if it is created, else Pending.',
         ],
     },
     daily: {
@@ -62,7 +62,7 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
         points: [
             'This Daily Work system replaces the old Events option.',
             'Open a task, complete it, and earning is credited to the matching wallet.',
-            'If Virtual Wallet is unlocked, earning goes there. Otherwise it goes to Pending.',
+            'If Virtual Account is created, earning goes there. Otherwise it goes to Pending.',
             'This earning has no 7–28 day hold.',
         ],
     },
@@ -92,7 +92,7 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
         next: '/user/wallet',
         points: [
             'Pending Wallet holds processing amounts.',
-            'Virtual Wallet is withdrawable after the Withdrawal Card is approved.',
+            'Virtual Account is withdrawable after the account is created.',
             'Card details auto-fill: Name, Number, Today, Expiry (6 months).',
             'Pay ₹499 (or ₹550 after inactivity) → admin approval → Virtual unlock.',
         ],
@@ -105,26 +105,26 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
             'Opening Income takes you to KYC first if it is not done.',
             'Enter your 12-digit Aadhaar number and upload the photo.',
             'After admin approval, Income opens for free — no ₹499 access fee.',
-            'A separate Withdrawal Card is needed for withdrawals.',
+            'A separate Virtual Account is needed for withdrawals.',
         ],
     },
     card: {
-        title: 'How to create a Withdrawal Card',
-        subtitle: 'Unlock Virtual Wallet',
-        next: '/user/withdrawal-card',
+        title: 'How to create a Virtual Account',
+        subtitle: 'Unlock withdrawals',
+        next: '/user/virtual-account',
         points: [
             'Name, number and dates are filled automatically.',
             'Tap Next to pay ₹499.',
-            'After admin approval, Virtual Wallet unlocks.',
-            'The card expires every 6 months — renew when it expires.',
+            'After payment and approval, Virtual Account opens.',
+            'The account expires every 6 months — renew when it expires.',
         ],
     },
     withdraw: {
         title: 'How to withdraw',
-        subtitle: 'Redeem from Virtual Wallet',
+        subtitle: 'Redeem from Virtual Account',
         next: '/user/wallet',
         points: [
-            'Withdrawals work only from an unlocked Virtual Wallet.',
+            'Withdrawals work only from an unlocked Virtual Account.',
             'Enter UPI or bank details to redeem.',
             'The ₹399 3-day reserve cannot be withdrawn immediately.',
         ],
@@ -151,11 +151,11 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
     },
 };
 
-/** 8 cards in English: How to do KYC?, How to Invite?, Create Withdrawal Card, etc. */
+/** 8 cards in English: How to do KYC?, How to Invite?, Create Virtual Account, etc. */
 export const HOME_GUIDE_CARDS = [
     { slug: 'kyc', label: 'How to do KYC?', icon: 'ClipboardCheck', iconBg: 'bg-violet-50', iconColor: 'text-violet-600' },
     { slug: 'invite', label: 'How to Invite?', icon: 'UserPlus', iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
-    { slug: 'card', label: 'Create Withdrawal Card', icon: 'CreditCard', iconBg: 'bg-amber-50', iconColor: 'text-amber-600' },
+    { slug: 'card', label: 'Create Virtual Account', icon: 'CreditCard', iconBg: 'bg-amber-50', iconColor: 'text-amber-600' },
     { slug: 'withdraw', label: 'How to Withdraw?', icon: 'Wallet', iconBg: 'bg-sky-50', iconColor: 'text-sky-600' },
     { slug: 'earn500', label: 'Earn ₹500 Daily', icon: 'TrendingUp', iconBg: 'bg-orange-50', iconColor: 'text-orange-600' },
     { slug: 'fund', label: 'Open Future Fund', icon: 'PiggyBank', iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },

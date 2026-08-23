@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MonitorPlay, Plus, Trash2, Clock, Coins, X, Link as LinkIcon, Edit3, Image as ImageIcon, Video, CheckCircle2, Save } from 'lucide-react';
+import { MonitorPlay, Plus, Trash2, Clock, X, Link as LinkIcon, Edit3, Image as ImageIcon, Video, CheckCircle2, Save } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import api from '../../shared/services/api';
 
@@ -157,11 +157,11 @@ const WatchAndEarnAdmin = () => {
             title: adForm.title.trim(),
             thumbnailUrl: adForm.thumbnail,
             videoUrl: adForm.videoUrl,
-            coinsReward: Number(adForm.coins) || 0,
+            coinsReward: 0,
             duration: Number(adForm.duration) || 0
         };
 
-        if (!payload.title || !payload.thumbnailUrl || !payload.videoUrl || !payload.coinsReward || !payload.duration) {
+        if (!payload.title || !payload.thumbnailUrl || !payload.videoUrl || !payload.duration) {
             alert("Please fill all fields correctly");
             return;
         }
@@ -190,8 +190,8 @@ const WatchAndEarnAdmin = () => {
         <div className="p-4 animate-in fade-in duration-500 min-h-screen">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
                 <PageHeader 
-                    title="Watch & Earn Engine" 
-                    subtitle="Manage platform-wide video campaigns and dashboard intro content" 
+                    title="Watch Ads"
+                    subtitle="Manage watch-ad campaigns. Ads do not credit coins or wallet cash."
                 />
                 
                 {/* Custom Tab Switcher */}
@@ -397,9 +397,6 @@ const WatchAndEarnAdmin = () => {
                                             </div>
                                             <h3 className="font-medium text-white text-xl uppercase tracking-tight">{ad.title}</h3>
                                         </div>
-                                        <div className="bg-amber-500 text-white font-medium px-4 py-2 rounded-lg text-[13px] flex items-center gap-1.5 shadow-xl shadow-amber-500/20">
-                                            <Coins size={16} className="fill-white/20" /> +{ad.coins}
-                                        </div>
                                     </div>
                                 </div>
 
@@ -451,7 +448,7 @@ const WatchAndEarnAdmin = () => {
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-medium text-slate-800 uppercase tracking-tight leading-none">{editId ? 'Modify Campaign' : 'Initialize Campaign'}</h3>
-                                    <p className="text-[11px] font-medium text-indigo-500 uppercase tracking-normal mt-2">{editId ? 'Update existing ad task' : 'Set coins and watch duration'}</p>
+                                    <p className="text-[11px] font-medium text-indigo-500 uppercase tracking-normal mt-2">{editId ? 'Update existing ad task' : 'Set title, thumbnail, and watch duration'}</p>
                                 </div>
                             </div>
                             <button onClick={handleCloseModal} className="w-12 h-12 bg-white text-slate-400 hover:text-slate-800 hover:shadow-md rounded-lg transition-all flex items-center justify-center shadow-sm"><X size={30}/></button>
@@ -471,20 +468,6 @@ const WatchAndEarnAdmin = () => {
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Reward (Coins)</label>
-                                    <div className="relative">
-                                        <div className="absolute left-5 top-1/2 -translate-y-1/2 text-amber-500"><Coins size={20}/></div>
-                                        <input 
-                                            required
-                                            type="number"
-                                            placeholder="50"
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 pr-5 pl-14 pl-14-override text-sm font-medium text-slate-800 focus:outline-none focus:border-indigo-500"
-                                            value={adForm.coins || ''}
-                                            onChange={(e) => setAdForm(prev => ({...prev, coins: e.target.value}))}
-                                        />
-                                    </div>
-                                </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Duration (Sec)</label>
                                     <div className="relative">

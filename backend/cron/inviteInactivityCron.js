@@ -35,7 +35,7 @@ const startInviteInactivityCron = () => {
                     user.notifications = user.notifications || [];
                     user.notifications.push({
                         title: 'Pending earnings removed',
-                        message: 'Withdrawal Card was not created within 14 days. Pending earnings were cleared.',
+                        message: 'Virtual Account was not created within 14 days. Pending earnings were cleared.',
                         type: 'warning',
                         isRead: false,
                     });
@@ -48,10 +48,16 @@ const startInviteInactivityCron = () => {
                     user.notifications = user.notifications || [];
                     user.notifications.push({
                         title: 'Account suspended',
-                        message: 'Withdrawal Card was not created within 28 days. This account is permanently suspended.',
+                        message: 'Virtual Account was not created within 28 days. This account is permanently suspended.',
                         type: 'error',
                         isRead: false,
                     });
+                    try {
+                        const { notifyJourney } = require('../utils/userJourneyPush');
+                        await notifyJourney(user._id, 'account_hold', { skipInApp: true });
+                    } catch (pushErr) {
+                        console.error('Account hold push failed:', pushErr.message);
+                    }
                     changed = true;
                 }
 

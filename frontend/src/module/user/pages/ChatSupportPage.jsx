@@ -168,7 +168,6 @@ const ChatSupportPage = () => {
                     isOpen={showRenewalModal}
                     onClose={() => setShowRenewalModal(false)}
                     plan="3 Months Support Extension"
-                    amount={SUPPORT_RENEWAL_AMOUNT}
                     type="SUPPORT_CHAT_RENEWAL"
                     extraData={{
                         planName: '3 Months Support Extension',

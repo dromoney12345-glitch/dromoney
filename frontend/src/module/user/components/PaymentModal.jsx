@@ -24,6 +24,25 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
     const [hasPendingManual, setHasPendingManual] = useState(false);
     const [copied, setCopied] = useState(false);
     const submitLockRef = React.useRef(false);
+    const [quote, setQuote] = useState(null);
+
+    useEffect(() => {
+        if (!isOpen) return undefined;
+        let cancelled = false;
+        const loadQuote = async () => {
+            try {
+                const params = new URLSearchParams({ type: type || 'PLATFORM_UNLOCK' });
+                if (itemId) params.set('ideaId', itemId);
+                if (plan || extraData.planName) params.set('planName', plan || extraData.planName);
+                const res = await api.get(`/user/data/payment-quote?${params.toString()}`);
+                if (!cancelled && res.success) setQuote(res.data);
+            } catch (err) {
+                console.error('Failed to load payment quote', err);
+            }
+        };
+        loadQuote();
+        return () => { cancelled = true; };
+    }, [isOpen, type, itemId, plan, extraData.planName]);
 
     useEffect(() => {
         setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
@@ -86,7 +105,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
             return;
         }
         if (type === 'PLATFORM_UNLOCK' && userData?.isPaid) {
-            setErrorMsg('Platform already unlocked.');
+            setErrorMsg('Virtual Account already created.');
             return;
         }
         if (hasPendingManual) {
@@ -141,7 +160,8 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
         || qrScannerImage.includes('wikipedia')
         || qrScannerImage.includes('wikimedia');
     const qrImageToShow = isPlaceholderQr ? DEFAULT_QR_IMAGE : qrScannerImage;
-    const formattedAmount = Number(amount).toFixed(2);
+    const payableAmount = Number(quote?.payableAmount ?? 0);
+    const formattedAmount = payableAmount.toFixed(2);
     const nativeIntent = `upi://pay?pa=${upiIdToUse}&pn=${encodeURIComponent(DEFAULT_MERCHANT_NAME)}&am=${formattedAmount}&cu=INR`;
 
     const handlePayViaApp = (e) => {
@@ -287,21 +307,21 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
                     {(status === 'idle' || status === 'error') && (
                         <>
                             <div className="bg-white rounded-xl px-4 py-3.5 flex items-center justify-between shadow-[0_2px_10px_rgba(15,23,42,0.04)]">
-                                <p className="text-[14px] font-medium text-slate-900">{plan || 'Withdrawal Card'}</p>
-                                <p className="text-[16px] font-medium text-[#462211]">₹{Math.round(amount)}</p>
+                                <p className="text-[14px] font-medium text-slate-900">{plan || 'Virtual Account'}</p>
+                                <p className="text-[16px] font-medium text-[#462211]">₹{quote ? Number(quote.payableAmount).toFixed(2) : '—'}</p>
                             </div>
 
-                            {(type === 'SUPPORT_BOOSTER' || type === 'TASK_BOOSTER') && (
+                            {quote && Number(quote.feeAmount) > 0 && (
                                 <div className="flex justify-between text-[10px] text-slate-500 px-1">
-                                    <span>Base ₹{Math.round(amount / 1.04)} + 4% fee</span>
-                                    <span className="text-rose-500">+₹{Math.round(amount - (amount / 1.04))}</span>
+                                    <span>Base ₹{Number(quote.baseAmount).toFixed(2)} + {quote.feePercent}% fee</span>
+                                    <span className="text-rose-500">+₹{Number(quote.feeAmount).toFixed(2)}</span>
                                 </div>
                             )}
 
                             {isPlatformAlreadyUnlocked && (
                                 <div className="p-2.5 bg-rose-50 rounded-xl flex items-start gap-2">
                                     <AlertCircle size={14} className="text-rose-500 mt-0.5 shrink-0" />
-                                    <p className="text-[11px] font-medium text-rose-700">You have already unlocked the platform.</p>
+                                    <p className="text-[11px] font-medium text-rose-700">You have already created a Virtual Account.</p>
                                 </div>
                             )}
 

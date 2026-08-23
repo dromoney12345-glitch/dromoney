@@ -67,10 +67,10 @@ exports.getStats = async (req, res, next) => {
             success: true,
             data: {
                 stats: [
-                    { label: 'Active Users', value: activeUsersCount.toLocaleString(), trend: 'Live', color: 'from-sky-500 to-indigo-600' },
-                    { label: 'Total Revenue', value: `₹${totalGrossRevenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: 'Live', color: 'from-emerald-500 to-teal-600' },
-                    { label: 'Wallet Balance', value: `₹${(totalWalletBalance[0]?.total || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: 'Active', color: 'from-amber-400 to-orange-600' },
-                    { label: 'Pending Payouts', value: `₹${(pendingWithdrawals[0]?.total || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: `${pendingWithdrawals[0]?.count || 0} requests`, color: 'from-rose-500 to-pink-600' }
+                    { label: 'Active Users', value: activeUsersCount.toLocaleString(), trend: 'Live', color: 'from-sky-500 to-indigo-600', path: '/admin/users' },
+                    { label: 'Total Revenue', value: `₹${totalGrossRevenue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: 'Live', color: 'from-emerald-500 to-teal-600', path: '/admin/payments' },
+                    { label: 'Wallet Balance', value: `₹${(totalWalletBalance[0]?.total || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: 'Active', color: 'from-amber-400 to-orange-600', path: '/admin/withdrawals' },
+                    { label: 'Pending Payouts', value: `₹${(pendingWithdrawals[0]?.total || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, trend: `${pendingWithdrawals[0]?.count || 0} requests`, color: 'from-rose-500 to-pink-600', path: '/admin/withdrawals' }
                 ],
                 conversionFunnel: [
                     { label: 'Total Visits', value: (activeUsersCount * 3.4).toFixed(0), percent: '100%', color: 'bg-slate-200' },
@@ -85,7 +85,8 @@ exports.getStats = async (req, res, next) => {
                     otherRevenue,
                     totalReferralPayouts,
                     platformSubGross,
-                    totalGrossRevenue
+                    totalGrossRevenue,
+                    revenueTarget: require('../utils/moneyQuotes').quoteRevenueTarget(totalGrossRevenue),
                 }
             }
         });

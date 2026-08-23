@@ -22,7 +22,7 @@ const api = axios.create({
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('dromoney_token');
-        const adminToken = localStorage.getItem('dromoney_admin_token');
+        const adminToken = localStorage.getItem('dromoney_admin_token') || sessionStorage.getItem('dromoney_admin_token');
         // Determine if request is for admin routes
         const isAdminRequest = config.url?.includes('/admin') || window.location.pathname.startsWith('/admin');
         if (isAdminRequest && adminToken) {
@@ -82,6 +82,7 @@ api.interceptors.response.use(
 
             if (isAdminApi || (isAdminPath && !isUserApi)) {
                 localStorage.removeItem('dromoney_admin_token');
+                sessionStorage.removeItem('dromoney_admin_token');
                 if (isAdminPath && !window.location.pathname.includes('/admin/login')) {
                     window.location.href = '/admin/login';
                 }

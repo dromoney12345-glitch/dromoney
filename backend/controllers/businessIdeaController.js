@@ -2,24 +2,29 @@ const BusinessIdea = require('../models/BusinessIdea');
 const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 
+/** Only this idea's paid unlock (or free/non-premium). Support chat / hub plan must NOT open every idea. */
+function isIdeaUnlockedForUser(idea, user) {
+    if (!idea) return false;
+    if (idea.isPremium === false) return true;
+    if (!user) return false;
+    const ideaId = idea._id.toString();
+    return (user.unlockedIdeas || []).some((id) => id && id.toString() === ideaId);
+}
+
 // @desc    Get all business ideas for users
 // @route   GET /api/public/business-ideas
 // @access  Public (Partial) / Private (User)
 exports.getBusinessIdeas = async (req, res, next) => {
     try {
         const ideas = await BusinessIdea.find({ isActive: true }).sort('createdAt');
-        
-        let unlockedIds = [];
-        let isSubscribed = false;
+
+        let user = null;
         if (req.user) {
-            const user = await User.findById(req.user.id);
-            unlockedIds = user.unlockedIdeas ? user.unlockedIdeas.map(id => id.toString()) : [];
-            isSubscribed = user.supportExpiry && new Date(user.supportExpiry).getTime() > new Date().getTime();
+            user = await User.findById(req.user.id).select('unlockedIdeas');
         }
 
         const data = ideas.map(idea => {
-            // Check if user has unlocked this specific idea or is it public or user has active business sub
-            const isUnlocked = !idea.isPremium || unlockedIds.includes(idea._id.toString()) || isSubscribed;
+            const isUnlocked = isIdeaUnlockedForUser(idea, user);
             
             return {
                 _id: idea._id,
@@ -40,9 +45,9 @@ exports.getBusinessIdeas = async (req, res, next) => {
                 isPremium: idea.isPremium,
                 price: idea.price || 199,
                 isLocked: !isUnlocked,
-                howItWorks: idea.howItWorks || '',
-                investmentDetails: idea.investmentDetails || '',
-                profitDetails: idea.profitDetails || ''
+                howItWorks: isUnlocked ? (idea.howItWorks || '') : '',
+                investmentDetails: isUnlocked ? (idea.investmentDetails || '') : '',
+                profitDetails: isUnlocked ? (idea.profitDetails || '') : ''
             };
         });
 
@@ -146,15 +151,11 @@ exports.getBusinessIdeaById = async (req, res, next) => {
             return next(new ErrorResponse('Idea not found', 404));
         }
 
-        let isUnlocked = !idea.isPremium;
+        let user = null;
         if (req.user) {
-            const user = await User.findById(req.user.id);
-            if (user) {
-                const unlockedIds = user.unlockedIdeas ? user.unlockedIdeas.map(id => id.toString()) : [];
-                const isSubscribed = user.supportExpiry && new Date(user.supportExpiry).getTime() > new Date().getTime();
-                isUnlocked = isUnlocked || unlockedIds.includes(idea._id.toString()) || isSubscribed;
-            }
+            user = await User.findById(req.user.id).select('unlockedIdeas');
         }
+        const isUnlocked = isIdeaUnlockedForUser(idea, user);
 
         const data = {
             _id: idea._id,
@@ -175,9 +176,9 @@ exports.getBusinessIdeaById = async (req, res, next) => {
             isPremium: idea.isPremium,
             price: idea.price || 199,
             isLocked: !isUnlocked,
-            howItWorks: idea.howItWorks || '',
-            investmentDetails: idea.investmentDetails || '',
-            profitDetails: idea.profitDetails || ''
+            howItWorks: isUnlocked ? (idea.howItWorks || '') : '',
+            investmentDetails: isUnlocked ? (idea.investmentDetails || '') : '',
+            profitDetails: isUnlocked ? (idea.profitDetails || '') : ''
         };
 
         res.status(200).json({

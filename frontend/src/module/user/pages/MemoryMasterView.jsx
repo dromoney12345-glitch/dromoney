@@ -158,7 +158,7 @@ const MemoryMasterView = () => {
     const handleFinish = async (isWin) => {
         setStep(3);
         if (isWin) {
-            await addCoins(taskReward, 'Memory Master Victory', id);
+            await addCoins(isEvent ? taskReward : 0, 'Memory Master Victory', id);
             taskStorage.markComplete(id);
             addNotification('Memory Master Won!', `You completed the challenge with ${timeLeft}s left!`, 'success');
             
@@ -392,17 +392,14 @@ const MemoryMasterView = () => {
                             <p className="text-2xl font-medium text-amber-400">{timeLeft}s</p>
                         </div>
                         <div className="bg-white/5 p-5 rounded-[2rem] border border-white/10">
-                            <p className="text-[9px] font-medium text-white/40 uppercase mb-1">Prize</p>
-                            <div className="flex items-center justify-center gap-1.5">
-                                <IndianRupee size={14} className="text-amber-400" />
-                                <p className="text-2xl font-medium text-white">
-                                    +{(!isEvent && isTaskBoosterActive) ? taskReward * 12 : taskReward}
-                                </p>
-                            </div>
-                            {!isEvent && isTaskBoosterActive && (
-                                <span className="block text-center mt-1 text-[8px] font-bold text-sky-400 bg-sky-400/10 border border-sky-400/20 px-1 py-0.5 rounded uppercase">
-                                    Boost Applied
-                                </span>
+                            <p className="text-[9px] font-medium text-white/40 uppercase mb-1">{isEvent ? 'Prize' : 'Status'}</p>
+                            {isEvent ? (
+                                <div className="flex items-center justify-center gap-1.5">
+                                    <IndianRupee size={14} className="text-amber-400" />
+                                    <p className="text-2xl font-medium text-white">+{taskReward}</p>
+                                </div>
+                            ) : (
+                                <p className="text-2xl font-medium text-white">Done</p>
                             )}
                         </div>
                     </div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
     Bell, Home as HomeIcon, User, HelpCircle, Building2, Rocket, X, CheckCircle2, 
-    AlertCircle, Info, Sparkles, Headset, TrendingUp, Briefcase, Share2, MoreVertical, Menu, MonitorPlay
+    AlertCircle, Info, Sparkles, Headset, TrendingUp, Briefcase, Share2, MoreVertical, Menu, MonitorPlay, ClipboardList, Gift
 } from 'lucide-react';
 import { useUser } from './context/UserContext';
 import api from '../shared/services/api';
@@ -45,19 +45,23 @@ const UserLayout = () => {
     }, [kycOk]);
 
     useEffect(() => {
-        const handleResize = () => {
-            // If window height shrinks by more than 20% (keyboard opened)
-            if (window.visualViewport) {
-                setIsKeyboardOpen(window.visualViewport.height < window.innerHeight * 0.8);
+        const updateKeyboard = () => {
+            const viewport = window.visualViewport;
+            if (viewport) {
+                const covered = window.innerHeight - viewport.height - viewport.offsetTop;
+                setIsKeyboardOpen(covered > 140);
             } else {
-                setIsKeyboardOpen(window.innerHeight < 500);
+                setIsKeyboardOpen(window.innerHeight < 420);
             }
         };
-        window.visualViewport?.addEventListener('resize', handleResize);
-        window.addEventListener('resize', handleResize);
+        updateKeyboard();
+        window.visualViewport?.addEventListener('resize', updateKeyboard);
+        window.visualViewport?.addEventListener('scroll', updateKeyboard);
+        window.addEventListener('resize', updateKeyboard);
         return () => {
-            window.visualViewport?.removeEventListener('resize', handleResize);
-            window.removeEventListener('resize', handleResize);
+            window.visualViewport?.removeEventListener('resize', updateKeyboard);
+            window.visualViewport?.removeEventListener('scroll', updateKeyboard);
+            window.removeEventListener('resize', updateKeyboard);
         };
     }, []);
 
@@ -105,7 +109,7 @@ const UserLayout = () => {
     };
 
     return (
-        <div className="bg-white text-slate-900 font-poppins overflow-hidden flex flex-col max-w-md mx-auto relative" style={{ height: '100vh', backgroundColor: '#FCF8F5' }}>
+        <div className="user-app-shell bg-white text-slate-900 font-poppins overflow-hidden flex flex-col w-full max-w-[430px] mx-auto relative" style={{ backgroundColor: '#FCF8F5' }}>
             <header className="shrink-0 z-50 bg-white px-3 py-2 flex items-center justify-between min-h-[54px] border-b border-slate-100/80">
                 <div className="flex items-center gap-2.5 active:scale-95 transition-transform cursor-pointer" onClick={() => navigate('/user/home')}>
                     <div
@@ -265,7 +269,9 @@ const UserLayout = () => {
                         <div className="h-px bg-[#EDE4DC] mx-3 mb-1.5"></div>
 
                         {[
-                            { icon: MonitorPlay, label: 'Watch & Earn', path: '/user/watch' },
+                            { icon: MonitorPlay, label: 'Watch Ads', path: '/user/watch' },
+                            { icon: ClipboardList, label: 'Daily Tasks', path: '/user/earn' },
+                            { icon: Gift, label: 'Offers', path: '/user/offerwall' },
                             { icon: User, label: 'Settings', path: '/user/profile' },
                             { icon: HelpCircle, label: 'How It Works', path: '/user/info/how-it-works' },
                             { icon: Sparkles, label: 'Benefits', path: '/user/info/benefits' },
@@ -304,41 +310,38 @@ const UserLayout = () => {
                 </div>
             </div>
 
-            {/* --- Dynamic Content Rendering Area (Pages) --- */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth" style={{ paddingBottom: '68px' }}>
+            {/* Page content */}
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden scroll-smooth">
                 <PullToRefreshWrapper>
                     <Outlet />
                 </PullToRefreshWrapper>
             </div>
 
-            {/* --- Premium White Elevated Bottom Navigation Bar --- FIXED: stays at bottom even when keyboard is open */}
             {!isKeyboardOpen && (
-            <div
-                className="absolute bottom-0 left-0 right-0 z-50 w-full px-3 pb-2"
-                style={{ transform: 'translateZ(0)' }}
+            <nav
+                className="user-bottom-nav shrink-0 z-50 w-full px-2 sm:px-3 pt-1 bg-transparent"
+                style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom, 8px))' }}
             >
-                <div className="relative bg-white rounded-2xl h-[60px] flex items-center px-1.5 shadow-[0_-6px_20px_rgba(15,23,42,0.07)] border border-slate-100">
-                    {navItems.map((item, idx) => {
+                <div className="bg-white rounded-2xl h-14 min-[360px]:h-[58px] flex items-stretch px-1 shadow-[0_-4px_18px_rgba(15,23,42,0.08)] border border-slate-100">
+                    {navItems.map((item) => {
                         const Icon = item.icon;
                         const isActive = item.label === 'Business'
                             ? location.pathname.includes('business')
-                            : location.pathname === item.path;
-                        const isProminent = item.label === 'Income' || item.label === 'Business';
-                        const activeCls = 'text-[#462211] font-bold';
-                        const activeShadow = 'bg-[#FFF5F0] shadow-[0_4px_12px_rgba(70,34,17,0.12)] border border-[#EDE4DC]';
+                            : location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
                         return (
                             <button
-                                key={idx}
+                                key={item.path}
+                                type="button"
                                 onClick={() => navigate(item.path)}
-                                className="flex-1 h-full flex items-center justify-center"
+                                className="flex-1 min-w-0 h-full flex items-center justify-center"
                             >
-                                <div className={`flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-1 px-1.5 rounded-xl transition-all ${isActive ? activeShadow : ''}`}>
+                                <div className={`flex flex-col items-center justify-center gap-0.5 w-full max-w-[72px] py-1 px-0.5 rounded-xl transition-all ${isActive ? 'bg-[#FFF5F0] border border-[#EDE4DC]' : ''}`}>
                                     <Icon
-                                        size={isProminent ? 26 : 18}
-                                        className={isActive ? activeCls : isProminent ? 'text-[#C2520A]' : 'text-slate-400'}
-                                        strokeWidth={isProminent ? 2.3 : isActive ? 2.2 : 2}
+                                        size={20}
+                                        className={isActive ? 'text-[#462211]' : 'text-slate-400'}
+                                        strokeWidth={isActive ? 2.3 : 2}
                                     />
-                                    <span className={`text-[10px] tracking-tight ${isActive ? activeCls : isProminent ? 'text-[#8A4214] font-bold' : 'text-slate-400 font-medium'}`}>
+                                    <span className={`text-[9px] min-[360px]:text-[10px] leading-none truncate w-full text-center ${isActive ? 'text-[#462211] font-semibold' : 'text-slate-400 font-medium'}`}>
                                         {item.label}
                                     </span>
                                 </div>
@@ -346,7 +349,7 @@ const UserLayout = () => {
                         );
                     })}
                 </div>
-            </div>
+            </nav>
             )}
         </div>
     );

@@ -33,8 +33,7 @@ const UnlockModal = ({ isOpen, onClose }) => {
             <PaymentModal 
                 isOpen={true} 
                 onClose={() => setIsPaymentOpen(false)}
-                plan="Platform Registration"
-                amount={499}
+                plan="Virtual Account"
                 onSuccess={handlePaymentSuccess}
             />
         );
@@ -59,10 +58,10 @@ const UnlockModal = ({ isOpen, onClose }) => {
                     </div>
 
                     <h2 className="text-2xl font-medium text-slate-900 mb-2 leading-tight">
-                        Platform <span className="text-sky-500">Locked!</span>
+                        Virtual Account <span className="text-sky-500">Locked</span>
                     </h2>
                     <p className="text-sm font-medium text-slate-400 mb-8 leading-relaxed px-4">
-                        "Unlock platform access today for just ₹499 and start earning big returns from every sale."
+                        Create your Virtual Account for ₹499 to withdraw earnings to UPI or bank.
                     </p>
 
                     <div className="space-y-3 w-full">
@@ -70,7 +69,7 @@ const UnlockModal = ({ isOpen, onClose }) => {
                             onClick={handleUnlockClick}
                             className="w-full bg-sky-600 hover:bg-sky-700 active:scale-95 text-white py-5 rounded-2xl text-xs font-medium shadow-lg shadow-sky-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest"
                         >
-                            Pay ₹499 to Unlock <ChevronRight size={18} />
+                            Create Virtual Account <ChevronRight size={18} />
                         </button>
                         <button 
                             onClick={onClose}
