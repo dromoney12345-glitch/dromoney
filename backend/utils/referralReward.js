@@ -63,7 +63,7 @@ async function creditReferralOnKyc(userDoc) {
                 title: inviteeHasCard ? 'Invite ₹200 credited' : 'Invite ₹200 in Pending',
                 message: inviteeHasCard
                     ? `${user.name} completed KYC and has a Virtual Account. ₹${commission} is in your Virtual Account.`
-                    : `${user.name} completed KYC. ₹${commission} is in your Pending Wallet. It moves to Virtual Account when they create one.`,
+                    : `${user.name} completed KYC. ₹${commission} is in your Pending Wallet. It transfers to Virtual Wallet in min 14 and max 28 days.`,
                 type: 'success',
                 isRead: false,
             });

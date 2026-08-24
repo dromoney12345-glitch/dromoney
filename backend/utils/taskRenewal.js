@@ -47,7 +47,23 @@ function getIstMinutesNow() {
     return istNow.getUTCHours() * 60 + istNow.getUTCMinutes();
 }
 
+/** Inclusive daily window in IST. Supports overnight (e.g. 22:00–06:00). */
+function isWithinIstWindow(startStr, endStr) {
+    if (!startStr || !endStr) return true;
+    const currentMins = getIstMinutesNow();
+    const [sh, sm] = String(startStr).split(':').map(Number);
+    const startMins = (sh || 0) * 60 + (sm || 0);
+    const [eh, em] = String(endStr).split(':').map(Number);
+    const endMins = (eh || 0) * 60 + (em || 0);
+    if (startMins === endMins) return true;
+    if (startMins < endMins) {
+        return currentMins >= startMins && currentMins <= endMins;
+    }
+    return currentMins >= startMins || currentMins <= endMins;
+}
+
 module.exports = {
     getLastRenewalTick,
-    getIstMinutesNow
+    getIstMinutesNow,
+    isWithinIstWindow,
 };

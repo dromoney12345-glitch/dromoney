@@ -386,7 +386,7 @@ const Wallet = () => {
                         </div>
                         <div className="border-t border-[#E8D5C8] mt-3 pt-3">
                             <p className="text-[11px] text-[#7A5648] leading-snug">
-                                This is your pending balance. Amount from invites, tasks, ads or other earnings will be transferred to your Virtual Account after it is created.
+                                This is your pending balance. Amount from invites, tasks, ads or other earnings is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.
                             </p>
                         </div>
                     </div>
@@ -399,9 +399,9 @@ const Wallet = () => {
                         <ul className="space-y-1.5 text-[12px] text-[#462211] leading-snug list-disc pl-4">
                             <li>Pending Wallet stays open for life — you can view it anytime.</li>
                             <li>Invite ₹200 is added to Pending when the invited user completes KYC.</li>
-                            <li>That ₹200 moves to Virtual Account only when they create a Virtual Account.</li>
+                            <li>The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.</li>
                             <li>Virtual Account opens only after you create it. Then you can withdraw.</li>
-                            <li>If they stay inactive for 28 days without a Virtual Account, the invite and ₹200 can be removed.</li>
+                            <li>If they do not create a Virtual Account within 14 days, their pending balance is removed. After 28 days the invite and ₹200 can be removed.</li>
                         </ul>
                     </div>
 

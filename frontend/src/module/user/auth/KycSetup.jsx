@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
+import { isWithinTaskWindow } from '../../shared/utils/taskRenewal';
 
 const ACCENT = '#462211';
 
@@ -29,6 +30,13 @@ const KycSetup = () => {
 
     const kycStatus = (userData?.kycStatus || '').toLowerCase();
     const [settings, setSettings] = useState(null);
+    const [isWithinKycWindow, setIsWithinKycWindow] = useState(true);
+
+    const refreshKycWindow = (data) => {
+        const start = data?.kycWindowStart || '07:00';
+        const end = data?.kycWindowEnd || '19:00';
+        setIsWithinKycWindow(isWithinTaskWindow(start, end));
+    };
 
     React.useEffect(() => {
         const fetchSettings = async () => {
@@ -36,10 +44,18 @@ const KycSetup = () => {
                 const res = await api.get('/public/settings');
                 if (res.success && res.data) {
                     setSettings(res.data);
+                    refreshKycWindow(res.data);
                 }
             } catch (err) {}
         };
         fetchSettings();
+        const timer = setInterval(() => {
+            setSettings((prev) => {
+                if (prev) refreshKycWindow(prev);
+                return prev;
+            });
+        }, 30 * 1000);
+        return () => clearInterval(timer);
     }, []);
 
     const formatTime12h = (time24) => {
@@ -110,6 +126,12 @@ const KycSetup = () => {
         e.preventDefault();
         setError('');
 
+        if (!isWithinKycWindow) {
+            setError(`Note: KYC submissions are only available between ${windowStart} and ${windowEnd} (IST, daily).`);
+            setShowErrorModal(true);
+            return;
+        }
+
         if (aadhaar.length < 12) {
             setError('Note: Aadhaar number must be exactly 12 digits.');
             setShowErrorModal(true);
@@ -148,6 +170,7 @@ const KycSetup = () => {
 
     const windowStart = formatTime12h(settings?.kycWindowStart) || '07:00 AM';
     const windowEnd = formatTime12h(settings?.kycWindowEnd) || '07:00 PM';
+    const canSubmitKyc = isWithinKycWindow && !loading;
 
     return (
         <div className="min-h-screen bg-[#FCF8F5] text-slate-900 font-poppins flex flex-col">
@@ -254,19 +277,24 @@ const KycSetup = () => {
 
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={!canSubmitKyc}
                         className="w-full disabled:opacity-50 text-white font-bold uppercase text-[13px] tracking-wide py-3.5 rounded-xl active:scale-[0.99] flex items-center justify-center gap-2 mt-1 shadow-[0_8px_18px_rgba(70,34,17,0.28)]"
                         style={{ backgroundColor: ACCENT }}
                     >
-                        {loading ? <Loader2 size={18} className="animate-spin" /> : 'SUBMIT KYC'}
+                        {loading ? <Loader2 size={18} className="animate-spin" /> : (isWithinKycWindow ? 'SUBMIT KYC' : 'KYC CLOSED NOW')}
                     </button>
 
                     <p className="flex items-center justify-center gap-1.5 text-[12px] text-slate-500 -mt-1">
                         <Clock size={13} className="text-slate-400" />
                         KYC Timing:{' '}
                         <span className="font-bold" style={{ color: ACCENT }}>{windowStart} – {windowEnd}</span>
-                        <span>(Daily)</span>
+                        <span>(Daily, IST)</span>
                     </p>
+                    {!isWithinKycWindow && (
+                        <p className="text-center text-[11px] font-medium text-[#B3591C] -mt-1">
+                            Submissions are closed right now. Come back during KYC hours.
+                        </p>
+                    )}
                 </form>
 
                 <div className="mt-5 rounded-2xl bg-[#FDF4EC] px-4 py-3.5">

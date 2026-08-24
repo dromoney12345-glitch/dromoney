@@ -104,7 +104,7 @@ const Income = () => {
                     iconColor="text-[#462211]"
                     arrowBg="bg-[#FFF5F0]"
                     title={reward != null ? `Invite & Earn ₹${reward}` : 'Invite & Earn'}
-                    subtitle={reward != null ? `₹${reward} goes to Pending after their KYC, then Virtual Account when they create one.` : 'Reward is credited after KYC, then to Virtual Account when they create one.'}
+                    subtitle={reward != null ? `₹${reward} goes to Pending after KYC, then to Virtual Wallet in min 14 and max 28 days.` : 'Reward is credited after KYC, then to Virtual Wallet in min 14 and max 28 days.'}
                     onClick={() => navigate('/user/guide/invite')}
                 />
                 <OptionCard

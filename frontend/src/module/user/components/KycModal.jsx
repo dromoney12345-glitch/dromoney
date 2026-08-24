@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { X, ShieldCheck, CheckCircle2, FileText, Clock, AlertCircle, Camera, Upload, Loader2 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import api from '../../shared/services/api';
+import { isWithinTaskWindow } from '../../shared/utils/taskRenewal';
 const KycModal = ({ isOpen, onClose }) => {
     const { userData, addNotification, refreshUserProfile } = useUser();
     const [submitting, setSubmitting] = useState(false);
@@ -21,25 +22,12 @@ const KycModal = ({ isOpen, onClose }) => {
                 const res = await api.get('/public/settings');
                 if (res.success && res.data) {
                     setSettings(res.data);
-                    checkKycWindow(res.data.kycWindowStart, res.data.kycWindowEnd);
+                    setIsWithinKycWindow(isWithinTaskWindow(res.data.kycWindowStart, res.data.kycWindowEnd));
                 }
             } catch (err) {}
         };
         fetchSettings();
     }, [isOpen]);
-
-    const checkKycWindow = (startStr, endStr) => {
-        if (!startStr || !endStr) return;
-        const now = new Date();
-        const currentMins = now.getHours() * 60 + now.getMinutes();
-        const [sh, sm] = startStr.split(':').map(Number);
-        const startMins = (sh || 0) * 60 + (sm || 0);
-        const [eh, em] = endStr.split(':').map(Number);
-        const endMins = (eh || 0) * 60 + (em || 0);
-        if (startMins < endMins) {
-            setIsWithinKycWindow(currentMins >= startMins && currentMins <= endMins);
-        }
-    };
 
     const formatTime = (timeStr) => {
         if (!timeStr) return '';
@@ -179,7 +167,7 @@ const KycModal = ({ isOpen, onClose }) => {
                             </div>
                             <h3 className="text-[15px] font-medium text-slate-800 tracking-tight">KYC Submissions Closed</h3>
                             <p className="text-[12px] font-medium text-slate-500 leading-relaxed">
-                                KYC submissions are only accepted between <span className="text-emerald-600 font-semibold">{formatTime(settings?.kycWindowStart)}</span> and <span className="text-emerald-600 font-semibold">{formatTime(settings?.kycWindowEnd)}</span>.
+                                KYC submissions are only accepted between <span className="text-emerald-600 font-semibold">{formatTime(settings?.kycWindowStart)}</span> and <span className="text-emerald-600 font-semibold">{formatTime(settings?.kycWindowEnd)}</span> (IST, daily).
                             </p>
                         </div>
                     ) : status === 'not started' || status === 'rejected' ? (

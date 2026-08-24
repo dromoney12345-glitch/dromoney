@@ -51,32 +51,22 @@ exports.updateKyc = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('User not found', 404));
     }
 
-    // Check Admin KYC Timing Window
+    // Check Admin KYC Timing Window (IST)
     const Settings = require('../models/Settings');
+    const { isWithinIstWindow } = require('../utils/taskRenewal');
     const settings = await Settings.findOne();
-    if (settings && settings.kycWindowStart && settings.kycWindowEnd) {
-        const now = new Date();
-        const options = { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' };
-        const timeString = now.toLocaleTimeString('en-GB', options);
-        const [h, m] = timeString.split(':').map(Number);
-        const currentTotalMins = h * 60 + m;
-        const [startH, startM] = settings.kycWindowStart.split(':').map(Number);
-        const startTotalMins = (startH || 0) * 60 + (startM || 0);
-        const [endH, endM] = settings.kycWindowEnd.split(':').map(Number);
-        const endTotalMins = (endH || 0) * 60 + (endM || 0);
-        if (startTotalMins < endTotalMins) {
-            if (currentTotalMins < startTotalMins || currentTotalMins > endTotalMins) {
-                const formatTime = (t) => {
-                    const [h, m] = t.split(':');
-                    let hrs = parseInt(h, 10);
-                    const ampm = hrs >= 12 ? 'pm' : 'am';
-                    hrs = hrs % 12 || 12;
-                    const mins = parseInt(m, 10);
-                    return mins > 0 ? `${hrs}:${m}${ampm}` : `${hrs}${ampm}`;
-                };
-                return next(new ErrorResponse(`KYC submissions are only available between ${formatTime(settings.kycWindowStart)} and ${formatTime(settings.kycWindowEnd)}`, 400));
-            }
-        }
+    const kycStart = settings?.kycWindowStart || '07:00';
+    const kycEnd = settings?.kycWindowEnd || '19:00';
+    if (!isWithinIstWindow(kycStart, kycEnd)) {
+        const formatTime = (t) => {
+            const [h, m] = t.split(':');
+            let hrs = parseInt(h, 10);
+            const ampm = hrs >= 12 ? 'pm' : 'am';
+            hrs = hrs % 12 || 12;
+            const mins = parseInt(m, 10);
+            return mins > 0 ? `${hrs}:${m}${ampm}` : `${hrs}${ampm}`;
+        };
+        return next(new ErrorResponse(`KYC submissions are only available between ${formatTime(kycStart)} and ${formatTime(kycEnd)}`, 400));
     }
 
     // Prevent resubmission if already Approved/Verified

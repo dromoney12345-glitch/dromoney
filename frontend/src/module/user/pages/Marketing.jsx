@@ -199,7 +199,7 @@ const Marketing = () => {
                 <div className="bg-[#FFF5F0] border border-[#EDE4DC] rounded-2xl p-3.5">
                     <h5 className="text-[11px] font-semibold text-[#462211] uppercase tracking-wider mb-1">How it works</h5>
                     <p className="text-[10px] font-medium text-[#7A5648] leading-relaxed">
-                        Share your invite link. After your friend completes KYC, ₹{rewardAmount} goes to your Pending Wallet. It moves to Virtual Account when they create one.
+                        Share your invite link. After your friend completes KYC, ₹{rewardAmount} goes to your Pending Wallet. The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.
                     </p>
                 </div>
 

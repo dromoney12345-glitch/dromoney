@@ -79,7 +79,7 @@ Copy your personal referral link from the Marketing section and share it via Wha
 Your invited friend downloads the app and completes their Aadhaar verification.
 
 💰 3. Instant ₹200 Reward
-After KYC verification, ₹200 appears in your Pending Wallet. It transfers to your Virtual Wallet once they unlock their withdrawal card.`
+After KYC verification, ₹200 appears in your Pending Wallet. The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.`
         }
     },
     {

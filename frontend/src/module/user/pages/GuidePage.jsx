@@ -16,6 +16,23 @@ const ICON_MAP = {
     CheckCircle2, HelpCircle, Flame, Gift, Compass
 };
 
+const rewriteInviteCopy = (text) => {
+    if (typeof text !== 'string' || !text) return text;
+    return text
+        .replace(
+            /It transfers to your Virtual Wallet once they unlock their withdrawal card\.?/gi,
+            'The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.'
+        )
+        .replace(
+            /It moves to Virtual Account when they create one\.?/gi,
+            'The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.'
+        )
+        .replace(
+            /That ₹200 moves to Virtual Account only when they create a Virtual Account\.?/gi,
+            'The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.'
+        );
+};
+
 const GuidePage = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
@@ -42,7 +59,7 @@ const GuidePage = () => {
                             subtitle: d.subtitle || d.description || fallbackGuide?.subtitle || '',
                             badge: d.badge || fallbackGuide?.badge || 'YOUR GROWTH OUR GUIDANCE',
                             logoUrl: d.logoUrl || fallbackGuide?.logoUrl || '',
-                            content: d.content || d.fullContent || (Array.isArray(rawPoints) && typeof rawPoints[0] === 'string' ? rawPoints.join('\n\n') : ''),
+                            content: rewriteInviteCopy(d.content || d.fullContent || (Array.isArray(rawPoints) && typeof rawPoints[0] === 'string' ? rawPoints.join('\n\n') : '')),
                             next: d.nextRoute || d.next || fallbackGuide?.next || '/user/earn',
                             ctaText: d.ctaText || fallbackGuide?.ctaText || 'Start Earning Now',
                             points: rawPoints
