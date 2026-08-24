@@ -4,6 +4,7 @@ import { ChevronLeft, Trophy, Sparkles, IndianRupee, Star, Gift, ArrowRight } fr
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
+import FundRewardNotice from '../components/FundRewardNotice';
 
 const DEFAULT_PRIZES = [
     { label: '₹10', coins: 10, cash: 0, bg: 'bg-indigo-500/10 text-indigo-400', color: 'text-indigo-400' },
@@ -304,9 +305,13 @@ const LuckyDrawView = () => {
                 </div>
 
                 <div className="bg-white/10 backdrop-blur p-5 rounded-3xl border border-white/20 text-center w-full max-w-xs">
+                    {taskReward !== null ? (
+                        <FundRewardNotice variant="dark" />
+                    ) : (
                     <p className="text-[10px] font-medium uppercase tracking-widest text-white/60">
                         🎉 Your result has been saved. Cash prizes will be credited within 24 hours.
                     </p>
+                    )}
                 </div>
             </div>
 

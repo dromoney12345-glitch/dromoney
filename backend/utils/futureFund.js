@@ -102,7 +102,17 @@ async function syncFutureFundCriteria(user, settings = {}) {
 
     const kycCurrent = await countSuccessfulKyc(user._id);
     const adsCurrent = Number(user.lifetimeAdsWatched) || 0;
-    const tasksCurrent = Number(user.lifetimeTasksCompleted) || 0;
+    let tasksCurrent = Number(user.lifetimeTasksCompleted) || 0;
+    if (!tasksCurrent) {
+        const inferred =
+            (Array.isArray(user.completedTasks) ? user.completedTasks.length : 0) +
+            (Array.isArray(user.dailyTaskCompletions) ? user.dailyTaskCompletions.length : 0);
+        if (inferred > 0) {
+            user.lifetimeTasksCompleted = inferred;
+            tasksCurrent = inferred;
+            modified = true;
+        }
+    }
 
     const criteria = [
         {
@@ -143,12 +153,13 @@ async function syncFutureFundCriteria(user, settings = {}) {
     const eligible = criteria.every((c) => c.completed);
 
     const prevProgress = user.futureFund.progress;
-    user.futureFund.criteria = criteria.map(({ id, title, target, current, completed }) => ({
+    user.futureFund.criteria = criteria.map(({ id, title, target, current, completed, unit }) => ({
         id,
         title,
         target,
         current,
         completed,
+        unit,
     }));
     user.futureFund.progress = progress;
     if (prevProgress !== progress) modified = true;

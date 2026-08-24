@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
 import { ChevronLeft, Zap, Trophy, Timer, MousePointer2 } from 'lucide-react';
+import FundRewardNotice from '../components/FundRewardNotice';
 
 const SpeedTapperView = () => {
     const { id } = useParams();
@@ -153,12 +154,15 @@ const SpeedTapperView = () => {
                 </div>
 
                 {status === 'won' && (
+                    <>
+                        <FundRewardNotice className="w-full max-w-sm" />
                     <button
                         onClick={() => navigate('/user/earn')}
                         className="w-full max-w-sm bg-slate-900 text-white py-5 rounded-[2rem] font-medium uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all text-xs"
                     >
                         Collect Reward
                     </button>
+                    </>
                 )}
             </div>
             <div className="h-10" />

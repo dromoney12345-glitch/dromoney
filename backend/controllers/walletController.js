@@ -233,18 +233,19 @@ exports.addEarning = asyncHandler(async (req, res, next) => {
         });
     }
 
-    // Track completed tasks
-    if (taskId) {
-        if ((task && task.isDaily) || !task) {
-            if (!user.dailyTaskCompletions) {
-                user.dailyTaskCompletions = [];
-            }
-            user.dailyTaskCompletions.push({
-                taskId: taskId,
-                completedAt: new Date()
-            });
-            user.lifetimeTasksCompleted = (user.lifetimeTasksCompleted || 0) + 1;
-        } else {
+    // Real in-app tasks count toward Future Fund. Events do not.
+    const countsTowardFund = Boolean(task) || (Boolean(taskId) && !isEventReward && !looksLikeEventPrize);
+    if (countsTowardFund) {
+        if (!user.dailyTaskCompletions) {
+            user.dailyTaskCompletions = [];
+        }
+        user.dailyTaskCompletions.push({
+            taskId: taskId,
+            completedAt: new Date()
+        });
+        user.lifetimeTasksCompleted = (user.lifetimeTasksCompleted || 0) + 1;
+
+        if (task && !task.isDaily) {
             if (!user.completedTasks) {
                 user.completedTasks = [];
             }
@@ -252,6 +253,14 @@ exports.addEarning = asyncHandler(async (req, res, next) => {
                 user.completedTasks.push(taskId);
             }
         }
+    }
+
+    try {
+        const { syncFutureFundCriteria } = require('../utils/futureFund');
+        const ffSettings = (await Settings.findOne()) || {};
+        await syncFutureFundCriteria(user, ffSettings);
+    } catch (ffErr) {
+        console.error('Future Fund sync after task failed:', ffErr.message);
     }
 
     await user.save();
@@ -265,7 +274,9 @@ exports.addEarning = asyncHandler(async (req, res, next) => {
             newPendingBalance: user.wallet.pendingBalance,
             newVirtualBalance: user.wallet.virtualBalance,
             completedTasks: user.completedTasks,
-            dailyTaskCompletions: user.dailyTaskCompletions
+            dailyTaskCompletions: user.dailyTaskCompletions,
+            lifetimeTasksCompleted: user.lifetimeTasksCompleted || 0,
+            futureFund: user.futureFund,
         }
     });
 });

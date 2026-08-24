@@ -37,8 +37,8 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
         subtitle: 'Invite & Earn ₹200',
         next: '/user/marketing',
         points: [
-            'Copy or share your Invite code and invite link.',
-            'Your friend signs up with that Invite code (optional for them) and completes KYC.',
+            'Copy or share your invite link.',
+            'Your friend pastes that link (or opens it) — the invite code is already inside the link — then completes KYC.',
             'After their KYC is approved, ₹200 is added to your Pending Wallet.',
             'That ₹200 moves to Virtual Account only when they create a Virtual Account.',
             'If they stay inactive for 28 days without a Virtual Account, the invite and ₹200 are removed.',

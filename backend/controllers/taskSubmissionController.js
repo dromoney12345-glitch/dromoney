@@ -131,6 +131,14 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
     });
     user.lifetimeTasksCompleted = (user.lifetimeTasksCompleted || 0) + 1;
 
+    try {
+        const { syncFutureFundCriteria } = require('../utils/futureFund');
+        const ffSettings = (await Settings.findOne()) || {};
+        await syncFutureFundCriteria(user, ffSettings);
+    } catch (ffErr) {
+        console.error('Future Fund sync after task approval failed:', ffErr.message);
+    }
+
     await user.save();
 
     // Check for High Value Milestones & Notify Admins

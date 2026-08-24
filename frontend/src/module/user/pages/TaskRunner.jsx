@@ -4,6 +4,7 @@ import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
 import { ChevronLeft, CheckCircle2, Play, UploadCloud, Link as LinkIcon, Loader2, Image as ImageIcon, Camera, XCircle, MessageCircle, Send, Copy, Share2 } from 'lucide-react';
+import FundRewardNotice, { FUND_TASK_COMPLETE_MSG } from '../components/FundRewardNotice';
 
 const Facebook = ({ size, className }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -22,7 +23,7 @@ const Instagram = ({ size, className }) => (
 const TaskRunner = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addCoins, userData } = useUser();
+    const { addCoins, userData, refreshUserProfile } = useUser();
     
     // Safety check incase user not unlocking bypassed
     useEffect(() => {
@@ -202,7 +203,9 @@ const TaskRunner = () => {
                     if (submissionRes.success) {
                         // Success state
                         taskStorage.markComplete(task._id || task.id);
-                        setTimeout(() => navigate('/user/earn'), 2500);
+                        await refreshUserProfile?.(false);
+                        showToast(FUND_TASK_COMPLETE_MSG, 'success');
+                        setTimeout(() => navigate('/user/earn'), 4000);
                     }
                 }
             } catch (err) {
@@ -223,8 +226,9 @@ const TaskRunner = () => {
             return;
         }
         taskStorage.markComplete(taskId);
-        setToast({ message: 'Task completed!', type: 'success' });
-        setTimeout(() => { setToast(null); navigate('/user/earn'); }, 1500);
+        setToast({ message: FUND_TASK_COMPLETE_MSG, type: 'success' });
+        await refreshUserProfile?.(false);
+        setTimeout(() => { setToast(null); navigate('/user/earn'); }, 4000);
     };
 
     return (
@@ -234,7 +238,7 @@ const TaskRunner = () => {
                     toast.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-rose-50 border-rose-100 text-rose-800'
                 }`}>
                     {toast.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> : <XCircle className="w-4 h-4 text-rose-600 shrink-0" />}
-                    <span className="text-[11px]">{toast.message}</span>
+                    <span className="text-[11px] leading-snug">{toast.message}</span>
                 </div>
             )}
 
@@ -289,7 +293,8 @@ const TaskRunner = () => {
                                         <CheckCircle2 size={40} className="text-emerald-400" />
                                     </div>
                                     <h3 className="text-xl font-medium text-white uppercase tracking-tight mb-2">Task Successfully Completed!</h3>
-                                    <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-8">You can now complete this task</p>
+                                    <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-4">You can now complete this task</p>
+                                    <FundRewardNotice variant="dark" className="mb-8 w-full" />
                                     
                                     <button 
                                         onClick={submitTask}
@@ -301,9 +306,10 @@ const TaskRunner = () => {
                             )}
                             
                             {status === 'completed' && (
-                                <div className="flex flex-col items-center justify-center animate-in zoom-in duration-500">
-                                    <Loader2 size={40} className="text-sky-500 animate-spin mb-4" />
-                                    <h3 className="text-sm font-medium text-white uppercase tracking-widest">Processing Reward...</h3>
+                                <div className="flex flex-col items-center justify-center animate-in zoom-in duration-500 gap-3 px-2">
+                                    <CheckCircle2 size={40} className="text-emerald-400" />
+                                    <h3 className="text-sm font-medium text-white uppercase tracking-widest">Task Completed</h3>
+                                    <FundRewardNotice variant="dark" className="w-full" />
                                 </div>
                             )}
                         </div>
@@ -410,6 +416,9 @@ const TaskRunner = () => {
                                     onChange={(e) => { if(e.target.files[0]) setScreenshotFile(e.target.files[0]); }} 
                                 />
                            </div>
+                       )}
+                       {status === 'completed' && (
+                           <FundRewardNotice variant="dark" />
                        )}
                     </div>
                     );

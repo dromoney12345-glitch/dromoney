@@ -92,7 +92,7 @@ app.use('/api/payment', payment);
 // Error handler (Must be after routers)
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001; // Dromoney local API (avoid 5000 clash with other apps)
 
 // Create HTTP server
 const http = require('http');
@@ -135,6 +135,29 @@ if (process.env.NODE_ENV !== 'test') {
 
     server.listen(PORT, () => {
         console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+
+        // Old Vite tabs still call :5000 — bind it when free so login does not get ERR_CONNECTION_REFUSED.
+        if (Number(PORT) !== 5000) {
+            const alias = http.createServer(app);
+            alias.on('error', (err) => {
+                if (err.code === 'EADDRINUSE') {
+                    console.warn(`Port 5000 is in use by another app. Use http://localhost:${PORT}/api`);
+                } else {
+                    console.error(err);
+                }
+            });
+            alias.listen(5000, () => {
+                console.log('Also listening on port 5000 for local frontends still using :5000');
+            });
+        }
+    });
+
+    server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.error(`Port ${PORT} is already in use. Stop the other app on this port (or set PORT in backend/.env) and retry.`);
+        } else {
+            console.error(err);
+        }
     });
 }
 

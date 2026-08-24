@@ -4,6 +4,7 @@ import { ChevronLeft, CheckCircle2, XCircle, Timer, Trophy, ArrowRight, Sparkles
 import { useUser } from '../context/UserContext';
 import { eventStorage } from '../../shared/services/eventStorage';
 import { taskStorage } from '../../shared/services/taskStorage';
+import FundRewardNotice from '../components/FundRewardNotice';
 
 const TaskQuizView = () => {
     const { id } = useParams();
@@ -225,7 +226,7 @@ const TaskQuizView = () => {
                         </div>
                         
                         <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 w-full max-w-xs space-y-4">
-                            <p className="text-[13px] font-medium text-slate-700">Quiz completed</p>
+                            <FundRewardNotice />
                         </div>
                     </>
                 ) : (

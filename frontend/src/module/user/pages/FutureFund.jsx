@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import api from '../../shared/services/api';
+import FundRewardNotice from '../components/FundRewardNotice';
 
 const formatMoney = (value) =>
     Number(value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -142,7 +143,7 @@ const FutureFund = () => {
         loadStatus();
         const t = setInterval(loadStatus, 60 * 1000);
         return () => clearInterval(t);
-    }, [loadStatus]);
+    }, [loadStatus, userData.lifetimeTasksCompleted, userData.lifetimeAdsWatched]);
 
     const completedTasksCount = useMemo(() => {
         const since = new Date();
@@ -175,8 +176,14 @@ const FutureFund = () => {
     const adsTarget = Number(adsCriterion?.target || ffStatus?.targets?.adsTarget || settings.futureFundWatchAdTarget || 50);
     const tasksTarget = Number(tasksCriterion?.target || ffStatus?.targets?.tasksTarget || settings.futureFundDailyTasksTarget || 50);
     const kycCurrent = Number(kycCriterion?.current ?? 0);
-    const adsCurrent = Number(adsCriterion?.current ?? userData.lifetimeAdsWatched ?? 0);
-    const tasksCurrent = Number(tasksCriterion?.current ?? userData.lifetimeTasksCompleted ?? 0);
+    const adsCurrent = Math.max(
+        Number(adsCriterion?.current ?? 0),
+        Number(userData.lifetimeAdsWatched ?? 0)
+    );
+    const tasksCurrent = Math.max(
+        Number(tasksCriterion?.current ?? 0),
+        Number(userData.lifetimeTasksCompleted ?? 0)
+    );
     const isEligible = !!ffStatus?.eligible;
     const criterionPct = (current, target) =>
         Math.round(Math.min(100, (Number(current) / Math.max(Number(target) || 1, 1)) * 100));
@@ -251,6 +258,8 @@ const FutureFund = () => {
                     </div>
 
                     <ActionCards navigate={navigate} />
+
+                    <FundRewardNotice />
 
                     <SectionDivider title="Grow Your Fund" />
 
@@ -358,6 +367,8 @@ const FutureFund = () => {
 
             <div className="px-3 space-y-3 max-w-md mx-auto w-full">
                 <ActionCards navigate={navigate} />
+
+                <FundRewardNotice />
 
                 <div className="bg-white border border-[#EDE4DC] rounded-2xl p-3.5">
                     <SectionDivider title="Future Fund Activation Criteria" />

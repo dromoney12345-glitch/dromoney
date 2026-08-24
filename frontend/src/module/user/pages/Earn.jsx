@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import UnlockModal from '../components/UnlockModal';
 import PaymentModal from '../components/PaymentModal';
+import FundRewardNotice from '../components/FundRewardNotice';
 
 const ICON_MAP = {
     Monitor: { el: Monitor, bg: 'bg-[#FFF5F0]', color: 'text-[#B3591C]' },
@@ -180,6 +181,11 @@ const Earn = () => {
                         </span>
                     </div>
                     <p className="text-[10px] text-[#7A5648] mt-1">Complete tasks here. Ads on Watch Ads do not add coins or wallet balance.</p>
+                </div>
+
+                <div className="mx-3 mt-3">
+                    <FundRewardNotice />
+                </div>
                 </div>
 
                 {/* Operating Hours */}

@@ -148,6 +148,8 @@ export function buildPlayStoreReferralLink(code, baseUrlFromSettings = '') {
 
     if (cleanCode) {
         url.searchParams.set('referrer', `ref=${cleanCode}`);
+        // Visible in the copied URL so signup can parse it from a pasted link
+        url.searchParams.set('ref', cleanCode);
         if (!url.searchParams.get('pcampaignid')) {
             url.searchParams.set('pcampaignid', 'web_share');
         }

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
 import { ChevronLeft, Sparkles, Trophy, Quote, CheckCircle2, Star } from 'lucide-react';
+import FundRewardNotice from '../components/FundRewardNotice';
 
 const QUOTES = [
     "Consistency is the key to big earnings!",
@@ -207,6 +208,7 @@ const ScratchCardView = () => {
                                 <Trophy size={32} className="text-emerald-500" />
                             </div>
                             <h3 className="text-lg font-medium text-slate-800 uppercase tracking-tight relative z-10">All Cards Done!</h3>
+                            <FundRewardNotice className="mt-4 relative z-10" />
                             <button
                                 onClick={() => navigate('/user/earn')}
                                 className="mt-6 w-full bg-blue-600 text-white font-medium text-[12px] uppercase tracking-[0.3em] py-5 rounded-2xl shadow-xl shadow-blue-500/20 active:scale-95 transition-all relative z-10"

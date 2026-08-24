@@ -125,7 +125,7 @@ const Income = () => {
                     subtitle="See how daily work and company tasks run."
                     onClick={() => navigate('/user/guide/daily')}
                 />
-                {offerwallEnabled ? (
+                {offerwallEnabled && (
                     <OptionCard
                         icon={Gift}
                         iconBg="bg-[#FFF5F0]"
@@ -134,16 +134,6 @@ const Income = () => {
                         title="Offers & Surveys"
                         subtitle="Complete partner offers. Reward is added after confirmation."
                         onClick={() => navigate('/user/offerwall')}
-                    />
-                ) : (
-                    <OptionCard
-                        icon={ClipboardList}
-                        iconBg="bg-[#FFF5F0]"
-                        iconColor="text-[#462211]"
-                        arrowBg="bg-[#FFF5F0]"
-                        title="Daily Tasks"
-                        subtitle="Complete in-app tasks. Watch ads stay separate and do not credit wallet."
-                        onClick={() => navigate('/user/earn')}
                     />
                 )}
 

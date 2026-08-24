@@ -460,18 +460,18 @@ const LayoutManager = () => {
             {/* TAB: FOOTER & POLICIES */}
             {activeTab === 'footer' && (
                 <div className="space-y-6 pb-24 animate-in slide-in-from-bottom-4 duration-500">
-                    {footerPolicies.map((item, idx) => (
+                        {footerPolicies.map((item, idx) => (
                         <div key={item.id} className="bg-white rounded-lg border border-[#EDE4DC] shadow-sm overflow-hidden">
                             <div className="p-5 border-b border-[#EDE4DC] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                                <div className="flex items-center gap-4">
+                                        <div className="flex items-center gap-4">
                                     <div className={`p-3 rounded-lg bg-[#FFF5F0] ${item.color}`}><item.icon size={24} /></div>
-                                    <div>
+                                            <div>
                                         <h3 className="text-lg font-medium text-[#462211] uppercase tracking-tight">{item.label}</h3>
                                         <p className="text-[10px] text-[#7A5648] font-medium uppercase tracking-normal mt-0.5">Manage sections and content</p>
-                                    </div>
-                                </div>
-                                <button 
-                                    onClick={() => handleUpdatePolicy(item)}
+                                            </div>
+                                        </div>
+                                        <button 
+                                            onClick={() => handleUpdatePolicy(item)}
                                     className="flex items-center gap-3 bg-[#462211] text-white px-6 py-3 rounded-lg font-medium text-[11px] uppercase tracking-normal shadow-xl hover:bg-[#5a2d1a] transition-all"
                                 >
                                     <Save size={16} /> Save Policy
@@ -537,10 +537,10 @@ const LayoutManager = () => {
                                             </div>
                                         ))}
                                     </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                 </div>
             )}
         </div>

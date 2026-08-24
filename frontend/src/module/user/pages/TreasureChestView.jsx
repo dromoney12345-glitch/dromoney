@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
 import { ChevronLeft, Gift, Sparkles, Trophy, Star } from 'lucide-react';
+import FundRewardNotice from '../components/FundRewardNotice';
 
 const TreasureChestView = () => {
     const { id } = useParams();
@@ -110,6 +111,7 @@ const TreasureChestView = () => {
                            <Trophy size={40} className="mx-auto mb-3 text-amber-400 animate-bounce" />
                            <h3 className="text-xl font-medium text-white">Chest Opened!</h3>
                            <p className="text-[11px] font-medium text-white/40 uppercase mt-1">Excellent choice, traveler!</p>
+                           <FundRewardNotice variant="dark" className="mt-4" />
                         </div>
                         
                         <button

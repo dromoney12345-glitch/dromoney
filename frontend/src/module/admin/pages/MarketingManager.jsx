@@ -362,15 +362,15 @@ const MarketingManager = () => {
                     {[
                         { id: 'banners', label: 'Home Banners', icon: Layout },
                         { id: 'explore_guide', label: 'User Guides', icon: Compass },
-                    ].map(tab => (
-                        <button
-                            key={tab.id}
-                            onClick={() => handleTabChange(tab.id)}
+                ].map(tab => (
+                    <button
+                        key={tab.id}
+                        onClick={() => handleTabChange(tab.id)}
                             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-md font-medium text-[11.5px] transition-all ${activeTab === tab.id ? 'bg-white text-slate-900 shadow-xs font-semibold' : 'text-slate-500 hover:text-slate-800'}`}
-                        >
+                    >
                             <tab.icon size={13} /> {tab.label}
-                        </button>
-                    ))}
+                    </button>
+                ))}
                 </div>
             </div>
 
@@ -929,8 +929,8 @@ const MarketingManager = () => {
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Line 2 (orange heading)</label>
-                                                <input value={banner.title} onChange={(e) => {
-                                                    const newB = [...banners]; newB[idx].title = e.target.value; setBanners(newB);
+                                            <input value={banner.title} onChange={(e) => {
+                                                const newB = [...banners]; newB[idx].title = e.target.value; setBanners(newB);
                                                 }} placeholder="e.g. Our Guidance" className="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-3.5 text-[14px] font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
                                             </div>
                                         </div>
@@ -1014,7 +1014,7 @@ const MarketingManager = () => {
                                             </div>
                                             <div className="space-y-2">
                                                 <div className="flex items-center justify-between">
-                                                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Action Link (Path)</label>
+                                                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-normal ml-1">Action Link (Path)</label>
                                                     <button
                                                         type="button"
                                                         onClick={() => {
@@ -1064,16 +1064,16 @@ const MarketingManager = () => {
                                                 <p className="text-[9px] font-medium text-slate-500 mt-1 line-clamp-3">{banner.subtitle}</p>
                                                 <div className="inline-flex items-center gap-1 bg-[#C2520A] text-white px-2.5 py-1 rounded-full mt-2 text-[9px] font-semibold w-fit">
                                                     {banner.ctaText || 'Explore Now'} <ChevronRight size={10} />
-                                                </div>
-                                            </div>
+                                    </div>
+                            </div>
                                             {banner.imageUrl && (
                                                 <img src={banner.imageUrl} alt="" className="w-[42%] max-w-[120px] h-[108px] object-cover object-top shrink-0 self-end" />
                                             )}
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
+                                                ))}
+                                            </div>
+                                        </div>
                     </div>
                 )}
 

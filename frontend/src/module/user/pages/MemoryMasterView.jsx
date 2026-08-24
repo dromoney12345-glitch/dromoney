@@ -7,6 +7,7 @@ import {
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
 import api from '../../shared/services/api';
+import FundRewardNotice from '../components/FundRewardNotice';
 
 const ICON_MAP = {
     Trophy, Zap, Heart, Star, Ghost, Gem, Smile, Rocket
@@ -379,12 +380,13 @@ const MemoryMasterView = () => {
                     </div>
                     
                     <h2 className="text-4xl font-medium mb-2">{timeLeft > 0 ? 'Brainy Victory! 🧠' : 'Time\'s Up!'}</h2>
-                    <p className="text-white/50 font-medium mb-10">
+                    <p className="text-white/50 font-medium mb-6">
                         {timeLeft > 0 
                             ? `Awesome! You cleared the board in ${maxTime - timeLeft} seconds.` 
                             : 'So close! Try to be focus and faster next time.'
                         }
                     </p>
+                    {!isEvent && timeLeft > 0 && <FundRewardNotice variant="dark" className="mb-8 w-full max-w-sm" />}
 
                     <div className="grid grid-cols-2 gap-4 w-full max-w-xs mb-10">
                          <div className="bg-white/5 p-5 rounded-[2rem] border border-white/10">

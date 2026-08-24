@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
-import api from '../../shared/services/api';
+import api, { BASE_URL } from '../../shared/services/api';
 import io from 'socket.io-client';
 import { buildReferralLink } from '../../shared/utils/referral';
 
 const UserContext = React.createContext();
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'https://dromoney.onrender.com';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || BASE_URL;
 
 // Initial empty state to prevent destructuring crashes
 const INITIAL_USER_STATE = {
@@ -346,7 +346,9 @@ export const UserProvider = ({ children }) => {
                         virtualBalance: res.data.newVirtualBalance ?? prev.wallet.virtualBalance,
                     },
                     completedTasks: res.data.completedTasks || prev.completedTasks,
-                    dailyTaskCompletions: res.data.dailyTaskCompletions || prev.dailyTaskCompletions
+                    dailyTaskCompletions: res.data.dailyTaskCompletions || prev.dailyTaskCompletions,
+                    lifetimeTasksCompleted: res.data.lifetimeTasksCompleted ?? prev.lifetimeTasksCompleted,
+                    futureFund: res.data.futureFund || prev.futureFund,
                 }));
             }
             return { success: true, data: res?.data };
