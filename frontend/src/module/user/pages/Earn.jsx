@@ -186,7 +186,6 @@ const Earn = () => {
                 <div className="mx-3 mt-3">
                     <FundRewardNotice />
                 </div>
-                </div>
 
                 {/* Operating Hours */}
                 {settings?.taskWindowStart && settings?.taskWindowEnd && (
