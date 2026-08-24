@@ -101,9 +101,10 @@ router.post('/claim', rewardLimiter, idempotency(), async (req, res) => {
             }
         }
 
-        // Watch & Earn does not credit coins or INR — only track ad completion
+        // Watch & Earn does not credit coins or INR — track completion for Future Fund (50 ads)
         user.lastRewardAt = new Date();
         user.todayRewardCount = (user.todayRewardCount || 0) + 1;
+        user.lifetimeAdsWatched = (user.lifetimeAdsWatched || 0) + 1;
 
         await user.save();
 

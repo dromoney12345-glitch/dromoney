@@ -100,8 +100,9 @@ const FutureFund = () => {
     const [ffStatus, setFfStatus] = useState(null);
     const [rewardStatus, setRewardStatus] = useState(null);
     const [settings, setSettings] = useState({
-        futureFundDailyTasksTarget: 10,
-        futureFundWatchAdTarget: 10,
+        futureFundKycTarget: 10,
+        futureFundDailyTasksTarget: 50,
+        futureFundWatchAdTarget: 50,
     });
 
     const loadStatus = useCallback(async () => {
@@ -121,8 +122,9 @@ const FutureFund = () => {
 
             if (settingsRes.success && settingsRes.data) {
                 setSettings({
-                    futureFundDailyTasksTarget: Number(settingsRes.data.futureFundDailyTasksTarget) || 10,
-                    futureFundWatchAdTarget: Number(settingsRes.data.futureFundWatchAdTarget) || 10,
+                    futureFundKycTarget: Number(settingsRes.data.futureFundKycTarget) || 10,
+                    futureFundDailyTasksTarget: Number(settingsRes.data.futureFundDailyTasksTarget) || 50,
+                    futureFundWatchAdTarget: Number(settingsRes.data.futureFundWatchAdTarget) || 50,
                 });
             }
 
@@ -150,8 +152,8 @@ const FutureFund = () => {
         ).length;
     }, [userData.dailyTaskCompletions]);
 
-    const dailyAdTarget = settings.futureFundWatchAdTarget;
-    const dailyTaskTarget = settings.futureFundDailyTasksTarget;
+    const dailyAdTarget = Number(rewardStatus?.maxDailyLimit) || 10;
+    const dailyTaskTarget = 10;
     const dailyAdCurrent = useMemo(() => {
         if (rewardStatus?.maxDailyLimit != null && rewardStatus?.remainingAds != null) {
             return Math.min(
@@ -162,29 +164,20 @@ const FutureFund = () => {
         return Math.min(dailyAdTarget, Number(userData.todayRewardCount) || 0);
     }, [rewardStatus, dailyAdTarget, userData.todayRewardCount]);
 
-    const salesCriterion = ffStatus?.criteria?.find((c) => c.id === 1) || {
-        current: 0,
-        target: ffStatus?.targets?.salesTarget || 10,
-        completed: false,
-    };
-    const activityCriterion = ffStatus?.criteria?.find((c) => c.id === 2) || {
-        current: 0,
-        target: ffStatus?.targets?.activityMinutesTarget || 50,
-        completed: false,
-    };
-    const daysCriterion = ffStatus?.criteria?.find((c) => c.id === 3) || {
-        current: 0,
-        target: ffStatus?.targets?.daysTarget || 50,
-        completed: false,
-    };
+    const byUnit = (unit, id) =>
+        ffStatus?.criteria?.find((c) => c.unit === unit || c.id === id) || null;
 
+    const kycCriterion = byUnit('kyc', 1);
+    const adsCriterion = byUnit('ads', 2);
+    const tasksCriterion = byUnit('tasks', 3);
+
+    const kycTarget = Number(kycCriterion?.target || ffStatus?.targets?.kycTarget || settings.futureFundKycTarget || 10);
+    const adsTarget = Number(adsCriterion?.target || ffStatus?.targets?.adsTarget || settings.futureFundWatchAdTarget || 50);
+    const tasksTarget = Number(tasksCriterion?.target || ffStatus?.targets?.tasksTarget || settings.futureFundDailyTasksTarget || 50);
+    const kycCurrent = Number(kycCriterion?.current ?? 0);
+    const adsCurrent = Number(adsCriterion?.current ?? userData.lifetimeAdsWatched ?? 0);
+    const tasksCurrent = Number(tasksCriterion?.current ?? userData.lifetimeTasksCompleted ?? 0);
     const isEligible = !!ffStatus?.eligible;
-    const kycCurrent = Number(salesCriterion.current ?? 0);
-    const kycTarget = Number(salesCriterion.target || 10);
-    const adsCurrent = Number(activityCriterion.current ?? userData.lifetimeAdsWatched ?? 0);
-    const adsTarget = Number(activityCriterion.target || 10);
-    const tasksCurrent = Number(daysCriterion.current ?? userData.lifetimeTasksCompleted ?? 0);
-    const tasksTarget = Number(daysCriterion.target || 10);
     const criterionPct = (current, target) =>
         Math.round(Math.min(100, (Number(current) / Math.max(Number(target) || 1, 1)) * 100));
 
@@ -322,27 +315,33 @@ const FutureFund = () => {
     const activationRows = [
         {
             key: 'kyc',
-            label: `${kycTarget} KYC`,
+            label: `${kycTarget} Successful KYC`,
+            subtitle: 'Invited friends who complete KYC',
             icon: User,
             current: kycCurrent,
             target: kycTarget,
-            completed: !!salesCriterion.completed || kycCurrent >= kycTarget,
+            completed: !!kycCriterion?.completed || kycCurrent >= kycTarget,
+            onClick: () => navigate('/user/marketing'),
         },
         {
             key: 'ads',
-            label: `${adsTarget} Ad Video`,
+            label: `${adsTarget} Advertisement Videos`,
+            subtitle: 'Watch ads in the app to grow this count',
             icon: Play,
             current: adsCurrent,
             target: adsTarget,
-            completed: !!activityCriterion.completed || adsCurrent >= adsTarget,
+            completed: !!adsCriterion?.completed || adsCurrent >= adsTarget,
+            onClick: () => navigate('/user/watch'),
         },
         {
             key: 'tasks',
-            label: `${tasksTarget} Tasks Complete`,
+            label: `${tasksTarget} Tasks`,
+            subtitle: 'Complete daily / company tasks',
             icon: ClipboardList,
             current: tasksCurrent,
             target: tasksTarget,
-            completed: !!daysCriterion.completed || tasksCurrent >= tasksTarget,
+            completed: !!tasksCriterion?.completed || tasksCurrent >= tasksTarget,
+            onClick: () => navigate('/user/earn'),
         },
     ];
 
@@ -367,15 +366,23 @@ const FutureFund = () => {
                             const Icon = row.icon;
                             const pct = criterionPct(row.current, row.target);
                             return (
-                                <div key={row.key} className="flex items-start gap-2.5">
+                                <button
+                                    key={row.key}
+                                    type="button"
+                                    onClick={row.onClick}
+                                    className="w-full flex items-start gap-2.5 text-left active:opacity-80"
+                                >
                                     <div className="w-9 h-9 rounded-full bg-[#F3E8E0] text-[#462211] flex items-center justify-center shrink-0">
                                         <Icon size={15} />
                                     </div>
                                     <div className="flex-1 min-w-0 pt-0.5">
                                         <div className="flex items-center justify-between gap-2">
                                             <p className="text-[12px] font-medium text-[#462211]">{row.label}</p>
-                                            {row.completed && <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />}
+                                            <span className="text-[11px] font-medium text-[#462211] shrink-0">
+                                                {Math.min(row.current, row.target)}/{row.target}
+                                            </span>
                                         </div>
+                                        <p className="text-[10px] text-[#7A5648] mt-0.5 leading-snug">{row.subtitle}</p>
                                         <div className="flex items-center gap-2 mt-1.5">
                                             <div className="flex-1 h-1.5 bg-[#F3E8E0] rounded-full overflow-hidden">
                                                 <div
@@ -383,10 +390,12 @@ const FutureFund = () => {
                                                     style={{ width: `${pct}%` }}
                                                 />
                                             </div>
-                                            <span className="text-[10px] text-[#7A5648] w-8 text-right shrink-0">{pct}%</span>
+                                            {row.completed
+                                                ? <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+                                                : <span className="text-[10px] text-[#7A5648] w-8 text-right shrink-0">{pct}%</span>}
                                         </div>
                                     </div>
-                                </div>
+                                </button>
                             );
                         })}
                     </div>
@@ -405,7 +414,9 @@ const FutureFund = () => {
 
                 <div className="bg-[#F3E8E0] rounded-xl px-3 py-2.5 flex items-start gap-2">
                     <Info size={14} className="text-[#462211] shrink-0 mt-0.5" />
-                    <p className="text-[11px] text-[#462211] leading-snug">Complete all three activities to enable your fund.</p>
+                    <p className="text-[11px] text-[#462211] leading-snug">
+                        Activate with {kycTarget} Successful KYC, {adsTarget} Advertisement Videos, and {tasksTarget} Tasks.
+                    </p>
                 </div>
 
                 <div className="space-y-3 pt-1">

@@ -34,8 +34,8 @@ const FutureFundAdmin = () => {
     // ── Global Rules (Now fully dynamic linked to DB Settings) ──
     const [rules, setRules] = useState({
         futureFundKycTarget: 10,
-        futureFundWatchAdTarget: 10,
-        futureFundDailyTasksTarget: 10,
+        futureFundWatchAdTarget: 50,
+        futureFundDailyTasksTarget: 50,
         ffTier1TasksLimit: 5,
         ffTier1AdsLimit: 5,
         ffTier1ProfitPercent: 60,
@@ -138,8 +138,8 @@ const FutureFundAdmin = () => {
                 if (res.success && res.data) {
                     setRules({
                         futureFundKycTarget: Number(res.data.futureFundKycTarget) || Number(res.data.futureFundSalesTarget) || 10,
-                        futureFundWatchAdTarget: Number(res.data.futureFundWatchAdTarget) || 10,
-                        futureFundDailyTasksTarget: Number(res.data.futureFundDailyTasksTarget) || 10,
+                        futureFundWatchAdTarget: Number(res.data.futureFundWatchAdTarget) || 50,
+                        futureFundDailyTasksTarget: Number(res.data.futureFundDailyTasksTarget) || 50,
                         ffTier1TasksLimit: Number(res.data.ffTier1TasksLimit) || 5,
                         ffTier1AdsLimit: Number(res.data.ffTier1AdsLimit) || 5,
                         ffTier1ProfitPercent: Number(res.data.ffTier1ProfitPercent) || 60,
@@ -159,8 +159,8 @@ const FutureFundAdmin = () => {
     const handleSaveRules = async () => {
         try {
             const kycTarget = Math.max(1, Number(rules.futureFundKycTarget) || 10);
-            const adsTarget = Math.max(1, Number(rules.futureFundWatchAdTarget) || 10);
-            const tasksTarget = Math.max(1, Number(rules.futureFundDailyTasksTarget) || 10);
+            const adsTarget = Math.max(1, Number(rules.futureFundWatchAdTarget) || 50);
+            const tasksTarget = Math.max(1, Number(rules.futureFundDailyTasksTarget) || 50);
             const res = await api.put('/admin/settings', {
                 futureFundKycTarget: kycTarget,
                 futureFundSalesTarget: kycTarget,
@@ -320,9 +320,9 @@ const FutureFundAdmin = () => {
                         {/* Unlock criteria — matches user Future Fund screen */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
                             {[
-                                { label: 'KYC Invites', key: 'futureFundKycTarget', icon: Users, color: 'text-indigo-500' },
-                                { label: 'Ad Videos', key: 'futureFundWatchAdTarget', icon: TrendingUp, color: 'text-emerald-500' },
-                                { label: 'Small Tasks', key: 'futureFundDailyTasksTarget', icon: Award, color: 'text-amber-500' }
+                                { label: 'Successful KYC', key: 'futureFundKycTarget', icon: Users, color: 'text-indigo-500' },
+                                { label: 'Advertisement Videos', key: 'futureFundWatchAdTarget', icon: TrendingUp, color: 'text-emerald-500' },
+                                { label: 'Tasks', key: 'futureFundDailyTasksTarget', icon: Award, color: 'text-amber-500' }
                             ].map((rule) => {
                                 const Icon = rule.icon || TrendingUp;
                                 return (
@@ -344,7 +344,7 @@ const FutureFundAdmin = () => {
                         </div>
 
                         <p className="text-[10px] text-slate-500 leading-relaxed mb-4">
-                            These 3 numbers are the same activation criteria shown in the user app (e.g. 10 KYC, 50 ads, 50 tasks). After unlock, ads/tasks on the active screen use the same ad and task targets.
+                            These 3 numbers are the user activation criteria: 10 Successful KYC, 50 Advertisement Videos, 50 Tasks. After unlock, the active screen uses daily ad/task progress, not these lifetime totals.
                         </p>
 
                         {/* Profit Distribution Tiers */}

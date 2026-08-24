@@ -1,6 +1,7 @@
 const Settings = require('../models/Settings');
 const Admin = require('../models/Admin');
 const asyncHandler = require('../middleware/async');
+const { persistPdfActivationDefaults, migratePdfActivationSettings } = require('../utils/futureFund');
 
 // @desc    Get system settings
 // @route   GET /api/admin/settings
@@ -12,6 +13,9 @@ exports.getSettings = asyncHandler(async (req, res) => {
     if (!settings) {
         settings = await Settings.create({});
     }
+    await migratePdfActivationSettings();
+    settings = await Settings.findOne();
+    await persistPdfActivationDefaults(settings);
 
     const admin = await Admin.findOne();
     const settingsObj = settings.toObject();

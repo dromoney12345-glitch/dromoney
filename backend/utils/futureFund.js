@@ -10,21 +10,65 @@ function getIstDateString(date = new Date()) {
     return `${y}-${m}-${d}`;
 }
 
+const FF_ACTIVATION = {
+    kycTarget: 10,
+    adsTarget: 50,
+    tasksTarget: 50,
+};
+
 function getTargets(settings = {}) {
+    const kyc = Number(settings.futureFundKycTarget) > 0
+        ? Number(settings.futureFundKycTarget)
+        : (Number(settings.futureFundSalesTarget) || FF_ACTIVATION.kycTarget);
+    const ads = Number(settings.futureFundWatchAdTarget) > 0
+        ? Number(settings.futureFundWatchAdTarget)
+        : FF_ACTIVATION.adsTarget;
+    const tasks = Number(settings.futureFundDailyTasksTarget) > 0
+        ? Number(settings.futureFundDailyTasksTarget)
+        : FF_ACTIVATION.tasksTarget;
     return {
-        kycTarget: Number(settings.futureFundKycTarget) > 0
-            ? Number(settings.futureFundKycTarget)
-            : (Number(settings.futureFundSalesTarget) || 10),
-        adsTarget: Number(settings.futureFundWatchAdTarget) > 0
-            ? Number(settings.futureFundWatchAdTarget)
-            : 10,
-        tasksTarget: Number(settings.futureFundDailyTasksTarget) > 0
-            ? Number(settings.futureFundDailyTasksTarget)
-            : 10,
-        salesTarget: Number(settings.futureFundKycTarget) || Number(settings.futureFundSalesTarget) || 10,
+        kycTarget: kyc,
+        adsTarget: ads,
+        tasksTarget: tasks,
+        salesTarget: kyc,
         daysTarget: Number(settings.futureFundDaysTarget) || 7,
         activityMinutesTarget: Number(settings.futureFundActivityMinutes) || 15,
     };
+}
+
+/** One-time: old schema stored ads/tasks as 10. PDF activation is 10 KYC / 50 ads / 50 tasks. */
+async function persistPdfActivationDefaults(settings) {
+    if (!settings || typeof settings !== 'object') return settings;
+    const ads = Number(settings.futureFundWatchAdTarget);
+    const tasks = Number(settings.futureFundDailyTasksTarget);
+    let changed = false;
+    if (!Number(settings.futureFundKycTarget)) {
+        settings.futureFundKycTarget = FF_ACTIVATION.kycTarget;
+        changed = true;
+    }
+    if (ads === 10 && tasks === 10) {
+        settings.futureFundWatchAdTarget = FF_ACTIVATION.adsTarget;
+        settings.futureFundDailyTasksTarget = FF_ACTIVATION.tasksTarget;
+        changed = true;
+    }
+    if (changed && typeof settings.save === 'function') {
+        await settings.save();
+    }
+    return settings;
+}
+
+async function migratePdfActivationSettings() {
+    const Settings = require('../models/Settings');
+    await Settings.updateOne(
+        { futureFundWatchAdTarget: 10, futureFundDailyTasksTarget: 10 },
+        {
+            $set: {
+                futureFundWatchAdTarget: FF_ACTIVATION.adsTarget,
+                futureFundDailyTasksTarget: FF_ACTIVATION.tasksTarget,
+                futureFundKycTarget: FF_ACTIVATION.kycTarget,
+            },
+        }
+    );
 }
 
 async function countSuccessfulKyc(userId) {
@@ -39,6 +83,7 @@ async function countSuccessfulSales(userId) {
 }
 
 async function syncFutureFundCriteria(user, settings = {}) {
+    await persistPdfActivationDefaults(settings);
     const targets = getTargets(settings);
     let modified = false;
 
@@ -147,8 +192,11 @@ async function addFutureFundActivity(user, minutes, settings = {}) {
 }
 
 module.exports = {
+    FF_ACTIVATION,
     getIstDateString,
     getTargets,
+    persistPdfActivationDefaults,
+    migratePdfActivationSettings,
     countSuccessfulSales,
     countSuccessfulKyc,
     syncFutureFundCriteria,

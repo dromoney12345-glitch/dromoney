@@ -1,12 +1,14 @@
 const Settings = require('../models/Settings');
 const User = require('../models/User');
 const { extractReferralCode } = require('../utils/referralCode');
+const { migratePdfActivationSettings } = require('../utils/futureFund');
 
 // @desc    Get Public Settings (Subset of settings for users)
 // @route   GET /api/public/settings
 // @access  Public
 exports.getPublicSettings = async (req, res) => {
     try {
+        await migratePdfActivationSettings();
         const settings = await Settings.findOne().select('appName contactEmail contactPhone adminUpiId qrScannerImage bankDetails referralSystemEnabled referralCommission referralLinkBaseUrl registrationFee minWithdrawal offerwallEnabled futureFundKycTarget futureFundDailyTasksTarget futureFundWatchAdTarget futureFundEventsTarget futureFundBoostersTarget futureFundSalesTarget futureFundDaysTarget futureFundActivityMinutes businessPlans maintenanceMode registrationOpen taskWindowStart taskWindowEnd taskRenewalHours');
         
         // Add fallbacks for existing documents that might not have newer schema fields
@@ -30,8 +32,8 @@ exports.getPublicSettings = async (req, res) => {
                 }
             ],
             futureFundKycTarget: 10,
-            futureFundDailyTasksTarget: 10,
-            futureFundWatchAdTarget: 10,
+            futureFundDailyTasksTarget: 50,
+            futureFundWatchAdTarget: 50,
             futureFundEventsTarget: 3,
             futureFundBoostersTarget: 1,
             futureFundSalesTarget: 10,
@@ -58,10 +60,10 @@ exports.getPublicSettings = async (req, res) => {
             responseData.futureFundKycTarget = responseData.futureFundSalesTarget || 10;
         }
         if (settings && !responseData.futureFundWatchAdTarget) {
-            responseData.futureFundWatchAdTarget = 10;
+            responseData.futureFundWatchAdTarget = 50;
         }
         if (settings && !responseData.futureFundDailyTasksTarget) {
-            responseData.futureFundDailyTasksTarget = 10;
+            responseData.futureFundDailyTasksTarget = 50;
         }
         
         res.status(200).json({

@@ -9,7 +9,8 @@ const fs = require('fs');
 const path = require('path');
 const {
     syncFutureFundCriteria,
-    addFutureFundActivity
+    addFutureFundActivity,
+    migratePdfActivationSettings,
 } = require('../utils/futureFund');
 
 // Configure Cloudinary
@@ -381,6 +382,7 @@ exports.getFutureFundStatus = asyncHandler(async (req, res, next) => {
     const user = await User.findById(req.user.id);
     if (!user) return next(new ErrorResponse('User not found', 404));
 
+    await migratePdfActivationSettings();
     const settings = (await Settings.findOne()) || {};
     const synced = await syncFutureFundCriteria(user, settings);
     if (synced.modified) {

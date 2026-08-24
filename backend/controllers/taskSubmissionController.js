@@ -129,6 +129,7 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
         taskId: task._id,
         completedAt: new Date()
     });
+    user.lifetimeTasksCompleted = (user.lifetimeTasksCompleted || 0) + 1;
 
     await user.save();
 
