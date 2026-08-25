@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
 import api from '../../shared/services/api';
-import { 
-    Users, ChevronLeft, Calendar, 
+import {
+    Users, ChevronLeft, Calendar,
     CheckCircle2, DollarSign, Clock, ArrowUpRight
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
+const statusLabel = (item) => {
+    const status = String(item.status || '');
+    const milestone = String(item.milestone || '');
+    if (status === 'Completed' || status === 'Settled') return 'Settled';
+    if (status === 'Failed' || milestone === 'removed') return 'Removed';
+    if (status === 'Waiting KYC' || milestone === 'waiting_kyc') return 'Waiting KYC';
+    if (milestone === 'card_active') return 'To Virtual';
+    if (status === 'Pending' || milestone === 'card_pending') return 'In Pending';
+    return status || 'Pending';
+};
 
 const MarketingHistory = () => {
     const navigate = useNavigate();
@@ -18,127 +29,147 @@ const MarketingHistory = () => {
         const fetchReferralHistory = async () => {
             try {
                 const res = await api.get('/user/data/referrals');
-                if (res.success && res.data) {
-                    const mapped = res.data.map(item => {
-                        const dateObj = new Date(item.createdAt);
-                        const dateFormatted = dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-                        const timeFormatted = dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                const rows = Array.isArray(res?.data) ? res.data : [];
+                const mapped = rows.map((item) => {
+                    const dateObj = new Date(item.createdAt || Date.now());
+                    const dateFormatted = Number.isNaN(dateObj.getTime())
+                        ? ''
+                        : dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                    const timeFormatted = Number.isNaN(dateObj.getTime())
+                        ? ''
+                        : dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                    const name =
+                        item.name ||
+                        item.referredUser?.name ||
+                        item.referredTo ||
+                        'Referred User';
+                    return {
+                        id: String(item._id || item.id || name + dateFormatted),
+                        name,
+                        amount: Number(item.amount) || 0,
+                        date: dateFormatted,
+                        time: timeFormatted,
+                        status: statusLabel(item),
+                    };
+                });
+
+                let list = mapped;
+                if (list.length === 0) {
+                    const walletTx = (userData?.wallet?.transactions || []).filter((t) =>
+                        /invite|referral|refer/i.test(`${t.source || ''} ${t.title || ''}`)
+                    );
+                    list = walletTx.map((t, idx) => {
+                        const dateObj = new Date(t.date || t.createdAt || Date.now());
                         return {
-                            id: item._id,
-                            name: item.referredUser?.name || 'Referred User',
-                            phone: item.referredUser?.phone ? `${item.referredUser.phone.substring(0, 5)}XXXXX` : 'N/A',
-                            amount: item.amount,
-                            date: dateFormatted,
-                            time: timeFormatted,
-                            status: item.status === 'Completed' ? 'Settled' : item.status
+                            id: String(t.id || t._id || `tx-${idx}`),
+                            name: t.title || t.source || 'Invite earning',
+                            amount: Number(t.amount) || 0,
+                            date: dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+                            time: dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+                            status: t.type === 'debit' ? 'Removed' : 'Credited',
                         };
                     });
-                    setReferrals(mapped);
-                    setTotalRevenue(Number(res.totalRevenue) || 0);
                 }
+
+                setReferrals(list);
+                const apiRevenue = Number(res?.totalRevenue);
+                setTotalRevenue(
+                    Number.isFinite(apiRevenue) && apiRevenue > 0
+                        ? apiRevenue
+                        : list.reduce((sum, r) => sum + (Number(r.amount) || 0), 0)
+                );
             } catch (err) {
-                console.error("Failed to fetch referrals list", err);
+                console.error('Failed to fetch referrals list', err);
             } finally {
                 setLoading(false);
             }
         };
         fetchReferralHistory();
-    }, []);
+    }, [userData?.wallet?.transactions]);
 
     const currentMonthYear = new Date().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
 
     return (
-        <div className="flex flex-col min-h-screen bg-white animate-in slide-in-from-right duration-500 pb-20">
-            {/* Header */}
-            <div className="px-6 pt-10 pb-6 bg-gradient-to-b from-slate-50 to-white flex items-center justify-between sticky top-0 z-30 backdrop-blur-md">
-                <button 
+        <div className="flex flex-col min-h-full bg-[#FCF8F5] font-poppins pb-8">
+            <div className="px-4 pt-4 pb-3 bg-white border-b border-[#EDE4DC] flex items-center justify-between sticky top-0 z-30">
+                <button
+                    type="button"
                     onClick={() => navigate(-1)}
-                    className="w-11 h-11 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-slate-600 active:scale-95 transition-all"
+                    className="w-10 h-10 bg-[#FFF5F0] rounded-xl border border-[#EDE4DC] flex items-center justify-center text-[#462211] active:scale-95"
                 >
                     <ChevronLeft size={22} />
                 </button>
                 <div className="text-center">
-                   <h2 className="text-lg font-medium text-slate-900 tracking-tight">Referral History</h2>
-                   <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-0.5">Track your earnings</p>
+                    <h2 className="text-[16px] font-semibold text-[#462211] tracking-tight">Referral History</h2>
+                    <p className="text-[9px] font-semibold text-[#B3591C] uppercase tracking-widest mt-0.5">Track your earnings</p>
                 </div>
-                <div className="w-11 h-11"></div>
+                <div className="w-10 h-10" />
             </div>
 
-            <div className="px-6 pt-4 space-y-6">
-                {/* Stats Summary Bubble */}
-                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                    <div className="bg-sky-50 border border-sky-100 rounded-3xl px-6 py-4 flex flex-col min-w-[140px]">
-                        <span className="text-[9px] font-medium text-sky-400 uppercase tracking-widest leading-none mb-2">Success</span>
-                        <span className="text-xl font-medium text-sky-600 italic leading-none">{referrals.length} Users</span>
+            <div className="px-4 pt-4 space-y-4">
+                <div className="flex gap-3">
+                    <div className="flex-1 bg-white border border-[#EDE4DC] rounded-2xl px-4 py-3.5">
+                        <span className="text-[9px] font-semibold text-[#9A8478] uppercase tracking-widest leading-none">Success</span>
+                        <p className="text-xl font-semibold text-[#462211] mt-1.5">{referrals.length} Users</p>
                     </div>
-                    <div className="bg-emerald-50 border border-emerald-100 rounded-3xl px-6 py-4 flex flex-col min-w-[140px]">
-                        <span className="text-[9px] font-medium text-emerald-400 uppercase tracking-widest leading-none mb-2">Revenue</span>
-                        <span className="text-xl font-medium text-emerald-600 italic leading-none">₹{totalRevenue}</span>
+                    <div className="flex-1 bg-white border border-[#EDE4DC] rounded-2xl px-4 py-3.5">
+                        <span className="text-[9px] font-semibold text-[#9A8478] uppercase tracking-widest leading-none">Revenue</span>
+                        <p className="text-xl font-semibold text-emerald-600 mt-1.5">₹{totalRevenue}</p>
                     </div>
                 </div>
 
-                {/* List Header */}
-                <div className="flex items-center justify-between px-1 mt-2">
-                    <h4 className="text-[11px] font-medium text-slate-900 uppercase tracking-[0.2em] italic">Recent Activity</h4>
+                <div className="flex items-center justify-between px-1">
+                    <h4 className="text-[11px] font-semibold text-[#462211] uppercase tracking-widest">Recent Activity</h4>
                     <div className="flex items-center gap-1">
-                       <Calendar size={12} className="text-slate-300" />
-                       <span className="text-[10px] font-medium text-slate-400">{currentMonthYear}</span>
+                        <Calendar size={12} className="text-[#9A8478]" />
+                        <span className="text-[10px] font-medium text-[#9A8478]">{currentMonthYear}</span>
                     </div>
                 </div>
 
-                {/* The List */}
-                <div className="space-y-4">
+                <div className="space-y-3">
                     {loading ? (
                         <div className="text-center py-10">
-                            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest">Loading transactions...</p>
+                            <p className="text-[11px] font-semibold text-[#9A8478] uppercase tracking-widest">Loading transactions...</p>
                         </div>
                     ) : referrals.length === 0 ? (
-                        <div className="text-center py-10 px-5 bg-slate-50 rounded-[2rem] border border-slate-100">
-                            <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest mb-1">No referrals yet</p>
-                            <p className="text-[10px] font-semibold text-slate-400">Share your link — ₹200 goes to Pending after KYC, then to Virtual when they create a Virtual Account.</p>
+                        <div className="text-center py-10 px-5 bg-white rounded-2xl border border-[#EDE4DC]">
+                            <p className="text-[11px] font-semibold text-[#462211] uppercase tracking-widest mb-1">No referrals yet</p>
+                            <p className="text-[10px] font-medium text-[#7A5648]">
+                                Share your Play Store invite link — ₹200 goes to Pending after KYC, then to Virtual when they create a Virtual Account.
+                            </p>
                         </div>
                     ) : (
                         referrals.map((ref) => (
-                            <div key={ref.id} className="relative group animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                 <div className="bg-slate-50/50 rounded-[2rem] p-5 flex items-center justify-between border border-slate-100 hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all group overflow-hidden">
-                                     {/* Background Decoration */}
-                                     <div className="absolute right-0 top-0 text-slate-100/50 group-hover:text-emerald-100/40 transition-colors">
-                                         <DollarSign size={80} strokeWidth={3} />
-                                     </div>
-                                     
-                                     <div className="flex items-center gap-4 relative z-10">
-                                         <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-slate-100 group-hover:border-sky-200 transition-colors">
-                                             <Users size={22} className="text-slate-400 group-hover:text-sky-500 transition-colors" />
-                                         </div>
-                                         <div>
-                                             <p className="text-sm font-medium text-slate-800 flex items-center gap-2">
-                                                 {ref.name}
-                                                 <ArrowUpRight size={12} className="text-slate-300" />
-                                             </p>
-                                             <div className="flex items-center gap-2 mt-1">
-                                                 <Clock size={10} className="text-slate-300" />
-                                                 <p className="text-[9px] font-medium text-slate-400 uppercase tracking-tighter">{ref.date} • {ref.time}</p>
-                                             </div>
-                                         </div>
-                                     </div>
-
-                                     <div className="text-right relative z-10">
-                                         <p className="text-base font-medium text-emerald-500 italic">+₹{ref.amount}</p>
-                                         <div className="flex items-center justify-end gap-1.5 mt-1">
-                                             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-sm shadow-emerald-200"></div>
-                                             <p className="text-[9px] font-medium text-slate-800 uppercase tracking-widest">{ref.status}</p>
-                                         </div>
-                                     </div>
-                                 </div>
+                            <div key={ref.id} className="bg-white rounded-2xl p-4 flex items-center justify-between border border-[#EDE4DC]">
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-11 h-11 bg-[#FFF5F0] rounded-xl flex items-center justify-center border border-[#EDE4DC] shrink-0">
+                                        <Users size={18} className="text-[#462211]" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-[13px] font-semibold text-[#462211] flex items-center gap-1.5 truncate">
+                                            {ref.name}
+                                            <ArrowUpRight size={12} className="text-[#C4B5A8] shrink-0" />
+                                        </p>
+                                        <div className="flex items-center gap-1.5 mt-0.5">
+                                            <Clock size={10} className="text-[#C4B5A8]" />
+                                            <p className="text-[10px] font-medium text-[#9A8478]">
+                                                {ref.date}{ref.time ? ` • ${ref.time}` : ''}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="text-right shrink-0 pl-2">
+                                    <p className="text-[15px] font-semibold text-emerald-600">+₹{ref.amount}</p>
+                                    <p className="text-[9px] font-semibold text-[#B3591C] uppercase tracking-widest mt-0.5">{ref.status}</p>
+                                </div>
                             </div>
                         ))
                     )}
                 </div>
 
-                {/* Empty Space Footer */}
-                <div className="py-8 text-center opacity-40">
-                    <CheckCircle2 size={32} className="text-slate-300 mx-auto mb-3" />
-                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">End of transaction list</p>
+                <div className="py-6 text-center opacity-50">
+                    <CheckCircle2 size={28} className="text-[#C4B5A8] mx-auto mb-2" />
+                    <p className="text-[10px] font-medium text-[#9A8478] uppercase tracking-widest">End of transaction list</p>
                 </div>
             </div>
         </div>

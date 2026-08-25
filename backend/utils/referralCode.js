@@ -119,4 +119,40 @@ async function findReferrerByCode(raw, { excludePhone = '', excludeEmail = '', e
     return { referrer, cleanCode, reason: 'ok' };
 }
 
-module.exports = { extractReferralCode, normalizeCode, findReferrerByCode };
+const PLAY_STORE_REFERRAL_BASE = 'https://play.google.com/store/apps/details?id=com.dromoney.user';
+
+function isPlaceholderReferralBase(base) {
+    const b = String(base || '').trim();
+    if (!b) return true;
+    return /earningapp\.com/i.test(b) || /example\.com/i.test(b);
+}
+
+/**
+ * Canonical invite base URL stored in settings.
+ * Play Store share URLs are stripped of a specific user's ref code.
+ */
+function normalizeReferralLinkBaseUrl(raw) {
+    const value = String(raw || '').trim();
+    if (!value || isPlaceholderReferralBase(value)) {
+        return PLAY_STORE_REFERRAL_BASE;
+    }
+    try {
+        const url = new URL(value.includes('://') ? value : `https://${value}`);
+        if (/play\.google\.com/i.test(url.hostname)) {
+            const id = url.searchParams.get('id') || 'com.dromoney.user';
+            return `https://play.google.com/store/apps/details?id=${id}`;
+        }
+        return url.toString();
+    } catch {
+        return PLAY_STORE_REFERRAL_BASE;
+    }
+}
+
+module.exports = {
+    extractReferralCode,
+    normalizeCode,
+    findReferrerByCode,
+    PLAY_STORE_REFERRAL_BASE,
+    isPlaceholderReferralBase,
+    normalizeReferralLinkBaseUrl,
+};

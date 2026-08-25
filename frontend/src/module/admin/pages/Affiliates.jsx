@@ -4,6 +4,7 @@ import PageHeader from '../components/PageHeader';
 import AdminStatCard from '../components/AdminStatCard';
 import StatusBadge from '../components/StatusBadge';
 import api from '../../shared/services/api';
+import { PLAY_STORE_URL, normalizeReferralLinkBaseUrl } from '../../shared/utils/referral';
 
 const Affiliates = () => {
     // ── Data & States ──
@@ -21,9 +22,9 @@ const Affiliates = () => {
     const [tempRate, setTempRate] = useState(200);
     
     // Base URL states
-    const [baseUrl, setBaseUrl] = useState('https://earningapp.com/join/');
+    const [baseUrl, setBaseUrl] = useState(PLAY_STORE_URL);
     const [editingBaseUrl, setEditingBaseUrl] = useState(false);
-    const [tempBaseUrl, setTempBaseUrl] = useState('');
+    const [tempBaseUrl, setTempBaseUrl] = useState(PLAY_STORE_URL);
 
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState('All');
@@ -41,9 +42,7 @@ const Affiliates = () => {
                 setReferralsData(res.data.logs);
                 setStats(res.data.stats);
                 setRate(res.data.stats.currentCommission);
-                if (res.data.stats.referralLinkBaseUrl) {
-                    setBaseUrl(res.data.stats.referralLinkBaseUrl);
-                }
+                setBaseUrl(normalizeReferralLinkBaseUrl(res.data.stats.referralLinkBaseUrl));
             }
         } catch (err) {
             console.error("Affiliate fetch error", err);
@@ -72,18 +71,20 @@ const Affiliates = () => {
     };
 
     const handleUpdateBaseUrl = async () => {
-        const next = tempBaseUrl.trim();
+        const next = normalizeReferralLinkBaseUrl(tempBaseUrl);
         try {
             const res = await api.put('/admin/settings', { referralLinkBaseUrl: next });
             if (res.success) {
-                setBaseUrl(next || 'Play Store (auto)');
+                const saved = normalizeReferralLinkBaseUrl(res.data?.referralLinkBaseUrl || next);
+                setBaseUrl(saved);
+                setTempBaseUrl(saved);
                 setEditingBaseUrl(false);
-                alert(next
-                    ? 'Referral Base URL updated successfully!'
-                    : 'Base URL cleared. App will share Play Store links with referral code.');
+                alert('Referral Base URL updated. Users will share this Play Store / join link with their own invite code.');
+            } else {
+                alert(res.message || 'Failed to update base url');
             }
         } catch (err) {
-            alert('Failed to update base url');
+            alert(err.message || 'Failed to update base url');
         }
     };
 
@@ -154,28 +155,28 @@ const Affiliates = () => {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-indigo-50 rounded-lg text-indigo-600 shadow-inner flex items-center justify-center"><Link2 size={18} /></div>
-                    <div>
+                <div className="flex items-center gap-4 min-w-0 flex-1">
+                    <div className="w-10 h-10 bg-indigo-50 rounded-lg text-indigo-600 shadow-inner flex items-center justify-center shrink-0"><Link2 size={18} /></div>
+                    <div className="min-w-0 flex-1">
                         <h3 className="text-[9px] text-slate-400 uppercase tracking-normal leading-none mb-1.5">Referral Base URL</h3>
                         {editingBaseUrl ? (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 min-w-0">
                                 <input
-                                    type="text"
+                                    type="url"
                                     value={tempBaseUrl}
                                     onChange={(e) => setTempBaseUrl(e.target.value)}
-                                    placeholder="Leave empty = Play Store + ref code"
-                                    className="w-48 bg-slate-50 border border-indigo-200 rounded-lg px-2 py-1 text-xs text-slate-900 outline-none focus:ring-2 focus:ring-indigo-500"
+                                    placeholder={PLAY_STORE_URL}
+                                    className="flex-1 min-w-[220px] bg-slate-50 border border-indigo-200 rounded-lg px-2 py-1.5 text-xs text-slate-900 outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
-                                <button onClick={handleUpdateBaseUrl} className="bg-indigo-500 text-white px-2 py-1 rounded-md text-[9px] uppercase">Save</button>
-                                <button onClick={() => setEditingBaseUrl(false)} className="text-slate-400 text-[9px] uppercase px-1">X</button>
+                                <button type="button" onClick={handleUpdateBaseUrl} className="bg-indigo-500 text-white px-3 py-1.5 rounded-md text-[9px] uppercase shrink-0">Save</button>
+                                <button type="button" onClick={() => { setEditingBaseUrl(false); setTempBaseUrl(baseUrl); }} className="text-slate-400 text-[9px] uppercase px-1 shrink-0">X</button>
                             </div>
                         ) : (
-                            <div className="flex items-center gap-2">
-                                <p className="text-xs text-slate-900 max-w-[150px] truncate" title={baseUrl}>
-                                    {baseUrl || 'Play Store (auto)'}
+                            <div className="flex items-center gap-2 min-w-0">
+                                <p className="text-xs text-slate-900 truncate" title={baseUrl}>
+                                    {baseUrl || PLAY_STORE_URL}
                                 </p>
-                                <button onClick={() => { setTempBaseUrl(baseUrl); setEditingBaseUrl(true); }} className="p-1 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-md transition-all" title="Click to change Base URL">
+                                <button type="button" onClick={() => { setTempBaseUrl(baseUrl || PLAY_STORE_URL); setEditingBaseUrl(true); }} className="p-1 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-md transition-all shrink-0" title="Click to change Base URL">
                                     <Edit2 size={10} />
                                 </button>
                             </div>

@@ -450,7 +450,9 @@ exports.getMe = async (req, res, next) => {
             success: true,
             data: userObj,
             settings: {
-                referralLinkBaseUrl: settings.referralLinkBaseUrl || ''
+                referralLinkBaseUrl: require('../utils/referralCode').normalizeReferralLinkBaseUrl(
+                    settings.referralLinkBaseUrl
+                )
             }
         });
     } catch (err) {

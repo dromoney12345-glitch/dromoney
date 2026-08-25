@@ -39,7 +39,9 @@ exports.getAffiliateStats = async (req, res) => {
                     activeReferrersCount: topReferrers.length,
                     topReferrer: topReferrers[0]?.name || 'None',
                     currentCommission: settings?.referralCommission || 200,
-                    referralLinkBaseUrl: settings?.referralLinkBaseUrl || ''
+                    referralLinkBaseUrl: require('../utils/referralCode').normalizeReferralLinkBaseUrl(
+                        settings?.referralLinkBaseUrl
+                    ),
                 },
                 logs: logs.map(log => {
                     const regDate = log.referredUser?.createdAt || log.createdAt;

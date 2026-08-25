@@ -1,6 +1,6 @@
 const Settings = require('../models/Settings');
 const User = require('../models/User');
-const { extractReferralCode } = require('../utils/referralCode');
+const { extractReferralCode, normalizeReferralLinkBaseUrl } = require('../utils/referralCode');
 const { migratePdfActivationSettings } = require('../utils/futureFund');
 
 // @desc    Get Public Settings (Subset of settings for users)
@@ -71,6 +71,7 @@ exports.getPublicSettings = async (req, res) => {
         if (settings && !responseData.kycWindowEnd) {
             responseData.kycWindowEnd = '19:00';
         }
+        responseData.referralLinkBaseUrl = normalizeReferralLinkBaseUrl(responseData.referralLinkBaseUrl);
         
         res.status(200).json({
             success: true,

@@ -187,6 +187,24 @@ function isPlaceholderReferralBase(base) {
     return /earningapp\.com/i.test(b) || /example\.com/i.test(b);
 }
 
+/** Canonical invite base URL (Play Store without a specific user's code). */
+export function normalizeReferralLinkBaseUrl(raw) {
+    const value = String(raw || '').trim();
+    if (!value || isPlaceholderReferralBase(value)) {
+        return PLAY_STORE_URL;
+    }
+    try {
+        const url = new URL(value.includes('://') ? value : `https://${value}`);
+        if (/play\.google\.com/i.test(url.hostname)) {
+            const id = url.searchParams.get('id') || 'com.dromoney.user';
+            return `https://play.google.com/store/apps/details?id=${id}`;
+        }
+        return url.toString();
+    } catch {
+        return PLAY_STORE_URL;
+    }
+}
+
 function buildWebJoinLink(code) {
     const cleanCode = extractReferralCode(code);
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://dromoney.app';
@@ -201,14 +219,14 @@ function buildWebJoinLink(code) {
  */
 export function buildReferralLink(code, baseUrlFromSettings = '') {
     const cleanCode = extractReferralCode(code);
-    const base = String(baseUrlFromSettings || '').trim();
+    const base = normalizeReferralLinkBaseUrl(baseUrlFromSettings);
 
     if (/play\.google\.com/i.test(base) || /pcampaignid=web_share/i.test(base)) {
         return buildPlayStoreReferralLink(cleanCode, base);
     }
 
     if (isPlaceholderReferralBase(base)) {
-        return buildWebJoinLink(cleanCode);
+        return buildPlayStoreReferralLink(cleanCode);
     }
 
     try {

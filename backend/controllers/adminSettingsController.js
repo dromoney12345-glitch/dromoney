@@ -37,10 +37,18 @@ exports.updateSettings = asyncHandler(async (req, res) => {
     let settings = await Settings.findOne();
     const wasMaintenance = !!(settings && settings.maintenanceMode);
 
-    const updateData = {
-        ...req.body,
-        businessPlans: req.body.businessPlans
-    };
+    const updateData = { ...req.body };
+    if (updateData.businessPlans === undefined) {
+        delete updateData.businessPlans;
+    }
+    Object.keys(updateData).forEach((key) => {
+        if (updateData[key] === undefined) delete updateData[key];
+    });
+
+    if (updateData.referralLinkBaseUrl !== undefined) {
+        const { normalizeReferralLinkBaseUrl } = require('../utils/referralCode');
+        updateData.referralLinkBaseUrl = normalizeReferralLinkBaseUrl(updateData.referralLinkBaseUrl);
+    }
 
     // Ensure referralCommission is never negative
     if (updateData.referralCommission !== undefined) {
