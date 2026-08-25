@@ -1,8 +1,8 @@
 const Content = require('../models/Content');
 const asyncHandler = require('../middleware/async');
 const axios = require('axios');
-
-const Banner = require('../models/Banner'); // Added Banner model
+const Banner = require('../models/Banner');
+const { rewriteContentPayload } = require('../utils/walletCycleCopy');
 
 // @desc    Get dynamic content by key
 // @route   GET /api/public/content/:key
@@ -18,13 +18,7 @@ exports.getContent = asyncHandler(async (req, res, next) => {
     }
 
     const payload = content.toObject ? content.toObject() : content;
-    if (payload.key === 'guide_invite' && payload.data && typeof payload.data.content === 'string') {
-        payload.data.content = payload.data.content
-            .replace(
-                /The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days\.?/gi,
-                'That ₹200 stays in Pending until they create a Virtual Account, then it moves to your Virtual Account.'
-            );
-    }
+    rewriteContentPayload(payload);
 
     res.status(200).json({
         success: true,
@@ -46,7 +40,9 @@ exports.getBulkContent = asyncHandler(async (req, res, next) => {
     // Map array to object for easy frontend access
     const results = {};
     contents.forEach(c => {
-        results[c.key] = c;
+        const item = c.toObject ? c.toObject() : c;
+        rewriteContentPayload(item);
+        results[c.key] = item;
     });
 
     res.status(200).json({

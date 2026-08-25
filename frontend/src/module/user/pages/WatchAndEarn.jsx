@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Clock, MonitorPlay, Sparkles, TrendingUp, RefreshCw, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import api from '../../shared/services/api';
@@ -45,13 +45,17 @@ const WatchAndEarn = () => {
         fetchStatus();
     }, []);
 
+    const claimLock = useRef(false);
+
     const claimFlutterReward = useCallback(async () => {
+        if (claimLock.current) return;
+        claimLock.current = true;
         try {
             const claimRes = await api.post('/reward/claim');
             if (claimRes.success) {
-                showToast('Ad watched. No coins or cash are added for ads.');
+                showToast('Ad completed. Progress updated.');
             } else {
-                showToast(claimRes.message || 'Could not claim reward.', 'error');
+                showToast(claimRes.message || 'Could not record this ad.', 'error');
             }
         } catch (err) {
             const errMsg = err.response?.data?.message || err.message || 'Failed to verify reward.';
@@ -59,15 +63,24 @@ const WatchAndEarn = () => {
         }
         await fetchStatus();
         if (refreshUserProfile) await refreshUserProfile();
+        claimLock.current = false;
     }, [refreshUserProfile]);
 
-    // Expose refreshRewardStatus for Flutter native callbacks
+    // Flutter may call these from native. Only onAdMob* means the user earned the reward.
+    // refreshRewardStatus used to claim on back-press — that inflated the progress bar.
     useEffect(() => {
-        window.refreshRewardStatus = claimFlutterReward;
+        window.refreshRewardStatus = async () => {
+            await fetchStatus();
+            if (refreshUserProfile) await refreshUserProfile();
+        };
+        window.onAdMobUserEarnedReward = claimFlutterReward;
+        window.onRewardedAdEarned = claimFlutterReward;
         return () => {
             delete window.refreshRewardStatus;
+            delete window.onAdMobUserEarnedReward;
+            delete window.onRewardedAdEarned;
         };
-    }, [claimFlutterReward]);
+    }, [claimFlutterReward, refreshUserProfile]);
 
     const [cooldownRemaining, setCooldownRemaining] = useState(0);
 
@@ -112,7 +125,12 @@ const WatchAndEarn = () => {
             }
 
             console.warn('Flutter rewarded ad unavailable:', reason);
-            showToast('No ad available right now. Please try again in a moment.', 'error');
+            showToast(
+                reason === 'no_bridge'
+                    ? 'Open the DroMoney app to watch live ads.'
+                    : 'Watch the full AdMob ad to complete. Back or close does not count.',
+                'error'
+            );
         } catch (e) {
             console.error('Watch ad error', e);
             showToast('Failed to launch ad. Please try again.', 'error');

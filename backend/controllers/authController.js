@@ -100,6 +100,10 @@ exports.register = async (req, res, next) => {
             referredBy: referredBy || undefined,
         });
 
+        if (referredBy) {
+            await User.findByIdAndUpdate(referredBy, { $inc: { referralCount: 1 } });
+        }
+
         try {
             const { notifyJourney } = require('../utils/userJourneyPush');
             await notifyJourney(user._id, 'welcome');

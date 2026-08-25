@@ -6,7 +6,7 @@ import {
     Trophy, Users, MousePointer2, FileText, Briefcase, Upload, Compass,
     ArrowUp, ArrowDown, RefreshCw, ShieldCheck, ListChecks,
     UserPlus, CreditCard, TrendingUp, Zap, Building2, Wallet,
-    HelpCircle, Flame, Gift, ArrowRight, X
+    HelpCircle, Flame, Gift, ArrowRight, X, ClipboardList
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { contentStorage } from '../../shared/services/contentStorage';
@@ -44,7 +44,7 @@ const DEFAULT_EXPLORE_GUIDE = {
         },
         {
             title: '👥 3. Invite Friends & Referrals',
-            text: 'अपना पर्सनल रेफरल लिंक दोस्तों के साथ शेयर करें। जब वे KYC पूरा करके Virtual Account बनाते हैं, तो आपके वॉलेट में रेफरल रिवॉर्ड इंसटेंट ऐड हो जाता है।',
+            text: 'अपना पर्सनल रेफरल लिंक दोस्तों के साथ शेयर करें। जब वे KYC पूरा करते हैं, ₹200 आपके Pending Wallet में जाता है। जब वे Virtual Account बनाते हैं, तब यह Virtual में जाता है। VA न बनाने पर उनका Pending हर 14 दिन (14, 28, 42…) पर clear होता है।',
             icon: 'UserPlus'
         },
         {
@@ -239,7 +239,10 @@ const MarketingManager = () => {
         { id: 'earn500', label: 'Earn ₹500 Daily', dbKey: 'guide_earn500', icon: TrendingUp },
         { id: 'fund', label: 'Open Future Fund', dbKey: 'guide_fund', icon: Sparkles },
         { id: 'tasks', label: 'Complete Tasks', dbKey: 'guide_tasks', icon: ListChecks },
+        { id: 'daily', label: 'Daily Work & Earn', dbKey: 'guide_daily', icon: ClipboardList },
+        { id: 'wallet', label: 'Wallet Guide', dbKey: 'guide_wallet', icon: Wallet },
         { id: 'business', label: 'Start a Business', dbKey: 'guide_business', icon: Building2 },
+        { id: 'affiliate-how', label: 'Affiliate How it works', dbKey: 'page_affiliate_how_it_works', icon: Users },
     ];
 
     const [selectedGuideId, setSelectedGuideId] = useState('explore-now');
@@ -273,6 +276,30 @@ const MarketingManager = () => {
         // Fallback default
         if (guideId === 'explore-now') {
             setExploreGuide(DEFAULT_EXPLORE_GUIDE);
+        } else if (guideId === 'affiliate-how') {
+            setExploreGuide({
+                badge: 'AFFILIATE CENTER',
+                title: 'How it works',
+                subtitle: 'Invite, Pending wallet, and 14-day cycle',
+                logoUrl: '',
+                ctaText: 'Invite Friends',
+                nextRoute: '/user/marketing',
+                content:
+                    'Share your invite link. After your friend completes KYC, ₹200 goes to your Pending Wallet. It moves to Virtual when they create a Virtual Account. If they do not create a Virtual Account, their Pending is cleared every 14 days (14, 28, 42…) until they buy one. After a 6-month Virtual Account expires, the same 14-day Pending cycle runs until they renew. Old Virtual balance is never deleted.',
+                points: [],
+            });
+        } else if (guideId === 'daily') {
+            setExploreGuide({
+                badge: 'DAILY WORK',
+                title: 'Daily Work & Earn',
+                subtitle: 'Tasks / offer tasks',
+                logoUrl: '',
+                ctaText: 'Start Earning Now',
+                nextRoute: '/user/earn',
+                content:
+                    'This Daily Work system replaces the old Events option.\n\nOpen a task, complete it, and earning is credited to the matching wallet.\n\nIf Virtual Account is created and active, earning goes there. Otherwise it goes to Pending.\n\nIf Virtual Account is not created or is expired, Pending is cleared every 14 days (14, 28, 42…) until you create or renew it. Old Virtual balance is never deleted.',
+                points: [],
+            });
         } else {
             setExploreGuide({
                 badge: 'YOUR GROWTH OUR GUIDANCE',

@@ -73,7 +73,7 @@ const FutureFundReport = () => {
         setConfirmModal({
             show: true,
             title: 'Confirm Distribution',
-            message: `Are you sure you want to distribute ₹${distributeAmount} pool amount among ${reportData.length} users?`,
+            message: `Are you sure you want to distribute ₹${distributeAmount} among ${reportData.length} active Future Fund users only? Members who have not unlocked Future Fund will get nothing.`,
             amount: distributeAmount,
             users: reportData.length,
             onConfirm: executeDistribution
@@ -139,7 +139,7 @@ const FutureFundReport = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
                 <div>
                     <h1 className="text-xl font-semibold text-slate-800 tracking-tight">Member activity report</h1>
-                    <p className="text-sm text-slate-500 mt-1">Manage and distribute profit to active Future Fund users.</p>
+                    <p className="text-sm text-slate-500 mt-1">Preview and send profit only to users who unlocked Future Fund (status: active). Other members never receive this amount.</p>
                 </div>
                 <div className="flex items-center gap-4 mt-4 md:mt-0">
                     <div className="relative">
@@ -223,7 +223,7 @@ const FutureFundReport = () => {
                     </div>
                 ) : filteredData.length === 0 ? (
                     <div className="p-16 text-center text-sm text-slate-500">
-                        No active members found.
+                        No active Future Fund users found. Amount will not be sent to anyone until a member unlocks Future Fund.
                     </div>
                 ) : (
                     <div className="overflow-x-auto">

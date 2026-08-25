@@ -50,24 +50,31 @@ export function waitForFlutterBridge(timeoutMs = 2500) {
     });
 }
 
-/** Normalize Flutter / AdMob handler return values. */
+/**
+ * Count an AdMob rewarded ad only when the SDK says the user earned the reward.
+ * Back / close / no-fill / null must NOT count — that was filling the progress bar early.
+ */
 export function isRewardedAdSuccess(result) {
     if (result === true || result === 1 || result === 'true' || result === '1') return true;
     if (result === false || result === 0 || result === 'false' || result === '0') return false;
-    if (result == null || result === undefined) {
-        // Older app builds returned undefined after a completed ad
-        return true;
-    }
+    if (result == null || result === undefined) return false;
     if (typeof result === 'object') {
         if (result.rewarded === true || result.success === true || result.earned === true) return true;
-        if (result.rewarded === false || result.success === false) return false;
-        if (result.status === 'rewarded' || result.status === 'completed' || result.status === 'success') return true;
-        if (result.status === 'failed' || result.status === 'dismissed' || result.status === 'error') return false;
+        if (Number(result.amount) > 0) return true;
+        if (result.rewardType || result.type === 'RewardItem') return true;
+        if (result.rewarded === false || result.success === false || result.earned === false) return false;
+        const status = String(result.status || result.event || result.state || '').toLowerCase();
+        if (['rewarded', 'completed', 'success', 'earned', 'user_earned_reward'].includes(status)) return true;
+        if (['failed', 'dismissed', 'closed', 'canceled', 'cancelled', 'error', 'nofill', 'no_fill', 'skipped'].includes(status)) {
+            return false;
+        }
     }
     if (typeof result === 'string') {
         const v = result.toLowerCase();
-        if (['rewarded', 'completed', 'success', 'ok', 'earned'].includes(v)) return true;
-        if (['failed', 'error', 'dismissed', 'canceled', 'cancelled', 'nofill', 'no_fill'].includes(v)) return false;
+        if (['rewarded', 'completed', 'success', 'ok', 'earned', 'user_earned_reward'].includes(v)) return true;
+        if (['failed', 'error', 'dismissed', 'closed', 'canceled', 'cancelled', 'nofill', 'no_fill', 'skipped'].includes(v)) {
+            return false;
+        }
     }
     return false;
 }

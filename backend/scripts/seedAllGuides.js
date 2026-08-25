@@ -34,7 +34,7 @@ Once logged in, explore top earning opportunities:
 • 🎁 Daily Quizzes, Video Ads & Extra Rewards
 
 👥 3. Refer Friends & Earn Rewards
-Share your unique referral invite link with friends. When they complete KYC and unlock their withdrawal card, instant referral rewards are credited to your matching wallet.
+Share your unique referral invite link with friends. When they complete KYC, ₹200 goes to your Pending Wallet. It moves to Virtual when they create a Virtual Account. If they do not, their Pending is cleared every 14 days (14, 28, 42…).
 
 💳 4. Instant Withdrawals & Security
 Withdraw your verified earnings directly to your UPI ID or Bank Account with 100% transparency and end-to-end encryption.`
@@ -207,6 +207,58 @@ Leverage Dromoney ecosystem tools, partner networks, and customer acquisition st
 🚀 3. Scale Your Venture
 Learn step-by-step scaling tactics from successful entrepreneurs.`
         }
+    },
+    {
+        key: 'guide_daily',
+        title: 'Daily Work & Earn',
+        description: 'Tasks and offer tasks',
+        data: {
+            badge: 'DAILY WORK',
+            title: 'Daily Work & Earn',
+            subtitle: 'Tasks / offer tasks',
+            logoUrl: '',
+            ctaText: 'Start Earning Now',
+            nextRoute: '/user/earn',
+            content: `This Daily Work system replaces the old Events option.
+
+Open a task, complete it, and earning is credited to the matching wallet.
+
+If Virtual Account is created and active, earning goes there. Otherwise it goes to Pending.
+
+If Virtual Account is not created or is expired, Pending is cleared every 14 days (14, 28, 42…) until you create or renew it. Old Virtual balance is never deleted.`
+        }
+    },
+    {
+        key: 'guide_wallet',
+        title: 'Wallet Guide',
+        description: 'Pending + Virtual',
+        data: {
+            badge: 'WALLET',
+            title: 'Wallet Guide',
+            subtitle: 'Pending + Virtual',
+            logoUrl: '',
+            ctaText: 'Open Wallet',
+            nextRoute: '/user/wallet',
+            content: `Pending Wallet holds earnings until Virtual Account is created or renewed. It is cleared every 14 days (14, 28, 42…) if you miss that window.
+
+Virtual Account is withdrawable after the account is created.
+
+Pay ₹499. Within 3 days of KYC, ₹399 is a 6-month reserve used at renewal.`
+        }
+    },
+    {
+        key: 'page_affiliate_how_it_works',
+        title: 'Affiliate How it works',
+        description: 'Text shown on Affiliate Center',
+        data: {
+            badge: 'AFFILIATE CENTER',
+            title: 'How it works',
+            subtitle: 'Invite, Pending wallet, and 14-day cycle',
+            logoUrl: '',
+            ctaText: 'Invite Friends',
+            nextRoute: '/user/marketing',
+            content: 'Share your invite link. After your friend completes KYC, ₹200 goes to your Pending Wallet. It moves to Virtual when they create a Virtual Account. If they do not create a Virtual Account, their Pending is cleared every 14 days (14, 28, 42…) until they buy one. After a 6-month Virtual Account expires, the same 14-day Pending cycle runs until they renew. Old Virtual balance is never deleted.'
+        }
     }
 ];
 
@@ -222,7 +274,7 @@ const seedAllGuides = async () => {
             console.log(`Seeded guide: ${g.key}`);
         }
 
-        console.log('All 9 guides seeded successfully in MongoDB!');
+        console.log('Guides seeded successfully in MongoDB!');
         process.exit(0);
     } catch (err) {
         console.error('Error seeding guides:', err);

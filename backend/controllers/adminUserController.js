@@ -227,7 +227,10 @@ exports.getUserTransactions = async (req, res, next) => {
 // @access  Private (Admin)
 exports.getFutureFundReport = async (req, res, next) => {
     try {
-        const users = await User.find({ role: { $ne: 'admin' } });
+        const users = await User.find({
+            role: { $ne: 'admin' },
+            'futureFund.status': 'active',
+        });
 
         if (users.length === 0) {
             return res.status(200).json({ success: true, count: 0, data: [] });

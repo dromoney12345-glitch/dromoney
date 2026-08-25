@@ -587,6 +587,7 @@ exports.attachReferral = asyncHandler(async (req, res, next) => {
 
     user.referredBy = linked.referrer._id;
     await user.save({ validateBeforeSave: false });
+    await User.findByIdAndUpdate(linked.referrer._id, { $inc: { referralCount: 1 } });
     console.log(`[REFERRAL] Attached ${user._id} to referrer ${linked.referrer._id} after signup`);
 
     try {

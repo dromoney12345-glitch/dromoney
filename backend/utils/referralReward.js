@@ -67,7 +67,6 @@ async function creditReferralOnKyc(userDoc) {
                 forceVirtual: toVirtual,
                 createTx: true,
             });
-            referrer.referralCount = (referrer.referralCount || 0) + 1;
             referrer.wallet.referralEarnings = (Number(referrer.wallet.referralEarnings) || 0) + commission;
             referrer.notifications = referrer.notifications || [];
             referrer.notifications.push({

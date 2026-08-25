@@ -140,29 +140,26 @@ const TaskRunner = () => {
             setStatus('calling_ad');
             // Prefer native AdMob inside the app
             if (window.flutter_inappwebview) {
-                // Register callback for when Flutter ad completes
-                window.refreshRewardStatus = async () => {
-                    delete window.refreshRewardStatus;
-                    await submitTask();
-                };
+                let earnedReward = false;
+                const markEarned = () => { earnedReward = true; };
+                window.onAdMobUserEarnedReward = markEarned;
+                window.onRewardedAdEarned = markEarned;
                 try {
                     const { showFlutterRewardedAd } = await import('../../shared/utils/flutterAds');
                     const { ok } = await showFlutterRewardedAd('reward_ad_1');
-                    if (ok) {
-                        // Some builds claim via refreshRewardStatus; others return true here
-                        if (window.refreshRewardStatus) {
-                            await window.refreshRewardStatus();
-                        } else {
-                            await submitTask();
-                        }
+                    if (ok || earnedReward) {
+                        await submitTask();
                     } else {
-                        showToast('No ad available right now. Please try again.', 'error');
+                        showToast('Watch the full ad to complete this task. Back/close does not count.', 'error');
                         setStatus('idle');
                     }
                 } catch (e) {
                     console.error('Flutter handler error', e);
                     showToast('Failed to launch Ad. Please try again.', 'error');
                     setStatus('idle');
+                } finally {
+                    delete window.onAdMobUserEarnedReward;
+                    delete window.onRewardedAdEarned;
                 }
             } else {
                 showToast('This feature is only available in the mobile app.', 'error');

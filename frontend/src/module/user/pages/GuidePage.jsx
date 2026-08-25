@@ -9,20 +9,12 @@ import {
 import { GUIDES } from '../data/guides';
 import api from '../../shared/services/api';
 import defaultLogo from '../../../assets/WhatsApp_Image_2026-04-28_at_10.52.49_PM-removebg-preview.png';
+import { rewriteWalletCycleCopy } from '../utils/walletCycleCopy';
 
 const ICON_MAP = {
     ShieldCheck, ListChecks, UserPlus, CreditCard, TrendingUp,
     Sparkles, Zap, Trophy, MousePointer2, Building2, Wallet,
     CheckCircle2, HelpCircle, Flame, Gift, Compass
-};
-
-const rewriteInviteCopy = (text) => {
-    if (typeof text !== 'string' || !text) return text;
-    return text
-        .replace(
-            /The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days\.?/gi,
-            'That ₹200 stays in Pending until they create a Virtual Account, then it moves to your Virtual Account.'
-        );
 };
 
 const GuidePage = () => {
@@ -37,21 +29,34 @@ const GuidePage = () => {
         const fetchGuide = async () => {
             setLoading(true);
             try {
-                // 1. Try to fetch specific key for explore-now or slug
-                const contentKey = (activeSlug === 'explore-now' || activeSlug === 'explore') ? 'explore_now_guide' : `guide_${activeSlug}`;
+                const contentKey = (activeSlug === 'explore-now' || activeSlug === 'explore')
+                    ? 'explore_now_guide'
+                    : activeSlug === 'affiliate-how'
+                        ? 'page_affiliate_how_it_works'
+                        : `guide_${activeSlug}`;
                 const res = await api.get(`/public/content/${contentKey}`);
 
                 if (res && res.success && res.data) {
                     const d = res.data.data || res.data;
                     const isDummy = d.title === 'Default Title' && d.description === 'Content pending admin setup.';
                     if (d && !isDummy && (d.title || d.content || (Array.isArray(d.points) && d.points.length > 0) || (Array.isArray(d.sections) && d.sections.length > 0))) {
-                        const rawPoints = d.points || d.sections || fallbackGuide?.points || [];
+                        const rawPoints = (d.points || d.sections || fallbackGuide?.points || []).map((point) => {
+                            if (typeof point === 'string') return rewriteWalletCycleCopy(point);
+                            if (point && typeof point === 'object') {
+                                return {
+                                    ...point,
+                                    title: rewriteWalletCycleCopy(point.title || ''),
+                                    text: rewriteWalletCycleCopy(point.text || point.description || point.desc || ''),
+                                };
+                            }
+                            return point;
+                        });
                         setGuide({
                             title: d.title || fallbackGuide?.title || 'Guide',
                             subtitle: d.subtitle || d.description || fallbackGuide?.subtitle || '',
                             badge: d.badge || fallbackGuide?.badge || 'YOUR GROWTH OUR GUIDANCE',
                             logoUrl: d.logoUrl || fallbackGuide?.logoUrl || '',
-                            content: rewriteInviteCopy(d.content || d.fullContent || (Array.isArray(rawPoints) && typeof rawPoints[0] === 'string' ? rawPoints.join('\n\n') : '')),
+                            content: rewriteWalletCycleCopy(d.content || d.fullContent || (Array.isArray(rawPoints) && typeof rawPoints[0] === 'string' ? rawPoints.join('\n\n') : '')),
                             next: d.nextRoute || d.next || fallbackGuide?.next || '/user/earn',
                             ctaText: d.ctaText || fallbackGuide?.ctaText || 'Start Earning Now',
                             points: rawPoints
@@ -65,7 +70,12 @@ const GuidePage = () => {
                 if (fallbackGuide) {
                     setGuide({
                         ...fallbackGuide,
-                        content: fallbackGuide.content || (Array.isArray(fallbackGuide.points) && typeof fallbackGuide.points[0] === 'string' ? fallbackGuide.points.join('\n\n') : '')
+                        content: rewriteWalletCycleCopy(
+                            fallbackGuide.content || (Array.isArray(fallbackGuide.points) && typeof fallbackGuide.points[0] === 'string' ? fallbackGuide.points.join('\n\n') : '')
+                        ),
+                        points: (fallbackGuide.points || []).map((point) =>
+                            typeof point === 'string' ? rewriteWalletCycleCopy(point) : point
+                        ),
                     });
                 }
             } catch (err) {

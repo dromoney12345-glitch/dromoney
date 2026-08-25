@@ -41,7 +41,7 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
             'Your friend pastes that link (or opens it) — the invite code is already inside the link — then completes KYC.',
             'After their KYC is approved, ₹200 is added to your Pending Wallet.',
             'That ₹200 moves to your Virtual Account when they create their Virtual Account.',
-            'If they do not create a Virtual Account, their own Pending is cleared every 14 days until they buy one.',
+            'If they do not create a Virtual Account, their own Pending is cleared every 14 days (14, 28, 42…) until they buy one.',
         ],
     },
     fund: {
@@ -52,7 +52,7 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
             'To activate: 10 successful KYC, 50 ads watched, 50 tasks completed.',
             'Watch Advertisement and Complete Tasks stay at the top.',
             'You will see progress and a small earning animation — not coins.',
-            'After the fund is active, a daily share goes to Virtual Account if it is created, else Pending.',
+            'After the fund is active, a daily share goes to Virtual Account if it is created, else Pending. Pending follows the 14 / 28 / 42-day cycle until Virtual Account is created or renewed.',
         ],
     },
     daily: {
@@ -62,8 +62,8 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
         points: [
             'This Daily Work system replaces the old Events option.',
             'Open a task, complete it, and earning is credited to the matching wallet.',
-            'If Virtual Account is created, earning goes there. Otherwise it goes to Pending.',
-            'This earning has no 7–28 day hold.',
+            'If Virtual Account is created and active, earning goes there. Otherwise it goes to Pending.',
+            'If Virtual Account is not created or is expired, Pending is cleared every 14 days (14, 28, 42…) until you create or renew it. Old Virtual balance is never deleted.',
         ],
     },
     options: {
@@ -91,7 +91,7 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
         subtitle: 'Pending + Virtual',
         next: '/user/wallet',
         points: [
-            'Pending Wallet holds processing amounts.',
+            'Pending Wallet holds earnings until Virtual Account is created or renewed. It is cleared every 14 days (14, 28, 42…) if you miss that window.',
             'Virtual Account is withdrawable after the account is created.',
             'Card details auto-fill: Name, Number, Today, Expiry (6 months).',
             'Pay ₹499 → admin approval → Virtual Account unlocks for 6 months.',
@@ -148,7 +148,7 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
         points: [
             'Open Income → Daily Work, or Future Fund → Complete Tasks.',
             'Read the instructions and submit proof.',
-            'On completion, earning is sent to Virtual or Pending Wallet.',
+            'On completion, earning is sent to Virtual if it is active, otherwise Pending. Pending follows the 14 / 28 / 42-day clear cycle until Virtual Account is created or renewed.',
         ],
     },
 };

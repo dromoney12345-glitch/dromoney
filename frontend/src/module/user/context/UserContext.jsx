@@ -21,6 +21,7 @@ const INITIAL_USER_STATE = {
     virtualAccount: null,
     kycStatus: 'Not Started',
     profileImage: '',
+    todayRewardCount: 0,
     futureFund: { status: 'locked', progress: 0, criteria: [] },
     isBoosterActive: false,
     isSupportBoosterActive: false,
@@ -261,6 +262,7 @@ export const UserProvider = ({ children }) => {
                 progress: dbUser.futureFund?.progress || 0,
                 criteria: dbUser.futureFund?.criteria || []
             },
+            todayRewardCount: dbUser.todayRewardCount || 0,
             watchedAdsCount: dbUser.lifetimeAdsWatched || (dbUser.watchedAds ? dbUser.watchedAds.length : 0),
             lifetimeAdsWatched: dbUser.lifetimeAdsWatched || 0,
             lifetimeTasksCompleted: dbUser.lifetimeTasksCompleted || 0,

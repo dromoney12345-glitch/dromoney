@@ -7,17 +7,20 @@ import {
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { buildReferralLink } from '../../shared/utils/referral';
+import { defaultAffiliateHowItWorks, rewriteWalletCycleCopy } from '../utils/walletCycleCopy';
 
 const Marketing = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { userData } = useUser();
+    const { userData, refreshUserProfile } = useUser();
     const [copied, setCopied] = useState(false);
     const [rewardAmount, setRewardAmount] = useState(200);
     const [linkBase, setLinkBase] = useState('');
     const [showReferralLink, setShowReferralLink] = useState(location.state?.showReferral || false);
     const [showShareModal, setShowShareModal] = useState(false);
     const [referrals, setReferrals] = useState([]);
+    const [memberCount, setMemberCount] = useState(0);
+    const [howItWorks, setHowItWorks] = useState('');
 
     const referralCode = userData?.referrals?.code || '';
     const referralLink = buildReferralLink(referralCode, linkBase);
@@ -41,12 +44,35 @@ const Marketing = () => {
         const loadReferrals = async () => {
             try {
                 const res = await api.get('/user/data/referrals');
-                if (res.success) setReferrals(res.data || []);
+                if (res.success) {
+                    setReferrals(res.data || []);
+                    setMemberCount(Number(res.count) || (res.data || []).length);
+                }
             } catch (err) {
                 console.error('Failed to load referrals', err);
             }
+            try {
+                await refreshUserProfile?.(false);
+            } catch {
+                /* ignore */
+            }
         };
         loadReferrals();
+    }, [refreshUserProfile]);
+
+    React.useEffect(() => {
+        const loadHowItWorks = async () => {
+            try {
+                const res = await api.get('/public/content/page_affiliate_how_it_works');
+                const d = res?.data?.data || res?.data || {};
+                const isDummy = d.title === 'Default Title';
+                const text = rewriteWalletCycleCopy(d.content || d.text || '');
+                if (!isDummy && text) setHowItWorks(text);
+            } catch (err) {
+                console.error('Failed to load affiliate how-it-works', err);
+            }
+        };
+        loadHowItWorks();
     }, []);
 
         const inviteBadge = (ref) => {
@@ -170,7 +196,7 @@ const Marketing = () => {
                         </div>
                         <span className="text-[11px] font-semibold text-[#462211] uppercase tracking-wider">Total Members</span>
                     </div>
-                    <span className="text-[13px] font-semibold text-[#462211]">{Math.max(userData?.referrals?.count || 0, referrals.length)}</span>
+                    <span className="text-[13px] font-semibold text-[#462211]">{Math.max(memberCount, userData?.referrals?.count || 0, referrals.length)}</span>
                 </div>
 
                 {/* Earnings */}
@@ -198,9 +224,8 @@ const Marketing = () => {
                 {/* How it works */}
                 <div className="bg-[#FFF5F0] border border-[#EDE4DC] rounded-2xl p-3.5">
                     <h5 className="text-[11px] font-semibold text-[#462211] uppercase tracking-wider mb-1">How it works</h5>
-                    <p className="text-[10px] font-medium text-[#7A5648] leading-relaxed">
-                        Share your invite link. After your friend completes KYC, ₹{rewardAmount} goes to your Pending Wallet. It moves to Virtual when they create a Virtual Account.
-                        {' '}If they do not create a Virtual Account, their Pending is cleared every 14 days until they buy one.
+                    <p className="text-[10px] font-medium text-[#7A5648] leading-relaxed whitespace-pre-line">
+                        {howItWorks || defaultAffiliateHowItWorks(rewardAmount)}
                     </p>
                 </div>
 
