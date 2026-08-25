@@ -139,15 +139,11 @@ const TaskRunner = () => {
         if (task.type === 'Video') {
             setStatus('calling_ad');
             // Prefer native AdMob inside the app
-            if (window.flutter_inappwebview) {
-                let earnedReward = false;
-                const markEarned = () => { earnedReward = true; };
-                window.onAdMobUserEarnedReward = markEarned;
-                window.onRewardedAdEarned = markEarned;
+            if (window.flutter_inappwebview || window.FlutterInAppWebView) {
                 try {
                     const { showFlutterRewardedAd } = await import('../../shared/utils/flutterAds');
                     const { ok } = await showFlutterRewardedAd('reward_ad_1');
-                    if (ok || earnedReward) {
+                    if (ok) {
                         await submitTask();
                     } else {
                         showToast('Watch the full ad to complete this task. Back/close does not count.', 'error');
@@ -157,9 +153,6 @@ const TaskRunner = () => {
                     console.error('Flutter handler error', e);
                     showToast('Failed to launch Ad. Please try again.', 'error');
                     setStatus('idle');
-                } finally {
-                    delete window.onAdMobUserEarnedReward;
-                    delete window.onRewardedAdEarned;
                 }
             } else {
                 showToast('This feature is only available in the mobile app.', 'error');

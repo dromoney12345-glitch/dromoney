@@ -287,7 +287,7 @@ exports.updatePaymentStatus = async (req, res) => {
 
                     try {
                         const { notifyJourney } = require('../utils/userJourneyPush');
-                        await notifyJourney(user._id, isRenewal ? 'va_renewed' : 'va_activated', { skipInApp: true });
+                        await notifyJourney(user._id, isRenewal ? 'va_renewed' : 'va_activated');
                     } catch (pushErr) {
                         console.error('Push notification failed for payment activation:', pushErr.message);
                     }

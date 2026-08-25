@@ -17,10 +17,12 @@ const AppNotificationSchema = new mongoose.Schema({
     step: { type: String, default: '' },
     link: { type: String, default: '/user/home' },
     isRead: { type: Boolean, default: false },
+    dedupeKey: { type: String, default: '', index: true },
 }, {
     timestamps: true,
 });
 
 AppNotificationSchema.index({ user: 1, createdAt: -1 });
+AppNotificationSchema.index({ user: 1, dedupeKey: 1 });
 
 module.exports = mongoose.model('AppNotification', AppNotificationSchema);

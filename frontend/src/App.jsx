@@ -65,6 +65,7 @@ import { AdminProvider, useAdmin } from './module/admin/context/AdminContext';
 import { UserProvider, useUser } from './module/user/context/UserContext';
 import SplashScreen from './module/user/auth/SplashScreen';
 import { extractReferralCode, getPendingReferralCode, installReferralCapture, captureReferralFromLocation } from './module/shared/utils/referral';
+import { installFcmTokenBridge, requestNativeFcmToken } from './module/shared/utils/fcmToken';
 
 import { Loader2 } from 'lucide-react';
 
@@ -181,27 +182,9 @@ const RouteTracker = () => {
   
   // Expose global method for Flutter to pass native FCM token
   React.useEffect(() => {
-    window.saveMobileFcmToken = async (token) => {
-      try {
-        // Always store it locally first just in case
-        localStorage.setItem('pending_mobile_fcm_token', token);
-        
-        const { default: api } = await import('./module/shared/services/api');
-        // Only try to save if we have a user token
-        if (localStorage.getItem('dromoney_token')) {
-            await api.post('/fcm-tokens/save', { token, platform: 'mobile' });
-            console.log("Successfully saved Mobile FCM Token from Flutter");
-            localStorage.removeItem('pending_mobile_fcm_token');
-        } else {
-            console.log("Saved Mobile FCM Token locally, waiting for login...");
-        }
-      } catch (err) {
-        console.error("Error saving Mobile FCM Token from Flutter:", err);
-      }
-    };
-    return () => {
-      delete window.saveMobileFcmToken;
-    };
+    installFcmTokenBridge();
+    requestNativeFcmToken();
+    return () => {};
   }, []);
   
   return null;
@@ -211,6 +194,11 @@ function App() {
   const [showSplash, setShowSplash] = React.useState(!localStorage.getItem('dromoney_token'));
 
   React.useEffect(() => installReferralCapture(), []);
+
+  React.useEffect(() => {
+    installFcmTokenBridge();
+    requestNativeFcmToken();
+  }, []);
 
   return (
     <AdminProvider>

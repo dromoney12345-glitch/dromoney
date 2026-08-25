@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useUser } from './context/UserContext';
 import api from '../shared/services/api';
+import { isFlutterWebView, requestNativeFcmToken, saveFcmTokenToServer } from '../shared/utils/fcmToken';
 import LogoImg from '../../assets/WhatsApp_Image_2026-04-28_at_10.52.49_PM-removebg-preview.png';
 import PullToRefreshWrapper from './components/PullToRefreshWrapper';
 
@@ -43,6 +44,39 @@ const UserLayout = () => {
             document.removeEventListener('visibilitychange', onVisible);
         };
     }, [kycOk]);
+
+    useEffect(() => {
+        requestNativeFcmToken();
+        if (isFlutterWebView()) return undefined;
+
+        let unsubscribe = () => {};
+        const registerWebFcm = async () => {
+            try {
+                if (!('serviceWorker' in navigator) || !('Notification' in window)) return;
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') return;
+                const { messaging, getToken, onMessage } = await import('../../services/firebase');
+                const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                const token = await getToken(messaging, {
+                    vapidKey: import.meta.env.VITE_VAPID_KEY,
+                    serviceWorkerRegistration: registration,
+                });
+                if (token) await saveFcmTokenToServer(token, 'web');
+                unsubscribe = onMessage(messaging, (payload) => {
+                    if (Notification.permission === 'granted' && payload?.notification) {
+                        new Notification(payload.notification.title, {
+                            body: payload.notification.body,
+                            icon: '/logo.png',
+                        });
+                    }
+                });
+            } catch (err) {
+                console.error('[FCM] User registration failed:', err);
+            }
+        };
+        registerWebFcm();
+        return () => unsubscribe();
+    }, []);
 
     useEffect(() => {
         const updateKeyboard = () => {

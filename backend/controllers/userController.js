@@ -48,8 +48,16 @@ exports.clearPersonalNotifications = asyncHandler(async (req, res, next) => {
 
     const AppNotification = require('../models/AppNotification');
     await AppNotification.deleteMany({ user: req.user.id });
+    res.status(200).json({ success: true });
+});
 
-    res.status(200).json({ success: true, data: {} });
+exports.markNotificationRead = asyncHandler(async (req, res) => {
+    const AppNotification = require('../models/AppNotification');
+    await AppNotification.updateOne(
+        { _id: req.params.id, user: req.user.id },
+        { $set: { isRead: true } }
+    );
+    res.status(200).json({ success: true });
 });
 
 // @desc    Update KYC Status and Documents
@@ -141,7 +149,7 @@ exports.updateKyc = asyncHandler(async (req, res, next) => {
 
         try {
             const { notifyJourney } = require('../utils/userJourneyPush');
-            await notifyJourney(user._id, 'kyc_submitted', { skipInApp: true });
+            await notifyJourney(user._id, 'kyc_submitted');
         } catch (pushErr) {
             console.error('Push notification failed for KYC submission:', pushErr.message);
         }
@@ -190,12 +198,19 @@ exports.unlockPlatform = asyncHandler(async (req, res, next) => {
     await activateVirtualWallet(user);
     await user.save();
 
-    try {
-        const { afterVirtualAccountActivated } = require('../utils/referralReward');
-        await afterVirtualAccountActivated(user);
-    } catch (err) {
-        console.error('Simulation Referral Error:', err.message);
-    }
+        try {
+            const { afterVirtualAccountActivated } = require('../utils/referralReward');
+            await afterVirtualAccountActivated(user);
+        } catch (err) {
+            console.error('Simulation Referral Error:', err.message);
+        }
+
+        try {
+            const { notifyJourney } = require('../utils/userJourneyPush');
+            await notifyJourney(user._id, 'va_activated');
+        } catch (pushErr) {
+            console.error('VA unlock notify failed:', pushErr.message);
+        }
 
     res.status(200).json({
         success: true,
@@ -499,6 +514,15 @@ exports.unlockFutureFund = asyncHandler(async (req, res, next) => {
 
     user.futureFund.status = 'active';
     await user.save({ validateBeforeSave: false });
+
+    try {
+        const { notifyJourney } = require('../utils/userJourneyPush');
+        await notifyJourney(user._id, 'ff_activated', {
+            notificationId: `${user._id}_ff_activated`,
+        });
+    } catch (pushErr) {
+        console.error('Future Fund activate notify failed:', pushErr.message);
+    }
 
     res.status(200).json({
         success: true,

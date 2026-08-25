@@ -164,6 +164,21 @@ async function syncFutureFundCriteria(user, settings = {}) {
     user.futureFund.progress = progress;
     if (prevProgress !== progress) modified = true;
 
+    if (eligible && !user.futureFund.criteriaNotified && user.futureFund.status !== 'active') {
+        user.futureFund.criteriaNotified = true;
+        modified = true;
+        if (process.env.NODE_ENV !== 'test') {
+            try {
+                const { notifyJourney } = require('./userJourneyPush');
+                notifyJourney(user._id, 'ff_criteria_done', {
+                    notificationId: `${user._id}_ff_criteria_done`,
+                }).catch((err) => console.error('FF criteria notify failed:', err.message));
+            } catch (err) {
+                console.error('FF criteria notify failed:', err.message);
+            }
+        }
+    }
+
     // Do not auto-activate — user taps Activate Fund.
 
     return {

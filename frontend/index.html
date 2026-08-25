@@ -30,6 +30,27 @@
     }
   </style>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    (function () {
+      window.__pendingFcmTokens = window.__pendingFcmTokens || [];
+      function stashFcmToken(raw) {
+        try {
+          var token = raw;
+          if (token && typeof token === 'object') {
+            token = token.token || token.fcmToken || '';
+          }
+          token = String(token || '').trim();
+          if (!token || token === 'null' || token === 'undefined') return;
+          window.__pendingFcmTokens.push(token);
+          localStorage.setItem('pending_mobile_fcm_token', token);
+        } catch (e) {}
+      }
+      window.saveMobileFcmToken = stashFcmToken;
+      window.saveFcmToken = stashFcmToken;
+      window.saveAppFcmToken = stashFcmToken;
+      window.onFcmToken = stashFcmToken;
+    })();
+  </script>
 </head>
 
 <body>

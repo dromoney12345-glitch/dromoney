@@ -168,14 +168,9 @@ exports.approveSubmission = asyncHandler(async (req, res, next) => {
 
     // Send Push Notification
     try {
-        const { sendNotificationToUser } = require('./fcmController');
-        await sendNotificationToUser(submission.user, {
-            title: 'Task Approved! 🌟',
-            body: `Awesome work! Your task "${task.title}" has been approved.`,
-            data: {
-                type: 'task',
-                link: '/user/earn'
-            }
+        const { notifyJourney } = require('../utils/userJourneyPush');
+        await notifyJourney(submission.user, 'task_approved', {
+            notificationId: `${submission.user}_task_approved_${submission._id}`,
         });
     } catch (pushErr) {
         console.error('Push notification failed for task approval:', pushErr.message);
@@ -211,14 +206,9 @@ exports.rejectSubmission = asyncHandler(async (req, res, next) => {
 
     // Send Push Notification
     try {
-        const { sendNotificationToUser } = require('./fcmController');
-        await sendNotificationToUser(submission.user, {
-            title: 'Task Action Required ⚠️',
-            body: `Your task submission for "${taskTitle}" was rejected. Please review guidelines and try again.`,
-            data: {
-                type: 'task',
-                link: '/user/earn'
-            }
+        const { notifyJourney } = require('../utils/userJourneyPush');
+        await notifyJourney(submission.user, 'task_rejected', {
+            notificationId: `${submission.user}_task_rejected_${submission._id}`,
         });
     } catch (pushErr) {
         console.error('Push notification failed for task rejection:', pushErr.message);

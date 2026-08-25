@@ -87,6 +87,15 @@ router.post('/claim', rewardLimiter, idempotency(), async (req, res) => {
 
         await checkAndResetDailyLimit(user);
 
+        const earned = req.body?.earned === true || req.body?.earned === 'true';
+        const source = String(req.body?.source || '');
+        if (!earned || source !== 'admob') {
+            return res.status(400).json({
+                success: false,
+                message: 'Ad was not completed. Watch the full rewarded ad.',
+            });
+        }
+
         // Check daily limit
         if ((user.todayRewardCount || 0) >= MAX_DAILY_ADS) {
             return res.status(400).json({ allowed: false, reason: 'daily_limit', message: 'Daily limit reached' });

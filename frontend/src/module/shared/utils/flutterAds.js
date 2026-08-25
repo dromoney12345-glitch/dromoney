@@ -1,7 +1,10 @@
 /**
- * Helpers for Flutter InAppWebView rewarded ads.
- * Some devices inject the bridge late or return inconsistent ad results.
+ * Flutter InAppWebView rewarded ads.
+ * Progress may increase ONLY after AdMob onUserEarnedReward.
+ * Back / close / dismiss / no-fill must never count.
  */
+
+let adSession = null;
 
 export function isFlutterApp() {
     return !!(
@@ -19,7 +22,6 @@ export function getFlutterBridge() {
     return null;
 }
 
-/** Wait until Flutter injects callHandler (common on slower devices). */
 export function waitForFlutterBridge(timeoutMs = 2500) {
     return new Promise((resolve) => {
         const existing = getFlutterBridge();
@@ -50,38 +52,114 @@ export function waitForFlutterBridge(timeoutMs = 2500) {
     });
 }
 
-/**
- * Count an AdMob rewarded ad only when the SDK says the user earned the reward.
- * Back / close / no-fill / null must NOT count — that was filling the progress bar early.
- */
-export function isRewardedAdSuccess(result) {
-    if (result === true || result === 1 || result === 'true' || result === '1') return true;
-    if (result === false || result === 0 || result === 'false' || result === '0') return false;
-    if (result == null || result === undefined) return false;
+function normStatus(value) {
+    return String(value || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+}
+
+const FAIL_STATUSES = new Set([
+    'failed',
+    'error',
+    'dismissed',
+    'closed',
+    'canceled',
+    'cancelled',
+    'skipped',
+    'skip',
+    'nofill',
+    'no_fill',
+    'not_shown',
+    'impression',
+    'opened',
+    'shown',
+    'loaded',
+    'clicked',
+]);
+
+const EARN_STATUSES = new Set([
+    'rewarded',
+    'user_earned_reward',
+    'earned',
+    'reward_earned',
+    'on_user_earned_reward',
+]);
+
+function isFailResult(result) {
+    if (result === false || result === 0 || result === 'false' || result === '0') return true;
+    if (result == null) return false;
+    if (typeof result === 'string') return FAIL_STATUSES.has(normStatus(result));
     if (typeof result === 'object') {
-        if (result.rewarded === true || result.success === true || result.earned === true) return true;
-        if (Number(result.amount) > 0) return true;
-        if (result.rewardType || result.type === 'RewardItem') return true;
-        if (result.rewarded === false || result.success === false || result.earned === false) return false;
-        const status = String(result.status || result.event || result.state || '').toLowerCase();
-        if (['rewarded', 'completed', 'success', 'earned', 'user_earned_reward'].includes(status)) return true;
-        if (['failed', 'dismissed', 'closed', 'canceled', 'cancelled', 'error', 'nofill', 'no_fill', 'skipped'].includes(status)) {
-            return false;
-        }
-    }
-    if (typeof result === 'string') {
-        const v = result.toLowerCase();
-        if (['rewarded', 'completed', 'success', 'ok', 'earned', 'user_earned_reward'].includes(v)) return true;
-        if (['failed', 'error', 'dismissed', 'closed', 'canceled', 'cancelled', 'nofill', 'no_fill', 'skipped'].includes(v)) {
-            return false;
-        }
+        if (result.rewarded === false || result.success === false || result.earned === false) return true;
+        const status = normStatus(result.status || result.event || result.state || result.reason || result.type);
+        return FAIL_STATUSES.has(status);
     }
     return false;
 }
 
 /**
- * Show a rewarded ad via Flutter. Resolves { ok, reason }.
- * Does not throw for normal "no fill" cases.
+ * Strict: only an explicit AdMob reward counts.
+ * Bare true / 1 is ignored — Flutter often returns that when the user hits back.
+ */
+export function isRewardedAdSuccess(result) {
+    if (result == null || result === true || result === 1 || result === 'true' || result === '1') {
+        return false;
+    }
+    if (isFailResult(result)) return false;
+    if (typeof result === 'string') return EARN_STATUSES.has(normStatus(result));
+    if (typeof result === 'object') {
+        if (result.rewarded === true || result.earned === true) return true;
+        if (result.success === true && (result.rewarded === true || result.earned === true || result.amount != null)) {
+            return Number(result.amount) > 0 || result.rewarded === true || result.earned === true;
+        }
+        const status = normStatus(result.status || result.event || result.state || result.callback);
+        return EARN_STATUSES.has(status);
+    }
+    return false;
+}
+
+export function noteRewardedAdEarned(payload) {
+    if (!adSession) return false;
+    if (isFailResult(payload)) return false;
+    // Native onUserEarnedReward often calls JS with no args. During an open ad session that is the earn signal.
+    if (payload == null || payload === true || payload === 1 || isRewardedAdSuccess(payload)) {
+        adSession.earned = true;
+        if (typeof adSession.resolveEarned === 'function') adSession.resolveEarned();
+        return true;
+    }
+    return false;
+}
+
+export function noteRewardedAdClosed() {
+    if (!adSession) return;
+    adSession.closed = true;
+    if (typeof adSession.resolveClosed === 'function') adSession.resolveClosed();
+}
+
+function installSessionHooks() {
+    const onEarned = (payload) => noteRewardedAdEarned(payload);
+    const onClosed = () => noteRewardedAdClosed();
+
+    window.onAdMobUserEarnedReward = onEarned;
+    window.onRewardedAdEarned = onEarned;
+    window.onUserEarnedReward = onEarned;
+    window.onRewardedAdClosed = onClosed;
+    window.onRewardedAdDismissed = onClosed;
+    window.onAdMobAdDismissed = onClosed;
+    window.onAdMobAdFailed = onClosed;
+}
+
+function clearSessionHooks() {
+    delete window.onAdMobUserEarnedReward;
+    delete window.onRewardedAdEarned;
+    delete window.onUserEarnedReward;
+    delete window.onRewardedAdClosed;
+    delete window.onRewardedAdDismissed;
+    delete window.onAdMobAdDismissed;
+    delete window.onAdMobAdFailed;
+}
+
+/**
+ * Show a rewarded ad. Resolves { ok, reason }.
+ * ok is true only if AdMob reported a reward (callback or explicit result object).
  */
 export async function showFlutterRewardedAd(placement = 'reward_ad_1', timeoutMs = 180000) {
     const bridge = await waitForFlutterBridge();
@@ -89,23 +167,45 @@ export async function showFlutterRewardedAd(placement = 'reward_ad_1', timeoutMs
         return { ok: false, reason: 'no_bridge' };
     }
 
+    adSession = { earned: false, closed: false };
+    const earnedWait = new Promise((resolve) => {
+        adSession.resolveEarned = () => resolve(true);
+    });
+    installSessionHooks();
+
     try {
         const result = await Promise.race([
             bridge.callHandler('showRewardAd', placement),
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('ad_timeout')), timeoutMs)
-            ),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('ad_timeout')), timeoutMs)),
         ]);
 
-        if (isRewardedAdSuccess(result)) {
+        if (adSession.earned || isRewardedAdSuccess(result)) {
             return { ok: true, reason: 'rewarded', result };
         }
-        return { ok: false, reason: 'no_fill', result };
+
+        // Reward callback usually arrives just before / with dismiss. Wait briefly.
+        const lateEarn = await Promise.race([
+            earnedWait,
+            new Promise((resolve) => setTimeout(() => resolve(false), 800)),
+        ]);
+
+        if (adSession.earned || lateEarn) {
+            return { ok: true, reason: 'rewarded', result };
+        }
+
+        if (isFailResult(result) || adSession.closed) {
+            return { ok: false, reason: 'dismissed', result };
+        }
+
+        return { ok: false, reason: 'dismissed', result };
     } catch (err) {
         const msg = String(err?.message || err || '');
         if (msg.includes('ad_timeout')) {
             return { ok: false, reason: 'timeout' };
         }
         return { ok: false, reason: 'error', error: err };
+    } finally {
+        clearSessionHooks();
+        adSession = null;
     }
 }

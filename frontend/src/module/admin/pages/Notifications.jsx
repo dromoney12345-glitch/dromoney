@@ -10,7 +10,11 @@ const Notifications = () => {
     const [loading, setLoading] = useState(false);
     const [history, setHistory] = useState([]);
     const [userStats, setUserStats] = useState({ totalActive: 0 });
-    const [editingId, setEditingId] = useState(null);
+    const [audience, setAudience] = useState('all');
+    const [userQuery, setUserQuery] = useState('');
+    const [userResults, setUserResults] = useState([]);
+    const [selectedUsers, setSelectedUsers] = useState([]);
+    const [scheduledAt, setScheduledAt] = useState('');
 
     // Toast state
     const [toast, setToast] = useState(null); // { message: '', type: 'success' | 'error' }
@@ -24,6 +28,67 @@ const Notifications = () => {
         fetchHistory();
         fetchStats();
     }, []);
+
+    useEffect(() => {
+        if (audience === 'all' || userQuery.trim().length < 2) {
+            setUserResults([]);
+            return undefined;
+        }
+        const timer = setTimeout(async () => {
+            try {
+                const res = await api.get(`/admin/users?search=${encodeURIComponent(userQuery.trim())}`);
+                if (res.success) setUserResults((res.data || []).slice(0, 8));
+            } catch {
+                setUserResults([]);
+            }
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [audience, userQuery]);
+
+    const handleSend = async () => {
+        if (!title || !message) return;
+        if (audience !== 'all' && selectedUsers.length === 0) {
+            showToast('Select at least one user', 'error');
+            return;
+        }
+        setLoading(true);
+        try {
+            if (editingId) {
+                const res = await api.put(`/admin/notifications/${editingId}`, { title, message });
+                if (res.success) {
+                    setSent(true);
+                    setTimeout(() => setSent(false), 3000);
+                    setTitle('');
+                    setMessage('');
+                    setEditingId(null);
+                    showToast("Notification updated successfully!", "success");
+                    fetchHistory();
+                }
+            } else {
+                const res = await api.post('/admin/notifications', {
+                    title,
+                    message,
+                    audience: audience === 'all' ? 'all' : 'selected',
+                    userIds: selectedUsers.map((u) => u._id),
+                    scheduledAt: scheduledAt || undefined,
+                });
+                if (res.success) {
+                    setSent(true);
+                    setTimeout(() => setSent(false), 3000);
+                    setTitle('');
+                    setMessage('');
+                    setSelectedUsers([]);
+                    setScheduledAt('');
+                    showToast(scheduledAt ? 'Notification scheduled' : 'Broadcast sent successfully!', 'success');
+                    fetchHistory();
+                }
+            }
+        } catch (err) {
+            showToast(editingId ? "Failed to update notification" : "Failed to send broadcast", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const fetchHistory = async () => {
         try {
@@ -46,39 +111,6 @@ const Notifications = () => {
                 setUserStats({ totalActive: count });
             }
         } catch (err) { console.error(err); }
-    };
-
-    const handleSend = async () => {
-        if (!title || !message) return;
-        setLoading(true);
-        try {
-            if (editingId) {
-                const res = await api.put(`/admin/notifications/${editingId}`, { title, message });
-                if (res.success) {
-                    setSent(true);
-                    setTimeout(() => setSent(false), 3000);
-                    setTitle('');
-                    setMessage('');
-                    setEditingId(null);
-                    showToast("Notification updated successfully!", "success");
-                    fetchHistory();
-                }
-            } else {
-                const res = await api.post('/admin/notifications', { title, message });
-                if (res.success) {
-                    setSent(true);
-                    setTimeout(() => setSent(false), 3000);
-                    setTitle('');
-                    setMessage('');
-                    showToast("Broadcast message sent successfully!", "success");
-                    fetchHistory();
-                }
-            }
-        } catch (err) {
-            showToast(editingId ? "Failed to update notification" : "Failed to send broadcast", "error");
-        } finally {
-            setLoading(false);
-        }
     };
 
     const handleEdit = (notification) => {
@@ -136,25 +168,11 @@ const Notifications = () => {
                     <span className="text-xs font-semibold">{toast.message}</span>
                 </div>
             )}
-            <PageHeader title="Notifications" subtitle="Broadcast plus 12 automatic phone alerts on every user journey step" />
+            <PageHeader title="Notifications" subtitle="Broadcast to all or selected users, plus automatic journey alerts from the notification spec" />
 
             <div className="mb-6 bg-white rounded-lg border border-slate-100 shadow-sm p-4">
-                <h3 className="text-[12px] font-medium text-slate-800 uppercase tracking-normal mb-3">12 phone notifications (FCM)</h3>
-                <p className="text-[11px] text-slate-500 mb-3">These fire on the user&apos;s phone at each step. If the app token is not saved yet, the push is queued and sent when the phone registers.</p>
-                <ol className="grid sm:grid-cols-2 gap-2 text-[12px] text-slate-700 font-medium">
-                    <li>1. Welcome after register</li>
-                    <li>2. KYC submitted</li>
-                    <li>3. KYC approved</li>
-                    <li>4. KYC rejected</li>
-                    <li>5. Virtual Account payment pending</li>
-                    <li>6. Virtual Account activated</li>
-                    <li>7. Invite ₹200 in Pending Wallet</li>
-                    <li>8. Invite ₹200 moved to Virtual</li>
-                    <li>9. Withdrawal requested</li>
-                    <li>10. Withdrawal approved</li>
-                    <li>11. Withdrawal rejected</li>
-                    <li>12. Invite ₹200 removed if they stay inactive (referrer notified)</li>
-                </ol>
+                <h3 className="text-[12px] font-medium text-slate-800 uppercase tracking-normal mb-3">Automatic notifications</h3>
+                <p className="text-[11px] text-slate-500 mb-3">These fire only on the matching event. The same event is not sent twice. If the app token is not saved yet, the push is queued until the phone registers.</p>
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
@@ -187,15 +205,72 @@ const Notifications = () => {
                                 rows={4}
                                 className="mt-2 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[14px] font-medium text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all resize-none" />
                         </div>
+                        <div>
+                            <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal">Send to</label>
+                            <div className="mt-2 flex gap-2">
+                                <button type="button" onClick={() => setAudience('all')}
+                                    className={`flex-1 py-2 rounded-xl text-[11px] font-medium border ${audience === 'all' ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 text-slate-600 border-slate-100'}`}>
+                                    All users
+                                </button>
+                                <button type="button" onClick={() => setAudience('selected')}
+                                    className={`flex-1 py-2 rounded-xl text-[11px] font-medium border ${audience === 'selected' ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 text-slate-600 border-slate-100'}`}>
+                                    Selected users
+                                </button>
+                            </div>
+                        </div>
+                        {audience === 'selected' && (
+                            <div>
+                                <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal">Search users</label>
+                                <input type="text" value={userQuery} onChange={(e) => setUserQuery(e.target.value)}
+                                    placeholder="Name, phone or email"
+                                    className="mt-2 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[14px] font-medium text-slate-800 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                                {userResults.length > 0 && (
+                                    <div className="mt-2 border border-slate-100 rounded-xl overflow-hidden">
+                                        {userResults.map((u) => (
+                                            <button type="button" key={u._id}
+                                                onClick={() => {
+                                                    if (!selectedUsers.some((s) => s._id === u._id)) {
+                                                        setSelectedUsers((prev) => [...prev, u]);
+                                                    }
+                                                    setUserQuery('');
+                                                    setUserResults([]);
+                                                }}
+                                                className="w-full text-left px-3 py-2 text-[12px] hover:bg-slate-50 border-b border-slate-50 last:border-0">
+                                                {u.name} · {u.phone || u.email}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                                {selectedUsers.length > 0 && (
+                                    <div className="mt-2 flex flex-wrap gap-2">
+                                        {selectedUsers.map((u) => (
+                                            <span key={u._id} className="text-[11px] bg-sky-50 text-sky-700 px-2 py-1 rounded-lg">
+                                                {u.name}
+                                                <button type="button" className="ml-1" onClick={() => setSelectedUsers((prev) => prev.filter((s) => s._id !== u._id))}>×</button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        <div>
+                            <label className="text-[10px] font-medium text-slate-500 uppercase tracking-normal">Schedule (optional)</label>
+                            <input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)}
+                                className="mt-2 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-[14px] font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                        </div>
                         <div className="flex items-center gap-3 p-3 bg-sky-50 rounded-xl border border-sky-100">
                             <Users size={16} className="text-sky-500 shrink-0" />
-                            <p className="text-[12px] font-medium text-sky-700">Will be sent to <span className="font-medium">{userStats.totalActive.toLocaleString()} users</span></p>
+                            <p className="text-[12px] font-medium text-sky-700">
+                                {audience === 'all'
+                                    ? <>Will be sent to <span className="font-medium">{userStats.totalActive.toLocaleString()} users</span></>
+                                    : <>Will be sent to <span className="font-medium">{selectedUsers.length} selected user{selectedUsers.length === 1 ? '' : 's'}</span></>}
+                            </p>
                         </div>
                         <button 
                             disabled={loading}
                             onClick={handleSend}
                             className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-medium text-[12px] uppercase tracking-normal transition-all active:scale-95 shadow-md ${sent ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-slate-900 hover:bg-black text-white shadow-sky-100'}`}>
-                            {loading ? <Loader2 size={15} className="animate-spin" /> : sent ? '✓ Success!' : <><Send size={15} /> {editingId ? 'Update Notification' : 'Send Broadcast'}</>}
+                            {loading ? <Loader2 size={15} className="animate-spin" /> : sent ? '✓ Success!' : <><Send size={15} /> {editingId ? 'Update Notification' : scheduledAt ? 'Schedule' : 'Send Broadcast'}</>}
                         </button>
                     </div>
                 </div>

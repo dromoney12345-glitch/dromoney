@@ -405,9 +405,17 @@ exports.getMe = async (req, res, next) => {
                 const { applyWalletMaintenance } = require('../utils/walletLedger');
                 const { persistPendingWipeEffects } = require('../utils/pendingWipeSideEffects');
                 const { applyInviteDay28IfDue } = require('../utils/referralReward');
+                const { sendFirstTimeVaReminders } = require('../utils/journeyReminders');
                 const { expiryWipe, kycWipe, migrated } = await applyWalletMaintenance(user);
                 const claw = await applyInviteDay28IfDue(user);
-                if (migrated || expiryWipe.cyclesApplied > 0 || kycWipe.cyclesApplied > 0 || claw.applied) {
+                const reminderChanged = await sendFirstTimeVaReminders(user);
+                const last = user.lastActiveAt ? new Date(user.lastActiveAt).getTime() : 0;
+                if (Date.now() - last > 60 * 60 * 1000) {
+                    user.lastActiveAt = new Date();
+                    if (user.inactiveReminderSent) user.inactiveReminderSent = false;
+                    modified = true;
+                }
+                if (migrated || expiryWipe.cyclesApplied > 0 || kycWipe.cyclesApplied > 0 || claw.applied || reminderChanged) {
                     modified = true;
                 }
                 if (modified) {

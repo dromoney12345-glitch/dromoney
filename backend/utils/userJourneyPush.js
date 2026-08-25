@@ -2,75 +2,183 @@ const User = require('../models/User');
 
 const JOURNEY_STEPS = {
     welcome: {
-        title: 'Welcome to Dromoney 👋',
-        body: 'Complete KYC, then create your Virtual Account to start earning.',
+        title: 'Welcome to Dromoney',
+        body: 'Welcome to Dromoney! आपका account successfully create हो गया है। अब अपने account को complete करके earning शुरू करें।',
         type: 'info',
         link: '/user/home',
     },
     kyc_submitted: {
-        title: 'KYC Received 📑',
-        body: 'Your KYC documents are received. Please wait while our team reviews them.',
+        title: 'KYC Submitted',
+        body: 'आपके KYC documents successfully submit हो गए हैं और अभी review में हैं। Verification complete होने पर आपको notification दिया जाएगा।',
         type: 'info',
         link: '/user/profile',
     },
     kyc_approved: {
-        title: 'KYC Approved ✅',
-        body: 'KYC is approved. Create a Virtual Account to move money from Pending to Virtual.',
+        title: 'KYC Approved',
+        body: 'Congratulations! आपका KYC successfully approve हो गया है। अब आप platform की eligible earning features का उपयोग कर सकते हैं।',
         type: 'success',
         link: '/user/virtual-account',
     },
     kyc_rejected: {
-        title: 'KYC Rejected ⚠️',
-        body: 'KYC verification failed. Please re-submit clear documents.',
+        title: 'KYC Rejected',
+        body: 'आपका KYC verification complete नहीं हो सका। कृपया दिए गए कारण को check करें और आवश्यक सुधार के बाद documents दोबारा submit करें।',
         type: 'error',
         link: '/user/profile',
     },
+    va_reminder_3: {
+        title: 'Virtual Account — 3 days',
+        body: 'अपना Virtual Account 3 दिनों के अंदर बनाएं और ₹399 अपने wallet में वापस पाएं। समय सीमा के बाद ₹499 लागू होगा।',
+        type: 'warning',
+        link: '/user/virtual-account',
+    },
     va_payment_pending: {
-        title: 'Virtual Account Payment Pending ⏳',
-        body: 'Payment proof received. Admin will verify in 10–15 minutes.',
+        title: 'Virtual Account Payment',
+        body: 'आपका Virtual Account payment successfully receive हो गया है। आपका payment अभी admin approval के लिए pending है।',
         type: 'info',
         link: '/user/virtual-account',
     },
     va_activated: {
-        title: 'Virtual Account Active 🚀',
-        body: 'Your Virtual Account is active. Withdrawals can be requested from Virtual Wallet.',
+        title: 'Virtual Account Unlocked',
+        body: 'आपका Virtual Account successfully approved और unlocked हो गया है। अब आप platform की संबंधित earning सुविधाओं का उपयोग कर सकते हैं।',
         type: 'success',
         link: '/user/wallet',
     },
+    va_deadline_7: {
+        title: 'Virtual Account reminder',
+        body: 'आपके Virtual Account बनाने की समय सीमा नजदीक आ रही है। कृपया 14 दिनों की समय सीमा से पहले Virtual Account बनाएं, अन्यथा आपकी pending amount सुरक्षित नहीं रह सकती।',
+        type: 'warning',
+        link: '/user/virtual-account',
+    },
+    va_deadline_1: {
+        title: '1 दिन बाकी',
+        body: 'अंतिम 1 दिन बाकी है! अभी अपना Virtual Account बनाएं और अपनी pending amount को सुरक्षित करें।',
+        type: 'warning',
+        link: '/user/virtual-account',
+    },
+    va_deadline_14: {
+        title: 'Pending amount removed',
+        body: 'आपकी pending amount समय सीमा पूरी होने के कारण remove कर दी गई है। कृपया Virtual Account बनाकर अपनी आगे की eligible earning सुविधाओं को सक्रिय रखें।',
+        type: 'warning',
+        link: '/user/virtual-account',
+    },
+    va_cycle_reminder: {
+        title: 'Virtual Account बनाएं',
+        body: 'अपनी earning सुविधाओं को जारी रखने के लिए अपना Virtual Account बनाएं और उपलब्ध benefits को सुरक्षित रखें।',
+        type: 'warning',
+        link: '/user/virtual-account',
+    },
+    va_renew_reminder: {
+        title: 'Virtual Account renewal',
+        body: 'आपके Virtual Account की validity समाप्त होने में केवल 7 दिन बाकी हैं। बिना interruption के service जारी रखने के लिए अपना Virtual Account समय पर renew करें।',
+        type: 'warning',
+        link: '/user/virtual-account',
+    },
+    va_renewal_pending: {
+        title: 'Renewal pending',
+        body: 'आपके Virtual Account का renewal pending है। कृपया अपना Virtual Account जल्द renew करें ताकि आपकी eligible earning services जारी रह सकें।',
+        type: 'warning',
+        link: '/user/virtual-account',
+    },
+    va_expired: {
+        title: 'Virtual Account locked',
+        body: 'आपके Virtual Account का renewal pending है। कृपया अपना Virtual Account जल्द renew करें ताकि आपकी eligible earning services जारी रह सकें।',
+        type: 'error',
+        link: '/user/virtual-account',
+    },
+    va_pending_cleared: {
+        title: 'Pending amount removed',
+        body: 'आपकी pending amount समय सीमा पूरी होने के कारण remove कर दी गई है। कृपया Virtual Account बनाकर अपनी आगे की eligible earning सुविधाओं को सक्रिय रखें।',
+        type: 'warning',
+        link: '/user/virtual-account',
+    },
+    va_renewed: {
+        title: 'Virtual Account Unlocked',
+        body: 'आपका Virtual Account successfully approved और unlocked हो गया है। अब आप platform की संबंधित earning सुविधाओं का उपयोग कर सकते हैं।',
+        type: 'success',
+        link: '/user/wallet',
+    },
+    ff_criteria_done: {
+        title: 'Future Fund criteria complete',
+        body: 'Congratulations! आपका Future Fund criteria successfully complete हो गया है। अब अपना Future Fund activate करें।',
+        type: 'success',
+        link: '/user/future-fund',
+    },
+    ff_activated: {
+        title: 'Future Fund Active',
+        body: 'आपका Future Fund successfully active हो गया है। अपनी eligible passive income जारी रखने के लिए Ads और Tasks नियमित रूप से complete करते रहें।',
+        type: 'success',
+        link: '/user/future-fund',
+    },
     invite_pending: {
-        title: 'Invite ₹200 in Pending',
-        body: 'Your invite completed KYC. ₹200 is in Pending until they create a Virtual Account.',
+        title: 'Referral ₹200 Pending',
+        body: 'Congratulations! आपकी ₹200 referral earning successfully pending wallet में add हो गई है। Verification complete होने के बाद eligible amount आपके Virtual Account में transfer होगी।',
         type: 'success',
         link: '/user/wallet',
     },
     invite_virtual: {
-        title: 'Invite ₹200 Unlocked',
-        body: '₹200 moved from Pending Wallet to Virtual Wallet.',
+        title: 'Referral ₹200 Virtual',
+        body: 'आपकी ₹200 referral earning successfully verify होकर आपके Virtual Account में add हो गई है। अब आप eligible amount को withdraw कर सकते हैं।',
         type: 'success',
         link: '/user/wallet',
     },
     invite_clawback: {
-        title: 'Refer active users only',
-        body: 'The user you referred is not active yet, so ₹200 was removed from Pending.',
+        title: 'Referral ₹200 removed',
+        body: 'आपका referred user inactive पाया गया है, इसलिए संबंधित ₹200 referral amount remove कर दी गई है। कृपया active और eligible users को ही refer करें ताकि आपकी referral earning सुरक्षित रहे।',
         type: 'warning',
         link: '/user/wallet',
     },
+    maintenance: {
+        title: 'Maintenance',
+        body: 'System में अभी maintenance चल रहा है। हुई असुविधा के लिए हमें खेद है। कृपया कुछ समय बाद दोबारा प्रयास करें। System जल्द ही सामान्य रूप से उपलब्ध होगा।',
+        type: 'alert',
+        link: '/user/home',
+    },
+    task_approved: {
+        title: 'Task Approved',
+        body: 'Congratulations! आपका task successfully approve हो गया है और आपकी eligible earning आपके fund में जमा कर दी गई है।',
+        type: 'success',
+        link: '/user/earn',
+    },
+    task_rejected: {
+        title: 'Task Rejected',
+        body: 'आपका task proof approve नहीं हो सका। कृपया rejection reason check करें और यदि applicable हो तो सही proof के साथ task दोबारा submit करें।',
+        type: 'error',
+        link: '/user/earn',
+    },
     withdraw_requested: {
-        title: 'Withdrawal Submitted 💸',
-        body: 'Your withdrawal request is pending. Admin will process it in 10–15 minutes.',
+        title: 'Withdrawal Submitted',
+        body: 'आपकी withdrawal request successfully submit हो गई है। आपकी request अभी verification/processing में है।',
+        type: 'info',
+        link: '/user/wallet',
+    },
+    withdraw_processing: {
+        title: 'Withdrawal Processing',
+        body: 'आपकी withdrawal request अभी processing में है। Verification complete होने के बाद payment process किया जाएगा।',
         type: 'info',
         link: '/user/wallet',
     },
     withdraw_approved: {
-        title: 'Withdrawal Approved 🎉',
-        body: 'Your withdrawal has been approved and transferred.',
+        title: 'Withdrawal Approved',
+        body: 'आपकी withdrawal request successfully approved और processed हो गई है। कृपया अपने selected payment account में amount check करें।',
         type: 'success',
         link: '/user/wallet',
     },
     withdraw_rejected: {
-        title: 'Withdrawal Rejected ❌',
-        body: 'Your withdrawal was rejected. Please check details and try again.',
+        title: 'Withdrawal Rejected',
+        body: 'आपकी withdrawal request reject कर दी गई है। कृपया rejection reason check करें और आवश्यक सुधार के बाद eligible होने पर दोबारा request submit करें।',
         type: 'error',
+        link: '/user/wallet',
+    },
+    inactive_nudge: {
+        title: 'वापस आएं',
+        body: 'आप पिछले कुछ दिनों से active नहीं हैं। अपनी earning जारी रखने के लिए Dromoney पर वापस आएं और available Ads, Tasks तथा eligible earning activities complete करें।',
+        type: 'info',
+        link: '/user/home',
+    },
+    earning_virtual: {
+        title: 'Earning credited',
+        body: 'Congratulations! आपकी earning successfully आपके Virtual Account में credit हो गई है। अपना balance check करें।',
+        type: 'success',
         link: '/user/wallet',
     },
     account_hold: {
@@ -79,43 +187,20 @@ const JOURNEY_STEPS = {
         type: 'error',
         link: '/user/home',
     },
-    va_deadline_7: {
-        title: 'Virtual Account reminder',
-        body: 'Create your Virtual Account so Pending earnings can move to Virtual and you can withdraw.',
-        type: 'warning',
-        link: '/user/virtual-account',
-    },
-    va_deadline_14: {
-        title: 'Pending earnings removed',
-        body: 'Virtual Account was not created within 14 days. Your Pending Wallet was cleared. This repeats every 14 days until you buy a Virtual Account.',
-        type: 'warning',
-        link: '/user/virtual-account',
-    },
-    va_renew_reminder: {
-        title: 'Virtual Account expires soon',
-        body: 'Your Virtual Account expires in 7 days. Renew it now so withdrawals stay open and new earnings keep going to Virtual.',
-        type: 'warning',
-        link: '/user/virtual-account',
-    },
-    va_expired: {
-        title: 'Virtual Account locked',
-        body: 'Your Virtual Account has expired and is locked. Previous Virtual balance is safe but cannot be withdrawn until you renew. New earnings will go to Pending.',
-        type: 'error',
-        link: '/user/virtual-account',
-    },
-    va_pending_cleared: {
-        title: 'Pending Wallet cleared',
-        body: 'Virtual Account was not renewed within 14 days, so Pending earnings were removed. Locked Virtual balance is still safe. Renew to unlock it.',
-        type: 'warning',
-        link: '/user/virtual-account',
-    },
-    va_renewed: {
-        title: 'Virtual Account renewed',
-        body: 'Virtual Account is active for 6 more months. Previous Virtual balance is unlocked again, and current Pending moved to Virtual.',
-        type: 'success',
-        link: '/user/wallet',
-    },
 };
+
+const ONCE_STEPS = new Set([
+    'welcome',
+    'kyc_approved',
+    'va_reminder_3',
+    'va_deadline_7',
+    'va_deadline_1',
+    'va_activated',
+    'ff_criteria_done',
+    'ff_activated',
+    'va_renew_reminder',
+    'inactive_nudge',
+]);
 
 function stringifyData(data = {}) {
     const out = {};
@@ -126,8 +211,18 @@ function stringifyData(data = {}) {
     return out;
 }
 
-async function persistNotification(userId, { title, message, type, step, link, skipUserArray = false }) {
+function journeyNotificationId(userId, step, extras = {}) {
+    if (extras.notificationId) return String(extras.notificationId);
+    if (ONCE_STEPS.has(step)) return `${userId}_${step}`;
+    return `${userId}_${step}_${Date.now()}`;
+}
+
+async function persistNotification(userId, { title, message, type, step, link, skipUserArray = false, dedupeKey = '' }) {
     const AppNotification = require('../models/AppNotification');
+    if (dedupeKey) {
+        const existing = await AppNotification.findOne({ user: userId, dedupeKey }).select('_id');
+        if (existing) return existing;
+    }
     const doc = await AppNotification.create({
         user: userId,
         title,
@@ -136,6 +231,7 @@ async function persistNotification(userId, { title, message, type, step, link, s
         step: step || '',
         link: link || '/user/home',
         isRead: false,
+        dedupeKey: dedupeKey || '',
     });
 
     if (!skipUserArray) {
@@ -167,6 +263,7 @@ async function queuePendingPush(userId, item) {
                     title: item.title,
                     body: item.body,
                     link: item.link,
+                    notificationId: item.notificationId || '',
                     createdAt: new Date(),
                 }],
                 $slice: -20,
@@ -185,18 +282,27 @@ async function notifyJourney(userId, step, extras = {}) {
     const body = extras.body || def.body;
     const type = extras.type || def.type || 'info';
     const link = extras.link || def.link || '/user/home';
+    const notificationId = journeyNotificationId(userId, step, extras);
 
     if (!title || !body) return { sent: false };
 
     try {
-        await persistNotification(userId, {
-            title,
-            message: body,
-            type,
-            step,
-            link,
-            skipUserArray: !!extras.skipInApp,
-        });
+        const AppNotification = require('../models/AppNotification');
+        const already = notificationId
+            ? await AppNotification.findOne({ user: userId, dedupeKey: notificationId }).select('_id')
+            : null;
+
+        if (!already) {
+            await persistNotification(userId, {
+                title,
+                message: body,
+                type,
+                step,
+                link,
+                skipUserArray: false,
+                dedupeKey: notificationId,
+            });
+        }
 
         const { sendNotificationToUser } = require('../controllers/fcmController');
         const sent = await sendNotificationToUser(userId, {
@@ -205,19 +311,19 @@ async function notifyJourney(userId, step, extras = {}) {
             data: stringifyData({
                 type: step,
                 link,
-                notificationId: extras.notificationId || `${userId}_${step}_${Date.now()}`,
+                notificationId,
             }),
         });
 
         if (!sent) {
-            await queuePendingPush(userId, { step, title, body, link });
+            await queuePendingPush(userId, { step, title, body, link, notificationId });
         }
 
-        return { sent: !!sent };
+        return { sent: !!sent, skipped: !!already };
     } catch (err) {
         console.error(`[JOURNEY-PUSH] ${step} failed:`, err.message);
         try {
-            await queuePendingPush(userId, { step, title, body, link });
+            await queuePendingPush(userId, { step, title, body, link, notificationId });
         } catch (queueErr) {
             console.error('[JOURNEY-PUSH] queue failed:', queueErr.message);
         }
@@ -243,7 +349,7 @@ async function flushPendingPushes(userId) {
                 data: stringifyData({
                     type: item.step || 'queued',
                     link: item.link || '/user/home',
-                    notificationId: `${userId}_${item.step || 'queued'}_${Date.now()}`,
+                    notificationId: item.notificationId || `${userId}_${item.step || 'queued'}_${Date.now()}`,
                 }),
             });
             if (!sent) {

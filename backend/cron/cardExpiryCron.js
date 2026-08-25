@@ -29,7 +29,7 @@ async function recordPendingWipe(user, wiped) {
     }).catch((err) => console.error('Pending wipe tx failed:', err.message));
 
     await notifyVa(user._id, 'va_pending_cleared', {
-        body: `₹${Number(wiped).toFixed(2)} in Pending was cleared because Virtual Account was not renewed within 14 days. Your locked Virtual balance is still safe. Renew to unlock it and keep new earnings.`,
+        notificationId: `${user._id}_va_pending_cleared_${Date.now()}`,
     });
 }
 
@@ -55,7 +55,9 @@ const startCardExpiryCron = () => {
                 user.markModified('wallet');
                 await user.save({ validateBeforeSave: false });
                 if (justExpired) {
-                    await notifyVa(user._id, 'va_expired');
+                    await notifyVa(user._id, 'va_expired', {
+                        notificationId: `${user._id}_va_expired_${user.withdrawalCard?.expiresAt || Date.now()}`,
+                    });
                 }
             }
 
@@ -69,8 +71,13 @@ const startCardExpiryCron = () => {
                 user.withdrawalCard.renewalReminderSent = true;
                 user.markModified('withdrawalCard');
                 await user.save({ validateBeforeSave: false });
-                await notifyVa(user._id, 'va_renew_reminder');
+                await notifyVa(user._id, 'va_renew_reminder', {
+                    notificationId: `${user._id}_va_renew_reminder`,
+                });
             }
+
+            const { sendRenewalGraceReminders } = require('../utils/journeyReminders');
+            await sendRenewalGraceReminders(now);
 
             const expired = await User.find({
                 'withdrawalCard.status': 'expired',

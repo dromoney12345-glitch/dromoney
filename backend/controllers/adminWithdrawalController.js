@@ -50,8 +50,29 @@ exports.updateWithdrawalStatus = async (req, res) => {
             return res.status(404).json({ success: false, message: "Withdrawal not found" });
         }
 
-        if (withdrawal.status !== 'Pending') {
-            return res.status(400).json({ success: false, message: "Only pending requests can be updated" });
+        if (!['Pending', 'Processing'].includes(withdrawal.status)) {
+            return res.status(400).json({ success: false, message: "Only pending or processing requests can be updated" });
+        }
+
+        if (status === 'Processing') {
+            if (withdrawal.status !== 'Pending') {
+                return res.status(400).json({ success: false, message: "Only pending requests can move to processing" });
+            }
+            withdrawal.status = 'Processing';
+            if (remarks) withdrawal.remarks = remarks;
+            await withdrawal.save();
+            try {
+                const { notifyJourney } = require('../utils/userJourneyPush');
+                await notifyJourney(withdrawal.user, 'withdraw_processing', {
+                    notificationId: `${withdrawal.user}_withdraw_processing_${withdrawal._id}`,
+                });
+            } catch (pushErr) {
+                console.error('Withdrawal processing push failed:', pushErr.message);
+            }
+            if (global.io) {
+                global.io.emit(`withdrawal_update_${withdrawal.user}`, { status: 'Processing' });
+            }
+            return res.json({ success: true, message: 'Withdrawal moved to processing' });
         }
 
         const user = await User.findById(withdrawal.user);
@@ -132,16 +153,11 @@ exports.updateWithdrawalStatus = async (req, res) => {
 
         // Send Push Notification
         if (status === 'Approved' || status === 'Rejected') {
-            const pushTitle = status === 'Approved' ? 'Withdrawal Approved! 🎉' : 'Withdrawal Rejected ❌';
-            const pushBody = status === 'Approved'
-                ? `Your withdrawal request of ₹${withdrawal.amount} has been successfully approved & transferred.`
-                : `Your withdrawal request of ₹${withdrawal.amount} was rejected. Reason: ${remarks || 'Incorrect details or document mismatch.'}`;
-
             const { notifyJourney } = require('../utils/userJourneyPush');
             await notifyJourney(
                 withdrawal.user,
                 status === 'Approved' ? 'withdraw_approved' : 'withdraw_rejected',
-                { title: pushTitle, body: pushBody }
+                { notificationId: `${withdrawal.user}_withdraw_${status}_${withdrawal._id}` }
             );
         }
 

@@ -35,6 +35,7 @@ exports.getSettings = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 exports.updateSettings = asyncHandler(async (req, res) => {
     let settings = await Settings.findOne();
+    const wasMaintenance = !!(settings && settings.maintenanceMode);
 
     const updateData = {
         ...req.body,
@@ -85,6 +86,28 @@ exports.updateSettings = asyncHandler(async (req, res) => {
             if (req.body.adminEmail) admin.email = req.body.adminEmail;
             if (req.body.adminPassword) admin.password = req.body.adminPassword;
             await admin.save();
+        }
+    }
+
+    if (settings?.maintenanceMode && !wasMaintenance) {
+        try {
+            const { JOURNEY_STEPS } = require('../utils/userJourneyPush');
+            const { deliverNotification } = require('./notificationController');
+            const Notification = require('../models/Notification');
+            const def = JOURNEY_STEPS.maintenance;
+            const notification = await Notification.create({
+                title: def.title,
+                message: def.body,
+                type: 'alert',
+                audience: 'all',
+                status: 'sent',
+                targetUrl: '/user/home',
+            });
+            await deliverNotification(notification);
+            settings.maintenanceNotifiedAt = new Date();
+            await settings.save();
+        } catch (err) {
+            console.error('Maintenance notify failed:', err.message);
         }
     }
 

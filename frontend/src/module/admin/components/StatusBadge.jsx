@@ -6,6 +6,7 @@ const StatusBadge = ({ status }) => {
         approved: 'bg-emerald-50 text-emerald-600',
         success: 'bg-emerald-50 text-emerald-600',
         pending: 'bg-amber-50 text-amber-600',
+        processing: 'bg-amber-50 text-amber-600',
         blocked: 'bg-rose-50 text-rose-600',
         rejected: 'bg-rose-50 text-rose-600',
         failed: 'bg-rose-50 text-rose-600',

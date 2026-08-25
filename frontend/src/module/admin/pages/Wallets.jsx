@@ -243,6 +243,31 @@ const Wallets = () => {
                                             {w.status === 'Pending' && (
                                                 <>
                                                     <button
+                                                        onClick={() => setConfirmAction({ id: w.id, status: 'Processing', name: w.user, amount: w.amount })}
+                                                        title="Mark processing"
+                                                        className="w-7 h-7 bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-500 rounded-lg flex items-center justify-center transition-all border border-amber-100 cursor-pointer"
+                                                    >
+                                                        <Clock size={13} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setConfirmAction({ id: w.id, status: 'Approved', name: w.user, amount: w.amount })}
+                                                        title="Approve"
+                                                        className="w-7 h-7 bg-emerald-50 hover:bg-emerald-500 hover:text-white text-emerald-500 rounded-lg flex items-center justify-center transition-all border border-emerald-100 cursor-pointer"
+                                                    >
+                                                        <CheckCircle size={13} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setConfirmAction({ id: w.id, status: 'Rejected', name: w.user, amount: w.amount })}
+                                                        title="Reject"
+                                                        className="w-7 h-7 bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-500 rounded-lg flex items-center justify-center transition-all border border-rose-100 cursor-pointer"
+                                                    >
+                                                        <XCircle size={13} />
+                                                    </button>
+                                                </>
+                                            )}
+                                            {w.status === 'Processing' && (
+                                                <>
+                                                    <button
                                                         onClick={() => setConfirmAction({ id: w.id, status: 'Approved', name: w.user, amount: w.amount })}
                                                         title="Approve"
                                                         className="w-7 h-7 bg-emerald-50 hover:bg-emerald-500 hover:text-white text-emerald-500 rounded-lg flex items-center justify-center transition-all border border-emerald-100 cursor-pointer"
@@ -271,14 +296,18 @@ const Wallets = () => {
             {confirmAction && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="bg-white rounded-lg w-full max-w-sm p-4 shadow-2xl animate-in zoom-in-95 duration-200">
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${confirmAction.status === 'Approved' ? 'bg-emerald-50' : 'bg-rose-50'}`}>
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 ${
+                            confirmAction.status === 'Approved' ? 'bg-emerald-50' : confirmAction.status === 'Processing' ? 'bg-amber-50' : 'bg-rose-50'
+                        }`}>
                             {confirmAction.status === 'Approved'
                                 ? <CheckCircle size={24} className="text-emerald-500" />
+                                : confirmAction.status === 'Processing'
+                                ? <Clock size={24} className="text-amber-500" />
                                 : <XCircle size={24} className="text-rose-500" />
                             }
                         </div>
                         <h3 className="text-center text-[15px] text-slate-800 mb-1">
-                            {confirmAction.status === 'Approved' ? 'Approve Withdrawal?' : 'Reject Withdrawal?'}
+                            {confirmAction.status === 'Approved' ? 'Approve Withdrawal?' : confirmAction.status === 'Processing' ? 'Move to Processing?' : 'Reject Withdrawal?'}
                         </h3>
                         <p className="text-center text-[11px] text-slate-400 mb-5">
                             {confirmAction.name} — {confirmAction.amount}
@@ -295,6 +324,8 @@ const Wallets = () => {
                                 className={`flex-1 py-2.5 rounded-xl text-[11px] text-white transition-all cursor-pointer ${
                                     confirmAction.status === 'Approved'
                                         ? 'bg-emerald-500 hover:bg-emerald-600'
+                                        : confirmAction.status === 'Processing'
+                                        ? 'bg-amber-500 hover:bg-amber-600'
                                         : 'bg-rose-500 hover:bg-rose-600'
                                 }`}
                             >
@@ -370,8 +401,16 @@ const Wallets = () => {
                             )}
 
                             {/* Action buttons inside detail modal for Pending */}
-                            {selectedDetail.status === 'Pending' && (
+                            {(selectedDetail.status === 'Pending' || selectedDetail.status === 'Processing') && (
                                 <div className="flex gap-3 pt-2">
+                                    {selectedDetail.status === 'Pending' && (
+                                        <button
+                                            onClick={() => setConfirmAction({ id: selectedDetail.id, status: 'Processing', name: selectedDetail.user, amount: selectedDetail.amount })}
+                                            className="flex-1 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-[11px] uppercase tracking-normal flex items-center justify-center gap-2 transition-all cursor-pointer"
+                                        >
+                                            <Clock size={14} /> Process
+                                        </button>
+                                    )}
                                     <button
                                         onClick={() => setConfirmAction({ id: selectedDetail.id, status: 'Approved', name: selectedDetail.user, amount: selectedDetail.amount })}
                                         className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-[11px] uppercase tracking-normal flex items-center justify-center gap-2 transition-all cursor-pointer"

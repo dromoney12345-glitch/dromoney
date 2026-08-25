@@ -2,104 +2,170 @@ const Notification = require('../models/Notification');
 const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 
-// @desc    Send broadcast notification to all users
-// @route   POST /api/admin/notifications/broadcast
-// @access  Private/Admin
+async function persistInboxForUsers(userIds, { title, message, type, link, notificationId }) {
+    const AppNotification = require('../models/AppNotification');
+    const docs = userIds.map((id) => ({
+        user: id,
+        title,
+        message,
+        type: type || 'broadcast',
+        step: 'admin_broadcast',
+        link: link || '/user/home',
+        isRead: false,
+        dedupeKey: `${id}_${notificationId}`,
+    }));
+    for (let i = 0; i < docs.length; i += 400) {
+        await AppNotification.insertMany(docs.slice(i, i + 400), { ordered: false }).catch(() => {});
+    }
+}
+
+async function resolveAudienceIds(audience, userIds) {
+    if (audience === 'selected' || audience === 'user') {
+        return [...new Set((userIds || []).map((id) => String(id)).filter(Boolean))];
+    }
+    const users = await User.find({ isBlocked: { $ne: true } }).select('_id');
+    return users.map((u) => String(u._id));
+}
+
+async function deliverNotification(notification) {
+    const ids = await resolveAudienceIds(notification.audience, notification.userIds);
+    const notificationId = `admin_${notification._id}`;
+    const link = notification.targetUrl || '/user/home';
+
+    await persistInboxForUsers(ids, {
+        title: notification.title,
+        message: notification.message,
+        type: notification.type || 'broadcast',
+        link,
+        notificationId,
+    });
+
+    if (global.io) {
+        if (notification.audience === 'all') {
+            global.io.emit('new_broadcast', {
+                id: notification._id,
+                title: notification.title,
+                message: notification.message,
+                createdAt: notification.createdAt,
+            });
+        } else {
+            ids.forEach((id) => {
+                global.io.emit(`user_notification_${id}`, {
+                    id: notification._id,
+                    title: notification.title,
+                    message: notification.message,
+                });
+            });
+        }
+    }
+
+    try {
+        const { sendBroadcastNotification } = require('./fcmController');
+        await sendBroadcastNotification({
+            title: notification.title,
+            body: notification.message,
+            userIds: notification.audience === 'all' ? undefined : ids,
+            data: {
+                type: notification.type || 'broadcast',
+                link,
+                notificationId,
+            },
+        });
+    } catch (pushErr) {
+        console.error('Push broadcast failed:', pushErr.message);
+    }
+
+    notification.status = 'sent';
+    notification.sentAt = new Date();
+    notification.recipients = ids.length;
+    await notification.save();
+    return notification;
+}
+
+exports.deliverNotification = deliverNotification;
+
 exports.sendBroadcast = async (req, res, next) => {
     try {
-        const { title, message, type, targetUrl } = req.body;
+        const { title, message, type, targetUrl, audience, userIds, scheduledAt } = req.body;
 
         if (!title || !message) {
             return next(new ErrorResponse('Please provide title and message', 400));
         }
 
-        // 1. Get total active users count for reporting
-        const userCount = await User.countDocuments({ isBlocked: false });
+        const audienceType = ['selected', 'user'].includes(audience) ? audience : 'all';
+        const ids = audienceType === 'all' ? [] : [...new Set((userIds || []).map(String).filter(Boolean))];
+        if (audienceType !== 'all' && !ids.length) {
+            return next(new ErrorResponse('Select at least one user', 400));
+        }
 
-        // 2. Save Notification to DB
+        const when = scheduledAt ? new Date(scheduledAt) : null;
+        const isFuture = when && !Number.isNaN(when.getTime()) && when.getTime() > Date.now() + 15000;
+
         const notification = await Notification.create({
             title,
             message,
             type: type || 'broadcast',
             targetUrl,
-            recipients: userCount
+            audience: audienceType,
+            userIds: ids,
+            scheduledAt: isFuture ? when : null,
+            status: isFuture ? 'scheduled' : 'sent',
+            recipients: 0,
         });
 
-        // 3. Emit Real-time signal via Socket.io (Handled in server.js or via global io)
-        if (global.io) {
-            global.io.emit('new_broadcast', {
-                id: notification._id,
-                title: notification.title,
-                message: notification.message,
-                createdAt: notification.createdAt
+        if (isFuture) {
+            return res.status(201).json({
+                success: true,
+                data: notification,
+                message: `Scheduled for ${when.toISOString()}`,
             });
         }
 
-        // 4. Send Push Notification Broadcast to all devices via FCM
-        try {
-            const { sendBroadcastNotification } = require('./fcmController');
-            await sendBroadcastNotification({
-                title: notification.title,
-                body: notification.message,
-                data: {
-                    type: notification.type,
-                    link: notification.targetUrl || '/user/events'
-                }
-            });
-        } catch (pushErr) {
-            console.error('Push broadcast failed:', pushErr.message);
-        }
+        await deliverNotification(notification);
 
         res.status(201).json({
             success: true,
-            data: notification
+            data: notification,
         });
     } catch (err) {
         next(err);
     }
 };
 
-// @desc    Get broadcast history
-// @route   GET /api/admin/notifications
-// @access  Private/Admin
 exports.getNotifications = async (req, res, next) => {
     try {
-        const notifications = await Notification.find().sort('-createdAt').limit(20);
+        const notifications = await Notification.find().sort('-createdAt').limit(40);
         res.status(200).json({
             success: true,
-            data: notifications
+            data: notifications,
         });
     } catch (err) {
         next(err);
     }
 };
 
-// @desc    Get latest notifications for user
-// @route   GET /api/public/notifications
-// @access  Public
 exports.getPublicNotifications = async (req, res, next) => {
     try {
-        let query = { isActive: true };
-        
-        // If user is logged in, don't show notifications that were created before they registered
+        let query = {
+            isActive: true,
+            status: { $ne: 'scheduled' },
+            $or: [{ audience: 'all' }, { audience: { $exists: false } }],
+        };
+
         if (req.user) {
             query.createdAt = { $gte: req.user.createdAt };
         }
 
-        // Fetch last 10 active broadcasts matching the query
         const notifications = await Notification.find(query).sort('-createdAt').limit(10);
         res.status(200).json({
             success: true,
-            data: notifications
+            data: notifications,
         });
     } catch (err) {
         next(err);
     }
 };
 
-// @desc    Delete a notification
-// @route   DELETE /api/admin/notifications/:id
-// @access  Private/Admin
 exports.deleteNotification = async (req, res, next) => {
     try {
         const notification = await Notification.findById(req.params.id);
@@ -112,31 +178,25 @@ exports.deleteNotification = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            data: {}
+            data: {},
         });
     } catch (err) {
         next(err);
     }
 };
 
-// @desc    Clear all broadcast history
-// @route   DELETE /api/admin/notifications/bulk/clear
-// @access  Private/Admin
 exports.clearAllNotifications = async (req, res, next) => {
     try {
         await Notification.deleteMany();
         res.status(200).json({
             success: true,
-            data: {}
+            data: {},
         });
     } catch (err) {
         next(err);
     }
 };
 
-// @desc    Update a notification
-// @route   PUT /api/admin/notifications/:id
-// @access  Private/Admin
 exports.updateNotification = async (req, res, next) => {
     try {
         const notification = await Notification.findById(req.params.id);
@@ -147,12 +207,12 @@ exports.updateNotification = async (req, res, next) => {
 
         notification.title = req.body.title || notification.title;
         notification.message = req.body.message || notification.message;
-        
+
         await notification.save();
 
         res.status(200).json({
             success: true,
-            data: notification
+            data: notification,
         });
     } catch (err) {
         next(err);

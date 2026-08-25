@@ -180,7 +180,7 @@ function withdrawableVirtual(user, now) {
  * forceVirtual is ignored when the Virtual Account is locked/expired — new money stays in Pending.
  * Other sources → Virtual if unlocked, else Pending.
  */
-async function creditEarning(user, amount, { source = 'Earning', inviteHold = false, forceVirtual = false, createTx = true } = {}) {
+async function creditEarning(user, amount, { source = 'Earning', inviteHold = false, forceVirtual = false, createTx = true, skipNotify = false } = {}) {
     migrateWalletSplits(user);
     ensureWithdrawalCardShape(user);
     const value = Math.round(Number(amount) * 100) / 100;
@@ -206,6 +206,25 @@ async function creditEarning(user, amount, { source = 'Earning', inviteHold = fa
             source,
             status: 'Success',
         });
+    }
+
+    if (
+        process.env.NODE_ENV !== 'test' &&
+        !toPending &&
+        !inviteHold &&
+        !skipNotify
+    ) {
+        const src = String(source || '');
+        if (!/referral|invite|opening credit/i.test(src)) {
+            try {
+                const { notifyJourney } = require('./userJourneyPush');
+                notifyJourney(user._id, 'earning_virtual', {
+                    notificationId: `${user._id}_earning_virtual_${Date.now()}_${value}`,
+                }).catch((err) => console.error('Earning virtual notify failed:', err.message));
+            } catch (err) {
+                console.error('Earning virtual notify failed:', err.message);
+            }
+        }
     }
 
     return { destination: toPending ? 'pending' : 'virtual', amount: value };

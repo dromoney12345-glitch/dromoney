@@ -51,7 +51,7 @@ const WatchAndEarn = () => {
         if (claimLock.current) return;
         claimLock.current = true;
         try {
-            const claimRes = await api.post('/reward/claim');
+            const claimRes = await api.post('/reward/claim', { earned: true, source: 'admob' });
             if (claimRes.success) {
                 showToast('Ad completed. Progress updated.');
             } else {
@@ -66,21 +66,16 @@ const WatchAndEarn = () => {
         claimLock.current = false;
     }, [refreshUserProfile]);
 
-    // Flutter may call these from native. Only onAdMob* means the user earned the reward.
-    // refreshRewardStatus used to claim on back-press — that inflated the progress bar.
+    // Native may fire these; they must NEVER claim. Only a finished rewarded ad claims.
     useEffect(() => {
         window.refreshRewardStatus = async () => {
             await fetchStatus();
             if (refreshUserProfile) await refreshUserProfile();
         };
-        window.onAdMobUserEarnedReward = claimFlutterReward;
-        window.onRewardedAdEarned = claimFlutterReward;
         return () => {
             delete window.refreshRewardStatus;
-            delete window.onAdMobUserEarnedReward;
-            delete window.onRewardedAdEarned;
         };
-    }, [claimFlutterReward, refreshUserProfile]);
+    }, [refreshUserProfile]);
 
     const [cooldownRemaining, setCooldownRemaining] = useState(0);
 

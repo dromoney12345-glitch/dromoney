@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useMemo, useEffect } from '
 import api, { BASE_URL } from '../../shared/services/api';
 import io from 'socket.io-client';
 import { buildReferralLink, getPendingReferralCode, clearPendingReferralCode } from '../../shared/utils/referral';
+import { installFcmTokenBridge, requestNativeFcmToken, saveFcmTokenToServer, readPendingFcmToken } from '../../shared/utils/fcmToken';
 
 const UserContext = React.createContext();
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || BASE_URL;
@@ -45,13 +46,17 @@ export const UserProvider = ({ children }) => {
     const [boostersConfig, setBoostersConfig] = useState({ support: [], task: [] });
 
     useEffect(() => {
-        // Cache bust for new versions
-        const CURRENT_VERSION = '2.0';
+        installFcmTokenBridge();
+
+        const CURRENT_VERSION = '2.1';
         if (localStorage.getItem('dromoney_app_version') !== CURRENT_VERSION) {
-            // Preserve token but clear other cached data like notifications
-            const token = localStorage.getItem('dromoney_token');
+            const keep = {};
+            ['dromoney_token', 'pending_mobile_fcm_token', 'dromoney_referral_code'].forEach((key) => {
+                const value = localStorage.getItem(key);
+                if (value) keep[key] = value;
+            });
             localStorage.clear();
-            if (token) localStorage.setItem('dromoney_token', token);
+            Object.entries(keep).forEach(([key, value]) => localStorage.setItem(key, value));
             localStorage.setItem('dromoney_app_version', CURRENT_VERSION);
             window.location.reload();
         }
@@ -74,17 +79,21 @@ export const UserProvider = ({ children }) => {
                     // Listen to real-time withdrawal updates for this specific user
                     activeSocket.on(`withdrawal_update_${profile._id}`, (data) => {
                         refreshUserProfile();
-                        // Dispatch custom browser event so active screens like Wallet.jsx can show instant alerts/popups
                         const event = new CustomEvent('withdrawal_status_updated', { detail: data });
                         window.dispatchEvent(event);
                     });
 
-                    // Listen to real-time payment updates for this specific user
                     activeSocket.on(`payment_update_${profile._id}`, (data) => {
                         refreshUserProfile();
                         const event = new CustomEvent('payment_status_updated', { detail: data });
                         window.dispatchEvent(event);
                     });
+
+                    activeSocket.on(`user_notification_${profile._id}`, (notif) => {
+                        addNotification(notif.title, notif.message, notif.type || 'broadcast');
+                    });
+
+                    requestNativeFcmToken();
                 }
             });
 
@@ -153,6 +162,9 @@ export const UserProvider = ({ children }) => {
             readIds.push(id);
             localStorage.setItem('dromoney_read_notifs', JSON.stringify(readIds));
         }
+        if (id && isAuthenticated) {
+            api.patch(`/user/data/notifications/${id}/read`).catch(() => {});
+        }
     };
 
     const clearNotifications = async () => {
@@ -198,15 +210,11 @@ export const UserProvider = ({ children }) => {
                 mapAndSetUserData(profileRes.data, transactions, profileRes.settings);
                 
                 // Check for pending FCM token and save it now that user is authenticated
-                const pendingToken = localStorage.getItem('pending_mobile_fcm_token');
+                const pendingToken = readPendingFcmToken();
                 if (pendingToken) {
-                    api.post('/fcm-tokens/save', { token: pendingToken, platform: 'mobile' })
-                        .then(() => {
-                            localStorage.removeItem('pending_mobile_fcm_token');
-                            console.log('Saved pending FCM token after login.');
-                        })
-                        .catch(err => console.error('Failed to save pending FCM token:', err));
+                    saveFcmTokenToServer(pendingToken, 'mobile');
                 }
+                requestNativeFcmToken();
 
                 await tryAttachPendingReferral();
                 fetchNotifications();
@@ -291,6 +299,12 @@ export const UserProvider = ({ children }) => {
         }
     };
 
+    const persistFcmAfterAuth = () => {
+        const pending = readPendingFcmToken();
+        if (pending) saveFcmTokenToServer(pending, 'mobile');
+        requestNativeFcmToken();
+    };
+
     const sendRegisterOtp = async (phone, email) => {
         setLoading(true);
         try {
@@ -309,6 +323,7 @@ export const UserProvider = ({ children }) => {
             const response = await api.post('/user/auth/verify-otp', { phone, otp });
             localStorage.setItem('dromoney_token', response.token);
             setIsAuthenticated(true);
+            persistFcmAfterAuth();
             return { success: true };
         } catch (err) {
             setLoading(false);
@@ -322,6 +337,7 @@ export const UserProvider = ({ children }) => {
             const response = await api.post('/user/auth/login', { email, password });
             localStorage.setItem('dromoney_token', response.token);
             setIsAuthenticated(true);
+            persistFcmAfterAuth();
             return { success: true };
         } catch (err) {
             setLoading(false);
@@ -336,6 +352,7 @@ export const UserProvider = ({ children }) => {
             const response = await api.post('/user/auth/register', { ...formData, referralCode });
             localStorage.setItem('dromoney_token', response.token);
             setIsAuthenticated(true);
+            persistFcmAfterAuth();
             return { success: true };
         } catch (err) {
             setLoading(false);

@@ -110,12 +110,9 @@ exports.manageKYC = async (req, res, next) => {
         try {
             const { notifyJourney } = require('../utils/userJourneyPush');
             if (kycApproved) {
-                await notifyJourney(user._id, 'kyc_approved', { skipInApp: true });
+                await notifyJourney(user._id, 'kyc_approved');
             } else if (kycRejected) {
-                await notifyJourney(user._id, 'kyc_rejected', {
-                    skipInApp: true,
-                    body: `KYC verification failed. Reason: ${rejectionReason || 'Invalid documents or blurred image'}. Tap to re-submit.`,
-                });
+                await notifyJourney(user._id, 'kyc_rejected');
             }
         } catch (pushErr) {
             console.error('Push notification failed for manageKYC:', pushErr.message);
@@ -421,21 +418,6 @@ exports.distributeFutureFundProfit = async (req, res, next) => {
                 });
                 await item.user.save({ validateBeforeSave: false });
                 totalDistributed += userShare;
-
-                // Send notification
-                try {
-                    const { sendNotificationToUser } = require('./fcmController');
-                    await sendNotificationToUser(item.user._id, {
-                        title: 'Future Fund Reward! 🏆',
-                        body: `Based on your activity today, ₹${userShare} has been added to your wallet!`,
-                        data: {
-                            type: 'future_fund',
-                            link: '/user/future-fund'
-                        }
-                    });
-                } catch (err) {
-                    console.error(`Failed to send FF notification to ${item.user._id}`);
-                }
             }
         }
 

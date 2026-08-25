@@ -18,6 +18,10 @@ const SettingsSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    maintenanceNotifiedAt: {
+        type: Date,
+        default: null
+    },
     registrationOpen: {
         type: Boolean,
         default: true

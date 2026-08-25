@@ -14,12 +14,34 @@ const NotificationSchema = new mongoose.Schema({
         enum: ['broadcast', 'system', 'reward', 'alert'],
         default: 'broadcast'
     },
+    audience: {
+        type: String,
+        enum: ['all', 'selected', 'user'],
+        default: 'all',
+    },
+    userIds: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+    }],
     recipients: {
         type: Number,
         default: 0
     },
     targetUrl: {
         type: String
+    },
+    scheduledAt: {
+        type: Date,
+        default: null,
+    },
+    sentAt: {
+        type: Date,
+        default: null,
+    },
+    status: {
+        type: String,
+        enum: ['draft', 'scheduled', 'sent'],
+        default: 'sent',
     },
     isActive: {
         type: Boolean,

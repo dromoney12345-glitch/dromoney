@@ -88,10 +88,7 @@ async function creditReferralOnKyc(userDoc) {
         try {
             const { notifyJourney } = require('./userJourneyPush');
             await notifyJourney(referrer._id, toVirtual ? 'invite_virtual' : 'invite_pending', {
-                skipInApp: true,
-                body: toVirtual
-                    ? `${user.name} completed KYC. ₹${commission} is in your Virtual Account.`
-                    : `${user.name} completed KYC. ₹${commission} is in Pending.`,
+                notificationId: `${referrer._id}_${toVirtual ? 'invite_virtual' : 'invite_pending'}_${user._id}`,
             });
         } catch (pushErr) {
             console.error('Referral push failed:', pushErr.message);
@@ -144,8 +141,7 @@ async function releaseReferralToVirtual(userDoc) {
     try {
         const { notifyJourney } = require('./userJourneyPush');
         await notifyJourney(referrer._id, 'invite_virtual', {
-            skipInApp: true,
-            body: `₹${moved} moved from Pending Wallet to Virtual Wallet.`,
+            notificationId: `${referrer._id}_invite_virtual_${userDoc._id}`,
         });
     } catch (pushErr) {
         console.error('Invite virtual push failed:', pushErr.message);
@@ -196,10 +192,7 @@ async function clawbackInvite(userDoc) {
         try {
             const { notifyJourney } = require('./userJourneyPush');
             await notifyJourney(referrer._id, 'invite_clawback', {
-                skipInApp: true,
-                title: 'Refer active users only',
-                body: `${inviteeName} is not active yet, so ₹${amount} was removed from Pending. Refer users who create a Virtual Account.`,
-                link: '/user/wallet',
+                notificationId: `${referrer._id}_invite_clawback_${userDoc._id}`,
             });
         } catch (pushErr) {
             console.error('Invite clawback push failed:', pushErr.message);

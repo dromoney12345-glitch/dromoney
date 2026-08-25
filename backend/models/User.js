@@ -91,14 +91,21 @@ const UserSchema = new mongoose.Schema({
         quotedCredit: { type: Number, default: 0 },
         lastPaymentAt: Date,
         renewalReminderSent: { type: Boolean, default: false },
+        renewalGraceRemindersSent: { type: Number, default: 0 },
         pendingWipesApplied: { type: Number, default: 0 },
     },
     kycApprovedAt: { type: Date },
+    lastActiveAt: { type: Date },
+    inactiveReminderSent: { type: Boolean, default: false },
     inviteInactive: {
         day7PenaltyApplied: { type: Boolean, default: false },
         day14WipeApplied: { type: Boolean, default: false },
         pendingWipesApplied: { type: Number, default: 0 },
         day28ClawbackApplied: { type: Boolean, default: false },
+        vaReminder3Sent: { type: Boolean, default: false },
+        vaReminder7Sent: { type: Boolean, default: false },
+        vaReminder13Sent: { type: Boolean, default: false },
+        lastFourteenReminderCycle: { type: Number, default: 0 },
     },
     lifetimeAdsWatched: { type: Number, default: 0 },
     lifetimeTasksCompleted: { type: Number, default: 0 },
@@ -139,6 +146,7 @@ const UserSchema = new mongoose.Schema({
         todayActivityMinutes: { type: Number, default: 0 },
         lastActivityDate: { type: String, default: null }, // IST YYYY-MM-DD
         activeDayDates: [{ type: String }], // IST dates that counted as active days
+        criteriaNotified: { type: Boolean, default: false },
         criteria: [{
             id: Number,
             title: String,
@@ -219,6 +227,7 @@ const UserSchema = new mongoose.Schema({
         title: String,
         body: String,
         link: String,
+        notificationId: String,
         createdAt: { type: Date, default: Date.now }
     }],
     readBroadcasts: [{

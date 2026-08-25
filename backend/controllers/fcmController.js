@@ -4,39 +4,119 @@ const admin = require('../config/firebaseAdmin');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 
+function normalizeFcmToken(raw) {
+    if (raw == null) return '';
+    let value = raw;
+    if (typeof value === 'object') {
+        value = value.token || value.fcmToken || value.data || '';
+        if (typeof value === 'object' && value) {
+            value = value.token || value.fcmToken || '';
+        }
+    }
+    let token = String(value || '').trim();
+    if (
+        (token.startsWith('"') && token.endsWith('"')) ||
+        (token.startsWith("'") && token.endsWith("'"))
+    ) {
+        token = token.slice(1, -1).trim();
+    }
+    if (token.startsWith('{')) {
+        try {
+            const parsed = JSON.parse(token);
+            token = String(parsed.token || parsed.fcmToken || '').trim();
+        } catch {
+            /* keep original */
+        }
+    }
+    if (!token || token === 'null' || token === 'undefined' || token.length < 20) {
+        return '';
+    }
+    return token;
+}
+
+function stringifyFcmData(data = {}) {
+    const out = {};
+    Object.entries(data).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+        out[key] = typeof value === 'string' ? value : String(value);
+    });
+    return out;
+}
+
+function uniqueTokens(list) {
+    return [...new Set((list || []).filter((t) => t && t !== 'undefined' && t !== 'null' && String(t).length >= 20))];
+}
+
+function firebaseReady() {
+    return !!(admin && admin.apps && admin.apps.length);
+}
+
+function pushPayload(title, body, tokens, data) {
+    return {
+        notification: { title, body },
+        android: {
+            priority: 'high',
+            notification: {
+                sound: 'default',
+                channelId: 'high_importance_channel',
+            },
+        },
+        apns: {
+            payload: {
+                aps: { sound: 'default' },
+            },
+        },
+        data: stringifyFcmData(data),
+        tokens,
+    };
+}
+
 // @desc    Save FCM Token
 // @route   POST /api/fcm-tokens/save
 // @access  Private
 exports.saveToken = asyncHandler(async (req, res, next) => {
-    const { token, platform } = req.body;
+    const token = normalizeFcmToken(req.body.token || req.body.fcmToken);
+    const platform = String(req.body.platform || 'web').toLowerCase();
 
     if (!token) {
         return next(new ErrorResponse('Please provide a token', 400));
     }
 
-    const field = (platform === 'mobile' || platform === 'app') ? 'fcmTokenMobile' : 'fcmTokens';
+    const isMobile = platform === 'mobile' || platform === 'app' || platform === 'android' || platform === 'ios';
+    const userId = req.user?._id || req.user?.id;
+    const adminId = req.admin?._id || req.admin?.id;
 
-    if (req.user) {
-        // Atomic update using $addToSet to prevent duplicates and parallel save errors
-        await User.findByIdAndUpdate(req.user.id, {
-            $addToSet: { [field]: token }
-        });
+    const add = isMobile
+        ? { fcmTokenMobile: token, fcmTokens: token }
+        : { fcmTokens: token };
+
+    if (userId) {
+        const updated = await User.findByIdAndUpdate(
+            userId,
+            { $addToSet: add },
+            { new: true, select: 'fcmTokens fcmTokenMobile' }
+        );
+        console.log(
+            `[FCM] saved ${isMobile ? 'mobile' : 'web'} token for user ${userId} ` +
+            `(web=${updated?.fcmTokens?.length || 0} mobile=${updated?.fcmTokenMobile?.length || 0} suffix=${token.slice(-8)})`
+        );
         try {
             const { flushPendingPushes } = require('../utils/userJourneyPush');
-            await flushPendingPushes(req.user.id);
+            await flushPendingPushes(userId);
         } catch (flushErr) {
             console.error('[FCM] Pending push flush failed:', flushErr.message);
         }
-    } else if (req.admin) {
+    } else if (adminId) {
         const Admin = require('../models/Admin');
-        await Admin.findByIdAndUpdate(req.admin.id, {
-            $addToSet: { [field]: token }
-        });
+        await Admin.findByIdAndUpdate(adminId, { $addToSet: add });
+        console.log(`[FCM] saved ${isMobile ? 'mobile' : 'web'} token for admin ${adminId}`);
+    } else {
+        return next(new ErrorResponse('Not authorized', 401));
     }
 
     res.status(200).json({
         success: true,
-        message: 'Token saved successfully'
+        message: 'Token saved successfully',
     });
 });
 
@@ -44,29 +124,28 @@ exports.saveToken = asyncHandler(async (req, res, next) => {
 // @route   POST /api/fcm-tokens/remove
 // @access  Private
 exports.removeToken = asyncHandler(async (req, res, next) => {
-    const { token } = req.body;
+    const token = normalizeFcmToken(req.body.token || req.body.fcmToken);
 
     if (req.user) {
-        // Atomic update using $pull to remove token safely
-        await User.findByIdAndUpdate(req.user.id, {
+        await User.findByIdAndUpdate(req.user._id || req.user.id, {
             $pull: {
                 fcmTokens: token,
-                fcmTokenMobile: token
-            }
+                fcmTokenMobile: token,
+            },
         });
     } else if (req.admin) {
         const Admin = require('../models/Admin');
-        await Admin.findByIdAndUpdate(req.admin.id, {
+        await Admin.findByIdAndUpdate(req.admin._id || req.admin.id, {
             $pull: {
                 fcmTokens: token,
-                fcmTokenMobile: token
-            }
+                fcmTokenMobile: token,
+            },
         });
     }
 
     res.status(200).json({
         success: true,
-        message: 'Token removed successfully'
+        message: 'Token removed successfully',
     });
 });
 
@@ -81,31 +160,47 @@ exports.testNotification = asyncHandler(async (req, res, next) => {
         data: {
             type: 'test',
             id: `test_${Date.now()}`,
-            link: req.admin ? '/admin/dashboard' : '/user/home'
-        }
+            link: req.admin ? '/admin/dashboard' : '/user/home',
+        },
     };
 
     if (req.user) {
-        await exports.sendNotificationToUser(req.user.id, payload);
+        await exports.sendNotificationToUser(req.user._id || req.user.id, payload);
     } else if (req.admin) {
-        await exports.sendNotificationToAdmin(req.admin.id, payload);
+        await exports.sendNotificationToAdmin(req.admin._id || req.admin.id, payload);
     }
 
     res.status(200).json({
         success: true,
-        message: 'Test notification triggered'
+        message: 'Test notification triggered',
     });
 });
+
+async function cleanupInvalidTokens(owner, tokens, responses, tokenFields) {
+    const failedTokens = [];
+    responses.forEach((resp, idx) => {
+        if (resp.success) return;
+        const errorCode = resp.error?.code;
+        if (
+            errorCode === 'messaging/invalid-registration-token' ||
+            errorCode === 'messaging/registration-token-not-registered'
+        ) {
+            failedTokens.push(tokens[idx]);
+        }
+    });
+    if (!failedTokens.length) return;
+    tokenFields.forEach((field) => {
+        owner[field] = (owner[field] || []).filter((t) => !failedTokens.includes(t));
+    });
+    await owner.save();
+}
 
 // Helper Function: Send Notification to User (Duplicate-Safe)
 exports.sendNotificationToUser = async (userId, payload) => {
     try {
-        // Generate a unique notification ID if not provided
         const notificationId = payload.data?.notificationId || `${userId}_${payload.data?.type || 'gen'}_${Date.now()}`;
-
-        // 1. Prevent duplicate delivery (24h window) - Bypass for test
         const isTest = payload.data?.type === 'test';
-        const exists = await NotificationLog.findOne({ notificationId });
+        const exists = await NotificationLog.findOne({ notificationId, status: 'Sent' });
         if (exists && !isTest) {
             return true;
         }
@@ -113,51 +208,21 @@ exports.sendNotificationToUser = async (userId, payload) => {
         const user = await User.findById(userId);
         if (!user) return false;
 
-        // Combine all tokens
-        let tokens = [...(user.fcmTokens || []), ...(user.fcmTokenMobile || [])];
-        tokens = [...new Set(tokens)]; // Remove duplicates
-        tokens = tokens.filter(t => t && t !== 'undefined' && t !== 'null');
-
+        const tokens = uniqueTokens([...(user.fcmTokens || []), ...(user.fcmTokenMobile || [])]);
         if (!tokens.length) {
-            await NotificationLog.create({
-                notificationId,
-                userId,
-                tokens: [],
-                title: payload.title,
-                body: payload.body,
-                status: 'NoToken',
-            }).catch(() => {});
+            console.log(`[FCM-DEBUG] No tokens for user ${userId}`);
             return false;
         }
 
-        // 2. Send via Firebase
-        const message = {
-            notification: {
-                title: payload.title,
-                body: payload.body
-            },
-            android: {
-                priority: 'high',
-                notification: {
-                    sound: 'default',
-                    channelId: 'high_importance_channel'
-                }
-            },
-            apns: {
-                payload: {
-                    aps: {
-                        sound: 'default'
-                    }
-                }
-            },
-            data: Object.fromEntries(
-                Object.entries({ ...(payload.data || {}), notificationId }).map(([k, v]) => [
-                    k,
-                    v === undefined || v === null ? '' : String(v),
-                ])
-            ),
-            tokens: tokens
-        };
+        if (!firebaseReady()) {
+            console.error('[FCM] Firebase Admin not initialized — token is saved, push skipped');
+            return false;
+        }
+
+        const message = pushPayload(payload.title, payload.body, tokens, {
+            ...(payload.data || {}),
+            notificationId,
+        });
 
         console.log(`[FCM-DEBUG] Sending to ${tokens.length} tokens for user: ${userId}`);
         const response = await admin.messaging().sendEachForMulticast(message);
@@ -166,40 +231,24 @@ exports.sendNotificationToUser = async (userId, payload) => {
         if (response.failureCount > 0) {
             response.responses.forEach((resp, idx) => {
                 if (!resp.success) {
-                    console.log(`[FCM-DEBUG] Token ${idx} Error:`, resp.error.code, resp.error.message);
+                    console.log(`[FCM-DEBUG] Token ${idx} Error:`, resp.error?.code, resp.error?.message);
                 }
             });
+            await cleanupInvalidTokens(user, tokens, response.responses, ['fcmTokens', 'fcmTokenMobile']);
         }
 
-        // 3. Cleanup invalid tokens if any failed
-        if (response.failureCount > 0) {
-            const failedTokens = [];
-            response.responses.forEach((resp, idx) => {
-                if (!resp.success) {
-                    const errorCode = resp.error.code;
-                    if (errorCode === 'messaging/invalid-registration-token' ||
-                        errorCode === 'messaging/registration-token-not-registered') {
-                        failedTokens.push(tokens[idx]);
-                    }
-                }
-            });
-
-            if (failedTokens.length > 0) {
-                user.fcmTokens = user.fcmTokens.filter(t => !failedTokens.includes(t));
-                user.fcmTokenMobile = user.fcmTokenMobile.filter(t => !failedTokens.includes(t));
-                await user.save();
-            }
-        }
-
-        // 4. Log the notification
-        await NotificationLog.create({
-            notificationId,
-            userId,
-            tokens,
-            title: payload.title,
-            body: payload.body,
-            status: response.successCount > 0 ? 'Sent' : 'Failed',
-        });
+        await NotificationLog.findOneAndUpdate(
+            { notificationId },
+            {
+                notificationId,
+                userId,
+                tokens,
+                title: payload.title,
+                body: payload.body,
+                status: response.successCount > 0 ? 'Sent' : 'Failed',
+            },
+            { upsert: true }
+        );
 
         return response.successCount > 0;
     } catch (error) {
@@ -208,160 +257,83 @@ exports.sendNotificationToUser = async (userId, payload) => {
     }
 };
 
-// Helper Function: Send Broadcast Notification to all users
 exports.sendBroadcastNotification = async (payload) => {
     try {
-        const users = await User.find({
-            $or: [
-                { fcmTokens: { $gt: [] } },
-                { fcmTokenMobile: { $gt: [] } }
-            ]
-        });
-
-        let allTokens = [];
-        users.forEach(user => {
-            const tokens = [...(user.fcmTokens || []), ...(user.fcmTokenMobile || [])];
-            allTokens.push(...tokens);
-        });
-
-        allTokens = [...new Set(allTokens)]; // Remove duplicates
-        allTokens = allTokens.filter(t => t && t !== 'undefined' && t !== 'null');
-
-        if (!allTokens.length) {
+        if (!firebaseReady()) {
+            console.error('[FCM] Firebase Admin not initialized — broadcast skipped');
             return;
         }
 
-        // Firebase multicast has a limit of 500 tokens per call, so chunk them
-        const chunks = [];
-        const chunkSize = 500;
-        for (let i = 0; i < allTokens.length; i += chunkSize) {
-            chunks.push(allTokens.slice(i, i + chunkSize));
-        }
-
-        for (const chunk of chunks) {
-            const message = {
-                notification: {
-                    title: payload.title,
-                    body: payload.body
-                },
-                android: {
-                    priority: 'high',
-                    notification: {
-                        sound: 'default',
-                        channelId: 'high_importance_channel'
-                    }
-                },
-                apns: {
-                    payload: {
-                        aps: {
-                            sound: 'default'
-                        }
-                    }
-                },
-                data: {
-                    ...payload.data,
-                    notificationId: `broadcast_${Date.now()}`
-                },
-                tokens: chunk
+        const query = payload.userIds?.length
+            ? { _id: { $in: payload.userIds } }
+            : {
+                $or: [
+                    { fcmTokens: { $gt: [] } },
+                    { fcmTokenMobile: { $gt: [] } },
+                ],
             };
 
-            await admin.messaging().sendEachForMulticast(message);
+        const users = await User.find(query).select('fcmTokens fcmTokenMobile');
+        let allTokens = [];
+        users.forEach((user) => {
+            allTokens.push(...uniqueTokens([...(user.fcmTokens || []), ...(user.fcmTokenMobile || [])]));
+        });
+        allTokens = uniqueTokens(allTokens);
+        if (!allTokens.length) return;
+
+        const chunkSize = 500;
+        for (let i = 0; i < allTokens.length; i += chunkSize) {
+            const chunk = allTokens.slice(i, i + chunkSize);
+            await admin.messaging().sendEachForMulticast(
+                pushPayload(payload.title, payload.body, chunk, {
+                    ...(payload.data || {}),
+                    notificationId: payload.data?.notificationId || `broadcast_${Date.now()}_${i}`,
+                })
+            );
         }
     } catch (error) {
         console.error('FCM Broadcast Error:', error);
     }
 };
 
-// Helper Function: Send Notification to Admin (Duplicate-Safe)
 exports.sendNotificationToAdmin = async (adminId, payload) => {
     try {
         const notificationId = payload.data?.notificationId || `${adminId}_${payload.data?.type || 'gen'}_${Date.now()}`;
-
-        // Prevent duplicate delivery (24h window) - Bypass for test
         const isTest = payload.data?.type === 'test';
-        const exists = await NotificationLog.findOne({ notificationId });
-        if (exists && !isTest) {
-            return;
-        }
+        const exists = await NotificationLog.findOne({ notificationId, status: 'Sent' });
+        if (exists && !isTest) return;
 
         const Admin = require('../models/Admin');
         const adminUser = await Admin.findById(adminId);
         if (!adminUser) return;
 
-        // Combine all tokens
-        let tokens = [...(adminUser.fcmTokens || []), ...(adminUser.fcmTokenMobile || [])];
-        tokens = [...new Set(tokens)]; // Remove duplicates
-        tokens = tokens.filter(t => t && t !== 'undefined' && t !== 'null');
+        const tokens = uniqueTokens([...(adminUser.fcmTokens || []), ...(adminUser.fcmTokenMobile || [])]);
+        if (!tokens.length || !firebaseReady()) return;
 
-        if (!tokens.length) {
-            return;
-        }
+        const response = await admin.messaging().sendEachForMulticast(
+            pushPayload(payload.title, payload.body, tokens, {
+                ...(payload.data || {}),
+                notificationId,
+            })
+        );
 
-        // Send via Firebase
-        const message = {
-            notification: {
-                title: payload.title,
-                body: payload.body
-            },
-            android: {
-                priority: 'high',
-                notification: {
-                    sound: 'default',
-                    channelId: 'high_importance_channel'
-                }
-            },
-            apns: {
-                payload: {
-                    aps: {
-                        sound: 'default'
-                    }
-                }
-            },
-            data: {
-                ...payload.data,
-                notificationId
-            },
-            tokens: tokens
-        };
-
-        console.log(`[FCM-DEBUG] Sending to ${tokens.length} tokens for admin: ${adminId}`);
-        const response = await admin.messaging().sendEachForMulticast(message);
-
-        // Cleanup invalid tokens if any failed
         if (response.failureCount > 0) {
-            const failedTokens = [];
-            response.responses.forEach((resp, idx) => {
-                if (!resp.success) {
-                    const errorCode = resp.error.code;
-                    if (errorCode === 'messaging/invalid-registration-token' ||
-                        errorCode === 'messaging/registration-token-not-registered') {
-                        failedTokens.push(tokens[idx]);
-                    }
-                }
-            });
-
-            if (failedTokens.length > 0) {
-                adminUser.fcmTokens = adminUser.fcmTokens.filter(t => !failedTokens.includes(t));
-                adminUser.fcmTokenMobile = adminUser.fcmTokenMobile.filter(t => !failedTokens.includes(t));
-                await adminUser.save();
-            }
+            await cleanupInvalidTokens(adminUser, tokens, response.responses, ['fcmTokens', 'fcmTokenMobile']);
         }
 
-        // Log the notification
         await NotificationLog.create({
             notificationId,
             userId: adminId,
             tokens,
             title: payload.title,
-            body: payload.body
-        });
-
+            body: payload.body,
+            status: response.successCount > 0 ? 'Sent' : 'Failed',
+        }).catch(() => {});
     } catch (error) {
         console.error('FCM sendNotificationToAdmin Error:', error);
     }
 };
 
-// Helper Function: Send Notification to All Admins
 exports.sendNotificationToAllAdmins = async (payload) => {
     try {
         const Admin = require('../models/Admin');
@@ -373,5 +345,3 @@ exports.sendNotificationToAllAdmins = async (payload) => {
         console.error('FCM sendNotificationToAllAdmins Error:', error);
     }
 };
-
-

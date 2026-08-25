@@ -543,7 +543,7 @@ exports.submitManualPayment = asyncHandler(async (req, res, next) => {
 
     try {
         const { notifyJourney } = require('../utils/userJourneyPush');
-        await notifyJourney(user._id, 'va_payment_pending', { skipInApp: true });
+        await notifyJourney(user._id, 'va_payment_pending');
     } catch (pushErr) {
         console.error('VA pending push failed:', pushErr.message);
     }

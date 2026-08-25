@@ -275,9 +275,16 @@ async function handlePaymentSuccess(payment) {
         const { activateVirtualWallet } = require('../utils/walletLedger');
         const fresh = await User.findById(user._id);
         if (fresh) {
-            await activateVirtualWallet(fresh, { isRenewal: String(fresh.withdrawalCard?.status) === 'expired' });
+            const isRenewal = String(fresh.withdrawalCard?.status) === 'expired';
+            await activateVirtualWallet(fresh, { isRenewal });
             await fresh.save({ validateBeforeSave: false });
             user.isPaid = true;
+            try {
+                const { notifyJourney } = require('../utils/userJourneyPush');
+                await notifyJourney(fresh._id, isRenewal ? 'va_renewed' : 'va_activated');
+            } catch (pushErr) {
+                console.error('VA payment notify failed:', pushErr.message);
+            }
         }
 
         try {

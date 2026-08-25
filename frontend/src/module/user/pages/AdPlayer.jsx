@@ -64,6 +64,20 @@ const AdPlayer = () => {
     }, [isPlaying, timeLeft, isCompleted, ad]);
 
     useEffect(() => {
+        const pauseIfHidden = () => {
+            if (document.visibilityState !== 'visible') {
+                setIsPlaying(false);
+            }
+        };
+        document.addEventListener('visibilitychange', pauseIfHidden);
+        window.addEventListener('pagehide', pauseIfHidden);
+        return () => {
+            document.removeEventListener('visibilitychange', pauseIfHidden);
+            window.removeEventListener('pagehide', pauseIfHidden);
+        };
+    }, []);
+
+    useEffect(() => {
         if (!nextAdAvailableAt) {
             setCooldownRemaining(0);
             return;

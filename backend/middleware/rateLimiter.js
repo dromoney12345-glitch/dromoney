@@ -24,7 +24,8 @@ function skipWebhooks(req) {
     return (
         path.includes('/api/public/offerwall/') ||
         path.includes('/webhook') ||
-        path.includes('/api/health')
+        path.includes('/api/health') ||
+        path.includes('/api/fcm-tokens/')
     );
 }
 

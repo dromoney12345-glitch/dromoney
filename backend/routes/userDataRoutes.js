@@ -16,6 +16,7 @@ const {
     getFutureFundEstimation,
     clearPersonalNotifications,
     getMyNotifications,
+    markNotificationRead,
     getWithdrawalCard
 } = require('../controllers/userController');
 const { submitTask } = require('../controllers/taskSubmissionController');
@@ -67,6 +68,7 @@ router.post('/ads/reward', rewardLimiter, idempotency(), rewardUserForAd);
 router.post('/events/:id/join', writeLimiter, joinEvent);
 router.post('/events/:id/submit', rewardLimiter, idempotency(), submitResult);
 router.get('/notifications', getMyNotifications);
+router.patch('/notifications/:id/read', markNotificationRead);
 router.delete('/notifications', clearPersonalNotifications);
 
 // Razorpay & Payment Routes
