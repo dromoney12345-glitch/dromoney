@@ -20,8 +20,7 @@ const NotificationLogSchema = new mongoose.Schema({
     },
     createdAt: { 
         type: Date, 
-        default: Date.now, 
-        expires: 86400 // Auto-delete after 24 hours to keep DB clean
+        default: Date.now,
     }
 });
 

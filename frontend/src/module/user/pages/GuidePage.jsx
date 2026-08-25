@@ -20,16 +20,8 @@ const rewriteInviteCopy = (text) => {
     if (typeof text !== 'string' || !text) return text;
     return text
         .replace(
-            /It transfers to your Virtual Wallet once they unlock their withdrawal card\.?/gi,
-            'The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.'
-        )
-        .replace(
-            /It moves to Virtual Account when they create one\.?/gi,
-            'The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.'
-        )
-        .replace(
-            /That ₹200 moves to Virtual Account only when they create a Virtual Account\.?/gi,
-            'The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.'
+            /The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days\.?/gi,
+            'That ₹200 stays in Pending until they create a Virtual Account, then it moves to your Virtual Account.'
         );
 };
 

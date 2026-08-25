@@ -104,7 +104,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
             setErrorMsg('Please upload a payment screenshot');
             return;
         }
-        if (type === 'PLATFORM_UNLOCK' && userData?.isPaid) {
+        if ((type === 'PLATFORM_UNLOCK' || type === 'VIRTUAL_ACCOUNT_RENEWAL') && userData?.isPaid && userData?.withdrawalCard?.status === 'active') {
             setErrorMsg('Virtual Account already created.');
             return;
         }
@@ -284,7 +284,10 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
 
     if (!isOpen) return null;
 
-    const isPlatformAlreadyUnlocked = type === 'PLATFORM_UNLOCK' && userData?.isPaid;
+    const isPlatformAlreadyUnlocked =
+        type === 'PLATFORM_UNLOCK' &&
+        userData?.isPaid &&
+        userData?.withdrawalCard?.status === 'active';
 
     return (
         <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center font-poppins">

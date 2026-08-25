@@ -28,6 +28,8 @@ const { getSettings, updateSettings } = require('../controllers/adminSettingsCon
 const { getAdminSubmissions, approveSubmission, rejectSubmission } = require('../controllers/taskSubmissionController');
 
 const { protectAdmin } = require('../middleware/authMiddleware');
+const { authLimiter } = require('../middleware/rateLimiter');
+const idempotency = require('../middleware/idempotency');
 
 // Settings Routes
 router.route('/settings')
@@ -35,7 +37,7 @@ router.route('/settings')
     .put(protectAdmin, updateSettings);
 
 // Auth Routes
-router.post('/auth/login', login);
+router.post('/auth/login', authLimiter, login);
 router.get('/auth/me', protectAdmin, getMe);
 
 // Dashboard Routes
@@ -48,7 +50,7 @@ router.get('/dashboard/engagement', protectAdmin, getEngagement);
 // User Management Routes
 router.get('/users', protectAdmin, getUsers);
 router.get('/users/future-fund/report', protectAdmin, getFutureFundReport);
-router.post('/users/future-fund/distribute', protectAdmin, distributeFutureFundProfit);
+router.post('/users/future-fund/distribute', protectAdmin, idempotency(), distributeFutureFundProfit);
 router.put('/users/:id/future-fund/override', protectAdmin, updateOverrideProfit);
 router.get('/users/future-fund/history', protectAdmin, getFutureFundHistory);
 router.get('/users/future-fund/pool', protectAdmin, getFundPoolSummary);
@@ -83,7 +85,7 @@ router.delete('/content/:type/:id', protectAdmin, deleteContent);
 
 // Withdrawal Routes
 router.get('/withdrawals/export', protectAdmin, exportWithdrawalsCSV);
-router.post('/withdrawals/bulk-approve', protectAdmin, bulkApproveWithdrawals);
+router.post('/withdrawals/bulk-approve', protectAdmin, idempotency(), bulkApproveWithdrawals);
 router.get('/withdrawals', protectAdmin, getWithdrawals);
 router.put('/withdrawals/:id', protectAdmin, updateWithdrawalStatus);
 

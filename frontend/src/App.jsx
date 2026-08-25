@@ -64,6 +64,7 @@ import { AdminProvider, useAdmin } from './module/admin/context/AdminContext';
 
 import { UserProvider, useUser } from './module/user/context/UserContext';
 import SplashScreen from './module/user/auth/SplashScreen';
+import { extractReferralCode, getPendingReferralCode, installReferralCapture, captureReferralFromLocation } from './module/shared/utils/referral';
 
 import { Loader2 } from 'lucide-react';
 
@@ -107,6 +108,7 @@ const ProtectedAdminRoute = ({ children }) => {
 // Smart root redirect — goes to home if logged in, login if not
 const RootRedirect = () => {
   const { isAuthenticated, loading } = useUser();
+  const location = useLocation();
   if (loading) return null; // wait silently
   
   const lastRoute = sessionStorage.getItem('dromoney_last_route');
@@ -116,13 +118,23 @@ const RootRedirect = () => {
     }
     return <Navigate to='/user/home' replace />;
   }
-  return <Navigate to='/user/auth/login' replace />;
+
+  const invite =
+    extractReferralCode(location.search) ||
+    extractReferralCode(location.pathname) ||
+    extractReferralCode(typeof window !== 'undefined' ? window.location.href : '') ||
+    getPendingReferralCode();
+  if (invite) {
+    return <Navigate to={`/user/auth/register?invite=${encodeURIComponent(invite)}`} replace />;
+  }
+  return <Navigate to={`/user/auth/login${location.search || ''}`} replace />;
 };
 
 const RouteTracker = () => {
   const location = useLocation();
   
   React.useEffect(() => {
+    captureReferralFromLocation();
     // 1. Existing App Logic
     if (location.pathname !== '/' && location.pathname !== '/user/auth/login') {
       sessionStorage.setItem('dromoney_last_route', location.pathname + location.search);
@@ -197,6 +209,8 @@ const RouteTracker = () => {
 
 function App() {
   const [showSplash, setShowSplash] = React.useState(!localStorage.getItem('dromoney_token'));
+
+  React.useEffect(() => installReferralCapture(), []);
 
   return (
     <AdminProvider>

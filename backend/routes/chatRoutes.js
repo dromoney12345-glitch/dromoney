@@ -10,11 +10,12 @@ const {
 
 const router = express.Router();
 const { protect, authorize, protectAdmin } = require('../middleware/authMiddleware');
+const { writeLimiter } = require('../middleware/rateLimiter');
 
 // User routes
 router.get('/', protect, getMessages);
-router.post('/', protect, sendMessage);
-router.post('/renew', protect, renewSupport);
+router.post('/', protect, writeLimiter, sendMessage);
+router.post('/renew', protect, writeLimiter, renewSupport);
 
 // Admin routes
 router.get('/admin/users', protectAdmin, getAdminChatUsers);

@@ -1,7 +1,7 @@
 import React from 'react';
 
 export const FUND_TASK_COMPLETE_MSG =
-    'Aapka reward aur paisa Future Fund mein add ho jayega. Fund active hone par aapko paisa mil jayega.';
+    'Your reward is added to your Future Fund. You will receive the money once the fund is active.';
 
 const VARIANT_CLASS = {
     cream: 'bg-[#FFF5F0] border border-[#EDE4DC] text-[#462211]',

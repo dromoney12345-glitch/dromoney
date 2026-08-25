@@ -119,6 +119,14 @@ exports.sendNotificationToUser = async (userId, payload) => {
         tokens = tokens.filter(t => t && t !== 'undefined' && t !== 'null');
 
         if (!tokens.length) {
+            await NotificationLog.create({
+                notificationId,
+                userId,
+                tokens: [],
+                title: payload.title,
+                body: payload.body,
+                status: 'NoToken',
+            }).catch(() => {});
             return false;
         }
 
@@ -189,12 +197,13 @@ exports.sendNotificationToUser = async (userId, payload) => {
             userId,
             tokens,
             title: payload.title,
-            body: payload.body
+            body: payload.body,
+            status: response.successCount > 0 ? 'Sent' : 'Failed',
         });
 
-        return true;
+        return response.successCount > 0;
     } catch (error) {
-        // Silently fail in production
+        console.error('[FCM] sendNotificationToUser failed:', error.message);
         return false;
     }
 };

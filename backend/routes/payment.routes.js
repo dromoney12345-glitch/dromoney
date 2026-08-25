@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
+const { walletLimiter } = require('../middleware/rateLimiter');
+const idempotency = require('../middleware/idempotency');
 const { validateCreatePayment, validateVerifyPayment } = require('../validators/payment.validator');
 const { 
     createPayment, 
@@ -12,10 +14,10 @@ const {
 // --- Protected Routes (Require Authentication) ---
 
 // POST /api/payment/create
-router.post('/create', protect, validateCreatePayment, createPayment);
+router.post('/create', protect, walletLimiter, idempotency(), validateCreatePayment, createPayment);
 
 // POST /api/payment/verify
-router.post('/verify', protect, validateVerifyPayment, verifyPayment);
+router.post('/verify', protect, walletLimiter, idempotency(), validateVerifyPayment, verifyPayment);
 
 // GET /api/payment/status/:orderId
 router.get('/status/:orderId', protect, getPaymentStatus);

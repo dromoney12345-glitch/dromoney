@@ -272,17 +272,17 @@ async function handlePaymentSuccess(payment) {
             $inc: { 'wallet.balance': payment.amount }
         });
     } else if (payment.orderType === 'SUBSCRIPTION' || payment.orderType === 'PLATFORM_UNLOCK') {
-        // Subscription activation first
-        await User.findByIdAndUpdate(user._id, {
-            isPaid: true,
-            unlockedAt: new Date()
-        });
-        user.isPaid = true;
+        const { activateVirtualWallet } = require('../utils/walletLedger');
+        const fresh = await User.findById(user._id);
+        if (fresh) {
+            await activateVirtualWallet(fresh, { isRenewal: String(fresh.withdrawalCard?.status) === 'expired' });
+            await fresh.save({ validateBeforeSave: false });
+            user.isPaid = true;
+        }
 
-        // Referral ₹200 only after KYC + ₹499 unlock
         try {
-            const { creditReferralOnQualifiedUnlock } = require('../utils/referralReward');
-            await creditReferralOnQualifiedUnlock(user);
+            const { afterVirtualAccountActivated } = require('../utils/referralReward');
+            await afterVirtualAccountActivated(fresh || user);
         } catch (refErr) {
             console.error('[REFERRAL ERROR] Failed to process reward in Bulkpe Webhook:', refErr.message);
         }

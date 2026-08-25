@@ -153,7 +153,7 @@ const Notifications = () => {
                     <li>9. Withdrawal requested</li>
                     <li>10. Withdrawal approved</li>
                     <li>11. Withdrawal rejected</li>
-                    <li>12. Account hold if Virtual Account is not created in 28 days</li>
+                    <li>12. Invite ₹200 removed if they stay inactive (referrer notified)</li>
                 </ol>
             </div>
 

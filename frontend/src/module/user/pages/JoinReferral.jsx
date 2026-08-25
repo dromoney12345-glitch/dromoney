@@ -12,7 +12,9 @@ const JoinReferral = () => {
 
     useEffect(() => {
         const fromParam = searchParams.get('invite') || searchParams.get('ref') || searchParams.get('referral') || code || '';
-        const cleaned = extractReferralCode(fromParam);
+        const cleaned =
+            extractReferralCode(fromParam) ||
+            extractReferralCode(typeof window !== 'undefined' ? window.location.href : '');
         if (cleaned) savePendingReferralCode(cleaned);
         navigate(cleaned ? `/user/auth/register?invite=${encodeURIComponent(cleaned)}` : '/user/auth/register', { replace: true });
     }, [code, searchParams, navigate]);

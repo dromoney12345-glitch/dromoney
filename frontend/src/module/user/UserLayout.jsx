@@ -65,12 +65,17 @@ const UserLayout = () => {
         };
     }, []);
 
-    // Combine global and personal notifications
     const allNotifications = React.useMemo(() => {
         const readIds = JSON.parse(localStorage.getItem('dromoney_read_notifs') || '[]');
-        
-        const personalNotifs = (userData?.userNotifications || []).map(n => {
-            const idStr = n._id || n.id || Math.random().toString();
+        const seen = new Set();
+
+        const fromInbox = (notifications || []).map((n) => ({
+            ...n,
+            timestamp: n.timestamp || Date.now(),
+        }));
+
+        const fromProfile = (userData?.userNotifications || []).map((n) => {
+            const idStr = n._id || n.id;
             return {
                 id: idStr,
                 title: n.title,
@@ -78,16 +83,18 @@ const UserLayout = () => {
                 time: n.createdAt ? new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now',
                 timestamp: n.createdAt ? new Date(n.createdAt).getTime() : Date.now(),
                 type: n.type || 'info',
-                isRead: n.isRead || readIds.includes(idStr)
+                isRead: n.isRead || readIds.includes(String(idStr)),
             };
         });
-        
-        const globalNotifs = notifications.map(n => ({
-            ...n,
-            timestamp: n.id // Global ones use timestamp for id in some places, or we can just assume recent
-        }));
 
-        return [...globalNotifs, ...personalNotifs].sort((a, b) => b.timestamp - a.timestamp);
+        return [...fromInbox, ...fromProfile]
+            .filter((n) => {
+                const key = `${n.title}|${n.message}|${n.id || ''}`;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            })
+            .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     }, [notifications, userData?.userNotifications]);
 
     const unreadNotifs = allNotifications.filter(n => !n.isRead);

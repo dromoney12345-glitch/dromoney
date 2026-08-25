@@ -45,6 +45,14 @@ const WithdrawalCard = () => {
     const alreadyActive = card.status === 'active';
     const expired = card.status === 'expired';
     const isRenewal = quote.isRenewal || expired;
+    const virtualBal = Number(data?.virtualAccount?.virtualBalance ?? data?.virtualBalance ?? userData?.wallet?.virtualBalance ?? 0);
+    const pendingBal = Number(data?.virtualAccount?.pendingBalance ?? data?.pendingBalance ?? userData?.wallet?.pendingBalance ?? 0);
+    const daysUntilPendingWipe = data?.virtualAccount?.daysUntilPendingWipe;
+    const daysLeft = data?.virtualAccount?.daysUntilExpiry
+        ?? (card.expiresAt
+            ? Math.ceil((new Date(card.expiresAt).getTime() - Date.now()) / (24 * 60 * 60 * 1000))
+            : null);
+    const renewSoon = alreadyActive && (data?.virtualAccount?.renewSoon || (daysLeft != null && daysLeft <= 7));
 
     return (
         <div className="min-h-full bg-[#FCF8F5] font-poppins p-4 pb-10">
@@ -62,6 +70,15 @@ const WithdrawalCard = () => {
                     <p className="text-[#462211] mt-2">{card.holderName}</p>
                     <p className="text-[#7A5648] text-[13px]">{card.phone}</p>
                     <p className="text-[12px] text-slate-400 mt-3">Expiry: {formatDate(card.expiresAt)}</p>
+                    {renewSoon && (
+                        <div className="mt-3 bg-[#FFF5F0] rounded-xl p-3 flex items-start gap-2">
+                            <Info size={14} className="text-[#462211] shrink-0 mt-0.5" />
+                            <p className="text-[11px] text-[#7A5648] leading-snug">
+                                Your Virtual Account expires in {Math.max(0, daysLeft)} day{daysLeft === 1 ? '' : 's'}.
+                                Renew after expiry to keep withdrawals open. Existing Virtual balance stays safe.
+                            </p>
+                        </div>
+                    )}
                     {Number(card.lockedReserve) > 0 && (
                         <div className="mt-3 bg-[#FFF5F0] rounded-xl p-3 flex items-start gap-2">
                             <Info size={14} className="text-[#462211] shrink-0 mt-0.5" />
@@ -76,6 +93,26 @@ const WithdrawalCard = () => {
                 </div>
             ) : (
                 <>
+                    {expired && (
+                        <div className="mt-5 bg-white border border-[#EDE4DC] rounded-2xl p-4 space-y-2">
+                            <p className="text-[11px] uppercase tracking-widest text-amber-700">Locked</p>
+                            <p className="text-[13px] text-[#462211]">
+                                Virtual balance ₹{virtualBal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} is safe and will unlock after renewal.
+                            </p>
+                            <p className="text-[11px] text-[#7A5648] leading-snug">
+                                New earnings are in Pending (₹{pendingBal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).
+                                Renew within {daysUntilPendingWipe ?? 14} days to move Pending to Virtual. After that, Pending is cleared and a new 14-day cycle starts. Locked Virtual balance is never deleted.
+                            </p>
+                        </div>
+                    )}
+                    {!expired && daysUntilPendingWipe != null && (
+                        <div className="mt-5 bg-[#FFF5F0] rounded-2xl p-3 flex items-start gap-2">
+                            <Info size={14} className="text-[#462211] shrink-0 mt-0.5" />
+                            <p className="text-[11px] text-[#7A5648] leading-snug">
+                                Pending is cleared every 14 days until you create a Virtual Account. Next clear in {daysUntilPendingWipe} day{daysUntilPendingWipe === 1 ? '' : 's'}.
+                            </p>
+                        </div>
+                    )}
                     <div className="mt-5 bg-white border border-[#EDE4DC] rounded-2xl p-4 space-y-3">
                         {[
                             ['Name', preview.name || userData.name],
@@ -107,7 +144,7 @@ const WithdrawalCard = () => {
                         <div className="mt-4 bg-[#EEF7EE] rounded-2xl p-4 border border-emerald-100">
                             <p className="text-[12px] font-medium text-emerald-800">Early bonus</p>
                             <p className="text-[11px] text-emerald-700 mt-1 leading-snug">
-                                Pay within 3 days of KYC — ₹{quote.credit} will be credited to Virtual Account (reserved, non-withdrawable).
+                                Pay within 3 days of KYC — ₹{quote.credit} goes into Virtual as a 6-month reserve and is used at renewal. ₹100 is the platform charge.
                             </p>
                         </div>
                     )}
@@ -135,7 +172,7 @@ const WithdrawalCard = () => {
                     onClose={() => setPayOpen(false)}
                     plan={expired ? 'Virtual Account Renew' : 'Virtual Account'}
                     amount={quote.amount}
-                    type="PLATFORM_UNLOCK"
+                    type={isRenewal ? 'VIRTUAL_ACCOUNT_RENEWAL' : 'PLATFORM_UNLOCK'}
                     onSuccess={async () => {
                         setPayOpen(false);
                         const profile = await refreshUserProfile?.();

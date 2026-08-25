@@ -11,16 +11,18 @@ const { getLastRenewalTick } = require('../utils/taskRenewal');
 // @route   GET /api/user/wallet/balance
 // @access  Private
 exports.getBalance = asyncHandler(async (req, res, next) => {
-    const user = await User.findById(req.user.id).select('wallet isPaid withdrawalCard');
+    const user = await User.findById(req.user.id).select('wallet isPaid withdrawalCard kycApprovedAt kyc inviteInactive name phone');
     const {
-        migrateWalletSplits,
-        ensureWithdrawalCardShape,
+        applyWalletMaintenance,
         withdrawableVirtual,
+        isVirtualUnlocked,
+        getVirtualAccountView,
     } = require('../utils/walletLedger');
+    const { persistPendingWipeEffects } = require('../utils/pendingWipeSideEffects');
     const { quoteMegaEligibility, WITHDRAWAL_FEE } = require('../utils/moneyQuotes');
-    migrateWalletSplits(user);
-    ensureWithdrawalCardShape(user);
+    const { expiryWipe, kycWipe } = await applyWalletMaintenance(user);
     await user.save({ validateBeforeSave: false });
+    await persistPendingWipeEffects(user, expiryWipe, kycWipe);
 
     const settings = await Settings.findOne();
     const minWithdrawalLimit = settings ? settings.minWithdrawal : 100;
@@ -48,7 +50,8 @@ exports.getBalance = asyncHandler(async (req, res, next) => {
         minWithdrawal: minWithdrawalLimit,
         megaEligibility: quoteMegaEligibility(user.wallet?.balance),
         card: user.withdrawalCard,
-        virtualUnlocked: !!user.isPaid,
+        virtualUnlocked: isVirtualUnlocked(user),
+        virtualAccount: getVirtualAccountView(user),
         recentWithdrawal,
         pendingWithdrawal
     });
@@ -319,12 +322,12 @@ exports.requestWithdrawal = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse(`You can only withdraw once every 24 hours. Please wait ${diffHours}h ${diffMins}m before trying again.`, 400));
     }
 
-    const { withdrawableVirtual, migrateWalletSplits, ensureWithdrawalCardShape } = require('../utils/walletLedger');
+    const { withdrawableVirtual, migrateWalletSplits, ensureWithdrawalCardShape, isVirtualUnlocked } = require('../utils/walletLedger');
     migrateWalletSplits(user);
     ensureWithdrawalCardShape(user);
 
-    if (!user.isPaid || user.withdrawalCard?.status !== 'active') {
-        return next(new ErrorResponse('Create a Virtual Account first to withdraw.', 400));
+    if (!isVirtualUnlocked(user)) {
+        return next(new ErrorResponse('Create or renew your Virtual Account to withdraw.', 400));
     }
 
     const { quoteUserWithdrawal } = require('../utils/walletLedger');

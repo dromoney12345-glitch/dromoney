@@ -6,6 +6,7 @@ import {
     Wallet, Clock, Lock, Gift
 } from 'lucide-react';
 import api from '../../shared/services/api';
+import { getVaView } from '../utils/virtualAccount';
 
 const formatMoney = (value) =>
     Number(value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -34,6 +35,8 @@ const Income = () => {
     const { userData, loading: userLoading } = useUser();
     const status = String(userData?.kycStatus || 'Not Started').toLowerCase();
     const virtualUnlocked = !!userData?.isPaid && userData?.withdrawalCard?.status === 'active';
+    const vaView = getVaView(userData);
+    const vaExpired = !!vaView.expired;
     const pending = Number(userData?.wallet?.pendingBalance ?? 0);
     const virtual = Number(userData?.wallet?.virtualBalance ?? 0);
 
@@ -88,7 +91,7 @@ const Income = () => {
 
     const reward = inviteAmount;
 
-    return (
+        return (
         <div className="flex flex-col min-h-full bg-[#FCF8F5] font-poppins pb-4">
             <div className="bg-white px-3 sm:px-4 py-2.5 flex items-center gap-3 sticky top-0 z-40 border-b border-[#EDE4DC]">
                 <button type="button" onClick={() => navigate(-1)} className="text-[#462211] active:scale-95 transition-all">
@@ -104,7 +107,7 @@ const Income = () => {
                     iconColor="text-[#462211]"
                     arrowBg="bg-[#FFF5F0]"
                     title={reward != null ? `Invite & Earn ₹${reward}` : 'Invite & Earn'}
-                    subtitle={reward != null ? `₹${reward} goes to Pending after KYC, then to Virtual Wallet in min 14 and max 28 days.` : 'Reward is credited after KYC, then to Virtual Wallet in min 14 and max 28 days.'}
+                    subtitle={reward != null ? `₹${reward} goes to Pending after KYC, then to Virtual when they create a Virtual Account.` : 'Reward goes to Pending after KYC, then to Virtual when they create a Virtual Account.'}
                     onClick={() => navigate('/user/guide/invite')}
                 />
                 <OptionCard
@@ -157,6 +160,7 @@ const Income = () => {
                             type="button"
                             onClick={() => {
                                 if (virtualUnlocked) navigate('/user/wallet', { state: { pane: 'virtual' } });
+                                else if (vaExpired) navigate('/user/wallet', { state: { pane: 'virtual' } });
                                 else navigate('/user/virtual-account');
                             }}
                             className="pr-3 text-left"
@@ -164,12 +168,12 @@ const Income = () => {
                             <div className="flex items-center gap-1 mb-1">
                                 <Wallet size={13} className="text-[#462211]" />
                                 <p className="text-[10px] text-slate-400">Virtual Account</p>
-                            </div>
+                        </div>
                             <p className="text-[18px] sm:text-[20px] font-bold text-[#462211] leading-none">₹{formatMoney(virtual)}</p>
                             <p className="text-[10px] text-slate-400 mt-1.5 flex items-center gap-1">
                                 {virtualUnlocked ? 'Available Balance' : (
                                     <>
-                                        <Lock size={10} /> Locked
+                                        <Lock size={10} /> {vaExpired ? 'Locked · amount is safe' : 'Locked'}
                                     </>
                                 )}
                             </p>
@@ -182,12 +186,30 @@ const Income = () => {
                             <div className="flex items-center gap-1 mb-1">
                                 <Clock size={13} className="text-[#462211]" />
                                 <p className="text-[10px] text-slate-400">Pending Wallet</p>
-                            </div>
-                            <p className="text-[18px] sm:text-[20px] font-bold text-[#462211] leading-none">₹{formatMoney(pending)}</p>
-                            <p className="text-[10px] text-slate-400 mt-1.5">Always open</p>
-                        </button>
-                    </div>
                 </div>
+                            <p className="text-[18px] sm:text-[20px] font-bold text-[#462211] leading-none">₹{formatMoney(pending)}</p>
+                            <p className="text-[10px] text-slate-400 mt-1.5">{vaExpired ? 'New earnings after lock' : 'Always open'}</p>
+                        </button>
+                </div>
+            </div>
+
+                {vaExpired && (
+                    <p className="text-[11px] text-[#7A5648] leading-snug px-0.5">
+                        Virtual is locked. ₹{formatMoney(virtual)} is safe. New earnings go to Pending.
+                        Renew within {vaView.daysUntilPendingWipe ?? 14} days to move Pending to Virtual.
+                    </p>
+                )}
+                {!virtualUnlocked && !vaExpired && vaView.daysUntilPendingWipe != null && (
+                    <p className="text-[11px] text-[#7A5648] leading-snug px-0.5">
+                        Create a Virtual Account to keep Pending earnings. Pending is cleared every 14 days until you buy one
+                        — next clear in {vaView.daysUntilPendingWipe} day{vaView.daysUntilPendingWipe === 1 ? '' : 's'}.
+                    </p>
+                )}
+                {vaView.renewSoon && !vaExpired && (
+                    <p className="text-[11px] text-[#7A5648] leading-snug px-0.5">
+                        Virtual Account expires in {vaView.daysUntilExpiry} day{vaView.daysUntilExpiry === 1 ? '' : 's'}. Renew after expiry to keep withdrawals open.
+                    </p>
+                )}
 
                 <button
                     type="button"

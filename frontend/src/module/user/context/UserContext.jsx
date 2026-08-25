@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import api, { BASE_URL } from '../../shared/services/api';
 import io from 'socket.io-client';
-import { buildReferralLink } from '../../shared/utils/referral';
+import { buildReferralLink, getPendingReferralCode, clearPendingReferralCode } from '../../shared/utils/referral';
 
 const UserContext = React.createContext();
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || BASE_URL;
@@ -18,6 +18,7 @@ const INITIAL_USER_STATE = {
     referrals: { count: 0, code: '', link: '' },
     wallet: { balance: 0, pendingBalance: 0, virtualBalance: 0, transactions: [] },
     withdrawalCard: { status: 'none' },
+    virtualAccount: null,
     kycStatus: 'Not Started',
     profileImage: '',
     futureFund: { status: 'locked', progress: 0, criteria: [] },
@@ -97,23 +98,40 @@ export const UserProvider = ({ children }) => {
 
     const fetchNotifications = async () => {
         try {
-            const [notifRes, boosterRes] = await Promise.all([
+            const [notifRes, boosterRes, inboxRes] = await Promise.all([
                 api.get('/public/notifications').catch(() => ({ success: false })),
-                api.get('/public/boosters').catch(() => ({ success: false }))
+                api.get('/public/boosters').catch(() => ({ success: false })),
+                isAuthenticated
+                    ? api.get('/user/data/notifications').catch(() => ({ success: false }))
+                    : Promise.resolve({ success: false }),
             ]);
 
-            if (notifRes.success && notifRes.data) {
-                const readIds = JSON.parse(localStorage.getItem('dromoney_read_notifs') || '[]');
-                const mapped = notifRes.data.map(n => ({
+            const readIds = JSON.parse(localStorage.getItem('dromoney_read_notifs') || '[]');
+            const broadcasts = (notifRes.success && notifRes.data)
+                ? notifRes.data.map((n) => ({
                     id: n._id,
                     title: n.title,
                     message: n.message,
                     time: new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    timestamp: new Date(n.createdAt).getTime(),
                     type: n.type || 'broadcast',
-                    isRead: readIds.includes(n._id)
-                }));
-                setNotifications(mapped);
-            }
+                    isRead: readIds.includes(n._id),
+                }))
+                : [];
+
+            const personal = (inboxRes.success && inboxRes.data)
+                ? inboxRes.data.map((n) => ({
+                    id: n._id,
+                    title: n.title,
+                    message: n.message,
+                    time: n.createdAt ? new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+                    timestamp: n.createdAt ? new Date(n.createdAt).getTime() : 0,
+                    type: n.type || 'info',
+                    isRead: !!n.isRead || readIds.includes(n._id),
+                }))
+                : [];
+
+            setNotifications([...personal, ...broadcasts].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)));
 
             if (boosterRes.success && boosterRes.data) {
                 const config = {};
@@ -138,15 +156,27 @@ export const UserProvider = ({ children }) => {
 
     const clearNotifications = async () => {
         setNotifications([]);
-        
-        if (userData?.userNotifications?.length > 0) {
-            try {
-                await api.delete('/user/data/notifications');
-                setUserData(prev => ({ ...prev, userNotifications: [] }));
-            } catch (err) {
-                console.error("Failed to clear personal notifications", err);
-            }
+        try {
+            await api.delete('/user/data/notifications');
+            setUserData((prev) => ({ ...prev, userNotifications: [] }));
+        } catch (err) {
+            console.error("Failed to clear personal notifications", err);
         }
+    };
+
+    const tryAttachPendingReferral = async () => {
+        const code = getPendingReferralCode();
+        if (!code) return false;
+        try {
+            const res = await api.post('/user/data/attach-referral', { referralCode: code });
+            if (res?.success) {
+                clearPendingReferralCode();
+                return !!res.attached;
+            }
+        } catch {
+            /* keep pending for a later retry */
+        }
+        return false;
     };
 
     const refreshUserProfile = async (showSpinner = false) => {
@@ -176,6 +206,9 @@ export const UserProvider = ({ children }) => {
                         })
                         .catch(err => console.error('Failed to save pending FCM token:', err));
                 }
+
+                await tryAttachPendingReferral();
+                fetchNotifications();
                 
                 return profileRes.data;
             }
@@ -239,7 +272,8 @@ export const UserProvider = ({ children }) => {
             completedTasks: dbUser.completedTasks || [],
             dailyTaskCompletions: dbUser.dailyTaskCompletions || [],
             hasCompletedCourse: dbUser.hasCompletedCourse || false,
-            userNotifications: dbUser.notifications || []
+            userNotifications: dbUser.notifications || [],
+            virtualAccount: dbUser.virtualAccount || null,
         });
     };
 
@@ -296,7 +330,8 @@ export const UserProvider = ({ children }) => {
     const register = async (formData) => {
         setLoading(true);
         try {
-            const response = await api.post('/user/auth/register', formData);
+            const referralCode = formData.referralCode || getPendingReferralCode() || '';
+            const response = await api.post('/user/auth/register', { ...formData, referralCode });
             localStorage.setItem('dromoney_token', response.token);
             setIsAuthenticated(true);
             return { success: true };

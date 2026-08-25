@@ -3,8 +3,6 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
-const rateLimit = require('express-rate-limit');
 const path = require('path');
 const connectDB = require('./config/db');
 
@@ -17,8 +15,13 @@ connectDB();
 const app = express();
 
 // Body parser
-app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // Required for UPIGateway webhook (x-www-form-urlencoded)
+app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: process.env.JSON_BODY_LIMIT || '2mb' }));
+
+app.set('trust proxy', 1);
+
+const { getRedis } = require('./config/redis');
+getRedis();
 
 // Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
@@ -61,9 +64,20 @@ app.use(cors({
     },
     credentials: true
 })); // Enable CORS
-// app.use(mongoSanitize()); // Sanitize data
+const sanitizeRequest = require('./middleware/sanitizeRequest');
+app.use(sanitizeRequest);
 
-// Rate limiting
+app.get('/api/health', (req, res) => {
+    const { isRedisReady } = require('./config/redis');
+    res.json({
+        success: true,
+        service: 'dromoney-api',
+        redis: isRedisReady() ? 'up' : 'down',
+        time: new Date().toISOString(),
+    });
+});
+
+// Rate limiting (Redis-backed when REDIS_URL is set)
 const { generalApiLimiter } = require('./middleware/rateLimiter');
 app.use('/api/', generalApiLimiter);
 
@@ -103,9 +117,18 @@ const server = http.createServer(app);
 // Initialize Socket.io
 const io = socketio(server, {
     cors: {
-        origin: "*", // Adjust this in production
-        methods: ["GET", "POST"]
-    }
+        origin: (origin, callback) => {
+            if (!origin) return callback(null, true);
+            const isLocalHost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+            const isProductionDomain = /^https?:\/\/(?:[a-zA-Z0-9-]+\.)*(?:dromoney\.com|dromoney\.vercel\.app)$/.test(origin);
+            if (isLocalHost || isProductionDomain || origin === process.env.FRONTEND_URL) {
+                return callback(null, true);
+            }
+            callback(new Error('Not allowed by CORS'));
+        },
+        methods: ['GET', 'POST'],
+        credentials: true,
+    },
 });
 
 // Expose io globally for controllers
@@ -125,6 +148,7 @@ const { startWeeklySeasonCron } = require('./cron/weeklySeasonCron');
 const { startNotificationCleanupCron } = require('./cron/notificationCron');
 const { startInviteInactivityCron } = require('./cron/inviteInactivityCron');
 const { startBusinessPlanExpiryCron } = require('./cron/businessPlanExpiryCron');
+const { startCardExpiryCron } = require('./cron/cardExpiryCron');
 
 if (process.env.NODE_ENV !== 'test') {
     startFutureFundCron();
@@ -132,6 +156,7 @@ if (process.env.NODE_ENV !== 'test') {
     startNotificationCleanupCron();
     startInviteInactivityCron();
     startBusinessPlanExpiryCron();
+    startCardExpiryCron();
 
     server.listen(PORT, () => {
         console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);

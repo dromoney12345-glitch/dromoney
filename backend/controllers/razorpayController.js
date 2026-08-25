@@ -65,6 +65,25 @@ async function resolvePaymentQuote({ type, ideaId, planName, user }) {
         };
     }
 
+    const cardStatus = String(user?.withdrawalCard?.status || '');
+    const cardExpired = cardStatus === 'expired'
+        || (user?.withdrawalCard?.expiresAt && new Date(user.withdrawalCard.expiresAt) < new Date() && cardStatus === 'active');
+    const wantsRenewal = type === 'VIRTUAL_ACCOUNT_RENEWAL' || (cardExpired && (!type || type === 'PLATFORM_UNLOCK'));
+
+    if (wantsRenewal) {
+        const { getCardQuote, ensureWithdrawalCardShape, migrateWalletSplits } = require('../utils/walletLedger');
+        migrateWalletSplits(user);
+        ensureWithdrawalCardShape(user);
+        const cardQuote = getCardQuote(user, settings);
+        const q = quotePayment({ baseAmount: Number(cardQuote.amount) || 199, feePercent: 0 });
+        return {
+            ...q,
+            planName: 'Virtual Account Renew',
+            paymentType: 'VIRTUAL_ACCOUNT_RENEWAL',
+            durationDays: 180,
+        };
+    }
+
     if (user?.isPaid) return { error: 'Platform already unlocked.', status: 400 };
     const unlockFee = Number(settings.registrationFee) || DEFAULT_UNLOCK_FEE;
     const q = quotePayment({ baseAmount: unlockFee, feePercent: 0 });
@@ -368,15 +387,16 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
                 status: 'Success'
             });
         } else {
-            console.log(`[PAYMENT] Unlocking Virtual Account for user ${user._id}`);
+            const isRenewal = payment.paymentType === 'VIRTUAL_ACCOUNT_RENEWAL';
+            console.log(`[PAYMENT] Unlocking Virtual Account for user ${user._id}${isRenewal ? ' (renewal)' : ''}`);
 
             const { activateVirtualWallet } = require('../utils/walletLedger');
-            await activateVirtualWallet(user);
+            await activateVirtualWallet(user, { isRenewal });
             await user.save();
 
             try {
-                const { creditReferralOnQualifiedUnlock } = require('../utils/referralReward');
-                await creditReferralOnQualifiedUnlock(user);
+                const { afterVirtualAccountActivated } = require('../utils/referralReward');
+                await afterVirtualAccountActivated(user);
             } catch (refErr) {
                 console.error('[REFERRAL ERROR] Failed to process reward:', refErr.message);
             }
@@ -407,7 +427,10 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
                 });
             } else {
                 const { notifyJourney } = require('../utils/userJourneyPush');
-                await notifyJourney(user._id, 'va_activated');
+                await notifyJourney(
+                    user._id,
+                    payment.paymentType === 'VIRTUAL_ACCOUNT_RENEWAL' ? 'va_renewed' : 'va_activated'
+                );
             }
         } catch (pushErr) {
             console.error('[FCM] Razorpay payment push failed:', pushErr.message);
@@ -442,7 +465,14 @@ exports.submitManualPayment = asyncHandler(async (req, res, next) => {
     let pType = type || 'PLATFORM_UNLOCK';
     let durationDays = parseInt(reqDurationInDays, 10) || 30;
 
-    if (pType === 'BUSINESS_IDEA_UNLOCK') {
+    if (pType === 'PLATFORM_UNLOCK' || pType === 'VIRTUAL_ACCOUNT_RENEWAL') {
+        const quote = await resolvePaymentQuote({ type: pType, user });
+        if (quote.error) return next(new ErrorResponse(quote.error, quote.status || 400));
+        pType = quote.paymentType;
+        finalAmount = Number(quote.payableAmount || quote.amount || finalAmount);
+        planName = quote.planName || planName;
+        durationDays = quote.durationDays || 180;
+    } else if (pType === 'BUSINESS_IDEA_UNLOCK') {
         const idea = await BusinessIdea.findById(ideaId);
         if (!idea) return next(new ErrorResponse('Business Idea not found', 404));
         const alreadyUnlocked = (user.unlockedIdeas || []).some((id) => id.toString() === String(ideaId));

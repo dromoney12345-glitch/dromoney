@@ -38,7 +38,6 @@ const Marketing = () => {
     }, []);
 
     React.useEffect(() => {
-        if (!showReferralLink) return;
         const loadReferrals = async () => {
             try {
                 const res = await api.get('/user/data/referrals');
@@ -48,13 +47,14 @@ const Marketing = () => {
             }
         };
         loadReferrals();
-    }, [showReferralLink]);
+    }, []);
 
-    const inviteBadge = (ref) => {
+        const inviteBadge = (ref) => {
         if (ref.status === 'Completed') return 'Released';
-        if (ref.status === 'Failed') return 'Removed';
-        if (ref.daysLeft != null) return `${ref.daysLeft} days left`;
-        return ref.kycStatus || 'Pending';
+        if (ref.status === 'Failed' || ref.milestone === 'removed') return 'Removed';
+        if (ref.status === 'Waiting KYC' || ref.milestone === 'waiting_kyc') return 'Waiting KYC';
+        if (ref.milestone === 'card_active') return 'Creating VA';
+        return 'In Pending';
     };
 
     const handleCopy = () => {
@@ -170,7 +170,7 @@ const Marketing = () => {
                         </div>
                         <span className="text-[11px] font-semibold text-[#462211] uppercase tracking-wider">Total Members</span>
                     </div>
-                    <span className="text-[13px] font-semibold text-[#462211]">{userData?.referrals?.count || 0}</span>
+                    <span className="text-[13px] font-semibold text-[#462211]">{Math.max(userData?.referrals?.count || 0, referrals.length)}</span>
                 </div>
 
                 {/* Earnings */}
@@ -199,7 +199,8 @@ const Marketing = () => {
                 <div className="bg-[#FFF5F0] border border-[#EDE4DC] rounded-2xl p-3.5">
                     <h5 className="text-[11px] font-semibold text-[#462211] uppercase tracking-wider mb-1">How it works</h5>
                     <p className="text-[10px] font-medium text-[#7A5648] leading-relaxed">
-                        Share your invite link. After your friend completes KYC, ₹{rewardAmount} goes to your Pending Wallet. The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.
+                        Share your invite link. After your friend completes KYC, ₹{rewardAmount} goes to your Pending Wallet. It moves to Virtual when they create a Virtual Account.
+                        {' '}If they do not create a Virtual Account, their Pending is cleared every 14 days until they buy one.
                     </p>
                 </div>
 

@@ -57,9 +57,18 @@ exports.manageKYC = async (req, res, next) => {
             user.kyc = { status: 'Not Started' };
         }
 
-        user.kyc.status = status;
+        const statusKey = String(status || '').trim().toLowerCase();
+        const kycApproved = statusKey === 'approved' || statusKey === 'verified';
+        const kycRejected = statusKey === 'rejected';
+        if (kycApproved) {
+            user.kyc.status = statusKey === 'verified' ? 'Verified' : 'Approved';
+        } else if (kycRejected) {
+            user.kyc.status = 'Rejected';
+        } else {
+            user.kyc.status = status;
+        }
         
-        if (status === 'Approved' || status === 'Verified') {
+        if (kycApproved) {
             user.kyc.rejectionReason = ''; // Clear reason on approval
             if (!user.kycApprovedAt) user.kycApprovedAt = new Date();
 
@@ -70,7 +79,7 @@ exports.manageKYC = async (req, res, next) => {
                 type: "success",
                 date: new Date()
             });
-        } else if (status === 'Rejected') {
+        } else if (kycRejected) {
             if (rejectionReason) user.kyc.rejectionReason = rejectionReason;
             
             // Add in-app notification
@@ -88,7 +97,7 @@ exports.manageKYC = async (req, res, next) => {
         await user.save();
 
         // Invite ₹200 → referrer Pending Wallet after KYC (Virtual after invitee card)
-        if (status === 'Approved' || status === 'Verified') {
+        if (kycApproved) {
             try {
                 const { creditReferralOnKyc } = require('../utils/referralReward');
                 const result = await creditReferralOnKyc(user);
@@ -100,9 +109,9 @@ exports.manageKYC = async (req, res, next) => {
 
         try {
             const { notifyJourney } = require('../utils/userJourneyPush');
-            if (status === 'Approved' || status === 'Verified') {
+            if (kycApproved) {
                 await notifyJourney(user._id, 'kyc_approved', { skipInApp: true });
-            } else if (status === 'Rejected') {
+            } else if (kycRejected) {
                 await notifyJourney(user._id, 'kyc_rejected', {
                     skipInApp: true,
                     body: `KYC verification failed. Reason: ${rejectionReason || 'Invalid documents or blurred image'}. Tap to re-submit.`,

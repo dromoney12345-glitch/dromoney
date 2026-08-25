@@ -27,6 +27,16 @@ function extractReferralCode(value) {
         if (nested) return nested;
     }
 
+    if (raw.startsWith('?') || raw.startsWith('#')) {
+        const params = new URLSearchParams(raw.replace(/^#/, ''));
+        const fromQuery =
+            params.get('invite') ||
+            params.get('ref') ||
+            params.get('referral') ||
+            params.get('code');
+        if (fromQuery) return normalizeCode(fromQuery);
+    }
+
     const labeled = raw.match(/invite\s*code\s*[:\-]\s*([A-Za-z0-9]+)/i);
     if (labeled) return normalizeCode(labeled[1]);
 
@@ -44,14 +54,17 @@ function extractReferralCode(value) {
                 url.searchParams.get('invite') ||
                 url.searchParams.get('ref') ||
                 url.searchParams.get('referral') ||
+                url.searchParams.get('utm_content') ||
                 url.searchParams.get('code');
             if (refParam) return normalizeCode(refParam);
 
             const installReferrer = url.searchParams.get('referrer');
             if (installReferrer) {
-                const decoded = decodeURIComponent(installReferrer);
+                let decoded = String(installReferrer);
+                try { decoded = decodeURIComponent(decoded); } catch { /* already decoded */ }
+                try { decoded = decodeURIComponent(decoded); } catch { /* once is enough */ }
                 const match =
-                    decoded.match(/(?:^|[&?])ref=([A-Za-z0-9]+)/i) ||
+                    decoded.match(/(?:^|[&?])(?:ref|invite|referral)=([A-Za-z0-9]+)/i) ||
                     decoded.match(/^([A-Za-z0-9]{4,12})$/);
                 if (match) return normalizeCode(match[1]);
             }
@@ -73,7 +86,37 @@ function extractReferralCode(value) {
     if (/nhgfAFF-/i.test(raw)) return normalizeCode(raw.split(/nhgfAFF-/i).pop());
     if (/AFF-/i.test(raw)) return normalizeCode(raw.split(/AFF-/i).pop());
     if (/\/join\//i.test(raw)) return normalizeCode(raw.split(/\/join\//i).pop());
+    const kv = raw.match(/(?:^|[?&\s])(?:ref|invite|referral)\s*=\s*([A-Za-z0-9]+)/i);
+    if (kv) return normalizeCode(kv[1]);
     return normalizeCode(raw);
 }
 
-module.exports = { extractReferralCode, normalizeCode };
+/**
+ * Look up the referrer user for a pasted code / Play Store / /join link.
+ */
+async function findReferrerByCode(raw, { excludePhone = '', excludeEmail = '', excludeId = null } = {}) {
+    const User = require('../models/User');
+    const cleanCode = extractReferralCode(raw);
+    if (!cleanCode) return { referrer: null, cleanCode: '', reason: 'no_code' };
+
+    const referrer = await User.findOne({
+        referralCode: new RegExp(`^${cleanCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i'),
+    });
+    if (!referrer) return { referrer: null, cleanCode, reason: 'not_found' };
+
+    if (excludeId && String(referrer._id) === String(excludeId)) {
+        return { referrer: null, cleanCode, reason: 'self_referral' };
+    }
+    const samePhone = referrer.phone && excludePhone && String(referrer.phone) === String(excludePhone);
+    const sameEmail =
+        referrer.email &&
+        excludeEmail &&
+        String(referrer.email).toLowerCase() === String(excludeEmail).toLowerCase();
+    if (samePhone || sameEmail) {
+        return { referrer: null, cleanCode, reason: 'self_referral' };
+    }
+
+    return { referrer, cleanCode, reason: 'ok' };
+}
+
+module.exports = { extractReferralCode, normalizeCode, findReferrerByCode };

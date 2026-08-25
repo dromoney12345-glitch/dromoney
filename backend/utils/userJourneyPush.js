@@ -49,6 +49,12 @@ const JOURNEY_STEPS = {
         type: 'success',
         link: '/user/wallet',
     },
+    invite_clawback: {
+        title: 'Refer active users only',
+        body: 'The user you referred is not active yet, so ₹200 was removed from Pending.',
+        type: 'warning',
+        link: '/user/wallet',
+    },
     withdraw_requested: {
         title: 'Withdrawal Submitted 💸',
         body: 'Your withdrawal request is pending. Admin will process it in 10–15 minutes.',
@@ -69,9 +75,45 @@ const JOURNEY_STEPS = {
     },
     account_hold: {
         title: 'Account Suspended',
-        body: 'Virtual Account was not created in 28 days. This account is permanently suspended.',
+        body: 'This account has been suspended. Contact support if you think this is a mistake.',
         type: 'error',
         link: '/user/home',
+    },
+    va_deadline_7: {
+        title: 'Virtual Account reminder',
+        body: 'Create your Virtual Account so Pending earnings can move to Virtual and you can withdraw.',
+        type: 'warning',
+        link: '/user/virtual-account',
+    },
+    va_deadline_14: {
+        title: 'Pending earnings removed',
+        body: 'Virtual Account was not created within 14 days. Your Pending Wallet was cleared. This repeats every 14 days until you buy a Virtual Account.',
+        type: 'warning',
+        link: '/user/virtual-account',
+    },
+    va_renew_reminder: {
+        title: 'Virtual Account expires soon',
+        body: 'Your Virtual Account expires in 7 days. Renew it now so withdrawals stay open and new earnings keep going to Virtual.',
+        type: 'warning',
+        link: '/user/virtual-account',
+    },
+    va_expired: {
+        title: 'Virtual Account locked',
+        body: 'Your Virtual Account has expired and is locked. Previous Virtual balance is safe but cannot be withdrawn until you renew. New earnings will go to Pending.',
+        type: 'error',
+        link: '/user/virtual-account',
+    },
+    va_pending_cleared: {
+        title: 'Pending Wallet cleared',
+        body: 'Virtual Account was not renewed within 14 days, so Pending earnings were removed. Locked Virtual balance is still safe. Renew to unlock it.',
+        type: 'warning',
+        link: '/user/virtual-account',
+    },
+    va_renewed: {
+        title: 'Virtual Account renewed',
+        body: 'Virtual Account is active for 6 more months. Previous Virtual balance is unlocked again, and current Pending moved to Virtual.',
+        type: 'success',
+        link: '/user/wallet',
     },
 };
 
@@ -84,18 +126,36 @@ function stringifyData(data = {}) {
     return out;
 }
 
-async function pushInApp(userId, { title, message, type }) {
-    await User.findByIdAndUpdate(userId, {
-        $push: {
-            notifications: {
-                title,
-                message,
-                type: type || 'info',
-                isRead: false,
-                createdAt: new Date(),
-            },
-        },
+async function persistNotification(userId, { title, message, type, step, link, skipUserArray = false }) {
+    const AppNotification = require('../models/AppNotification');
+    const doc = await AppNotification.create({
+        user: userId,
+        title,
+        message,
+        type: type || 'info',
+        step: step || '',
+        link: link || '/user/home',
+        isRead: false,
     });
+
+    if (!skipUserArray) {
+        await User.findByIdAndUpdate(userId, {
+            $push: {
+                notifications: {
+                    $each: [{
+                        title,
+                        message,
+                        type: type || 'info',
+                        isRead: false,
+                        createdAt: new Date(),
+                    }],
+                    $slice: -50,
+                },
+            },
+        });
+    }
+
+    return doc;
 }
 
 async function queuePendingPush(userId, item) {
@@ -129,9 +189,14 @@ async function notifyJourney(userId, step, extras = {}) {
     if (!title || !body) return { sent: false };
 
     try {
-        if (!extras.skipInApp) {
-            await pushInApp(userId, { title, message: body, type });
-        }
+        await persistNotification(userId, {
+            title,
+            message: body,
+            type,
+            step,
+            link,
+            skipUserArray: !!extras.skipInApp,
+        });
 
         const { sendNotificationToUser } = require('../controllers/fcmController');
         const sent = await sendNotificationToUser(userId, {
@@ -194,4 +259,5 @@ module.exports = {
     JOURNEY_STEPS,
     notifyJourney,
     flushPendingPushes,
+    persistNotification,
 };

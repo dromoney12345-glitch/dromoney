@@ -30,6 +30,16 @@ api.interceptors.request.use(
         } else if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+
+        const method = String(config.method || 'get').toLowerCase();
+        const url = String(config.url || '');
+        const moneyWrite = /withdraw|add-earning|add-coins|reward\/claim|tasks\/submit|razorpay|payment\/create|payment\/verify|\/unlock|manual-payment|ads\/reward|future-fund\/unlock/.test(url);
+        if (['post', 'put', 'patch'].includes(method) && moneyWrite && !config.headers['X-Idempotency-Key'] && !(config.data instanceof FormData)) {
+            config.headers['X-Idempotency-Key'] =
+                (typeof crypto !== 'undefined' && crypto.randomUUID)
+                    ? crypto.randomUUID()
+                    : `idemp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        }
         // Debug log to verify which token is used
         console.debug('API request', config.method?.toUpperCase(), config.url, 'Authorization set:', !!config.headers.Authorization);
         return config;

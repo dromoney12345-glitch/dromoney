@@ -8,7 +8,7 @@ const { getLastRenewalTick } = require('../utils/taskRenewal');
 const { syncFutureFundCriteria } = require('../utils/futureFund');
 const { sendOtpSMS } = require('../utils/smsService');
 
-const { extractReferralCode } = require('../utils/referralCode');
+const { findReferrerByCode } = require('../utils/referralCode');
 
 // @desc    Register user
 // @route   POST /api/user/auth/register
@@ -22,6 +22,7 @@ exports.register = async (req, res, next) => {
             req.body.referral ||
             req.body.ref ||
             req.body.invite ||
+            req.headers['x-referral-code'] ||
             '';
 
         if (!phone || !otp) {
@@ -77,30 +78,15 @@ exports.register = async (req, res, next) => {
         // Resolve invite code (accepts code OR full invite / Play Store link)
         // ₹200 is credited to the referrer only after this user's KYC is approved
         let referredBy = null;
-        const cleanCode = extractReferralCode(rawReferral);
-
-        if (cleanCode) {
-            const referrer = await User.findOne({
-                referralCode: new RegExp(`^${cleanCode}$`, 'i'),
-            });
-
-            if (!referrer) {
-                console.warn(`[REFERRAL] No user found for code: ${cleanCode}`);
-            } else {
-                const samePhone = referrer.phone && trimmedPhone && String(referrer.phone) === String(trimmedPhone);
-                const sameEmail =
-                    referrer.email &&
-                    trimmedEmail &&
-                    String(referrer.email).toLowerCase() === trimmedEmail;
-                if (samePhone || sameEmail) {
-                    console.warn(`[REFERRAL] Self-referral blocked for code: ${cleanCode}`);
-                } else {
-                    referredBy = referrer._id;
-                    console.log(`[REFERRAL] Linked new user to referrer ${referrer._id} (code ${cleanCode}) — ₹200 on KYC approve`);
-                }
-            }
+        const linked = await findReferrerByCode(rawReferral, {
+            excludePhone: trimmedPhone,
+            excludeEmail: trimmedEmail,
+        });
+        if (linked.reason === 'ok') {
+            referredBy = linked.referrer._id;
+            console.log(`[REFERRAL] Linked new user to referrer ${referredBy} (code ${linked.cleanCode}) — ₹200 on KYC approve`);
         } else if (rawReferral) {
-            console.warn(`[REFERRAL] Could not extract code from: ${String(rawReferral).slice(0, 120)}`);
+            console.warn(`[REFERRAL] Invite not attached (${linked.reason}): ${String(rawReferral).slice(0, 120)}`);
         }
 
         const userPassword = password || '123456';
@@ -412,28 +398,47 @@ exports.getMe = async (req, res, next) => {
             }
 
             try {
-                const { migrateWalletSplits, ensureWithdrawalCardShape } = require('../utils/walletLedger');
-                if (migrateWalletSplits(user)) modified = true;
-                ensureWithdrawalCardShape(user);
-                modified = true;
+                const { applyWalletMaintenance } = require('../utils/walletLedger');
+                const { persistPendingWipeEffects } = require('../utils/pendingWipeSideEffects');
+                const { applyInviteDay28IfDue } = require('../utils/referralReward');
+                const { expiryWipe, kycWipe, migrated } = await applyWalletMaintenance(user);
+                const claw = await applyInviteDay28IfDue(user);
+                if (migrated || expiryWipe.cyclesApplied > 0 || kycWipe.cyclesApplied > 0 || claw.applied) {
+                    modified = true;
+                }
+                if (modified) {
+                    await user.save({ validateBeforeSave: false });
+                }
+                await persistPendingWipeEffects(user, expiryWipe, kycWipe);
             } catch (wErr) {
                 console.error('Wallet split migrate failed:', wErr.message);
+                if (modified) {
+                    await user.save({ validateBeforeSave: false });
+                }
             }
 
-            if (modified) {
-                await user.save({ validateBeforeSave: false });
+            // Backfill invite commission if KYC is already approved
+            if (user.referredBy) {
+                try {
+                    const { creditReferralOnKyc } = require('../utils/referralReward');
+                    await creditReferralOnKyc(user);
+                } catch (refErr) {
+                    console.error('[REFERRAL] getMe credit failed:', refErr.message);
+                }
             }
         }
 
         const userObj = user.toObject();
         const { quoteMegaEligibility } = require('../utils/moneyQuotes');
+        const { getVirtualAccountView } = require('../utils/walletLedger');
         userObj.megaEligibility = quoteMegaEligibility(user.wallet?.balance);
+        userObj.virtualAccount = getVirtualAccountView(user);
 
         res.status(200).json({
             success: true,
             data: userObj,
             settings: {
-                referralLinkBaseUrl: settings.referralLinkBaseUrl || 'https://earningapp.com/join/'
+                referralLinkBaseUrl: settings.referralLinkBaseUrl || ''
             }
         });
     } catch (err) {

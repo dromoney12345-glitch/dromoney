@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import UnlockModal from '../components/UnlockModal';
 import api from '../../shared/services/api';
+import { getVaView } from '../utils/virtualAccount';
 
 const Wallet = () => {
     const navigate = useNavigate();
@@ -17,8 +18,16 @@ const Wallet = () => {
     const pendingAmt = Number(wallet?.pendingBalance || 0);
     const virtualAmt = Number(wallet?.virtualBalance || 0);
     const virtualUnlocked = !!isPaid && withdrawalCard?.status === 'active';
+    const vaView = getVaView(userData);
+    const vaExpired = !!vaView.expired;
+    const canViewVirtual = virtualUnlocked || vaExpired;
+    const daysUntilPendingWipe = vaView.daysUntilPendingWipe;
     const VIRTUAL_ACCOUNT_PATH = '/user/virtual-account';
-    const [pane, setPane] = useState(location.state?.pane === 'pending' ? 'pending' : (location.state?.pane === 'virtual' && virtualUnlocked ? 'virtual' : 'pending'));
+    const [pane, setPane] = useState(
+        location.state?.pane === 'pending'
+            ? 'pending'
+            : (location.state?.pane === 'virtual' && canViewVirtual ? 'virtual' : 'pending')
+    );
     const [pendingFilter, setPendingFilter] = useState('All');
     const [activeTab, setActiveTab] = useState('cash');
     const [amount, setAmount] = useState('');
@@ -160,7 +169,7 @@ const Wallet = () => {
     }, [amount]);
 
     const goToVirtual = () => {
-        if (virtualUnlocked) setPane('virtual');
+        if (canViewVirtual) setPane('virtual');
         else navigate(VIRTUAL_ACCOUNT_PATH);
     };
 
@@ -171,10 +180,10 @@ const Wallet = () => {
             return;
         }
         if (requested === 'virtual') {
-            if (virtualUnlocked) setPane('virtual');
+            if (canViewVirtual) setPane('virtual');
             else navigate(VIRTUAL_ACCOUNT_PATH, { replace: true });
         }
-    }, [location.state, virtualUnlocked, navigate]);
+    }, [location.state, canViewVirtual, navigate]);
 
     // Listen to real-time status updates from UserContext socket events
     useEffect(() => {
@@ -335,12 +344,9 @@ const Wallet = () => {
 
     const inviteStatusLabel = (ref) => {
         if (ref.status === 'Completed') return { text: 'Released to Virtual', cls: 'text-emerald-700 bg-emerald-50' };
-        if (ref.status === 'Failed') return { text: 'Removed', cls: 'text-red-700 bg-red-50' };
-        if (ref.milestone === 'card_active') return { text: 'Card active — releasing', cls: 'text-emerald-700 bg-emerald-50' };
-        if (ref.milestone === 'day14') return { text: '14-day warning', cls: 'text-red-700 bg-red-50' };
-        if (ref.milestone === 'day7') return { text: '7-day penalty zone', cls: 'text-amber-700 bg-amber-50' };
-        if (ref.milestone === 'day3_bonus') return { text: `${ref.daysLeft} days left · bonus window`, cls: 'text-[#462211] bg-[#FFF5F0]' };
-        if (ref.milestone === 'card_pending') return { text: `${ref.daysLeft} days left for Virtual Account`, cls: 'text-[#462211] bg-[#FFF5F0]' };
+        if (ref.status === 'Failed' || ref.milestone === 'removed') return { text: 'Removed', cls: 'text-red-700 bg-red-50' };
+        if (ref.milestone === 'card_active') return { text: 'Virtual Account created — releasing', cls: 'text-emerald-700 bg-emerald-50' };
+        if (ref.milestone === 'card_pending') return { text: 'In Pending until they create a Virtual Account', cls: 'text-[#462211] bg-[#FFF5F0]' };
         return { text: 'Waiting for KYC', cls: 'text-slate-600 bg-slate-100' };
     };
 
@@ -350,7 +356,7 @@ const Wallet = () => {
         <div className="flex flex-col gap-2.5 p-3 animate-in fade-in duration-700 bg-[#FCF8F5] font-poppins">
             <UnlockModal isOpen={isUnlockOpen} onClose={() => setIsUnlockOpen(false)} />
 
-            {(pane !== 'virtual' || !virtualUnlocked) ? (
+            {(pane !== 'virtual' || !canViewVirtual) ? (
                 <>
                     <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
@@ -386,7 +392,11 @@ const Wallet = () => {
                         </div>
                         <div className="border-t border-[#E8D5C8] mt-3 pt-3">
                             <p className="text-[11px] text-[#7A5648] leading-snug">
-                                This is your pending balance. Amount from invites, tasks, ads or other earnings is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.
+                                {vaExpired
+                                    ? `Virtual Account is locked. New earnings sit here. Renew within ${daysUntilPendingWipe ?? 14} day${daysUntilPendingWipe === 1 ? '' : 's'} to move this amount to Virtual. If you miss the window, Pending is cleared and a new 14-day cycle starts. Locked Virtual balance is never deleted.`
+                                    : !canViewVirtual
+                                        ? `Create a Virtual Account to keep these earnings. Pending is cleared every 14 days until you buy one${daysUntilPendingWipe != null ? ` — next clear in ${daysUntilPendingWipe} day${daysUntilPendingWipe === 1 ? '' : 's'}` : ''}.`
+                                        : 'Invite ₹200 stays here until that person creates a Virtual Account. Then it moves to your Virtual Account.'}
                             </p>
                         </div>
                     </div>
@@ -397,13 +407,49 @@ const Wallet = () => {
                             <h3 className="text-[13px] font-medium text-[#462211]">Important Information</h3>
                         </div>
                         <ul className="space-y-1.5 text-[12px] text-[#462211] leading-snug list-disc pl-4">
-                            <li>Pending Wallet stays open for life — you can view it anytime.</li>
-                            <li>Invite ₹200 is added to Pending when the invited user completes KYC.</li>
-                            <li>The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.</li>
-                            <li>Virtual Account opens only after you create it. Then you can withdraw.</li>
-                            <li>If they do not create a Virtual Account within 14 days, their pending balance is removed. After 28 days the invite and ₹200 can be removed.</li>
+                            {vaExpired ? (
+                                <>
+                                    <li>Locked Virtual balance stays in your account. You cannot withdraw it until you renew.</li>
+                                    <li>Referral and other new earnings go to Pending, not Virtual.</li>
+                                    <li>Renew within 14 days to move current Pending into Virtual.</li>
+                                    <li>If you do not renew in 14 days, Pending is cleared. The next 14-day cycle then starts (14, 28, 42…).</li>
+                                </>
+                            ) : !canViewVirtual ? (
+                                <>
+                                    <li>Pay ₹499 to create a Virtual Account. It stays active for 6 months.</li>
+                                    <li>If you pay within 3 days of KYC, ₹399 is a 6-month reserve in Virtual and is used at renewal. ₹100 is the platform charge.</li>
+                                    <li>If you do not create a Virtual Account, Pending is cleared every 14 days (14, 28, 42…) until you buy one.</li>
+                                    <li>After you create it, current Pending moves to Virtual and you can withdraw.</li>
+                                </>
+                            ) : (
+                                <>
+                                    <li>Pending Wallet stays open for life — you can view it anytime.</li>
+                                    <li>Invite ₹200 is added to Pending when the invited user completes KYC.</li>
+                                    <li>That ₹200 moves to your Virtual Account when they create their Virtual Account.</li>
+                                    <li>You can withdraw from Virtual Account after it is created.</li>
+                                </>
+                            )}
                         </ul>
                     </div>
+
+                    {vaExpired && (
+                        <button
+                            type="button"
+                            onClick={() => navigate(VIRTUAL_ACCOUNT_PATH)}
+                            className="w-full bg-[#462211] text-white py-3 rounded-xl text-[11px] font-medium uppercase tracking-widest"
+                        >
+                            Renew Virtual Account
+                        </button>
+                    )}
+                    {!canViewVirtual && (
+                        <button
+                            type="button"
+                            onClick={() => navigate(VIRTUAL_ACCOUNT_PATH)}
+                            className="w-full bg-[#462211] text-white py-3 rounded-xl text-[11px] font-medium uppercase tracking-widest"
+                        >
+                            Create Virtual Account
+                        </button>
+                    )}
 
                     {referrals.length > 0 && (
                         <>
@@ -528,7 +574,7 @@ const Wallet = () => {
                     <div className="bg-[#FFF5F0] rounded-xl p-3">
                         <p className="text-[9px] uppercase tracking-widest text-[#462211]">Virtual Account</p>
                         <p className="text-lg font-medium text-[#462211] mt-1">₹{virtualAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                        <p className="text-[9px] text-slate-400 mt-0.5">{virtualUnlocked ? 'Total balance' : 'Locked'}</p>
+                        <p className="text-[9px] text-slate-400 mt-0.5">{virtualUnlocked ? 'Total balance' : (vaExpired ? 'Locked · still safe' : 'Locked')}</p>
                     </div>
                     <button type="button" onClick={() => setPane('pending')} className="bg-[#FFF5F0] rounded-xl p-3 text-left">
                         <p className="text-[9px] uppercase tracking-widest text-[#462211]">Pending Wallet</p>
@@ -554,8 +600,17 @@ const Wallet = () => {
                         onClick={() => navigate(VIRTUAL_ACCOUNT_PATH)}
                         className="mt-3 w-full bg-[#462211] text-white py-2.5 rounded-xl text-[11px] font-medium uppercase tracking-widest"
                     >
-                        Create Virtual Account
+                        {vaExpired ? 'Renew Virtual Account' : 'Create Virtual Account'}
                     </button>
+                )}
+                {vaExpired && (
+                    <div className="bg-[#FFF5F0] border border-[#EDE4DC] rounded-xl p-3 flex items-start gap-2">
+                        <Info size={14} className="text-[#462211] shrink-0 mt-0.5" />
+                        <p className="text-[11px] text-[#7A5648] leading-snug">
+                            Virtual Account is locked. ₹{virtualAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} stays safe and becomes withdrawable after renewal.
+                            New earnings go to Pending. Renew within {daysUntilPendingWipe ?? 14} day{daysUntilPendingWipe === 1 ? '' : 's'} to move Pending to Virtual. After that, Pending is cleared and the next 14-day cycle starts.
+                        </p>
+                    </div>
                 )}
             </div>
 
@@ -591,7 +646,9 @@ const Wallet = () => {
                     <div className="flex justify-between items-start">
                         <div>
                             <p className="text-[11px] font-medium text-white tracking-[0.18em]">DROMONEY</p>
-                            <p className="text-[8px] text-white/70 tracking-[0.16em] mt-0.5">VIRTUAL ACCOUNT</p>
+                            <p className="text-[8px] text-white/70 tracking-[0.16em] mt-0.5">
+                                {vaExpired ? 'VIRTUAL ACCOUNT · LOCKED' : 'VIRTUAL ACCOUNT'}
+                            </p>
                         </div>
                         <p className="text-[8px] text-white/70 tracking-[0.14em]">VIRTUAL ACCOUNT</p>
                     </div>
@@ -608,16 +665,18 @@ const Wallet = () => {
                         <div>
                             <p className="text-[8px] text-white/55">Wallet Balance</p>
                             <p className="text-[20px] font-medium text-white tracking-tight">
-                                {`₹ ${Number(wallet.balance).toFixed(2)}`}
+                                {`₹ ${Number(virtualAmt).toFixed(2)}`}
                             </p>
                             <p className="text-[10px] font-medium text-white/90 uppercase tracking-wider mt-0.5">{name || 'USER'}</p>
                         </div>
                         <div className="text-right">
-                            <p className="text-[8px] text-white/55 tracking-widest">VALID THRU</p>
+                            <p className="text-[8px] text-white/55 tracking-widest">{vaExpired ? 'STATUS' : 'VALID THRU'}</p>
                             <p className="text-[11px] font-medium text-white">
-                                {withdrawalCard?.expiresAt
+                                {vaExpired
+                                    ? 'LOCKED'
+                                    : (withdrawalCard?.expiresAt
                                     ? `${String(new Date(withdrawalCard.expiresAt).getMonth() + 1).padStart(2, '0')}/${String(new Date(withdrawalCard.expiresAt).getFullYear()).slice(-2)}`
-                                    : '—'}
+                                    : '—')}
                             </p>
                         </div>
                     </div>
@@ -642,6 +701,7 @@ const Wallet = () => {
             </div>
 
             {/* --- Withdrawal Section --- */}
+            {virtualUnlocked ? (
             <div id="withdraw-section" className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm flex flex-col gap-3">
                     {/* Header with Fee Information */}
                     <div className="flex items-center justify-between border-b border-slate-50 pb-2.5">
@@ -762,10 +822,29 @@ const Wallet = () => {
                                 ? 'Redeem Locked (24h Cooldown)' 
                                 : isPaid 
                                 ? 'Redeem Now' 
+                                : vaExpired
+                                ? 'Renew to Redeem'
                                 : 'Unlock to Redeem')}
                         </button>
                     </div>
                 </div>
+            ) : (
+            <div id="withdraw-section" className="bg-white border border-[#EDE4DC] rounded-xl p-4">
+                <h3 className="text-[13px] font-medium text-[#462211]">Withdrawals locked</h3>
+                <p className="text-[11px] text-[#7A5648] mt-1 leading-snug">
+                    {vaExpired
+                        ? `₹${virtualAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} stays safe in Virtual. Renew to withdraw it. Pending ₹${pendingAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} moves to Virtual if you renew within ${daysUntilPendingWipe ?? 14} days.`
+                        : 'Create a Virtual Account to withdraw earnings.'}
+                </p>
+                <button
+                    type="button"
+                    onClick={() => navigate(VIRTUAL_ACCOUNT_PATH)}
+                    className="mt-3 w-full bg-[#462211] text-white py-2.5 rounded-xl text-[11px] font-medium uppercase tracking-widest"
+                >
+                    {vaExpired ? 'Renew Virtual Account' : 'Create Virtual Account'}
+                </button>
+            </div>
+            )}
 
             {/* --- Wallet Actions --- */}
             <div className="px-1 mt-1">

@@ -2,7 +2,15 @@ const User = require('../models/User');
 const Settings = require('../models/Settings');
 const ReferralTransaction = require('../models/ReferralTransaction');
 const Transaction = require('../models/Transaction');
-const { creditEarning, transferPendingToVirtual, migrateWalletSplits } = require('./walletLedger');
+const {
+    creditEarning,
+    transferPendingToVirtual,
+    migrateWalletSplits,
+    ensureWithdrawalCardShape,
+    isVirtualUnlocked,
+    neverCreatedVirtualAccount,
+    daysSince,
+} = require('./walletLedger');
 
 function isKycComplete(user) {
     const status = String(user?.kyc?.status || '').toLowerCase();
@@ -36,37 +44,42 @@ async function creditReferralOnKyc(userDoc) {
     const existing = await ReferralTransaction.findOne({ referredUser: user._id });
     if (existing) return { credited: false, reason: 'already_credited' };
 
+    migrateWalletSplits(referrer);
+    ensureWithdrawalCardShape(referrer);
     const inviteeHasCard = !!user.isPaid;
+    const referrerUnlocked = isVirtualUnlocked(referrer);
+    const toVirtual = inviteeHasCard && referrerUnlocked;
 
     try {
         const tx = await ReferralTransaction.create({
             referrer: referrer._id,
             referredUser: user._id,
             amount: commission,
-            status: inviteeHasCard ? 'Completed' : 'Pending',
+            status: toVirtual ? 'Completed' : 'Pending',
         });
 
         try {
-            migrateWalletSplits(referrer);
             await creditEarning(referrer, commission, {
-                source: inviteeHasCard
+                source: toVirtual
                     ? `Invite reward: ${user.name}`
                     : `Invite reward (pending): ${user.name}`,
-                inviteHold: !inviteeHasCard,
-                forceVirtual: inviteeHasCard,
+                inviteHold: !toVirtual,
+                forceVirtual: toVirtual,
                 createTx: true,
             });
             referrer.referralCount = (referrer.referralCount || 0) + 1;
             referrer.wallet.referralEarnings = (Number(referrer.wallet.referralEarnings) || 0) + commission;
             referrer.notifications = referrer.notifications || [];
             referrer.notifications.push({
-                title: inviteeHasCard ? 'Invite ₹200 credited' : 'Invite ₹200 in Pending',
-                message: inviteeHasCard
+                title: toVirtual ? 'Invite ₹200 credited' : 'Invite ₹200 in Pending',
+                message: toVirtual
                     ? `${user.name} completed KYC and has a Virtual Account. ₹${commission} is in your Virtual Account.`
-                    : `${user.name} completed KYC. ₹${commission} is in your Pending Wallet. It transfers to Virtual Wallet in min 14 and max 28 days.`,
+                    : `${user.name} completed KYC. ₹${commission} is in your Pending Wallet.`,
                 type: 'success',
                 isRead: false,
             });
+            referrer.markModified('wallet');
+            referrer.markModified('notifications');
             await referrer.save({ validateBeforeSave: false });
         } catch (creditErr) {
             await ReferralTransaction.deleteOne({ _id: tx._id }).catch(() => {});
@@ -75,18 +88,18 @@ async function creditReferralOnKyc(userDoc) {
 
         try {
             const { notifyJourney } = require('./userJourneyPush');
-            await notifyJourney(referrer._id, inviteeHasCard ? 'invite_virtual' : 'invite_pending', {
+            await notifyJourney(referrer._id, toVirtual ? 'invite_virtual' : 'invite_pending', {
                 skipInApp: true,
-                body: inviteeHasCard
+                body: toVirtual
                     ? `${user.name} completed KYC. ₹${commission} is in your Virtual Account.`
-                    : `${user.name} completed KYC. ₹${commission} is in Pending until they create a Virtual Account.`,
+                    : `${user.name} completed KYC. ₹${commission} is in Pending.`,
             });
         } catch (pushErr) {
             console.error('Referral push failed:', pushErr.message);
         }
 
-        console.log(`[REFERRAL] ₹${commission} to referrer ${referrer._id} after KYC of ${user._id} (${inviteeHasCard ? 'virtual' : 'pending hold'})`);
-        return { credited: true, amount: commission, held: !inviteeHasCard };
+        console.log(`[REFERRAL] ₹${commission} to referrer ${referrer._id} after KYC of ${user._id} (${toVirtual ? 'virtual' : 'pending hold'})`);
+        return { credited: true, amount: commission, held: !toVirtual };
     } catch (err) {
         if (err.code === 11000) {
             return { credited: false, reason: 'already_credited' };
@@ -112,6 +125,10 @@ async function releaseReferralToVirtual(userDoc) {
     if (!referrer) return { released: false, reason: 'referrer_missing' };
 
     migrateWalletSplits(referrer);
+    ensureWithdrawalCardShape(referrer);
+    if (!isVirtualUnlocked(referrer)) {
+        return { released: false, reason: 'referrer_va_locked' };
+    }
     const moved = transferPendingToVirtual(referrer, tx.amount);
     tx.status = 'Completed';
     await tx.save();
@@ -148,40 +165,41 @@ async function releaseReferralToVirtual(userDoc) {
 }
 
 /**
- * 28-day inactivity: remove invite + pending ₹200 from referrer.
+ * 28-day inactivity (hidden from the invitee): remove the referrer's pending ₹200 only.
+ * Does not block or suspend the invitee. Does not touch Virtual balance.
  */
 async function clawbackInvite(userDoc) {
     const tx = await ReferralTransaction.findOne({
         referredUser: userDoc._id,
-        status: { $in: ['Pending', 'Completed'] },
+        status: 'Pending',
     });
     if (!tx) return { clawed: false, reason: 'no_tx' };
 
     const referrer = await User.findById(tx.referrer);
+    const inviteeName = userDoc.name || 'The referred user';
+    const amount = Number(tx.amount) || 0;
     if (referrer) {
         migrateWalletSplits(referrer);
-        if (tx.status === 'Pending') {
-            referrer.wallet.pendingBalance = Math.max(0, (Number(referrer.wallet.pendingBalance) || 0) - tx.amount);
-        } else {
-            referrer.wallet.virtualBalance = Math.max(0, (Number(referrer.wallet.virtualBalance) || 0) - tx.amount);
-            referrer.wallet.balance = Math.max(0, (Number(referrer.wallet.balance) || 0) - tx.amount);
-        }
-        referrer.referralCount = Math.max(0, (referrer.referralCount || 0) - 1);
-        referrer.wallet.referralEarnings = Math.max(0, (Number(referrer.wallet.referralEarnings) || 0) - tx.amount);
+        const pending = Number(referrer.wallet.pendingBalance) || 0;
+        const fromPending = Math.min(pending, amount);
+        referrer.wallet.pendingBalance = Math.round((pending - fromPending) * 100) / 100;
+        referrer.wallet.referralEarnings = Math.max(0, (Number(referrer.wallet.referralEarnings) || 0) - amount);
         referrer.notifications = referrer.notifications || [];
         referrer.notifications.push({
-            title: 'Invite Removed',
-            message: `An invited user stayed inactive. ₹${tx.amount} was removed.`,
+            title: 'Refer active users only',
+            message: `${inviteeName} is not active yet, so ₹${amount} was removed from Pending.`,
             type: 'warning',
             isRead: false,
         });
+        referrer.markModified?.('wallet');
+        referrer.markModified?.('notifications');
         await referrer.save({ validateBeforeSave: false });
         try {
             const { notifyJourney } = require('./userJourneyPush');
-            await notifyJourney(referrer._id, 'account_hold', {
+            await notifyJourney(referrer._id, 'invite_clawback', {
                 skipInApp: true,
-                title: 'Invite Removed',
-                body: `An invited user stayed inactive. ₹${tx.amount} was removed.`,
+                title: 'Refer active users only',
+                body: `${inviteeName} is not active yet, so ₹${amount} was removed from Pending. Refer users who create a Virtual Account.`,
                 link: '/user/wallet',
             });
         } catch (pushErr) {
@@ -191,34 +209,53 @@ async function clawbackInvite(userDoc) {
 
     tx.status = 'Failed';
     await tx.save();
-    return { clawed: true, amount: tx.amount };
+    return { clawed: true, amount };
+}
+
+async function applyInviteDay28IfDue(invitee) {
+    if (!invitee?._id || !neverCreatedVirtualAccount(invitee)) {
+        return { clawed: false };
+    }
+    const days = daysSince(invitee.kycApprovedAt || invitee.kyc?.approvedAt);
+    invitee.inviteInactive = invitee.inviteInactive || {};
+    if (days == null || days < 28 || invitee.inviteInactive.day28ClawbackApplied) {
+        return { clawed: false };
+    }
+    const result = await clawbackInvite(invitee);
+    invitee.inviteInactive.day28ClawbackApplied = true;
+    return { ...result, applied: true };
 }
 
 /**
- * 7-day penalty: add 10% of ₹200 onto referrer's pending invite hold.
+ * When the referrer later unlocks/renews Virtual Account, release holds
+ * for invitees who already bought a Virtual Account.
  */
-async function applyDay7Penalty(userDoc) {
-    const tx = await ReferralTransaction.findOne({
-        referredUser: userDoc._id,
+async function releaseReadyInvitesForReferrer(referrerDoc) {
+    if (!referrerDoc?._id) return { released: 0 };
+    migrateWalletSplits(referrerDoc);
+    ensureWithdrawalCardShape(referrerDoc);
+    if (!isVirtualUnlocked(referrerDoc)) {
+        return { released: 0, reason: 'referrer_va_locked' };
+    }
+
+    const txs = await ReferralTransaction.find({
+        referrer: referrerDoc._id,
         status: 'Pending',
     });
-    if (!tx) return { applied: false };
+    let released = 0;
+    for (const tx of txs) {
+        const invitee = await User.findById(tx.referredUser).select('name isPaid kyc withdrawalCard');
+        if (!invitee?.isPaid) continue;
+        const result = await releaseReferralToVirtual(invitee);
+        if (result.released) released += 1;
+    }
+    return { released };
+}
 
-    const penalty = Math.round(tx.amount * 0.1 * 100) / 100;
-    const referrer = await User.findById(tx.referrer);
-    if (!referrer) return { applied: false };
-
-    migrateWalletSplits(referrer);
-    referrer.wallet.pendingBalance = (Number(referrer.wallet.pendingBalance) || 0) + penalty;
-    referrer.notifications = referrer.notifications || [];
-    referrer.notifications.push({
-        title: 'Invite inactivity penalty',
-        message: `Invited user missed 7-day card deadline. ₹${penalty} added to your Pending Wallet.`,
-        type: 'warning',
-        isRead: false,
-    });
-    await referrer.save({ validateBeforeSave: false });
-    return { applied: true, penalty };
+async function afterVirtualAccountActivated(userDoc) {
+    const fromInvitee = await creditReferralOnQualifiedUnlock(userDoc);
+    const fromReferrerHolds = await releaseReadyInvitesForReferrer(userDoc);
+    return { fromInvitee, fromReferrerHolds };
 }
 
 // Payment callers: invitee Withdrawal Card unlocks the held ₹200 Pending → Virtual.
@@ -237,6 +274,8 @@ module.exports = {
     creditReferralOnKyc,
     creditReferralOnQualifiedUnlock,
     releaseReferralToVirtual,
+    releaseReadyInvitesForReferrer,
+    afterVirtualAccountActivated,
     clawbackInvite,
-    applyDay7Penalty,
+    applyInviteDay28IfDue,
 };

@@ -24,13 +24,12 @@ const TaskRunner = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addCoins, userData, refreshUserProfile } = useUser();
-    
-    // Safety check incase user not unlocking bypassed
+    const kycOk = ['approved', 'verified'].includes(String(userData?.kycStatus || '').toLowerCase());
+
     useEffect(() => {
-        if (!userData.isPaid) {
-            navigate(-1);
-        }
-    }, [userData.isPaid, navigate]);
+        if (!userData?.mongoId) return;
+        if (!kycOk) navigate(-1);
+    }, [userData?.mongoId, kycOk, navigate]);
 
     // Fetch dynamic task from storage once inside an effect
     const [task, setTask] = useState(null);

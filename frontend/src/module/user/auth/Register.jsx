@@ -6,8 +6,8 @@ import {
     extractReferralCode,
     savePendingReferralCode,
     getPendingReferralCode,
-    clearPendingReferralCode,
     fetchFlutterInstallReferrer,
+    resolveReferralCodeForRegister,
 } from '../../shared/utils/referral';
 
 const inputClass =
@@ -111,15 +111,21 @@ const Register = () => {
                 searchParams.get('referral') ||
                 searchParams.get('code') ||
                 '';
-            const flutterCode = await fetchFlutterInstallReferrer();
-            const initial =
+            const immediate =
                 extractReferralCode(fromQuery) ||
-                flutterCode ||
-                getPendingReferralCode();
+                getPendingReferralCode() ||
+                extractReferralCode(typeof window !== 'undefined' ? window.location.href : '');
 
-            if (cancelled || !initial) return;
-            savePendingReferralCode(initial);
-            applyReferralInput(initial, { showCode: true });
+            if (immediate && !cancelled) {
+                savePendingReferralCode(immediate);
+                applyReferralInput(immediate, { showCode: true });
+            }
+
+            const flutterCode = await fetchFlutterInstallReferrer();
+            const next = flutterCode || immediate;
+            if (cancelled || !next) return;
+            savePendingReferralCode(next);
+            applyReferralInput(next, { showCode: true });
         };
 
         applyInitialInvite();
@@ -191,10 +197,9 @@ const Register = () => {
         if (otp.length < 6) return;
 
         setLoading(true);
-        const resolvedCode =
-            referralCode ||
-            extractReferralCode(formData.referral) ||
-            '';
+        const resolvedCode = resolveReferralCodeForRegister(
+            referralCode || formData.referral
+        );
         const result = await register({
             name: formData.name,
             email: formData.email,
@@ -205,7 +210,6 @@ const Register = () => {
         setLoading(false);
 
         if (result.success) {
-            clearPendingReferralCode();
             navigate('/user/home');
         } else {
             setError(result.error || 'Registration failed. Please try again.');

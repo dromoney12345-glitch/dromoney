@@ -55,7 +55,7 @@ const AuthLayout = () => {
                     {!hideAuthTabs && (
                         <div className="flex border-b border-[#EDE4DC] mb-4">
                             <Link
-                                to="/user/auth/register"
+                                to={`/user/auth/register${location.search || ''}`}
                                 className={`flex-1 flex items-center justify-center gap-1.5 pb-3 text-[13px] font-medium transition-colors ${
                                     isRegister
                                         ? 'text-[#462211] border-b-2 border-[#462211]'
@@ -66,7 +66,7 @@ const AuthLayout = () => {
                                 Sign Up
                             </Link>
                             <Link
-                                to="/user/auth/login"
+                                to={`/user/auth/login${location.search || ''}`}
                                 className={`flex-1 flex items-center justify-center gap-1.5 pb-3 text-[13px] font-medium transition-colors ${
                                     !isRegister
                                         ? 'text-[#462211] border-b-2 border-[#462211]'

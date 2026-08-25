@@ -21,12 +21,8 @@ exports.getContent = asyncHandler(async (req, res, next) => {
     if (payload.key === 'guide_invite' && payload.data && typeof payload.data.content === 'string') {
         payload.data.content = payload.data.content
             .replace(
-                /It transfers to your Virtual Wallet once they unlock their withdrawal card\.?/gi,
-                'The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.'
-            )
-            .replace(
-                /It moves to Virtual Account when they create one\.?/gi,
-                'The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.'
+                /The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days\.?/gi,
+                'That ₹200 stays in Pending until they create a Virtual Account, then it moves to your Virtual Account.'
             );
     }
 

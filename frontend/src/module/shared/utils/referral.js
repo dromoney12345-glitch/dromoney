@@ -21,14 +21,29 @@ function extractFromUrlString(rawUrl) {
             url.searchParams.get('invite') ||
             url.searchParams.get('ref') ||
             url.searchParams.get('referral') ||
+            url.searchParams.get('utm_content') ||
             url.searchParams.get('code');
         if (inviteParam) return normalizeCode(inviteParam);
 
+        const hash = String(url.hash || '').replace(/^#/, '');
+        if (hash) {
+            const hashParams = new URLSearchParams(hash.startsWith('/') ? hash.split('?')[1] || '' : hash);
+            const fromHash =
+                hashParams.get('invite') ||
+                hashParams.get('ref') ||
+                hashParams.get('referral');
+            if (fromHash) return normalizeCode(fromHash);
+            const hashJoin = hash.match(/join\/([A-Za-z0-9]+)/i);
+            if (hashJoin) return normalizeCode(hashJoin[1]);
+        }
+
         const installReferrer = url.searchParams.get('referrer');
         if (installReferrer) {
-            const decoded = decodeURIComponent(installReferrer);
+            let decoded = String(installReferrer);
+            try { decoded = decodeURIComponent(decoded); } catch { /* already decoded */ }
+            try { decoded = decodeURIComponent(decoded); } catch { /* once is enough */ }
             const match =
-                decoded.match(/(?:^|[&?])ref=([A-Za-z0-9]+)/i) ||
+                decoded.match(/(?:^|[&?])(?:ref|invite|referral)=([A-Za-z0-9]+)/i) ||
                 decoded.match(/^([A-Za-z0-9]{4,12})$/);
             if (match) return normalizeCode(match[1]);
         }
@@ -57,6 +72,16 @@ export function extractReferralCode(value) {
         if (fromUrl) return fromUrl;
     }
 
+    if (raw.startsWith('?') || raw.startsWith('#')) {
+        const params = new URLSearchParams(raw.replace(/^#/, ''));
+        const fromQuery =
+            params.get('invite') ||
+            params.get('ref') ||
+            params.get('referral') ||
+            params.get('code');
+        if (fromQuery) return normalizeCode(fromQuery);
+    }
+
     const labeled = raw.match(/invite\s*code\s*[:\-]\s*([A-Za-z0-9]+)/i);
     if (labeled) return normalizeCode(labeled[1]);
 
@@ -75,9 +100,8 @@ export function extractReferralCode(value) {
     if (/\/join\//i.test(raw)) {
         return normalizeCode(raw.split(/\/join\//i).pop());
     }
-    if (raw.includes('/') && !/user\/auth|\/login|\/register/i.test(raw)) {
-        return normalizeCode(raw.split('/').pop());
-    }
+    const kv = raw.match(/(?:^|[?&\s])(?:ref|invite|referral)\s*=\s*([A-Za-z0-9]+)/i);
+    if (kv) return normalizeCode(kv[1]);
     return normalizeCode(raw);
 }
 
@@ -157,20 +181,36 @@ export function buildPlayStoreReferralLink(code, baseUrlFromSettings = '') {
     return url.toString();
 }
 
+function isPlaceholderReferralBase(base) {
+    const b = String(base || '').trim();
+    if (!b) return true;
+    return /earningapp\.com/i.test(b) || /example\.com/i.test(b);
+}
+
+function buildWebJoinLink(code) {
+    const cleanCode = extractReferralCode(code);
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://dromoney.app';
+    if (!cleanCode) return `${origin}/join`;
+    return `${origin}/join/${cleanCode}`;
+}
+
 /**
  * Shareable referral link for Marketing / Profile.
- * Uses admin Play Store base when set; always embeds code via referrer=ref=CODE.
+ * Prefer a web /join/CODE link so signup actually receives the code.
+ * Play Store is used only when admin explicitly set a Play Store base URL.
  */
 export function buildReferralLink(code, baseUrlFromSettings = '') {
     const cleanCode = extractReferralCode(code);
     const base = String(baseUrlFromSettings || '').trim();
 
-    // Admin Play Store URL (or empty) → always proper Play Store + referrer
-    if (!base || /play\.google\.com/i.test(base) || /pcampaignid=web_share/i.test(base)) {
+    if (/play\.google\.com/i.test(base) || /pcampaignid=web_share/i.test(base)) {
         return buildPlayStoreReferralLink(cleanCode, base);
     }
 
-    // Custom non–Play Store base from admin
+    if (isPlaceholderReferralBase(base)) {
+        return buildWebJoinLink(cleanCode);
+    }
+
     try {
         if (/\/join\/?$/i.test(base) || /\/join\//i.test(base)) {
             if (!cleanCode) return base;
@@ -180,8 +220,51 @@ export function buildReferralLink(code, baseUrlFromSettings = '') {
         if (cleanCode) url.searchParams.set('ref', cleanCode);
         return url.toString();
     } catch {
-        return buildPlayStoreReferralLink(cleanCode, '');
+        return buildWebJoinLink(cleanCode);
     }
+}
+
+export function captureReferralFromLocation(href) {
+    const raw = href || (typeof window !== 'undefined' ? window.location.href : '');
+    const cleaned = extractReferralCode(raw);
+    if (cleaned) return savePendingReferralCode(cleaned);
+    return '';
+}
+
+export function resolveReferralCodeForRegister(explicit = '') {
+    return (
+        extractReferralCode(explicit) ||
+        getPendingReferralCode() ||
+        captureReferralFromLocation() ||
+        ''
+    );
+}
+
+/**
+ * Install capture as soon as the webview loads (including splash).
+ * Flutter can call window.savePendingReferral('CODE') or pass a full Play Store URL.
+ */
+export function installReferralCapture() {
+    captureReferralFromLocation();
+
+    const apply = (value) => savePendingReferralCode(value);
+
+    if (typeof window !== 'undefined') {
+        window.savePendingReferral = apply;
+        window.saveReferralCode = apply;
+        window.savePendingReferralCode = apply;
+    }
+
+    fetchFlutterInstallReferrer(2500).then((code) => {
+        if (code) savePendingReferralCode(code);
+    });
+
+    return () => {
+        if (typeof window === 'undefined') return;
+        delete window.savePendingReferral;
+        delete window.saveReferralCode;
+        delete window.savePendingReferralCode;
+    };
 }
 
 /** Try to read install referrer from Flutter native bridge (if implemented). */

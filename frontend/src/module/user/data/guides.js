@@ -23,7 +23,7 @@ Login करने के बाद Home Page दिखाई देता ह�
 • 👥 Community Guidelines & Help Desk
 
 👥 3. Invite Friends & Referrals
-अपना पर्सनल रेफरल लिंक दोस्तों के साथ शेयर करें। जब वे KYC पूरा करके Virtual Account बनाते हैं, तो आपके वॉलेट में रेफरल रिवॉर्ड इंसटेंट ऐड हो जाता है।
+अपना पर्सनल रेफरल लिंक दोस्तों के साथ शेयर करें। जब वे KYC पूरा करते हैं, ₹200 आपके Pending Wallet में जाता है। जब वे Virtual Account बनाते हैं, तब यह राशि आपके Virtual Account में ट्रांसफर होती है।
 
 💼 4. Part-Time Income & Business Guidance
 Dromoney Users को अलग-अलग प्रकार की Opportunities को Explore करने का मौका देता है। आप Daily Tasks, Video Watching, Quizzes, Brand Promotion और Refer & Earn के माध्यम से Rewards Earn कर सकते हैं।
@@ -40,8 +40,8 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
             'Copy or share your invite link.',
             'Your friend pastes that link (or opens it) — the invite code is already inside the link — then completes KYC.',
             'After their KYC is approved, ₹200 is added to your Pending Wallet.',
-            'The amount is transferred to your Virtual Wallet in a minimum of 14 days and a maximum of 28 days.',
-            'If they do not create a Virtual Account within 14 days, their pending balance is removed. After 28 days the invite can be removed.',
+            'That ₹200 moves to your Virtual Account when they create their Virtual Account.',
+            'If they do not create a Virtual Account, their own Pending is cleared every 14 days until they buy one.',
         ],
     },
     fund: {
@@ -94,7 +94,7 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
             'Pending Wallet holds processing amounts.',
             'Virtual Account is withdrawable after the account is created.',
             'Card details auto-fill: Name, Number, Today, Expiry (6 months).',
-            'Pay ₹499 (or ₹550 after inactivity) → admin approval → Virtual unlock.',
+            'Pay ₹499 → admin approval → Virtual Account unlocks for 6 months.',
         ],
     },
     kyc: {
@@ -114,9 +114,10 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
         next: '/user/virtual-account',
         points: [
             'Name, number and dates are filled automatically.',
-            'Tap Next to pay ₹499.',
+            'Tap Next to pay ₹499. If you pay within 3 days of KYC, ₹399 is a 6-month reserve in Virtual (used at renewal). ₹100 is the platform charge.',
             'After payment and approval, Virtual Account opens.',
-            'The account expires every 6 months — renew when it expires.',
+            'You get a reminder 7 days before expiry. If you do not renew, Virtual locks but the old balance stays safe.',
+            'After expiry, new earnings go to Pending. Renew within 14 days to move Pending to Virtual, or Pending is cleared and the next 14-day cycle starts.',
         ],
     },
     withdraw: {
@@ -127,6 +128,7 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
             'Withdrawals work only from an unlocked Virtual Account.',
             'Enter UPI or bank details to redeem.',
             'The ₹399 3-day reserve cannot be withdrawn immediately.',
+            'If Virtual is expired, renew first. Old Virtual balance is not deleted.',
         ],
     },
     earn500: {

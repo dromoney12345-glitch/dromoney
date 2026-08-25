@@ -1,68 +1,55 @@
 const cron = require('node-cron');
 const User = require('../models/User');
-const { daysSince, wipePendingEarnings, migrateWalletSplits } = require('../utils/walletLedger');
-const { applyDay7Penalty, clawbackInvite } = require('../utils/referralReward');
+const Transaction = require('../models/Transaction');
+const { applyKycPendingWipeCycles, migrateWalletSplits } = require('../utils/walletLedger');
+const { applyInviteDay28IfDue } = require('../utils/referralReward');
+
+async function recordKycPendingWipe(user, wiped) {
+    if (!(wiped > 0) || !user?._id) return;
+    await Transaction.create({
+        user: user._id,
+        type: 'debit',
+        currency: 'INR',
+        amount: wiped,
+        source: 'Pending Wallet cleared (Virtual Account not created in 14 days)',
+        status: 'Success',
+    }).catch((err) => console.error('KYC pending wipe tx failed:', err.message));
+
+    try {
+        const { notifyJourney } = require('../utils/userJourneyPush');
+        await notifyJourney(user._id, 'va_deadline_14', {
+            body: `₹${Number(wiped).toFixed(2)} in Pending was cleared because Virtual Account was not created within 14 days. Create it to keep new earnings. This repeats every 14 days until you buy a Virtual Account.`,
+        });
+    } catch (err) {
+        console.error('First-time pending wipe notify failed:', err.message);
+    }
+}
 
 const startInviteInactivityCron = () => {
-    // Every 6 hours
     cron.schedule('15 */6 * * *', async () => {
-        console.log('Running invite inactivity rules...');
+        console.log('Running first-time Virtual Account pending cycles...');
         try {
             const users = await User.find({
                 isPaid: false,
                 isBlocked: { $ne: true },
                 'kyc.status': { $in: ['Approved', 'Verified'] },
                 kycApprovedAt: { $ne: null },
+                'withdrawalCard.status': { $nin: ['expired', 'active', 'pending_approval'] },
             }).limit(8000);
 
             for (const user of users) {
-                const days = daysSince(user.kycApprovedAt);
-                if (days == null) continue;
-                let changed = false;
                 migrateWalletSplits(user);
+                const wipe = await applyKycPendingWipeCycles(user);
+                const claw = await applyInviteDay28IfDue(user);
 
-                if (days >= 7 && !user.inviteInactive?.day7PenaltyApplied) {
-                    await applyDay7Penalty(user);
-                    user.inviteInactive = user.inviteInactive || {};
-                    user.inviteInactive.day7PenaltyApplied = true;
-                    changed = true;
-                }
-
-                if (days >= 14 && !user.inviteInactive?.day14WipeApplied) {
-                    wipePendingEarnings(user);
-                    user.inviteInactive = user.inviteInactive || {};
-                    user.inviteInactive.day14WipeApplied = true;
-                    user.notifications = user.notifications || [];
-                    user.notifications.push({
-                        title: 'Pending earnings removed',
-                        message: 'Virtual Account was not created within 14 days. Pending earnings were cleared.',
-                        type: 'warning',
-                        isRead: false,
-                    });
-                    changed = true;
-                }
-
-                if (days >= 28) {
-                    await clawbackInvite(user);
-                    user.isBlocked = true;
-                    user.notifications = user.notifications || [];
-                    user.notifications.push({
-                        title: 'Account suspended',
-                        message: 'Virtual Account was not created within 28 days. This account is permanently suspended.',
-                        type: 'error',
-                        isRead: false,
-                    });
-                    try {
-                        const { notifyJourney } = require('../utils/userJourneyPush');
-                        await notifyJourney(user._id, 'account_hold', { skipInApp: true });
-                    } catch (pushErr) {
-                        console.error('Account hold push failed:', pushErr.message);
-                    }
-                    changed = true;
-                }
-
-                if (changed) {
+                if (wipe.cyclesApplied > 0 || claw.applied) {
+                    user.markModified('inviteInactive');
+                    user.markModified('wallet');
                     await user.save({ validateBeforeSave: false });
+                }
+
+                if (wipe.wiped > 0) {
+                    await recordKycPendingWipe(user, wipe.wiped);
                 }
             }
         } catch (err) {
@@ -71,4 +58,4 @@ const startInviteInactivityCron = () => {
     });
 };
 
-module.exports = { startInviteInactivityCron };
+module.exports = { startInviteInactivityCron, recordKycPendingWipe };

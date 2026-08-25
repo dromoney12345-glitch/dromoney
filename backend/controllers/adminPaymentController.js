@@ -259,14 +259,16 @@ exports.updatePaymentStatus = async (req, res) => {
                         console.error('Push notification failed for support renewal:', pushErr.message);
                     }
                 } else {
-                    // PLATFORM_UNLOCK only — do not unlock wallet for business/support payments
+                    const isRenewal = payment.paymentType === 'VIRTUAL_ACCOUNT_RENEWAL';
                     const { activateVirtualWallet } = require('../utils/walletLedger');
-                    await activateVirtualWallet(user);
+                    await activateVirtualWallet(user, { isRenewal });
 
                     user.notifications = user.notifications || [];
                     user.notifications.push({
-                        title: 'Virtual Account Unlocked',
-                        message: 'Virtual Account approved. It is now active for 6 months.',
+                        title: isRenewal ? 'Virtual Account Renewed' : 'Virtual Account Unlocked',
+                        message: isRenewal
+                            ? 'Virtual Account renewed. It is now active for 6 more months.'
+                            : 'Virtual Account approved. It is now active for 6 months.',
                         type: 'success',
                         isRead: false
                     });
@@ -279,19 +281,23 @@ exports.updatePaymentStatus = async (req, res) => {
                         type: 'debit',
                         currency: 'INR',
                         amount: payment.amount,
-                        source: payment.plan || 'Platform Unlock',
+                        source: payment.plan || (isRenewal ? 'Virtual Account Renew' : 'Platform Unlock'),
                         status: 'Success'
                     });
 
                     try {
                         const { notifyJourney } = require('../utils/userJourneyPush');
-                        await notifyJourney(user._id, 'va_activated', { skipInApp: true });
+                        await notifyJourney(user._id, isRenewal ? 'va_renewed' : 'va_activated', { skipInApp: true });
                     } catch (pushErr) {
                         console.error('Push notification failed for payment activation:', pushErr.message);
                     }
 
-                    const { creditReferralOnQualifiedUnlock } = require('../utils/referralReward');
-                    await creditReferralOnQualifiedUnlock(user);
+                    try {
+                        const { afterVirtualAccountActivated } = require('../utils/referralReward');
+                        await afterVirtualAccountActivated(user);
+                    } catch (refErr) {
+                        console.error('[REFERRAL] after Virtual Account activation failed:', refErr.message);
+                    }
                 }
             }
 

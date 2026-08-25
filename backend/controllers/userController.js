@@ -25,6 +25,15 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET || 'io9bbDuRyDZ0Sd1C2fy2sCP4YmI'
 });
 
+// @desc    List personal in-app notifications (database)
+// @route   GET /api/user/data/notifications
+// @access  Private
+exports.getMyNotifications = asyncHandler(async (req, res, next) => {
+    const AppNotification = require('../models/AppNotification');
+    const items = await AppNotification.find({ user: req.user.id }).sort('-createdAt').limit(50);
+    res.status(200).json({ success: true, count: items.length, data: items });
+});
+
 // @desc    Clear personal notifications
 // @route   DELETE /api/user/data/notifications
 // @access  Private
@@ -33,10 +42,13 @@ exports.clearPersonalNotifications = asyncHandler(async (req, res, next) => {
     if (!user) {
         return next(new ErrorResponse('User not found', 404));
     }
-    
+
     user.notifications = [];
-    await user.save();
-    
+    await user.save({ validateBeforeSave: false });
+
+    const AppNotification = require('../models/AppNotification');
+    await AppNotification.deleteMany({ user: req.user.id });
+
     res.status(200).json({ success: true, data: {} });
 });
 
@@ -179,8 +191,8 @@ exports.unlockPlatform = asyncHandler(async (req, res, next) => {
     await user.save();
 
     try {
-        const { creditReferralOnQualifiedUnlock } = require('../utils/referralReward');
-        await creditReferralOnQualifiedUnlock(user);
+        const { afterVirtualAccountActivated } = require('../utils/referralReward');
+        await afterVirtualAccountActivated(user);
     } catch (err) {
         console.error('Simulation Referral Error:', err.message);
     }
@@ -499,55 +511,158 @@ exports.unlockFutureFund = asyncHandler(async (req, res, next) => {
     });
 });
 
+function mapReferralRow(ref, tx, commission) {
+    const kycStatus = String(ref.kyc?.status || '').toLowerCase();
+    const kycDone = kycStatus === 'approved' || kycStatus === 'verified';
+    const cardActive = ref.isPaid && String(ref.withdrawalCard?.status || '') === 'active';
+
+    let milestone = 'waiting_kyc';
+    if (tx?.status === 'Failed') milestone = 'removed';
+    else if (tx?.status === 'Completed' || (cardActive && tx?.status === 'Pending')) milestone = 'card_active';
+    else if (cardActive) milestone = 'card_active';
+    else if (kycDone) milestone = 'card_pending';
+
+    const amount = tx?.amount || (kycDone ? commission : 0);
+    const status = tx?.status || (kycDone ? 'Pending' : 'Waiting KYC');
+
+    return {
+        _id: tx?._id || ref._id,
+        referredUser: ref._id ? ref : { name: 'Unknown User' },
+        name: ref.name || 'Unknown User',
+        phone: ref.phone || '',
+        amount,
+        status,
+        createdAt: tx?.createdAt || ref.createdAt,
+        kycStatus: ref.kyc?.status || 'Not Started',
+        kycApprovedAt: ref.kycApprovedAt || null,
+        cardStatus: ref.withdrawalCard?.status || 'none',
+        isPaid: !!ref.isPaid,
+        milestone,
+    };
+}
+
+// @desc    Attach invite code after signup if it was missed (Play Store / Flutter race)
+// @route   POST /api/user/data/attach-referral
+// @access  Private
+exports.attachReferral = asyncHandler(async (req, res, next) => {
+    const raw =
+        req.body.referralCode ||
+        req.body.inviteCode ||
+        req.body.referral ||
+        req.body.ref ||
+        req.body.invite ||
+        req.headers['x-referral-code'] ||
+        '';
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+        return next(new ErrorResponse('User not found', 404));
+    }
+
+    if (user.referredBy) {
+        return res.status(200).json({ success: true, attached: false, reason: 'already_linked' });
+    }
+
+    const ageMs = Date.now() - new Date(user.createdAt).getTime();
+    const maxAgeMs = 7 * 24 * 60 * 60 * 1000;
+    if (ageMs > maxAgeMs) {
+        return res.status(400).json({ success: false, message: 'Invite code can only be added within 7 days of signup' });
+    }
+
+    const { findReferrerByCode } = require('../utils/referralCode');
+    const linked = await findReferrerByCode(raw, {
+        excludePhone: user.phone,
+        excludeEmail: user.email,
+        excludeId: user._id,
+    });
+
+    if (linked.reason !== 'ok') {
+        return res.status(400).json({
+            success: false,
+            message: linked.reason === 'self_referral'
+                ? 'You cannot use your own invite code'
+                : 'Invalid invite code',
+        });
+    }
+
+    user.referredBy = linked.referrer._id;
+    await user.save({ validateBeforeSave: false });
+    console.log(`[REFERRAL] Attached ${user._id} to referrer ${linked.referrer._id} after signup`);
+
+    try {
+        const { creditReferralOnKyc } = require('../utils/referralReward');
+        await creditReferralOnKyc(user);
+    } catch (refErr) {
+        console.error('[REFERRAL] attach-referral KYC credit:', refErr.message);
+    }
+
+    res.status(200).json({ success: true, attached: true });
+});
+
 // @desc    Get user's referrals list
 // @route   GET /api/user/data/referrals
 // @access  Private
 exports.getReferrals = asyncHandler(async (req, res, next) => {
     const referrerId = req.user._id || req.user.id;
-    const { daysSince } = require('../utils/walletLedger');
+    const settings = await Settings.findOne().select('referralCommission');
+    const commission = Number(settings?.referralCommission) > 0 ? Number(settings.referralCommission) : 200;
 
-    const transactions = await ReferralTransaction.find({ referrer: referrerId })
-        .populate('referredUser', 'name phone createdAt isPaid kyc kycApprovedAt withdrawalCard isBlocked')
-        .sort('-createdAt');
+    const [transactions, invitedUsers] = await Promise.all([
+        ReferralTransaction.find({ referrer: referrerId })
+            .populate('referredUser', 'name phone createdAt isPaid kyc kycApprovedAt withdrawalCard isBlocked')
+            .sort('-createdAt'),
+        User.find({ referredBy: referrerId })
+            .select('name phone createdAt isPaid kyc kycApprovedAt withdrawalCard isBlocked referredBy')
+            .sort('-createdAt'),
+    ]);
 
-    const referralsData = transactions.map((tx) => {
-        const ref = tx.referredUser || {};
-        const kycStatus = String(ref.kyc?.status || '').toLowerCase();
+    const { creditReferralOnKyc } = require('../utils/referralReward');
+    let creditedAny = false;
+    for (const invitee of invitedUsers) {
+        const kycStatus = String(invitee.kyc?.status || '').toLowerCase();
         const kycDone = kycStatus === 'approved' || kycStatus === 'verified';
-        const cardActive = ref.isPaid && ref.withdrawalCard?.status === 'active';
-        const days = kycDone ? daysSince(ref.kycApprovedAt) : null;
-        const daysLeft = days != null ? Math.max(0, 28 - days) : null;
-
-        let milestone = 'waiting_kyc';
-        if (ref.isBlocked) milestone = 'suspended';
-        else if (cardActive) milestone = 'card_active';
-        else if (kycDone && days != null) {
-            if (days >= 28) milestone = 'suspended';
-            else if (days >= 14) milestone = 'day14';
-            else if (days >= 7) milestone = 'day7';
-            else if (days <= 3) milestone = 'day3_bonus';
-            else milestone = 'card_pending';
+        const hasTx = transactions.some((tx) => String(tx.referredUser?._id || tx.referredUser) === String(invitee._id));
+        if (kycDone && !hasTx) {
+            try {
+                const result = await creditReferralOnKyc(invitee);
+                if (result?.credited) creditedAny = true;
+            } catch (err) {
+                console.error('[REFERRAL] backfill on list failed:', err.message);
+            }
         }
+    }
 
-        return {
-            _id: tx._id,
-            referredUser: ref._id ? ref : { name: 'Unknown User' },
-            name: ref.name || 'Unknown User',
-            phone: ref.phone || '',
-            amount: tx.amount || 200,
-            status: tx.status || 'Pending',
-            createdAt: tx.createdAt,
-            kycStatus: ref.kyc?.status || 'Not Started',
-            kycApprovedAt: ref.kycApprovedAt || null,
-            cardStatus: ref.withdrawalCard?.status || 'none',
-            isPaid: !!ref.isPaid,
-            daysSinceKyc: days,
-            daysLeft,
-            milestone,
-        };
-    });
+    const freshTx = creditedAny
+        ? await ReferralTransaction.find({ referrer: referrerId })
+            .populate('referredUser', 'name phone createdAt isPaid kyc kycApprovedAt withdrawalCard isBlocked')
+            .sort('-createdAt')
+        : transactions;
 
-    const totalRevenue = referralsData.reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+    const txByInvitee = new Map(
+        freshTx
+            .filter((tx) => tx.referredUser?._id)
+            .map((tx) => [String(tx.referredUser._id), tx])
+    );
+
+    const seen = new Set();
+    const referralsData = [];
+
+    for (const ref of invitedUsers) {
+        const id = String(ref._id);
+        seen.add(id);
+        referralsData.push(mapReferralRow(ref, txByInvitee.get(id) || null, commission));
+    }
+
+    for (const tx of freshTx) {
+        const ref = tx.referredUser;
+        if (!ref?._id || seen.has(String(ref._id))) continue;
+        referralsData.push(mapReferralRow(ref, tx, commission));
+    }
+
+    const totalRevenue = referralsData.reduce((sum, r) => {
+        if (r.status === 'Waiting KYC') return sum;
+        return sum + (Number(r.amount) || 0);
+    }, 0);
 
     res.status(200).json({
         success: true,
@@ -662,19 +777,21 @@ exports.getWithdrawalCard = asyncHandler(async (req, res, next) => {
     if (!user) return next(new ErrorResponse('User not found', 404));
 
     const {
-        migrateWalletSplits,
-        ensureWithdrawalCardShape,
         getCardQuote,
         withdrawableVirtual,
+        isVirtualUnlocked,
+        applyWalletMaintenance,
+        getVirtualAccountView,
     } = require('../utils/walletLedger');
+    const { persistPendingWipeEffects } = require('../utils/pendingWipeSideEffects');
 
     const settings = (await Settings.findOne()) || {};
-    migrateWalletSplits(user);
-    ensureWithdrawalCardShape(user);
+    const { expiryWipe, kycWipe } = await applyWalletMaintenance(user);
     const quote = getCardQuote(user, settings);
     user.withdrawalCard.quotedAmount = quote.amount;
     user.withdrawalCard.quotedCredit = quote.credit;
     await user.save({ validateBeforeSave: false });
+    await persistPendingWipeEffects(user, expiryWipe, kycWipe);
 
     const issued = new Date();
     const expires = new Date(issued);
@@ -695,7 +812,8 @@ exports.getWithdrawalCard = asyncHandler(async (req, res, next) => {
             virtualBalance: user.wallet.virtualBalance || 0,
             withdrawable: withdrawableVirtual(user),
             lockedReserve: user.withdrawalCard?.lockedReserve || 0,
-            virtualUnlocked: !!user.isPaid && user.withdrawalCard?.status === 'active',
+            virtualUnlocked: isVirtualUnlocked(user),
+            virtualAccount: getVirtualAccountView(user),
         },
     });
 });
