@@ -104,3 +104,27 @@ exports.getReferrerName = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 };
+
+// @desc    Record invite-link open before Play Store install (deferred attribution)
+// @route   POST /api/public/referral-click
+// @access  Public
+exports.recordReferralClick = async (req, res) => {
+    try {
+        const { recordReferralClick } = require('../utils/referralClick');
+        const raw =
+            req.body.referralCode ||
+            req.body.code ||
+            req.body.ref ||
+            req.body.invite ||
+            '';
+        const result = await recordReferralClick(req, raw);
+        res.status(200).json({
+            success: true,
+            recorded: !!result.recorded,
+            clickId: result.clickId || '',
+            code: result.code || '',
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};

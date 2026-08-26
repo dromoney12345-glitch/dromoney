@@ -593,14 +593,27 @@ exports.attachReferral = asyncHandler(async (req, res, next) => {
         return res.status(400).json({ success: false, message: 'Invite code can only be added within 14 days of signup' });
     }
 
-    const { findReferrerByCode } = require('../utils/referralCode');
-    const linked = await findReferrerByCode(raw, {
+    const { findReferrerByCode, extractReferralCode } = require('../utils/referralCode');
+    let linked = await findReferrerByCode(raw, {
         excludePhone: user.phone,
         excludeEmail: user.email,
         excludeId: user._id,
     });
 
+    if (linked.reason !== 'ok' && !extractReferralCode(raw)) {
+        const { consumeReferralClick } = require('../utils/referralClick');
+        linked = await consumeReferralClick(req, {
+            extraToken: req.body.referralClickId || req.body.clickId || '',
+            excludePhone: user.phone,
+            excludeEmail: user.email,
+            excludeId: user._id,
+        });
+    }
+
     if (linked.reason !== 'ok') {
+        if (!extractReferralCode(raw)) {
+            return res.status(200).json({ success: true, attached: false, reason: 'no_code' });
+        }
         return res.status(400).json({
             success: false,
             message: linked.reason === 'self_referral'

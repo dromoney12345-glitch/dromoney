@@ -75,18 +75,30 @@ exports.register = async (req, res, next) => {
             return next(new ErrorResponse('This email address is already registered.', 400));
         }
 
-        // Resolve invite code (accepts code OR full invite / Play Store link)
+        // Resolve invite code (Play Store link, /join/CODE, or deferred install click)
         // ₹200 is credited to the referrer only after this user's KYC is approved
         let referredBy = null;
         const linked = await findReferrerByCode(rawReferral, {
             excludePhone: trimmedPhone,
             excludeEmail: trimmedEmail,
         });
-        if (linked.reason === 'ok') {
-            referredBy = linked.referrer._id;
-            console.log(`[REFERRAL] Linked new user to referrer ${referredBy} (code ${linked.cleanCode}) — ₹200 on KYC approve`);
+        let resolved = linked;
+        if (resolved.reason !== 'ok') {
+            const incomingCode = require('../utils/referralCode').extractReferralCode(rawReferral);
+            if (!incomingCode) {
+                const { consumeReferralClick } = require('../utils/referralClick');
+                resolved = await consumeReferralClick(req, {
+                    extraToken: req.body.referralClickId || req.body.clickId || '',
+                    excludePhone: trimmedPhone,
+                    excludeEmail: trimmedEmail,
+                });
+            }
+        }
+        if (resolved.reason === 'ok') {
+            referredBy = resolved.referrer._id;
+            console.log(`[REFERRAL] Linked new user to referrer ${referredBy} (code ${resolved.cleanCode}) — ₹200 on KYC approve`);
         } else if (rawReferral) {
-            console.warn(`[REFERRAL] Invite not attached (${linked.reason}): ${String(rawReferral).slice(0, 120)}`);
+            console.warn(`[REFERRAL] Invite not attached (${resolved.reason}): ${String(rawReferral).slice(0, 120)}`);
         }
 
         const userPassword = password || '123456';

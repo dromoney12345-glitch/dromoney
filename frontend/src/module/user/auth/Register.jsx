@@ -10,6 +10,7 @@ import {
     getPendingReferralCode,
     fetchFlutterInstallReferrer,
     resolveReferralCodeForRegister,
+    captureReferralFromClipboard,
 } from '../../shared/utils/referral';
 
 const inputClass =
@@ -124,8 +125,9 @@ const Register = () => {
                 applyReferralInput(immediate, { showCode: true });
             }
 
+            const fromClipboard = await captureReferralFromClipboard();
             const flutterCode = await fetchFlutterInstallReferrer(immediate ? 1200 : 12000);
-            const next = flutterCode || immediate || getPendingReferralCode();
+            const next = flutterCode || fromClipboard || immediate || getPendingReferralCode();
             if (cancelled || !next) return;
             savePendingReferralCode(next);
             applyReferralInput(next, { showCode: true });

@@ -10,7 +10,7 @@ const { getOptionalUser } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-const { getPublicSettings, getReferrerName } = require('../controllers/publicController');
+const { getPublicSettings, getReferrerName, recordReferralClick } = require('../controllers/publicController');
 const { ayetCallback } = require('../controllers/offerwallController');
 
 router.get('/content/download-logo', downloadLogo);
@@ -28,6 +28,7 @@ router.get('/events/:id', getOptionalUser, getEvent);
 router.get('/tasks', getTasks);
 router.get('/settings', getPublicSettings);
 router.get('/referrer/:code', getReferrerName);
+router.post('/referral-click', recordReferralClick);
 router.get('/offerwall/ayet', ayetCallback);
 // --- TEST ROUTE FOR DEBUGGING UPIGATEWAY ---
 router.get('/test-payment', async (req, res) => {

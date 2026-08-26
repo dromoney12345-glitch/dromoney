@@ -326,32 +326,12 @@ function buildWebJoinLink(code) {
 }
 
 /**
- * Shareable referral link for Marketing / Profile.
- * Play Store links carry Install Referrer so download-from-link can attach ₹200.
+ * Shareable referral link.
+ * Always use /join/CODE so the invite is recorded before Play Store download.
+ * The join page then sends Android users to Play Store with Install Referrer.
  */
-export function buildReferralLink(code, baseUrlFromSettings = '') {
-    const cleanCode = extractReferralCode(code);
-    const base = normalizeReferralLinkBaseUrl(baseUrlFromSettings);
-
-    if (/play\.google\.com/i.test(base) || /pcampaignid=web_share/i.test(base)) {
-        return buildPlayStoreReferralLink(cleanCode, base);
-    }
-
-    if (isPlaceholderReferralBase(base)) {
-        return buildPlayStoreReferralLink(cleanCode);
-    }
-
-    try {
-        if (/\/join\/?$/i.test(base) || /\/join\//i.test(base)) {
-            if (!cleanCode) return base;
-            return `${base.replace(/\/?$/, '/')}${cleanCode}`;
-        }
-        const url = new URL(base);
-        if (cleanCode) url.searchParams.set('ref', cleanCode);
-        return url.toString();
-    } catch {
-        return buildWebJoinLink(cleanCode);
-    }
+export function buildReferralLink(code) {
+    return buildWebJoinLink(code);
 }
 
 export function captureReferralFromLocation(href) {
@@ -368,6 +348,35 @@ export function resolveReferralCodeForRegister(explicit = '') {
         captureReferralFromLocation() ||
         ''
     );
+}
+
+const REF_CLICK_KEY = 'dromoney_referral_click';
+
+export function saveReferralClickId(clickId) {
+    const token = String(clickId || '').trim();
+    if (!token) return '';
+    try { localStorage.setItem(REF_CLICK_KEY, token); } catch { /* ignore */ }
+    return token;
+}
+
+export function getReferralClickId() {
+    try { return String(localStorage.getItem(REF_CLICK_KEY) || '').trim(); } catch { return ''; }
+}
+
+export function clearReferralClickId() {
+    try { localStorage.removeItem(REF_CLICK_KEY); } catch { /* ignore */ }
+}
+
+export async function captureReferralFromClipboard() {
+    if (typeof navigator === 'undefined' || !navigator.clipboard?.readText) return '';
+    try {
+        const text = await navigator.clipboard.readText();
+        if (!text) return '';
+        if (!/dromoney|play\.google|invite\s*code|\/join\/|[?&]ref=/i.test(text)) return '';
+        return savePendingReferralCode(text);
+    } catch {
+        return '';
+    }
 }
 
 function readNativeWindowReferrer() {
@@ -542,6 +551,7 @@ export function installReferralCapture() {
 
     if (!installReferralCapture._started) {
         installReferralCapture._started = true;
+        captureReferralFromClipboard();
         fetchFlutterInstallReferrer(15000).then((code) => {
             if (code) savePendingReferralCode(code);
         });

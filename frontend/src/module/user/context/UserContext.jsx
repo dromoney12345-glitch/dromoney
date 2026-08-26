@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import api, { BASE_URL } from '../../shared/services/api';
 import io from 'socket.io-client';
-import { buildReferralLink, getPendingReferralCode, clearPendingReferralCode, savePendingReferralCode, fetchFlutterInstallReferrer } from '../../shared/utils/referral';
+import { buildReferralLink, getPendingReferralCode, clearPendingReferralCode, savePendingReferralCode, fetchFlutterInstallReferrer, getReferralClickId, clearReferralClickId } from '../../shared/utils/referral';
 import { installFcmTokenBridge, requestNativeFcmToken, saveFcmTokenToServer, readPendingFcmToken } from '../../shared/utils/fcmToken';
 
 const UserContext = React.createContext();
@@ -51,7 +51,7 @@ export const UserProvider = ({ children }) => {
         const CURRENT_VERSION = '2.1';
         if (localStorage.getItem('dromoney_app_version') !== CURRENT_VERSION) {
             const keep = {};
-            ['dromoney_token', 'pending_mobile_fcm_token', 'dromoney_referral_code'].forEach((key) => {
+            ['dromoney_token', 'pending_mobile_fcm_token', 'dromoney_referral_code', 'dromoney_referral_click'].forEach((key) => {
                 const value = localStorage.getItem(key);
                 if (value) keep[key] = value;
             });
@@ -184,15 +184,23 @@ export const UserProvider = ({ children }) => {
         }
         if (code) savePendingReferralCode(code);
         code = getPendingReferralCode();
-        if (!code) return false;
+        const clickId = getReferralClickId();
+        if (!code && !clickId) return false;
         try {
-            const res = await api.post('/user/data/attach-referral', { referralCode: code });
+            const res = await api.post('/user/data/attach-referral', {
+                referralCode: code || '',
+                referralClickId: clickId,
+            });
             if (res?.success) {
                 clearPendingReferralCode();
+                clearReferralClickId();
                 return !!res.attached;
             }
         } catch (err) {
-            if (err?.status === 400) clearPendingReferralCode();
+            if (err?.status === 400) {
+                clearPendingReferralCode();
+                clearReferralClickId();
+            }
         }
         return false;
     };
@@ -374,10 +382,14 @@ export const UserProvider = ({ children }) => {
         try {
             const referralCode = formData.referralCode || getPendingReferralCode() || '';
             if (referralCode) savePendingReferralCode(referralCode);
+            const clickId = getReferralClickId();
+            const headers = {};
+            if (referralCode) headers['X-Referral-Code'] = referralCode;
+            if (clickId) headers['X-Referral-Click'] = clickId;
             const response = await api.post(
                 '/user/auth/register',
-                { ...formData, referralCode },
-                referralCode ? { headers: { 'X-Referral-Code': referralCode } } : undefined
+                { ...formData, referralCode, referralClickId: clickId },
+                Object.keys(headers).length ? { headers } : undefined
             );
             localStorage.setItem('dromoney_token', response.token);
             setIsAuthenticated(true);
