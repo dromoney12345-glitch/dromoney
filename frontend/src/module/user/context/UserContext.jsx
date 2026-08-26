@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import api, { BASE_URL } from '../../shared/services/api';
 import io from 'socket.io-client';
-import { buildReferralLink, getPendingReferralCode, clearPendingReferralCode } from '../../shared/utils/referral';
+import { buildReferralLink, getPendingReferralCode, clearPendingReferralCode, savePendingReferralCode, fetchFlutterInstallReferrer } from '../../shared/utils/referral';
 import { installFcmTokenBridge, requestNativeFcmToken, saveFcmTokenToServer, readPendingFcmToken } from '../../shared/utils/fcmToken';
 
 const UserContext = React.createContext();
@@ -177,8 +177,13 @@ export const UserProvider = ({ children }) => {
         }
     };
 
-    const tryAttachPendingReferral = async () => {
-        const code = getPendingReferralCode();
+    const tryAttachPendingReferral = async ({ waitMs = 0 } = {}) => {
+        let code = getPendingReferralCode();
+        if (!code && waitMs > 0) {
+            code = await fetchFlutterInstallReferrer(waitMs);
+        }
+        if (code) savePendingReferralCode(code);
+        code = getPendingReferralCode();
         if (!code) return false;
         try {
             const res = await api.post('/user/data/attach-referral', { referralCode: code });
@@ -186,11 +191,30 @@ export const UserProvider = ({ children }) => {
                 clearPendingReferralCode();
                 return !!res.attached;
             }
-        } catch {
-            /* keep pending for a later retry */
+        } catch (err) {
+            if (err?.status === 400) clearPendingReferralCode();
         }
         return false;
     };
+
+    useEffect(() => {
+        const onReferralSaved = () => {
+            if (localStorage.getItem('dromoney_token')) {
+                tryAttachPendingReferral();
+            }
+        };
+        window.addEventListener('dromoney_referral_saved', onReferralSaved);
+        if (!isAuthenticated) {
+            return () => window.removeEventListener('dromoney_referral_saved', onReferralSaved);
+        }
+        const retrySoon = setTimeout(() => tryAttachPendingReferral({ waitMs: 4000 }), 2500);
+        const retryLater = setTimeout(() => tryAttachPendingReferral({ waitMs: 4000 }), 10000);
+        return () => {
+            window.removeEventListener('dromoney_referral_saved', onReferralSaved);
+            clearTimeout(retrySoon);
+            clearTimeout(retryLater);
+        };
+    }, [isAuthenticated]);
 
     const refreshUserProfile = async (showSpinner = false) => {
         if (!isAuthenticated) return null;
@@ -349,10 +373,16 @@ export const UserProvider = ({ children }) => {
         setLoading(true);
         try {
             const referralCode = formData.referralCode || getPendingReferralCode() || '';
-            const response = await api.post('/user/auth/register', { ...formData, referralCode });
+            if (referralCode) savePendingReferralCode(referralCode);
+            const response = await api.post(
+                '/user/auth/register',
+                { ...formData, referralCode },
+                referralCode ? { headers: { 'X-Referral-Code': referralCode } } : undefined
+            );
             localStorage.setItem('dromoney_token', response.token);
             setIsAuthenticated(true);
             persistFcmAfterAuth();
+            await tryAttachPendingReferral({ waitMs: 5000 });
             return { success: true };
         } catch (err) {
             setLoading(false);

@@ -63,24 +63,19 @@ import Offerwall from './module/user/pages/Offerwall';
 import { AdminProvider, useAdmin } from './module/admin/context/AdminContext';
 
 import { UserProvider, useUser } from './module/user/context/UserContext';
-import SplashScreen from './module/user/auth/SplashScreen';
 import { extractReferralCode, getPendingReferralCode, installReferralCapture, captureReferralFromLocation } from './module/shared/utils/referral';
 import { installFcmTokenBridge, requestNativeFcmToken } from './module/shared/utils/fcmToken';
+import { notifyFlutterAppReady } from './module/shared/utils/flutterAds';
 
-import { Loader2 } from 'lucide-react';
+const SilentBoot = () => <div className="min-h-screen bg-white" aria-hidden />;
 
 // Protected Route Component
 const ProtectedUserRoute = ({ children }) => {
   const { isAuthenticated, userData, loading } = useUser();
 
-  // Still initializing — token exists but profile not yet loaded
-  // Show a neutral splash instead of redirecting to login
+  // Token exists but profile is still loading — keep blank so Flutter splash is not replaced by a spinner
   if (loading && !userData?.mongoId) {
-    return (
-      <div className="min-h-screen bg-[#FCF8F5] flex flex-col items-center justify-center gap-4">
-        <div className="w-10 h-10 border-4 border-[#EDE4DC] border-t-[#462211] rounded-full animate-spin"></div>
-      </div>
-    );
+    return <SilentBoot />;
   }
 
   if (!isAuthenticated) return <Navigate to="/user/auth/login" replace />;
@@ -190,9 +185,24 @@ const RouteTracker = () => {
   return null;
 };
 
-function App() {
-  const [showSplash, setShowSplash] = React.useState(!localStorage.getItem('dromoney_token'));
+const FlutterSplashBridge = () => {
+  const { isAuthenticated, userData, loading } = useUser();
+  const location = useLocation();
 
+  React.useEffect(() => {
+    if (location.pathname === '/') return;
+    if (location.pathname.startsWith('/admin')) {
+      notifyFlutterAppReady();
+      return;
+    }
+    const sessionReady = isAuthenticated ? !!userData?.mongoId : !loading;
+    if (sessionReady) notifyFlutterAppReady();
+  }, [isAuthenticated, userData?.mongoId, loading, location.pathname]);
+
+  return null;
+};
+
+function App() {
   React.useEffect(() => installReferralCapture(), []);
 
   React.useEffect(() => {
@@ -203,11 +213,9 @@ function App() {
   return (
     <AdminProvider>
       <UserProvider>
-        {showSplash ? (
-          <SplashScreen onComplete={() => setShowSplash(false)} />
-        ) : (
-          <Router>
+        <Router>
             <RouteTracker />
+            <FlutterSplashBridge />
             <Routes>
             {/* Redirecting root to login or home based on auth */}
             <Route path="/" element={<RootRedirect />} />
@@ -298,7 +306,6 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
-        )}
       </UserProvider>
     </AdminProvider>
   );

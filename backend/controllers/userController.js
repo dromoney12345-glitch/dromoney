@@ -588,9 +588,9 @@ exports.attachReferral = asyncHandler(async (req, res, next) => {
     }
 
     const ageMs = Date.now() - new Date(user.createdAt).getTime();
-    const maxAgeMs = 7 * 24 * 60 * 60 * 1000;
+    const maxAgeMs = 14 * 24 * 60 * 60 * 1000;
     if (ageMs > maxAgeMs) {
-        return res.status(400).json({ success: false, message: 'Invite code can only be added within 7 days of signup' });
+        return res.status(400).json({ success: false, message: 'Invite code can only be added within 14 days of signup' });
     }
 
     const { findReferrerByCode } = require('../utils/referralCode');

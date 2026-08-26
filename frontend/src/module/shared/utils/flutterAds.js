@@ -22,6 +22,26 @@ export function getFlutterBridge() {
     return null;
 }
 
+let flutterAppReadySent = false;
+
+/** Tell Flutter the WebView UI is ready so native splash can hide without a spinner flash. */
+export function notifyFlutterAppReady() {
+    if (flutterAppReadySent) return;
+    const send = (bridge) => {
+        if (!bridge || typeof bridge.callHandler !== 'function' || flutterAppReadySent) return false;
+        try {
+            bridge.callHandler('appReady');
+            bridge.callHandler('hideSplash');
+            flutterAppReadySent = true;
+            return true;
+        } catch {
+            return false;
+        }
+    };
+    if (send(getFlutterBridge())) return;
+    waitForFlutterBridge(8000).then((bridge) => send(bridge));
+}
+
 export function waitForFlutterBridge(timeoutMs = 2500) {
     return new Promise((resolve) => {
         const existing = getFlutterBridge();

@@ -11,7 +11,14 @@ const JoinReferral = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fromParam = searchParams.get('invite') || searchParams.get('ref') || searchParams.get('referral') || code || '';
+        const fromParam =
+            searchParams.get('invite') ||
+            searchParams.get('ref') ||
+            searchParams.get('referral') ||
+            searchParams.get('utm_content') ||
+            searchParams.get('referrer') ||
+            code ||
+            '';
         const cleaned =
             extractReferralCode(fromParam) ||
             extractReferralCode(typeof window !== 'undefined' ? window.location.href : '');
@@ -20,9 +27,7 @@ const JoinReferral = () => {
     }, [code, searchParams, navigate]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#FCF8F5] font-['Poppins'] px-6">
-            <p className="text-[12px] text-[#7A5648] uppercase tracking-widest">Opening sign up…</p>
-        </div>
+        <div className="min-h-screen bg-white" aria-hidden />
     );
 };
 

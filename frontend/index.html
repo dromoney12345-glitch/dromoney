@@ -26,7 +26,7 @@
       font-family: 'Poppins', sans-serif !important;
     }
     html, body, #root {
-      background: #FCF8F5;
+      background: #FFFFFF;
     }
   </style>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -49,6 +49,100 @@
       window.saveFcmToken = stashFcmToken;
       window.saveAppFcmToken = stashFcmToken;
       window.onFcmToken = stashFcmToken;
+
+      // Flutter / Play Install Referrer can inject before React boots.
+      var REF_KEY = 'dromoney_referral_code';
+      var RESERVED = {
+        REGISTER: 1, LOGIN: 1, AUTH: 1, USER: 1, ADMIN: 1, JOIN: 1, HOME: 1,
+        EARN: 1, WALLET: 1, PROFILE: 1, INCOME: 1, EVENTS: 1, WATCH: 1, HELP: 1,
+        API: 1, PUBLIC: 1, STORE: 1, APPS: 1, DETAILS: 1, NULL: 1, UNDEFINED: 1,
+        TRUE: 1, FALSE: 1, INVITE: 1, SHARE: 1, ORGANIC: 1, GOOGLE: 1, PLAY: 1
+      };
+      function normalizeRef(code) {
+        var cleaned = String(code || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 8);
+        if (!cleaned || cleaned.length < 4 || RESERVED[cleaned]) return '';
+        return cleaned;
+      }
+      function extractRef(raw) {
+        if (raw == null) return '';
+        if (typeof raw === 'object') {
+          return extractRef(raw.referrer || raw.installReferrer || raw.ref || raw.code || raw.referral || raw.invite || '');
+        }
+        var text = String(raw).trim();
+        if (!text || text === 'null' || text === 'undefined') return '';
+        var decoded = text;
+        try { decoded = decodeURIComponent(decoded); } catch (e1) {}
+        try { decoded = decodeURIComponent(decoded); } catch (e2) {}
+        var urlMatch = decoded.match(/https?:\/\/[^\s]+/i);
+        var search = '';
+        try {
+          var href = urlMatch ? urlMatch[0] : (decoded.indexOf('play.google.com') >= 0 || decoded.indexOf('://') >= 0 ? decoded : '');
+          if (href) {
+            var u = new URL(href, location.origin);
+            search = u.search || '';
+            var fromQuery = u.searchParams.get('ref') || u.searchParams.get('invite') || u.searchParams.get('referral') || u.searchParams.get('utm_content') || u.searchParams.get('code');
+            var nq = normalizeRef(fromQuery);
+            if (nq) return nq;
+            var install = u.searchParams.get('referrer') || '';
+            if (install) {
+              var fromInstall = extractRef(install);
+              if (fromInstall) return fromInstall;
+            }
+            var parts = u.pathname.split('/').filter(Boolean);
+            for (var i = 0; i < parts.length; i++) {
+              if (String(parts[i]).toLowerCase() === 'join' && parts[i + 1]) {
+                var nj = normalizeRef(parts[i + 1]);
+                if (nj) return nj;
+              }
+            }
+          }
+        } catch (e3) {}
+        var params = new URLSearchParams((search || decoded).replace(/^\?/, ''));
+        var fromParams = params.get('ref') || params.get('invite') || params.get('referral') || params.get('utm_content') || params.get('code');
+        var np = normalizeRef(fromParams);
+        if (np) return np;
+        var kv = decoded.match(/(?:^|[?&\s#])(?:ref|invite|referral|utm_content)\s*=\s*([A-Za-z0-9]+)/i);
+        if (kv) return normalizeRef(kv[1]);
+        var join = decoded.match(/\/join\/([A-Za-z0-9]+)/i);
+        if (join) return normalizeRef(join[1]);
+        if (/^[A-Za-z0-9]{4,8}$/.test(decoded)) return normalizeRef(decoded);
+        return '';
+      }
+      function persistRef(code) {
+        if (!code) return '';
+        window.__pendingReferral = code;
+        try { localStorage.setItem(REF_KEY, code); } catch (e4) {}
+        try { sessionStorage.setItem(REF_KEY, code); } catch (e5) {}
+        try { document.cookie = 'dromoney_ref=' + encodeURIComponent(code) + '; path=/; max-age=1209600; SameSite=Lax'; } catch (e6) {}
+        return code;
+      }
+      function stashReferral(raw) {
+        var code = extractRef(raw);
+        if (!code) return '';
+        persistRef(code);
+        try { window.dispatchEvent(new CustomEvent('dromoney_referral_saved', { detail: code })); } catch (e7) {}
+        return code;
+      }
+      window.savePendingReferral = stashReferral;
+      window.saveReferralCode = stashReferral;
+      window.savePendingReferralCode = stashReferral;
+      window.onInstallReferrer = stashReferral;
+      window.onReferralCode = stashReferral;
+      stashReferral(location.href);
+      window.addEventListener('message', function (ev) {
+        var d = ev && ev.data;
+        if (d == null) return;
+        if (typeof d === 'object') {
+          if (d.referrer || d.installReferrer || d.ref || d.referral || d.invite || d.referralCode || d.code) {
+            stashReferral(d);
+          }
+          return;
+        }
+        var text = String(d);
+        if (/ref=/i.test(text) || /utm_content=/i.test(text) || /\/join\//i.test(text) || /play\.google\.com/i.test(text) || /invite\s*code/i.test(text) || /^[A-Za-z0-9]{4,8}$/.test(text.trim())) {
+          stashReferral(text);
+        }
+      });
     })();
   </script>
 </head>

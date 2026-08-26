@@ -24,6 +24,9 @@ const Marketing = () => {
 
     const referralCode = userData?.referrals?.code || '';
     const referralLink = buildReferralLink(referralCode, linkBase);
+    const inviteShareText = referralCode
+        ? `Hey! Join Dromoney and start earning 🚀\n\nInvite code: ${referralCode}\n${referralLink}`
+        : `Hey! Join Dromoney and start earning 🚀\n\n${referralLink}`;
 
     React.useEffect(() => {
         const fetchSettings = async () => {
@@ -84,19 +87,18 @@ const Marketing = () => {
     };
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(referralLink);
+        navigator.clipboard.writeText(inviteShareText);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
 
     const handleInvite = async () => {
         if (!referralLink) return;
-        const shareText = `Hey! Join Dromoney and start earning 🚀\n\n${referralLink}`;
         if (navigator.share) {
             try {
                 await navigator.share({
                     title: 'Join Dromoney & Earn',
-                    text: shareText,
+                    text: inviteShareText,
                     url: referralLink,
                 });
             } catch (err) {
@@ -108,7 +110,7 @@ const Marketing = () => {
     };
 
     const shareOnSocial = (platform) => {
-        const message = encodeURIComponent(`Hey! Join Dromoney and start earning 🚀\n\n${referralLink}`);
+        const message = encodeURIComponent(inviteShareText);
         const url = encodeURIComponent(referralLink);
         
         switch (platform) {

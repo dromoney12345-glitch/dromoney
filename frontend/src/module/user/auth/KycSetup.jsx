@@ -89,9 +89,7 @@ const KycSetup = () => {
     }, [aadhaarFile]);
 
     if (userLoading) return (
-        <div className="min-h-screen bg-[#FCF8F5] flex items-center justify-center font-poppins">
-            <Loader2 className="animate-spin w-8 h-8" style={{ color: ACCENT }} />
-        </div>
+        <div className="min-h-screen bg-white" aria-hidden />
     );
 
     const handleFileChange = (e) => {

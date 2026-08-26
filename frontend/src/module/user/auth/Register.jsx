@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Loader2, Smartphone, Lock, User, Mail, Gift, ShieldCheck } from 'lucide-react';
 import { useUser } from '../context/UserContext';
+import api from '../../shared/services/api';
+import { isFlutterApp } from '../../shared/utils/flutterAds';
 import {
     extractReferralCode,
     savePendingReferralCode,
@@ -41,8 +43,7 @@ const Register = () => {
         }
         setCheckingReferral(true);
         try {
-            const res = await fetch(`/api/public/referrer/${encodeURIComponent(code)}`);
-            const data = await res.json();
+            const data = await api.get(`/public/referrer/${encodeURIComponent(code)}`);
             if (data.success && data.name) {
                 setReferrerName(data.name);
             } else {
@@ -109,6 +110,8 @@ const Register = () => {
                 searchParams.get('invite') ||
                 searchParams.get('ref') ||
                 searchParams.get('referral') ||
+                searchParams.get('utm_content') ||
+                searchParams.get('referrer') ||
                 searchParams.get('code') ||
                 '';
             const immediate =
@@ -121,8 +124,8 @@ const Register = () => {
                 applyReferralInput(immediate, { showCode: true });
             }
 
-            const flutterCode = await fetchFlutterInstallReferrer();
-            const next = flutterCode || immediate;
+            const flutterCode = await fetchFlutterInstallReferrer(immediate ? 1200 : 12000);
+            const next = flutterCode || immediate || getPendingReferralCode();
             if (cancelled || !next) return;
             savePendingReferralCode(next);
             applyReferralInput(next, { showCode: true });
@@ -170,6 +173,8 @@ const Register = () => {
         }
 
         setLoading(true);
+        const pendingInvite = resolveReferralCodeForRegister(referralCode || formData.referral);
+        if (pendingInvite) savePendingReferralCode(pendingInvite);
         const result = await sendRegisterOtp(formData.phone, formData.email);
         setLoading(false);
         if (result.success) {
@@ -197,9 +202,16 @@ const Register = () => {
         if (otp.length < 6) return;
 
         setLoading(true);
-        const resolvedCode = resolveReferralCodeForRegister(
+        let resolvedCode = resolveReferralCodeForRegister(
             referralCode || formData.referral
         );
+        if (!resolvedCode) {
+            const waitMs = isFlutterApp() || (typeof window !== 'undefined' && (window.Android || window.android))
+                ? 10000
+                : 600;
+            resolvedCode = await fetchFlutterInstallReferrer(waitMs);
+        }
+        if (resolvedCode) savePendingReferralCode(resolvedCode);
         const result = await register({
             name: formData.name,
             email: formData.email,

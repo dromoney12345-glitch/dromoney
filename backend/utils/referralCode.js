@@ -17,6 +17,51 @@ function normalizeCode(code) {
     return cleaned;
 }
 
+const UTM_NOISE = new Set([
+    'INVITE', 'SHARE', 'ORGANIC', 'GOOGLE', 'PLAY', 'ANDROID', 'WEBSHARE', 'WEB',
+]);
+
+function looksLikeInviteCode(value) {
+    const cleaned = normalizeCode(value);
+    if (!cleaned || cleaned.length < 4) return '';
+    if (UTM_NOISE.has(cleaned)) return '';
+    return cleaned;
+}
+
+/** Play Install Referrer payload: `ref=CODE` or `utm_source=invite&utm_content=CODE`. */
+function parseReferrerPayload(raw) {
+    if (!raw) return '';
+    let decoded = String(raw).trim();
+    try { decoded = decodeURIComponent(decoded); } catch { /* already decoded */ }
+    try { decoded = decodeURIComponent(decoded); } catch { /* once is enough */ }
+    decoded = decoded.replace(/^referrer=/i, '');
+
+    try {
+        const params = new URLSearchParams(decoded.includes('=') ? decoded : `ref=${decoded}`);
+        const campaign = params.get('utm_campaign') || '';
+        const candidates = [
+            params.get('ref'),
+            params.get('invite'),
+            params.get('referral'),
+            params.get('utm_content'),
+            params.get('code'),
+            /^(web_share|google|organic|invite|share)$/i.test(campaign) ? '' : campaign,
+        ];
+        for (const candidate of candidates) {
+            const code = looksLikeInviteCode(candidate);
+            if (code) return code;
+        }
+    } catch {
+        /* fall through */
+    }
+
+    const match =
+        decoded.match(/(?:^|[?&\s#])(?:ref|invite|referral|utm_content)\s*=\s*([A-Za-z0-9]+)/i) ||
+        decoded.match(/^([A-Za-z0-9]{4,12})$/);
+    if (match) return looksLikeInviteCode(match[1]);
+    return '';
+}
+
 function extractReferralCode(value) {
     if (!value) return '';
     const raw = String(value).trim();
@@ -33,12 +78,13 @@ function extractReferralCode(value) {
             params.get('invite') ||
             params.get('ref') ||
             params.get('referral') ||
+            params.get('utm_content') ||
             params.get('code');
-        if (fromQuery) return normalizeCode(fromQuery);
+        if (fromQuery) return looksLikeInviteCode(fromQuery) || normalizeCode(fromQuery);
     }
 
     const labeled = raw.match(/invite\s*code\s*[:\-]\s*([A-Za-z0-9]+)/i);
-    if (labeled) return normalizeCode(labeled[1]);
+    if (labeled) return looksLikeInviteCode(labeled[1]) || normalizeCode(labeled[1]);
 
     try {
         if (raw.includes('://') || raw.includes('play.google.com') || raw.startsWith('/')) {
@@ -56,22 +102,20 @@ function extractReferralCode(value) {
                 url.searchParams.get('referral') ||
                 url.searchParams.get('utm_content') ||
                 url.searchParams.get('code');
-            if (refParam) return normalizeCode(refParam);
+            if (refParam) {
+                const fromParam = looksLikeInviteCode(refParam) || normalizeCode(refParam);
+                if (fromParam) return fromParam;
+            }
 
             const installReferrer = url.searchParams.get('referrer');
             if (installReferrer) {
-                let decoded = String(installReferrer);
-                try { decoded = decodeURIComponent(decoded); } catch { /* already decoded */ }
-                try { decoded = decodeURIComponent(decoded); } catch { /* once is enough */ }
-                const match =
-                    decoded.match(/(?:^|[&?])(?:ref|invite|referral)=([A-Za-z0-9]+)/i) ||
-                    decoded.match(/^([A-Za-z0-9]{4,12})$/);
-                if (match) return normalizeCode(match[1]);
+                const fromInstall = parseReferrerPayload(installReferrer);
+                if (fromInstall) return fromInstall;
             }
 
             const campaign = url.searchParams.get('pcampaignid') || '';
             const campaignMatch = campaign.match(/web_share([A-Za-z0-9]{4,8})$/i);
-            if (campaignMatch) return normalizeCode(campaignMatch[1]);
+            if (campaignMatch) return looksLikeInviteCode(campaignMatch[1]);
 
             const parts = url.pathname.split('/').filter(Boolean);
             const joinIdx = parts.findIndex((p) => p.toLowerCase() === 'join');
@@ -86,9 +130,12 @@ function extractReferralCode(value) {
     if (/nhgfAFF-/i.test(raw)) return normalizeCode(raw.split(/nhgfAFF-/i).pop());
     if (/AFF-/i.test(raw)) return normalizeCode(raw.split(/AFF-/i).pop());
     if (/\/join\//i.test(raw)) return normalizeCode(raw.split(/\/join\//i).pop());
+    const fromPayload = parseReferrerPayload(raw);
+    if (fromPayload) return fromPayload;
     const kv = raw.match(/(?:^|[?&\s])(?:ref|invite|referral)\s*=\s*([A-Za-z0-9]+)/i);
-    if (kv) return normalizeCode(kv[1]);
-    return normalizeCode(raw);
+    if (kv) return looksLikeInviteCode(kv[1]) || normalizeCode(kv[1]);
+    if (/^[A-Za-z0-9]{4,8}$/.test(raw.trim())) return normalizeCode(raw);
+    return '';
 }
 
 /**

@@ -31,12 +31,8 @@ const Login = () => {
         }
     }, [resendCooldown]);
 
-    if (isAuthenticated || contextLoading) {
-        return (
-            <div className="min-h-[200px] flex items-center justify-center py-12">
-                <div className="w-8 h-8 border-4 border-[#F3E8E0] border-t-[#462211] rounded-full animate-spin" />
-            </div>
-        );
+    if (isAuthenticated || (contextLoading && !!localStorage.getItem('dromoney_token'))) {
+        return <div className="min-h-[200px] bg-white" aria-hidden />;
     }
 
     const handleSendOtp = async (e) => {
