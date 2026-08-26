@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const { RedisStore } = require('rate-limit-redis');
 const { getRedis, redisCall } = require('../config/redis');
@@ -21,20 +22,39 @@ function sharedStore(prefix) {
 
 function skipWebhooks(req) {
     const path = String(req.originalUrl || req.url || '');
-    return (
+    const method = String(req.method || '').toUpperCase();
+    if (
         path.includes('/api/public/offerwall/') ||
         path.includes('/webhook') ||
         path.includes('/api/health') ||
         path.includes('/api/fcm-tokens/')
-    );
+    ) {
+        return true;
+    }
+    // Public reads (settings, content, tasks) should not burn the rate-limit bucket.
+    if (method === 'GET' && path.includes('/api/public/')) return true;
+    return false;
 }
 
 function ipKey(req) {
     return `ip:${ipKeyGenerator(req.ip || '127.0.0.1')}`;
 }
 
+function idFromBearerToken(req) {
+    const header = String(req.headers?.authorization || '');
+    if (!header.startsWith('Bearer ')) return '';
+    const token = header.slice(7).trim();
+    if (!token || !process.env.JWT_SECRET) return '';
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        return String(decoded.id || decoded._id || '');
+    } catch {
+        return '';
+    }
+}
+
 function userOrIpKey(req) {
-    const userId = req.user?._id || req.user?.id || req.admin?._id;
+    const userId = req.user?._id || req.user?.id || req.admin?._id || idFromBearerToken(req);
     if (userId) return `u:${userId}`;
     return ipKey(req);
 }
@@ -49,9 +69,10 @@ const limiterDefaults = {
 const generalApiLimiter = rateLimit({
     ...limiterDefaults,
     windowMs: (Number(process.env.RATE_LIMIT_GENERAL_WINDOW_MIN) || 10) * 60 * 1000,
-    max: Number(process.env.RATE_LIMIT_GENERAL_MAX) || 500,
+    max: Number(process.env.RATE_LIMIT_GENERAL_MAX) || 2000,
     skip: skipWebhooks,
-    keyGenerator: ipKey,
+    // Logged-in KYC/users must not share one bucket with everyone on the same Wi‑Fi / CGNAT IP.
+    keyGenerator: userOrIpKey,
     store: sharedStore('general'),
     message: {
         success: false,
