@@ -2,13 +2,55 @@ const BusinessIdea = require('../models/BusinessIdea');
 const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 
-/** Only this idea's paid unlock (or free/non-premium). Support chat / hub plan must NOT open every idea. */
+function ideaPrice(idea) {
+    return Math.max(0, Number(idea?.price) || 0);
+}
+
+/** Idea content is free unless admin marks premium AND sets price > 0. */
+function isIdeaFree(idea) {
+    if (!idea) return false;
+    if (idea.isPremium !== true) return true;
+    return ideaPrice(idea) <= 0;
+}
+
+/**
+ * Free ideas: always open.
+ * Premium paid ideas: only if in user.unlockedIdeas (after payment).
+ * Support plan / chat must NOT unlock every idea.
+ */
 function isIdeaUnlockedForUser(idea, user) {
     if (!idea) return false;
-    if (idea.isPremium === false) return true;
+    if (isIdeaFree(idea)) return true;
     if (!user) return false;
     const ideaId = idea._id.toString();
     return (user.unlockedIdeas || []).some((id) => id && id.toString() === ideaId);
+}
+
+/** One-shot DB migrate: older seeds used isPremium:true + ₹199. */
+let freeIdeasMigrated = false;
+async function migrateBusinessIdeasToFreeStart() {
+    if (freeIdeasMigrated) return;
+    try {
+        const Settings = require('../models/Settings');
+        const settings = await Settings.findOne().select('businessIdeasFreeStartMigrated');
+        if (settings?.businessIdeasFreeStartMigrated) {
+            freeIdeasMigrated = true;
+            return;
+        }
+        await BusinessIdea.updateMany(
+            { $or: [{ isPremium: true }, { price: { $gt: 0 } }] },
+            { $set: { isPremium: false, price: 0 } }
+        );
+        await Settings.updateOne(
+            {},
+            { $set: { businessIdeasFreeStartMigrated: true } },
+            { upsert: true }
+        );
+        freeIdeasMigrated = true;
+        console.log('[BusinessIdeas] Migrated existing ideas to free start');
+    } catch (err) {
+        console.error('[BusinessIdeas] free-start migrate failed:', err.message);
+    }
 }
 
 // @desc    Get all business ideas for users
@@ -16,6 +58,7 @@ function isIdeaUnlockedForUser(idea, user) {
 // @access  Public (Partial) / Private (User)
 exports.getBusinessIdeas = async (req, res, next) => {
     try {
+        await migrateBusinessIdeasToFreeStart();
         const ideas = await BusinessIdea.find({ isActive: true }).sort('createdAt');
 
         let user = null;
@@ -25,6 +68,7 @@ exports.getBusinessIdeas = async (req, res, next) => {
 
         const data = ideas.map(idea => {
             const isUnlocked = isIdeaUnlockedForUser(idea, user);
+            const free = isIdeaFree(idea);
             
             return {
                 _id: idea._id,
@@ -42,8 +86,8 @@ exports.getBusinessIdeas = async (req, res, next) => {
                     title: card.title,
                     description: isUnlocked ? card.description : ''
                 })),
-                isPremium: idea.isPremium,
-                price: idea.price || 199,
+                isPremium: !!idea.isPremium && !free,
+                price: free ? 0 : ideaPrice(idea),
                 isLocked: !isUnlocked,
                 howItWorks: isUnlocked ? (idea.howItWorks || '') : '',
                 investmentDetails: isUnlocked ? (idea.investmentDetails || '') : '',
@@ -93,6 +137,7 @@ exports.unlockIdea = async (req, res, next) => {
 // @access  Private/Admin
 exports.adminGetBusinessIdeas = async (req, res, next) => {
     try {
+        await migrateBusinessIdeasToFreeStart();
         const ideas = await BusinessIdea.find().sort('-createdAt');
         res.status(200).json({
             success: true,
@@ -146,6 +191,7 @@ exports.updateBusinessIdea = async (req, res, next) => {
 // @access  Public (Partial) / Private (User)
 exports.getBusinessIdeaById = async (req, res, next) => {
     try {
+        await migrateBusinessIdeasToFreeStart();
         const idea = await BusinessIdea.findById(req.params.id);
         if (!idea) {
             return next(new ErrorResponse('Idea not found', 404));
@@ -156,6 +202,7 @@ exports.getBusinessIdeaById = async (req, res, next) => {
             user = await User.findById(req.user.id).select('unlockedIdeas');
         }
         const isUnlocked = isIdeaUnlockedForUser(idea, user);
+        const free = isIdeaFree(idea);
 
         const data = {
             _id: idea._id,
@@ -173,8 +220,8 @@ exports.getBusinessIdeaById = async (req, res, next) => {
                 title: card.title,
                 description: isUnlocked ? card.description : ''
             })),
-            isPremium: idea.isPremium,
-            price: idea.price || 199,
+            isPremium: !!idea.isPremium && !free,
+            price: free ? 0 : ideaPrice(idea),
             isLocked: !isUnlocked,
             howItWorks: isUnlocked ? (idea.howItWorks || '') : '',
             investmentDetails: isUnlocked ? (idea.investmentDetails || '') : '',

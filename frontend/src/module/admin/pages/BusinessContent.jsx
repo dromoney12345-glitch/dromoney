@@ -32,8 +32,8 @@ const BusinessContent = () => {
         badges: ['Trending'],
         videoUrl: '',
         meetingLink: '',
-        price: 199,
-        isPremium: true
+        price: 0,
+        isPremium: false
     });
 
     // Subscription Settings Data (Multiple Plans)
@@ -194,8 +194,8 @@ const BusinessContent = () => {
             badges: ['Trending'],
             videoUrl: '',
             meetingLink: '',
-            price: 199,
-            isPremium: true
+            price: 0,
+            isPremium: false
         });
         setEditingId(null);
     };
@@ -268,8 +268,8 @@ const BusinessContent = () => {
             howItWorks: idea.howItWorks || '',
             investmentDetails: idea.investmentDetails || '',
             profitDetails: idea.profitDetails || '',
-            price: idea.price || 199,
-            isPremium: idea.isPremium !== false
+            price: idea.price || 0,
+            isPremium: idea.isPremium === true
         });
         setEditingId(idea._id);
         setShowModal(true);

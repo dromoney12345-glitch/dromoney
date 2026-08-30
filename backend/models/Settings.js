@@ -147,6 +147,8 @@ const SettingsSchema = new mongoose.Schema({
     // Withdrawal Card renewal display
     cardRenewalAmount: { type: Number, default: 199 },
     cardRenewalDisplayAmount: { type: Number, default: 699 },
+    // One-shot: business ideas opened free (legacy ₹199 locks cleared once)
+    businessIdeasFreeStartMigrated: { type: Boolean, default: false },
     adminEmail: {
         type: String,
         default: 'admin@dromoney.com'

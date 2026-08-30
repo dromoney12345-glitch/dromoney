@@ -37,13 +37,15 @@ const BusinessIdeaSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    // Free by default — idea content / Support Hub open without pay.
+    // Admin can set isPremium:true + price > 0 later for paid-only ideas.
     isPremium: {
         type: Boolean,
-        default: true
+        default: false
     },
     price: {
         type: Number,
-        default: 199
+        default: 0
     },
     isActive: {
         type: Boolean,

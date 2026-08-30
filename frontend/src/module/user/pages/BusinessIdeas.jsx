@@ -22,9 +22,14 @@ const BusinessIdeas = () => {
 
     const isSubscribed = userData?.supportExpiry && new Date(userData.supportExpiry) > new Date();
     const unlockedIdeaIds = (userData?.unlockedIdeas || []).map(String);
+    const isIdeaFree = (idea) => {
+        if (!idea) return false;
+        if (idea.isPremium !== true) return true;
+        return Number(idea.price) <= 0;
+    };
     const isIdeaUnlocked = (idea) => {
         if (!idea) return false;
-        if (idea.isPremium === false) return true;
+        if (isIdeaFree(idea) || idea.isLocked === false) return true;
         const id = idea._id ? String(idea._id) : '';
         return !!id && unlockedIdeaIds.includes(id);
     };
@@ -310,9 +315,14 @@ const BusinessIdeas = () => {
                                     onClick={() => handleIdeaSelect(idea)}
                                     className="bg-white rounded-2xl p-3 text-left shadow-[0_2px_12px_rgba(70,34,17,0.06)] border border-[#EDE4DC]/60 active:scale-[0.98] transition-transform relative"
                                 >
-                                    {locked && (
+                                    {locked && Number(idea.price) > 0 && (
                                         <span className="absolute top-2 right-2 z-10 inline-flex items-center gap-1 bg-[#462211] text-white text-[8px] font-semibold px-1.5 py-0.5 rounded-full">
-                                            <Lock size={8} /> ₹{idea.price || 199}
+                                            <Lock size={8} /> ₹{idea.price}
+                                        </span>
+                                    )}
+                                    {!locked && (
+                                        <span className="absolute top-2 right-2 z-10 inline-flex items-center bg-emerald-100 text-emerald-700 text-[8px] font-semibold px-1.5 py-0.5 rounded-full">
+                                            Free
                                         </span>
                                     )}
                                     <div className="h-[72px] flex items-center justify-center mb-2.5 rounded-xl bg-[#FCF8F5] overflow-hidden">
@@ -351,7 +361,8 @@ const BusinessIdeas = () => {
         const summary = selectedIdea?.description || selectedIdea?.subtitle || selectedIdea?.desc
             || 'Start your own business with step-by-step guidance, video support and expert help.';
         const canAccessHub = isIdeaUnlocked(selectedIdea);
-        const ideaPrice = selectedIdea?.price || 199;
+        const ideaPrice = Number(selectedIdea?.price) || 0;
+        const ideaIsFree = isIdeaFree(selectedIdea);
 
         const infoRows = [
             {
@@ -489,14 +500,23 @@ const BusinessIdeas = () => {
                 </div>
 
                 <div className="sticky bottom-0 left-0 right-0 z-50 bg-[#FCF8F5] px-3 pt-2 pb-4 space-y-2 border-t border-[#EDE4DC]">
-                    {canAccessHub ? (
-                        <button
-                            type="button"
-                            onClick={() => navigate(`/user/business-ideas/${ideaId}/ecosystem`)}
-                            className="w-full bg-[#462211] text-white font-semibold text-[14px] py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-[0.99] shadow-[0_4px_16px_rgba(70,34,17,0.25)]"
-                        >
-                            Continue to Support Hub <ArrowRight size={18} />
-                        </button>
+                    {canAccessHub || ideaIsFree ? (
+                        <>
+                            <button
+                                type="button"
+                                onClick={() => navigate(`/user/business-ideas/${ideaId}/ecosystem`)}
+                                className="w-full bg-[#462211] text-white font-semibold text-[14px] py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-[0.99] shadow-[0_4px_16px_rgba(70,34,17,0.25)]"
+                            >
+                                Continue to Support Hub <ArrowRight size={18} />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => navigate(`/user/business-ideas/${ideaId}/subscription`)}
+                                className="w-full bg-white text-[#462211] font-semibold text-[13px] py-3 rounded-xl flex items-center justify-center gap-2 active:scale-[0.99] border border-[#EDE4DC]"
+                            >
+                                Get Premium Support (optional)
+                            </button>
+                        </>
                     ) : (
                         <>
                             <button
@@ -659,7 +679,8 @@ const BusinessIdeas = () => {
     const EcosystemScreen = () => {
         useEffect(() => {
             if (!selectedIdea?._id) return;
-            if (!isIdeaUnlocked(selectedIdea)) {
+            // Only paid-premium ideas need unlock; free ideas open hub directly
+            if (!isIdeaUnlocked(selectedIdea) && !isIdeaFree(selectedIdea)) {
                 navigate(`/user/business-ideas/${ideaId}/subscription`, { replace: true });
             }
         }, [ideaId, selectedIdea, unlockedIdeaIds.join('|')]);
@@ -667,6 +688,7 @@ const BusinessIdeas = () => {
         const cards = selectedIdea?.ecosystemCards || [];
         const activePlan = settings.businessPlans[selectedPlanIdx] || settings.businessPlans[0];
         const hubIcons = [Headphones, Bell, Calculator, Wrench];
+        const freeIdea = isIdeaFree(selectedIdea);
 
         if (cards.length === 0 && !loading) {
             return (
@@ -679,7 +701,7 @@ const BusinessIdeas = () => {
 
         return (
             <div className="min-h-screen bg-[#FCF8F5] pb-28 font-poppins relative">
-                <PageHeader title="My Support Hub" onBack={() => navigate(`/user/business-ideas/${ideaId}/subscription`)} />
+                <PageHeader title="My Support Hub" onBack={() => navigate(`/user/business-ideas/${ideaId}`)} />
 
                 <div className="px-4 space-y-4">
                     <div className="bg-[#FDF4EA] rounded-2xl p-4 flex items-center gap-3 border border-[#EDE4DC]/60">
@@ -687,15 +709,19 @@ const BusinessIdeas = () => {
                             <Award size={22} className="text-[#462211]" strokeWidth={1.8} />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-[10px] text-[#7A5648]">Active Plan</p>
+                            <p className="text-[10px] text-[#7A5648]">Access</p>
                             <p className="text-[15px] font-semibold text-[#462211] leading-tight">
-                                {isSubscribed ? (userData?.activeBusinessPlan || activePlan?.title || 'Premium Plan') : 'Idea Unlocked'}
+                                {isSubscribed
+                                    ? (userData?.activeBusinessPlan || activePlan?.title || 'Premium Plan')
+                                    : freeIdea
+                                        ? 'Free Idea Access'
+                                        : 'Idea Unlocked'}
                             </p>
                         </div>
                         <div className="text-right shrink-0">
-                            <p className="text-[10px] text-[#7A5648]">{isSubscribed ? 'Amount Paid' : 'Unlock'}</p>
+                            <p className="text-[10px] text-[#7A5648]">{isSubscribed ? 'Amount Paid' : 'Status'}</p>
                             <p className="text-[18px] font-bold text-[#462211]">
-                                {isSubscribed ? `₹${activePlan?.price || '—'}` : `₹${selectedIdea?.price || 199}`}
+                                {isSubscribed ? `₹${activePlan?.price || '—'}` : freeIdea ? 'Free' : `₹${selectedIdea?.price || 0}`}
                             </p>
                             <span className="inline-flex items-center gap-1 mt-1 bg-emerald-100 text-emerald-700 text-[9px] font-semibold px-2 py-0.5 rounded-full">
                                 <Check size={9} strokeWidth={3} /> Active
@@ -913,7 +939,9 @@ const BusinessIdeas = () => {
                                 </div>
                                 <p className="font-semibold text-[#462211] text-[12px]">{unlocked ? 'Update in progress' : 'Unlock this idea to view details'}</p>
                                 <p className="text-[#9A8478] text-[10px] max-w-[200px]">
-                                    {unlocked ? 'Content will be available soon.' : `Pay ₹${selectedIdea?.price || 199} to enable this business idea only.`}
+                                    {unlocked
+                                        ? 'Content will be available soon.'
+                                        : `Pay ₹${selectedIdea?.price || 0} to enable this business idea only.`}
                                 </p>
                             </div>
                         )}

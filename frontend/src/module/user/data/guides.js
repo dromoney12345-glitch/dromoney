@@ -81,9 +81,10 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
         subtitle: 'Business Ideas',
         next: '/user/business-ideas',
         points: [
-            'Business is now a direct option in bottom navigation.',
-            'Explore ideas and start your business from the existing system.',
-            'The core business flow stays the same — only placement and this guide are new.',
+            'Business is a direct option in bottom navigation.',
+            'Ideas open free — How to Start, Investment and Profit without payment.',
+            'Continue to Support Hub for daily plan, updates, tools and calculations.',
+            'Premium Support (chat / mentor plans) is optional if you want paid guidance.',
         ],
     },
     wallet: {
