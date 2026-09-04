@@ -127,6 +127,7 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
     const resetStr = getISTDateString(user.lastAdCountResetAt || Date.now());
     if (todayStr !== resetStr) {
         user.dailyAdCount = 0;
+        user.todayRewardCount = 0;
         user.watchedAds = [];
         user.lastAdCountResetAt = new Date();
     }

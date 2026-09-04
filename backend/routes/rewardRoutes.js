@@ -22,6 +22,7 @@ const checkAndResetDailyLimit = async (user) => {
 
     if (todayStr !== resetStr) {
         user.todayRewardCount = 0;
+        user.dailyAdCount = 0;
         user.lastAdCountResetAt = now;
         await user.save();
     }
@@ -44,7 +45,10 @@ router.get('/status', async (req, res) => {
 
         let available = true;
         let nextAdIn = 0;
-        let remainingAds = Math.max(0, MAX_DAILY_ADS - (user.todayRewardCount || 0));
+        let remainingAds = Math.max(
+            0,
+            MAX_DAILY_ADS - Math.max(user.todayRewardCount || 0, user.dailyAdCount || 0)
+        );
 
         if (remainingAds <= 0) {
             available = false;
@@ -100,7 +104,8 @@ router.post('/claim', rewardLimiter, idempotency(), async (req, res) => {
         }
 
         // Check daily limit
-        if ((user.todayRewardCount || 0) >= MAX_DAILY_ADS) {
+        const usedToday = Math.max(user.todayRewardCount || 0, user.dailyAdCount || 0);
+        if (usedToday >= MAX_DAILY_ADS) {
             return res.status(400).json({ allowed: false, reason: 'daily_limit', message: 'Daily limit reached' });
         }
 
@@ -114,9 +119,11 @@ router.post('/claim', rewardLimiter, idempotency(), async (req, res) => {
         }
 
         // Watch & Earn — track for Future Fund lifetime ads + daily score
+        // Keep both counters in sync (UI + Future Fund daily progress read either field)
+        const nextCount = usedToday + 1;
         user.lastRewardAt = new Date();
-        user.todayRewardCount = (user.todayRewardCount || 0) + 1;
-        user.dailyAdCount = (user.dailyAdCount || 0) + 1;
+        user.todayRewardCount = nextCount;
+        user.dailyAdCount = nextCount;
         user.lifetimeAdsWatched = (user.lifetimeAdsWatched || 0) + 1;
 
         let ffSynced = null;

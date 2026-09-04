@@ -141,7 +141,8 @@ const WatchAndEarn = () => {
             }
 
             const { ok, reason } = await showFlutterRewardedAd('reward_ad_1');
-            if (ok) {
+            if (ok || window.__dromoneyPendingAdReward) {
+                delete window.__dromoneyPendingAdReward;
                 await claimFlutterReward();
                 return;
             }
@@ -150,7 +151,9 @@ const WatchAndEarn = () => {
             showToast(
                 reason === 'no_bridge'
                     ? 'Open the DroMoney app to watch live ads.'
-                    : 'Watch the full AdMob ad to complete. Back or close does not count.',
+                    : reason === 'timeout'
+                        ? 'Ad timed out. Please try again and watch until the end.'
+                        : 'Watch the full AdMob ad to complete. Back or close does not count.',
                 'error'
             );
         } catch (e) {
