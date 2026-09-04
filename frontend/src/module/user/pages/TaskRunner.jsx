@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
+import { findTaskById } from '../../shared/utils/findTaskById';
 import api from '../../shared/services/api';
 import { ChevronLeft, CheckCircle2, Play, UploadCloud, Link as LinkIcon, Loader2, Image as ImageIcon, Camera, XCircle, MessageCircle, Send, Copy, Share2 } from 'lucide-react';
 import FundRewardNotice, { FUND_TASK_COMPLETE_MSG } from '../components/FundRewardNotice';
@@ -33,11 +34,11 @@ const TaskRunner = () => {
 
     // Fetch dynamic task from storage once inside an effect
     const [task, setTask] = useState(null);
+    const [loadError, setLoadError] = useState(false);
     const [timeLeft, setTimeLeft] = useState(0);
     const [status, setStatus] = useState('idle'); // idle, running, verify, completed, calling_ad
     const [screenshotFile, setScreenshotFile] = useState(null);
     const [toast, setToast] = useState(null);
-    const [taskMultiplier, setTaskMultiplier] = useState(12);
     const fileInputRef = React.useRef(null);
 
     const showToast = (message, type = 'success') => {
@@ -47,36 +48,17 @@ const TaskRunner = () => {
 
     useEffect(() => {
         const loadTask = async () => {
-            let allTasks = taskStorage.getTasks();
-            console.log("TaskRunner: Searching in storage. ID:", id);
-            
-            let foundTask = allTasks.find(t => String(t._id || t.id) === String(id));
-            
-            if (!foundTask) {
-                console.log("TaskRunner: Not in storage, fetching from API...");
-                try {
-                    const res = await api.get('/public/tasks');
-                    if (res.success && res.data) {
-                        allTasks = res.data;
-                        taskStorage.syncTasks(allTasks); // Sync for future use
-                        foundTask = allTasks.find(t => String(t._id || t.id) === String(id));
-                    }
-                } catch (err) {
-                    console.error("TaskRunner: API Fetch Error:", err);
-                }
-            }
-
-            console.log("TaskRunner: Final found task:", foundTask);
-            
+            const foundTask = await findTaskById(id);
             if (foundTask) {
                  setTask(foundTask);
+                 setLoadError(false);
                  const tType = foundTask.type;
                  const timerValue = Number(foundTask.config?.timer) || (tType === 'Video' ? 30 : 25);
-                 if (tType === 'Video' || tType === 'Web' || tType === 'Join' || tType === 'Social') {
+                 if (tType === 'Video' || tType === 'Web' || tType === 'Join' || tType === 'Social' || tType === 'Watch' || tType === 'Bonus') {
                      setTimeLeft(timerValue);
                  }
             } else {
-                console.warn("TaskRunner: Task not found anywhere.");
+                setLoadError(true);
             }
         };
 
@@ -94,8 +76,19 @@ const TaskRunner = () => {
 
     if (!task) return (
         <div className="p-8 text-center text-white min-h-screen bg-slate-950 flex flex-col items-center justify-center font-medium uppercase tracking-widest gap-4">
-            <Loader2 className="animate-spin text-sky-500 w-12 h-12" />
-            <p>Loading Task Details...</p>
+            {loadError ? (
+                <>
+                    <p className="text-sm normal-case tracking-normal">Task not found. Please go back and try again.</p>
+                    <button onClick={() => navigate('/user/earn')} className="px-5 py-3 rounded-xl bg-sky-500 text-slate-950 text-xs font-medium uppercase tracking-widest">
+                        Back to Tasks
+                    </button>
+                </>
+            ) : (
+                <>
+                    <Loader2 className="animate-spin text-sky-500 w-12 h-12" />
+                    <p>Loading Task Details...</p>
+                </>
+            )}
         </div>
     );
 
@@ -472,6 +465,34 @@ const TaskRunner = () => {
                               </button>
                          </div>
                      </div>
+                )}
+
+                {/* Fallback for any other / unknown task type */}
+                {![
+                    'Web', 'Join', 'Social', 'Survey', 'Watch', 'Bonus', 'Video',
+                    'Proof', 'Download', 'Sponsored', 'Share', 'Quiz', 'Spin'
+                ].includes(task.type) && !(task.type === 'Social' && (task.title || '').toLowerCase().includes('share')) && (
+                    <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center px-4">
+                        <h2 className="text-white font-medium text-lg">{task.title}</h2>
+                        <p className="text-xs text-slate-400">{task.description || 'Follow the instructions and claim when ready.'}</p>
+                        {(task.link || task.config?.url) && (
+                            <button
+                                onClick={() => {
+                                    window.open(task.link || task.config?.url, '_blank', 'noopener,noreferrer');
+                                    setStatus('verify');
+                                }}
+                                className="px-6 py-3 bg-sky-500 text-slate-950 rounded-xl text-xs font-medium uppercase tracking-widest"
+                            >
+                                Open Link
+                            </button>
+                        )}
+                        <button
+                            onClick={() => setStatus('verify')}
+                            className="px-6 py-3 bg-slate-800 text-white rounded-xl text-xs font-medium uppercase tracking-widest border border-slate-700"
+                        >
+                            Mark Ready to Complete
+                        </button>
+                    </div>
                 )}
             </div>
 

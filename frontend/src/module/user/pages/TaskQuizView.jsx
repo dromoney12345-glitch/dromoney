@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, CheckCircle2, XCircle, Timer, Trophy, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
+import { ChevronLeft, CheckCircle2, XCircle, Timer, Trophy, ArrowRight, Sparkles, AlertCircle, Loader2 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import { eventStorage } from '../../shared/services/eventStorage';
 import { taskStorage } from '../../shared/services/taskStorage';
+import { findTaskById } from '../../shared/utils/findTaskById';
 import FundRewardNotice from '../components/FundRewardNotice';
 
 const TaskQuizView = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addCoins, userData, boostersConfig } = useUser();
-    // We reuse event questions as a generic bank for 10 questions
-    const QUESTIONS = eventStorage.getQuestions();
+    const isSupportBoosterActive = !!(userData?.isSupportBoosterActive && (!boostersConfig?.support?.length || boostersConfig.support.includes('Quiz')));
+    const QUESTIONS = eventStorage.getQuestions() || [];
     const totalQ = QUESTIONS.length;
-    
-    const task = taskStorage.getTasks().find(t => String(t.id) === String(id));
-    
+
+    const [task, setTask] = useState(null);
+    const [loadError, setLoadError] = useState(false);
     const [currentStep, setCurrentStep] = useState(0); // 0: Start, 1: Questions, 2: Result
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [selectedOption, setSelectedOption] = useState(null);
@@ -25,11 +26,22 @@ const TaskQuizView = () => {
     const [isEventClosed, setIsEventClosed] = useState(false);
 
     useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            const found = await findTaskById(id);
+            if (cancelled) return;
+            if (found) setTask(found);
+            else setLoadError(true);
+        })();
+        return () => { cancelled = true; };
+    }, [id]);
+
+    useEffect(() => {
         const completed = taskStorage.getCompletedTasks();
-        if (completed.includes(id)) {
+        if (completed.includes(String(id))) {
             setIsEventClosed(true);
             setCurrentStep(2);
-            setScore(10); 
+            setScore(10);
         }
     }, [id]);
 
@@ -39,14 +51,14 @@ const TaskQuizView = () => {
             timer = setInterval(() => {
                 setTimeLeft(prev => prev - 1);
             }, 1000);
-        } else if (timeLeft === 0 && !isAnswered) {
+        } else if (timeLeft === 0 && !isAnswered && currentStep === 1) {
             handleNext();
         }
         return () => clearInterval(timer);
     }, [currentStep, timeLeft, isAnswered]);
 
     const handleOptionSelect = (index) => {
-        if (isAnswered) return;
+        if (isAnswered || !QUESTIONS[currentQuestion]) return;
         setSelectedOption(index);
         setIsAnswered(true);
         let newScore = score;
@@ -72,10 +84,10 @@ const TaskQuizView = () => {
     const handleFinish = async (finalScore) => {
         const s = finalScore !== undefined ? finalScore : score;
         setCurrentStep(2);
-        
+
         const completed = taskStorage.getCompletedTasks();
-        if (!completed.includes(id)) {
-            if (s === 10) {
+        if (!completed.includes(String(id))) {
+            if (s === totalQ && totalQ > 0) {
                 const res = await addCoins(0, `Task Quiz: ${task?.title}`, id);
                 if (res && res.success) {
                     taskStorage.markComplete(id);
@@ -87,6 +99,25 @@ const TaskQuizView = () => {
             }
         }
     };
+
+    if (!task && !loadError && currentStep === 0) {
+        return (
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+            </div>
+        );
+    }
+
+    if (loadError && !task && currentStep === 0) {
+        return (
+            <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4 p-6">
+                <p className="text-sm font-medium text-slate-600 text-center">Task not found. Please go back and try again.</p>
+                <button onClick={() => navigate('/user/earn')} className="px-5 py-3 rounded-xl bg-blue-600 text-white text-xs font-medium uppercase tracking-widest">
+                    Back to Tasks
+                </button>
+            </div>
+        );
+    }
 
     if (currentStep === 0) {
         return (
@@ -102,20 +133,20 @@ const TaskQuizView = () => {
                     <div className="w-28 h-28 bg-indigo-50 rounded-[2rem] flex items-center justify-center shadow-xl shadow-indigo-100 border-4 border-white mb-6 animate-pulse">
                         <Sparkles size={48} className="text-indigo-500" />
                     </div>
-                    
+
                     <h2 className="text-3xl font-medium text-slate-800 leading-tight mb-3">Ready for challenge?</h2>
                     <p className="text-slate-500 font-medium max-w-xs mx-auto text-xs leading-relaxed uppercase tracking-tighter mb-8">
-                        Answer 10 simple questions correctly to win your reward instantly! 
+                        Answer {totalQ || 10} simple questions correctly to win your reward instantly!
                     </p>
 
                     <div className="grid grid-cols-2 gap-4 w-full max-w-xs mx-auto">
                         <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-sm">
                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none mb-2">Questions</p>
-                            <p className="text-lg font-medium text-slate-800">10</p>
+                            <p className="text-lg font-medium text-slate-800">{totalQ || 10}</p>
                         </div>
                         <div className="bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-sm">
                             <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none mb-2">Time/Ques</p>
-                            <p className="text-lg font-medium text-slate-800">10s</p>
+                            <p className="text-lg font-medium text-slate-800">{isSupportBoosterActive ? '13s' : '10s'}</p>
                         </div>
                     </div>
                 </div>
@@ -126,8 +157,14 @@ const TaskQuizView = () => {
                         <p className="text-[11px] font-medium text-amber-700 uppercase tracking-widest">You have already completed this quiz today!</p>
                     </div>
                 ) : (
-                    <button 
-                        onClick={() => setCurrentStep(1)}
+                    <button
+                        onClick={() => {
+                            if (totalQ === 0) {
+                                alert('Quiz questions are not available right now.');
+                                return;
+                            }
+                            setCurrentStep(1);
+                        }}
                         className="w-full bg-blue-600 text-white py-5 rounded-3xl font-medium text-lg uppercase tracking-widest shadow-2xl shadow-blue-100 active:scale-95 transition-all mb-8"
                     >
                         Start Now
@@ -139,9 +176,16 @@ const TaskQuizView = () => {
 
     if (currentStep === 1) {
         const question = QUESTIONS[currentQuestion];
+        if (!question) {
+            return (
+                <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-4 p-6">
+                    <p className="text-sm text-slate-600">No questions available.</p>
+                    <button onClick={() => navigate('/user/earn')} className="px-5 py-3 rounded-xl bg-slate-900 text-white text-xs uppercase tracking-widest">Back</button>
+                </div>
+            );
+        }
         return (
             <div className="min-h-screen bg-slate-50 flex flex-col pt-0 animate-in fade-in duration-300">
-                {/* Progress Header */}
                 <div className="bg-white px-6 py-8 rounded-b-[3rem] shadow-xl shadow-slate-200/50 z-10 border-b border-slate-100">
                     <div className="flex items-center justify-between mb-6">
                         <span className="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-[12px] font-medium uppercase tracking-widest border border-blue-100">
@@ -157,11 +201,10 @@ const TaskQuizView = () => {
                             )}
                         </div>
                     </div>
-                    {/* Progress Bar */}
                     <div className="h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-50 p-0.5">
-                        <div 
+                        <div
                             className="h-full bg-blue-600 rounded-full transition-all duration-500 shadow-sm"
-                            style={{ width: `${((currentQuestion + 1) / totalQ) * 100}%` }}
+                            style={{ width: `${((currentQuestion + 1) / Math.max(totalQ, 1)) * 100}%` }}
                         ></div>
                     </div>
                 </div>
@@ -172,7 +215,7 @@ const TaskQuizView = () => {
                     </h2>
 
                     <div className="space-y-4">
-                        {question.options.map((option, index) => {
+                        {(question.options || []).map((option, index) => {
                             let statusClasses = "bg-white border-slate-100 text-slate-700";
                             if (isAnswered) {
                                 if (index === question.answer) {
@@ -194,14 +237,13 @@ const TaskQuizView = () => {
                                     className={`w-full p-5 rounded-3xl border-2 text-left font-medium transition-all flex items-center justify-between group ${statusClasses}`}
                                 >
                                     <span className="text-[15px] uppercase tracking-tight">{option}</span>
-                                    {isAnswered && index === QUESTIONS[currentQuestion].answer && <CheckCircle2 size={24} className="text-emerald-500" />}
-                                    {isAnswered && index === selectedOption && index !== QUESTIONS[currentQuestion].answer && <XCircle size={24} className="text-rose-500" />}
+                                    {isAnswered && index === question.answer && <CheckCircle2 size={24} className="text-emerald-500" />}
+                                    {isAnswered && index === selectedOption && index !== question.answer && <XCircle size={24} className="text-rose-500" />}
                                 </button>
                             );
                         })}
                     </div>
-                    
-                    {/* Common Instruction Below Options */}
+
                     <p className="mt-8 text-center text-[10px] text-slate-400 font-medium uppercase tracking-widest">
                         Choose the most appropriate answer above.
                     </p>
@@ -210,7 +252,7 @@ const TaskQuizView = () => {
         );
     }
 
-    const isWin = score === 10;
+    const isWin = score === totalQ && totalQ > 0;
 
     return (
         <div className="min-h-screen bg-white flex flex-col p-6 animate-in zoom-in-95 duration-500">
@@ -222,9 +264,9 @@ const TaskQuizView = () => {
                         </div>
                         <div className="space-y-2">
                             <h2 className="text-3xl font-medium text-slate-800 tracking-tight leading-none">Successfully <br/> You Won!</h2>
-                            <p className="text-slate-500 font-medium uppercase tracking-widest text-[11px]">Task Completed 10/10</p>
+                            <p className="text-slate-500 font-medium uppercase tracking-widest text-[11px]">Task Completed {score}/{totalQ}</p>
                         </div>
-                        
+
                         <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 w-full max-w-xs space-y-4">
                             <FundRewardNotice />
                         </div>
@@ -237,7 +279,7 @@ const TaskQuizView = () => {
                         <div className="space-y-4">
                             <h2 className="text-3xl font-medium text-slate-800 tracking-tight leading-none">You Lost</h2>
                             <p className="text-slate-500 font-medium uppercase tracking-widest text-[11px] leading-relaxed">
-                                You scored {score}/10.<br/>
+                                You scored {score}/{totalQ || 10}.<br/>
                                 Please next day try!
                             </p>
                         </div>
@@ -245,7 +287,7 @@ const TaskQuizView = () => {
                 )}
             </div>
 
-            <button 
+            <button
                 onClick={() => navigate('/user/earn')}
                 className="w-full bg-slate-900 text-white py-5 rounded-3xl font-medium text-sm uppercase tracking-widest shadow-2xl active:scale-95 transition-all mb-4 flex items-center justify-center gap-3"
             >

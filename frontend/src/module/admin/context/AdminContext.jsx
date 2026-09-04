@@ -19,11 +19,18 @@ export const AdminProvider = ({ children }) => {
     useEffect(() => {
         if (!isAuthenticated) return;
 
-        const socket = socketIO(BASE_URL, { transports: ['websocket', 'polling'] });
+        const socket = socketIO(BASE_URL || 'http://localhost:5001', {
+            path: '/socket.io',
+            transports: ['websocket', 'polling'],
+            withCredentials: true,
+        });
         socketRef.current = socket;
 
         socket.on('connect', () => {
             console.log('[Admin Socket] Connected:', socket.id);
+        });
+        socket.on('connect_error', (err) => {
+            console.warn('[Admin Socket] connect_error:', err.message);
         });
 
         socket.on('new_report', (data) => {

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
-import { ChevronLeft, Gift, Sparkles, Trophy, Star } from 'lucide-react';
+import { findTaskById } from '../../shared/utils/findTaskById';
+import { ChevronLeft, Gift, Sparkles, Trophy, Star, IndianRupee, Loader2 } from 'lucide-react';
 import FundRewardNotice from '../components/FundRewardNotice';
 
 const TreasureChestView = () => {
@@ -10,36 +11,54 @@ const TreasureChestView = () => {
     const navigate = useNavigate();
     const { addCoins } = useUser();
     const [task, setTask] = useState(null);
+    const [loadError, setLoadError] = useState(false);
     
     const [step, setStep] = useState(0); // 0: Start, 1: Picked, 2: Reveal
     const [selectedIdx, setSelectedIdx] = useState(null);
-    const [winningIdx, setWinningIdx] = useState(null);
 
     useEffect(() => {
-        const allTasks = taskStorage.getTasks();
-        const found = allTasks.find(t => String(t.id) === String(id));
-        setTask(found);
+        let cancelled = false;
+        (async () => {
+            const found = await findTaskById(id);
+            if (cancelled) return;
+            if (found) setTask(found);
+            else setLoadError(true);
+        })();
+        return () => { cancelled = true; };
     }, [id]);
 
     const handlePick = (idx) => {
-        if (step !== 0) return;
+        if (step !== 0 || !task) return;
         
         setSelectedIdx(idx);
-        setWinningIdx(Math.floor(Math.random() * 3));
         setStep(1);
 
         setTimeout(async () => {
             setStep(2);
-            if (idx === winningIdx || true) { // Logic: For now, always win to make client happy, or use random
-                 const res = await addCoins(0, 'Treasure Chest Found', task._id || task.id);
-                 if (res && res.success) {
-                     taskStorage.markComplete(task._id || task.id);
-                 }
+            const taskId = task._id || task.id;
+            const res = await addCoins(0, 'Treasure Chest Found', taskId);
+            if (res && res.success) {
+                taskStorage.markComplete(taskId);
             }
         }, 1500);
     };
 
-    if (!task) return null;
+    if (!task) {
+        return (
+            <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-4 p-6 text-white">
+                {loadError ? (
+                    <>
+                        <p className="text-sm font-medium text-center">Task not found. Please go back and try again.</p>
+                        <button onClick={() => navigate('/user/earn')} className="px-5 py-3 rounded-xl bg-indigo-500 text-xs font-medium uppercase tracking-widest">
+                            Back to Tasks
+                        </button>
+                    </>
+                ) : (
+                    <Loader2 className="w-10 h-10 animate-spin text-indigo-400" />
+                )}
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-indigo-900 via-slate-900 to-black p-6 text-white overflow-hidden">

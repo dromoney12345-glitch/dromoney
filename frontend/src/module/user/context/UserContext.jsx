@@ -5,7 +5,21 @@ import { buildReferralLink, getPendingReferralCode, clearPendingReferralCode, sa
 import { installFcmTokenBridge, requestNativeFcmToken, saveFcmTokenToServer, readPendingFcmToken } from '../../shared/utils/fcmToken';
 
 const UserContext = React.createContext();
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || BASE_URL;
+
+/** Always resolve an absolute Socket.io URL — empty/relative falls back to Vite origin and 404s. */
+function getSocketUrl() {
+    const envUrl = String(import.meta.env.VITE_SOCKET_URL || '').trim().replace(/\/$/, '');
+    if (envUrl) return envUrl;
+    const base = String(BASE_URL || '').trim().replace(/\/$/, '');
+    if (base && /^https?:\/\//i.test(base)) return base;
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1' || host === '::1') {
+        return 'http://localhost:5001';
+    }
+    return window.location.origin;
+}
+
+const SOCKET_URL = getSocketUrl();
 
 // Initial empty state to prevent destructuring crashes
 const INITIAL_USER_STATE = {
@@ -69,8 +83,21 @@ export const UserProvider = ({ children }) => {
             refreshUserProfile().then((profile) => {
                 if (profile && profile._id) {
                     // Setup Socket Connection
-                    activeSocket = io(SOCKET_URL);
+                    activeSocket = io(SOCKET_URL, {
+                        path: '/socket.io',
+                        transports: ['websocket', 'polling'],
+                        withCredentials: true,
+                        reconnection: true,
+                        reconnectionAttempts: 10,
+                    });
                     setSocket(activeSocket);
+
+                    activeSocket.on('connect', () => {
+                        console.debug('[User Socket] Connected:', activeSocket.id, '→', SOCKET_URL);
+                    });
+                    activeSocket.on('connect_error', (err) => {
+                        console.warn('[User Socket] connect_error:', err.message, '→', SOCKET_URL);
+                    });
 
                     activeSocket.on('new_broadcast', (notif) => {
                         addNotification(notif.title, notif.message, 'broadcast');

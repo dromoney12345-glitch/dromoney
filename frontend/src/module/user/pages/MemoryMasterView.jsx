@@ -71,12 +71,10 @@ const MemoryMasterView = () => {
                 console.log("Memory Master: Not an event, running as task with defaults");
                 setIsEvent(false);
                 try {
-                    const taskRes = await api.get('/user/data/tasks');
-                    if (taskRes.success) {
-                        const currentTask = taskRes.data.find(t => String(t._id) === String(id) || String(t.id) === String(id));
-                        if (currentTask && currentTask.reward) {
-                            setTaskReward(currentTask.reward);
-                        }
+                    const { findTaskById } = await import('../../shared/utils/findTaskById');
+                    const currentTask = await findTaskById(id);
+                    if (currentTask) {
+                        setTaskReward(currentTask.coinsReward ?? currentTask.reward ?? 0);
                     }
                 } catch(e) {}
             } finally {
@@ -174,7 +172,7 @@ const MemoryMasterView = () => {
                     api.post(`/user/data/events/${id}/submit`, {
                         score: timeLeft,
                         result: `${timeLeft}s remaining`,
-                        prize: `₹${reward}`,
+                        prize: `₹${taskReward}`,
                         timeTaken: maxTime - timeLeft
                     }).then(async (res) => {
                         if (res?.supportBoosterConsumed && refreshUserProfile) {

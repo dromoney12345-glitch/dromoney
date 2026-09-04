@@ -71,8 +71,13 @@ const Earn = () => {
         try {
             const res = await api.get('/public/tasks');
             if (res.success && res.data && res.data.length > 0) {
-                setTasks(res.data);
-                taskStorage.syncTasks(res.data);
+                const normalized = res.data.map((t) => ({
+                    ...t,
+                    id: t._id || t.id,
+                    _id: t._id || t.id,
+                }));
+                setTasks(normalized);
+                taskStorage.syncTasks(normalized);
             } else {
                 setTasks(taskStorage.getTasks());
             }

@@ -50,28 +50,25 @@ const LuckyDrawView = () => {
                     }
                 }
             } catch (err) {
-                if (err.message && err.message.includes('Event not found')) {
-                    // Ignore, it's a task ID not an event ID
-                    try {
-                        const currentTask = taskStorage.getTasks().find(t => String(t._id) === String(id) || String(t.id) === String(id));
-                        if (currentTask) {
-                            const currentReward = currentTask.coinsReward || currentTask.reward;
-                            if (currentReward) setTaskReward(currentReward);
-                            if (currentTask.title) setTaskTitle(currentTask.title);
-                        } else {
-                            const taskRes = await api.get('/user/data/tasks');
-                            if (taskRes.success) {
-                                const dbTask = taskRes.data.find(t => String(t._id) === String(id) || String(t.id) === String(id));
-                                if (dbTask) {
-                                    const dbReward = dbTask.coinsReward || dbTask.reward;
-                                    if (dbReward) setTaskReward(dbReward);
-                                    if (dbTask.title) setTaskTitle(dbTask.title);
-                                }
+                // Task IDs are not events — always fall back to task data
+                try {
+                    const currentTask = taskStorage.getTasks().find(t => String(t._id) === String(id) || String(t.id) === String(id));
+                    if (currentTask) {
+                        setTaskReward(currentTask.coinsReward ?? currentTask.reward ?? 0);
+                        if (currentTask.title) setTaskTitle(currentTask.title);
+                    } else {
+                        const taskRes = await api.get('/public/tasks');
+                        if (taskRes.success) {
+                            const dbTask = taskRes.data.find(t => String(t._id) === String(id) || String(t.id) === String(id));
+                            if (dbTask) {
+                                setTaskReward(dbTask.coinsReward ?? dbTask.reward ?? 0);
+                                if (dbTask.title) setTaskTitle(dbTask.title);
+                                taskStorage.syncTasks(taskRes.data);
                             }
                         }
-                    } catch(e) {}
-                } else {
-                    console.error("Failed to load lucky draw details:", err);
+                    }
+                } catch (e) {
+                    console.error("Failed to load lucky draw task fallback:", e);
                 }
             } finally {
                 setLoading(false);

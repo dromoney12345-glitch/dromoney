@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
-import { ChevronLeft, Zap, Trophy, Timer, MousePointer2 } from 'lucide-react';
+import { findTaskById } from '../../shared/utils/findTaskById';
+import { ChevronLeft, Zap, Trophy, Timer, MousePointer2, Loader2 } from 'lucide-react';
 import FundRewardNotice from '../components/FundRewardNotice';
 
 const SpeedTapperView = () => {
@@ -10,6 +11,7 @@ const SpeedTapperView = () => {
     const navigate = useNavigate();
     const { addCoins } = useUser();
     const [task, setTask] = useState(null);
+    const [loadError, setLoadError] = useState(false);
     
     const [taps, setTaps] = useState(0);
     const [status, setStatus] = useState('idle'); // idle, playing, won, lost
@@ -19,9 +21,14 @@ const SpeedTapperView = () => {
     const duration = 10;
 
     useEffect(() => {
-        const allTasks = taskStorage.getTasks();
-        const found = allTasks.find(t => String(t.id) === String(id));
-        setTask(found);
+        let cancelled = false;
+        (async () => {
+            const found = await findTaskById(id);
+            if (cancelled) return;
+            if (found) setTask(found);
+            else setLoadError(true);
+        })();
+        return () => { cancelled = true; };
     }, [id]);
 
     useEffect(() => {
@@ -60,7 +67,22 @@ const SpeedTapperView = () => {
         taskStorage.markComplete(task._id || task.id);
     };
 
-    if (!task) return null;
+    if (!task) {
+        return (
+            <div className="min-h-screen bg-[#F0F4F8] flex flex-col items-center justify-center gap-4 p-6">
+                {loadError ? (
+                    <>
+                        <p className="text-sm font-medium text-slate-600 text-center">Task not found. Please go back and try again.</p>
+                        <button onClick={() => navigate('/user/earn')} className="px-5 py-3 rounded-xl bg-slate-900 text-white text-xs font-medium uppercase tracking-widest">
+                            Back to Tasks
+                        </button>
+                    </>
+                ) : (
+                    <Loader2 className="w-10 h-10 animate-spin text-sky-500" />
+                )}
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-[#F0F4F8] flex flex-col p-6 text-slate-800 overflow-hidden">

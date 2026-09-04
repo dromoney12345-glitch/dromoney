@@ -108,20 +108,20 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5001; // Dromoney local API (avoid 5000 clash with other apps)
 
-// Create HTTP server
 const http = require('http');
-const socketio = require('socket.io');
+const { Server } = require('socket.io');
 
 const server = http.createServer(app);
 
-// Initialize Socket.io
-const io = socketio(server, {
+// Initialize Socket.io on the primary HTTP server
+const ioOptions = {
     cors: {
         origin: (origin, callback) => {
             if (!origin) return callback(null, true);
             const isLocalHost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+            const isPrivateIP = /^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$/.test(origin);
             const isProductionDomain = /^https?:\/\/(?:[a-zA-Z0-9-]+\.)*(?:dromoney\.com|dromoney\.vercel\.app)$/.test(origin);
-            if (isLocalHost || isProductionDomain || origin === process.env.FRONTEND_URL) {
+            if (isLocalHost || isPrivateIP || isProductionDomain || origin === process.env.FRONTEND_URL) {
                 return callback(null, true);
             }
             callback(new Error('Not allowed by CORS'));
@@ -129,7 +129,9 @@ const io = socketio(server, {
         methods: ['GET', 'POST'],
         credentials: true,
     },
-});
+    transports: ['websocket', 'polling'],
+};
+const io = new Server(server, ioOptions);
 
 // Expose io globally for controllers
 global.io = io;
@@ -160,10 +162,12 @@ if (process.env.NODE_ENV !== 'test') {
 
     server.listen(PORT, () => {
         console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+        console.log(`Socket.io listening on port ${PORT}`);
 
-        // Old Vite tabs still call :5000 — bind it when free so login does not get ERR_CONNECTION_REFUSED.
+        // Old Vite tabs still call :5000 — same Express app + same Socket.io engine.
         if (Number(PORT) !== 5000) {
             const alias = http.createServer(app);
+            io.attach(alias);
             alias.on('error', (err) => {
                 if (err.code === 'EADDRINUSE') {
                     console.warn(`Port 5000 is in use by another app. Use http://localhost:${PORT}/api`);
@@ -172,7 +176,7 @@ if (process.env.NODE_ENV !== 'test') {
                 }
             });
             alias.listen(5000, () => {
-                console.log('Also listening on port 5000 for local frontends still using :5000');
+                console.log('Also listening on port 5000 for local frontends still using :5000 (API + Socket.io)');
             });
         }
     });

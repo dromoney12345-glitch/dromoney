@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { taskStorage } from '../../shared/services/taskStorage';
-import { ChevronLeft, Sparkles, Trophy, Quote, CheckCircle2, Star } from 'lucide-react';
+import { findTaskById } from '../../shared/utils/findTaskById';
+import { ChevronLeft, Sparkles, Trophy, CheckCircle2, Star, Loader2 } from 'lucide-react';
 import FundRewardNotice from '../components/FundRewardNotice';
 
 const QUOTES = [
@@ -27,15 +28,21 @@ const ScratchCard = ({ quote, onComplete }) => {
 
     const initCanvas = () => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
+        if (!ctx) return;
+        canvas.width = Math.max(canvas.offsetWidth || 120, 1);
+        canvas.height = Math.max(canvas.offsetHeight || 120, 1);
 
         // Premium Solid Silver Surface
         ctx.fillStyle = '#CBD5E1';
-        ctx.beginPath();
-        ctx.roundRect(0, 0, canvas.width, canvas.height, 20);
-        ctx.fill();
+        if (typeof ctx.roundRect === 'function') {
+            ctx.beginPath();
+            ctx.roundRect(0, 0, canvas.width, canvas.height, 20);
+            ctx.fill();
+        } else {
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
 
         ctx.font = 'bold 12px Inter, sans-serif';
         ctx.fillStyle = '#64748B';
@@ -126,15 +133,21 @@ const ScratchCardView = () => {
     const navigate = useNavigate();
     const { addCoins, addNotification } = useUser();
     const [task, setTask] = useState(null);
+    const [loadError, setLoadError] = useState(false);
     const [completedCount, setCompletedCount] = useState(0);
     const [randomQuotes, setRandomQuotes] = useState([]);
 
     useEffect(() => {
-        const allTasks = taskStorage.getTasks();
-        const found = allTasks.find(t => String(t.id) === String(id));
-        setTask(found);
-        const shuffled = [...QUOTES].sort(() => 0.5 - Math.random());
-        setRandomQuotes(shuffled.slice(0, 3));
+        let cancelled = false;
+        (async () => {
+            const found = await findTaskById(id);
+            if (cancelled) return;
+            if (found) setTask(found);
+            else setLoadError(true);
+            const shuffled = [...QUOTES].sort(() => 0.5 - Math.random());
+            setRandomQuotes(shuffled.slice(0, 3));
+        })();
+        return () => { cancelled = true; };
     }, [id]);
 
     const handleCardFinish = () => {
@@ -149,7 +162,22 @@ const ScratchCardView = () => {
         addCoins(0, 'Scratch Card Reward', (completedCount + 1 === 3) ? (task?._id || task?.id) : undefined);
     };
 
-    if (!task) return null;
+    if (!task) {
+        return (
+            <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center gap-4 p-6">
+                {loadError ? (
+                    <>
+                        <p className="text-sm font-medium text-slate-600 text-center">Task not found. Please go back and try again.</p>
+                        <button onClick={() => navigate('/user/earn')} className="px-5 py-3 rounded-xl bg-blue-600 text-white text-xs font-medium uppercase tracking-widest">
+                            Back to Tasks
+                        </button>
+                    </>
+                ) : (
+                    <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+                )}
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] flex flex-col p-5 select-none relative overflow-hidden">

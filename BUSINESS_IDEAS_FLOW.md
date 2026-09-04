@@ -1,10 +1,10 @@
-# Business Ideas — Live Flow (Free Start)
+# Business Ideas — Live Flow
 
 
 
-**Updated:** 31 Aug 2026  
+**Updated:** 4 Sep 2026  
 
-**Status:** Ideas free by default; Premium Support prices from admin only; unlock is per-idea
+**Status:** Preview details open; Support Hub only after subscription plan purchase (per idea)
 
 
 
@@ -20,33 +20,31 @@
 
 Business tab
 
-  → Guide (optional)
+  → Guide / Intro (optional entry)
 
-  → SHME Intro
+  → Business Hub listing
 
-  → Business Hub listing  (Free badge — no hardcoded ₹199)
+  → Business Details (OPEN for everyone)
 
-  → Business Details
+       • How to Start
 
-       • How to Start / Investment / Profit — OPEN (free ideas)
+       • Investment & Cost (kharcha)
 
-       • Continue to Support Hub
+       • Profit Potential
 
-       • Get Premium Support (optional — admin plan prices)
+       • Video Support
 
-  → Premium Support
+       • CTA → View Subscription Plans   (no optional buttons)
 
-       • Plans = Settings.businessPlans (admin Customize Membership)
+  → Subscription Plans
 
-       • Pay unlocks support chat + ONLY this idea
+       • Admin businessPlans only
 
-  → My Support Hub
+       • Pay unlocks ONLY this idea + support access
 
-       • Ecosystem cards for this idea
+  → My Support Hub (locked until plan purchase)
 
-       • Meeting link (if set)
-
-       • Support Chat — renewal amount from admin settings / cheapest plan
+       • Ecosystem cards / meeting / chat
 
 ```
 
@@ -66,19 +64,17 @@ Business tab
 
 | Browse ideas | Free |
 
-| Read How to Start / Investment / Profit | Free (unless admin sets Premium + price > 0) |
+| Read How to Start / Investment / Profit / Video | Free (preview) |
 
-| Open Support Hub + ecosystem cards | Free for free ideas; else only if this idea is in `unlockedIdeas` |
+| Optional / free skip to Support Hub | **Removed** |
 
-| Premium Support plans (subscription) | Paid — amount from admin `businessPlans` only |
+| Subscription plan | Paid — admin `businessPlans` |
 
-| Support chat renewal | Paid — `supportChatRenewalAmount` or cheapest admin plan |
-
-| One idea plan purchase unlocks all ideas? | **No** — only that idea |
+| Support Hub / ecosystem / chat for that idea | After plan unlocks this idea |
 
 
 
-Admin can mark a future idea as **Premium + price > 0**; then unlock payment is required for that idea only.
+One plan purchase unlocks **only that idea**, not all ideas.
 
 
 
@@ -90,14 +86,9 @@ Admin can mark a future idea as **Premium + price > 0**; then unlock payment is 
 
 
 
-- Model default: `isPremium: false`, `price: 0`
+- UI: `BusinessIdeas.jsx` — details CTA goes to `/subscription`; hub redirects to plans if not unlocked
 
-- One-shot DB migrate clears old ₹199 locks (`businessIdeasFreeStartMigratedV3`)
+- Unlock list: `user.unlockedIdeas` after successful `BUSINESS_HUB_PLAN` payment
 
-- Unlock: free unless `isPremium === true` AND `price > 0`
-
-- `supportExpiry` = chat / membership window — does **not** unlock every idea
-
-- User UI must never hardcode ₹150 / ₹199 for business prices
-
+- No hardcoded ₹150 / ₹199 in user UI
 
