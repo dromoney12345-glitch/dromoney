@@ -14,13 +14,14 @@ function isSuccessErrorCode(code) {
 
 /**
  * Send OTP via SMSINDIAHUB (DLT template).
- * Throws if credentials missing or provider returns a non-success ErrorCode.
+ * Uses both APIKey auth and DLT PEId/template id aliases required by operators.
  */
 const sendOtpSMS = async (phone, otp) => {
     const apiKey = process.env.SMSINDIAHUB_API_KEY;
     const senderId = process.env.SMSINDIAHUB_SENDER_ID || 'BGADEC';
     const peid = process.env.SMSINDIAHUB_PEID || '1001164203633432409';
     const templateId = process.env.SMSINDIAHUB_TEMPLATE_ID || '1007282516644508833';
+    const route = process.env.SMSINDIAHUB_ROUTE || '';
 
     if (!apiKey) {
         throw new Error('SMSINDIAHUB_API_KEY is not configured');
@@ -31,11 +32,12 @@ const sendOtpSMS = async (phone, otp) => {
         throw new Error('Invalid phone number for SMS');
     }
 
-    // Exact DLT-approved template text (do not change spacing/words without re-registering template)
+    // Exact DLT-approved template text (must match registered template character-for-character)
     const message = `Welcome to the Dromoney powered by Appzeto.Your OTP for registration is ${otp}.BGADEC`;
     const formattedPhone = `91${phone10}`;
 
-    const params = new URLSearchParams({
+    // Include common parameter aliases — SMS India Hub / DLT gateways are inconsistent on casing.
+    const params = {
         APIKey: apiKey,
         senderid: senderId,
         channel: 'Trans',
@@ -43,9 +45,15 @@ const sendOtpSMS = async (phone, otp) => {
         flashsms: '0',
         number: formattedPhone,
         text: message,
+        // DLT principal entity + content template
+        PEId: peid,
         peid,
         templateid: templateId,
-    });
+        TemplateId: templateId,
+        dlttemplateid: templateId,
+        DLTTemplateId: templateId,
+    };
+    if (route) params.route = route;
 
     const bases = [
         'https://cloud.smsindiahub.in/api/mt/SendSMS',
@@ -55,7 +63,8 @@ const sendOtpSMS = async (phone, otp) => {
     let lastError;
     for (const base of bases) {
         try {
-            const response = await axios.get(`${base}?${params.toString()}`, {
+            const response = await axios.get(base, {
+                params,
                 timeout: 20000,
                 validateStatus: () => true,
             });
@@ -70,11 +79,13 @@ const sendOtpSMS = async (phone, otp) => {
 
             if (!isSuccessErrorCode(errorCode)) {
                 lastError = new Error(`SMS provider rejected: ${errorCode || 'unknown'} ${errorMessage}`.trim());
-                console.error(`[SMS Error] ${formattedPhone}:`, data);
+                console.error(`[SMS Error] ${formattedPhone}: code=${errorCode} msg=${errorMessage}`);
                 continue;
             }
 
-            console.log(`[SMS] OTP accepted for ${formattedPhone}. JobId:`, data?.JobId || data?.jobId || 'n/a');
+            const jobId = data?.JobId || data?.jobId || 'n/a';
+            const messageId = data?.MessageData?.[0]?.MessageId || 'n/a';
+            console.log(`[SMS] OTP accepted for ${formattedPhone}. JobId=${jobId} MessageId=${messageId}`);
             return data;
         } catch (error) {
             lastError = error;
