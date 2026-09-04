@@ -150,14 +150,15 @@ exports.updatePaymentStatus = async (req, res) => {
                     }
                 } else if (payment.paymentType === 'BUSINESS_IDEA_UNLOCK') {
                     const ideaId = payment.businessIdea ? payment.businessIdea.toString() : '';
-                    const already = (user.unlockedIdeas || []).some((id) => id.toString() === ideaId);
+                    user.unlockedIdeas = user.unlockedIdeas || [];
+                    const already = user.unlockedIdeas.some((id) => id && id.toString() === ideaId);
                     if (ideaId && !already) {
                         user.unlockedIdeas.push(payment.businessIdea);
                     }
                     user.notifications = user.notifications || [];
                     user.notifications.push({
                         title: 'Business Idea Unlocked',
-                        message: `Your payment for ${payment.plan || 'this business idea'} is confirmed. Support content is now open.`,
+                        message: `Your payment for ${payment.plan || 'this business idea'} is confirmed. Only this idea is unlocked.`,
                         type: 'success',
                         isRead: false
                     });
@@ -192,10 +193,17 @@ exports.updatePaymentStatus = async (req, res) => {
                     user.supportExpiry = currentExpiry;
                     user.activeBusinessPlan = payment.plan || 'Premium Plan';
                     user.businessPlanStatus = 'active';
+                    // Unlock ONLY the idea this plan was bought for — never all ideas
+                    if (payment.businessIdea) {
+                        const ideaId = payment.businessIdea.toString();
+                        user.unlockedIdeas = user.unlockedIdeas || [];
+                        const already = user.unlockedIdeas.some((id) => id && id.toString() === ideaId);
+                        if (!already) user.unlockedIdeas.push(payment.businessIdea);
+                    }
                     user.notifications = user.notifications || [];
                     user.notifications.push({
                         title: 'Premium Support Activated',
-                        message: `${payment.plan || 'Premium Plan'} is now active. Support chat and hub are unlocked.`,
+                        message: `${payment.plan || 'Premium Plan'} is active for this idea. Other ideas stay locked unless free or paid separately.`,
                         type: 'success',
                         isRead: false
                     });

@@ -20,7 +20,8 @@ const BusinessIdeas = () => {
     const { ideaId, section, cardId } = useParams();
     const { userData, refreshUserProfile } = useUser();
 
-    const isSubscribed = userData?.supportExpiry && new Date(userData.supportExpiry) > new Date();
+    // Support chat / membership plan active — does NOT unlock every idea
+    const hasActiveSupport = !!(userData?.supportExpiry && new Date(userData.supportExpiry) > new Date());
     const unlockedIdeaIds = (userData?.unlockedIdeas || []).map(String);
     const isIdeaFree = (idea) => {
         if (!idea) return false;
@@ -29,12 +30,11 @@ const BusinessIdeas = () => {
     };
     const isIdeaUnlocked = (idea) => {
         if (!idea) return false;
-        if (isIdeaFree(idea) || idea.isLocked === false) return true;
+        if (isIdeaFree(idea)) return true;
+        if (idea.isLocked === false) return true;
         const id = idea._id ? String(idea._id) : '';
         return !!id && unlockedIdeaIds.includes(id);
     };
-    const SUPPORT_RENEWAL_AMOUNT = 150;
-    const SUPPORT_RENEWAL_DAYS = 90;
 
     // Derive step from URL
     const getStepFromUrl = () => {
@@ -55,7 +55,11 @@ const BusinessIdeas = () => {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [paymentMode, setPaymentMode] = useState('plan'); // plan | idea | renew
     const [selectedEcoCard, setSelectedEcoCard] = useState(null);
-    const [settings, setSettings] = useState({ businessPlans: [] });
+    const [settings, setSettings] = useState({
+        businessPlans: [],
+        supportChatRenewalAmount: 0,
+        supportChatRenewalDays: 90,
+    });
     const [refreshing, setRefreshing] = useState(false);
     const [detailType, setDetailType] = useState(null); // 'howItWorks', 'investmentDetails', 'profitDetails'
     const [descExpanded, setDescExpanded] = useState(false);
@@ -153,8 +157,28 @@ const BusinessIdeas = () => {
     const fetchSettings = async () => {
         try {
             const res = await api.get('/public/settings');
-            if (res.success) setSettings({ businessPlans: res.data.businessPlans || [] });
+            if (res.success) {
+                setSettings({
+                    businessPlans: res.data.businessPlans || [],
+                    supportChatRenewalAmount: Number(res.data.supportChatRenewalAmount) || 0,
+                    supportChatRenewalDays: Number(res.data.supportChatRenewalDays) || 90,
+                });
+            }
         } catch (err) { console.error('Settings fetch error:', err); }
+    };
+
+    /** Renewal price from admin settings, else cheapest membership plan — never hardcoded. */
+    const getSupportRenewalQuote = () => {
+        const fromSettings = Number(settings.supportChatRenewalAmount) || 0;
+        const planPrices = (settings.businessPlans || [])
+            .map((p) => Number(p.price))
+            .filter((n) => Number.isFinite(n) && n > 0);
+        const fromPlans = planPrices.length ? Math.min(...planPrices) : 0;
+        const amount = fromSettings > 0 ? fromSettings : fromPlans;
+        const days = Number(settings.supportChatRenewalDays) > 0
+            ? Number(settings.supportChatRenewalDays)
+            : 90;
+        return { amount, days };
     };
 
     const fetchIdeas = async () => {
@@ -315,16 +339,19 @@ const BusinessIdeas = () => {
                                     onClick={() => handleIdeaSelect(idea)}
                                     className="bg-white rounded-2xl p-3 text-left shadow-[0_2px_12px_rgba(70,34,17,0.06)] border border-[#EDE4DC]/60 active:scale-[0.98] transition-transform relative"
                                 >
-                                    {locked && Number(idea.price) > 0 && (
+                                    {locked && Number(idea.price) > 0 ? (
                                         <span className="absolute top-2 right-2 z-10 inline-flex items-center gap-1 bg-[#462211] text-white text-[8px] font-semibold px-1.5 py-0.5 rounded-full">
                                             <Lock size={8} /> ₹{idea.price}
                                         </span>
-                                    )}
-                                    {!locked && (
+                                    ) : !locked && isIdeaFree(idea) ? (
                                         <span className="absolute top-2 right-2 z-10 inline-flex items-center bg-emerald-100 text-emerald-700 text-[8px] font-semibold px-1.5 py-0.5 rounded-full">
                                             Free
                                         </span>
-                                    )}
+                                    ) : !locked ? (
+                                        <span className="absolute top-2 right-2 z-10 inline-flex items-center bg-emerald-100 text-emerald-700 text-[8px] font-semibold px-1.5 py-0.5 rounded-full">
+                                            Unlocked
+                                        </span>
+                                    ) : null}
                                     <div className="h-[72px] flex items-center justify-center mb-2.5 rounded-xl bg-[#FCF8F5] overflow-hidden">
                                         {idea.bannerImage ? (
                                             <img src={idea.bannerImage} className="w-full h-full object-contain p-1" alt="" />
@@ -601,7 +628,9 @@ const BusinessIdeas = () => {
                                         <p className={`text-[20px] font-bold mt-1 ${selected ? 'text-[#462211]' : 'text-[#462211]/80'}`}>
                                             ₹{plan.price}
                                         </p>
-                                        <p className="text-[9px] text-[#9A8478] mt-0.5">Total</p>
+                                        <p className="text-[9px] text-[#9A8478] mt-0.5">
+                                            {plan.duration || `${plan.durationInDays || 30} days`}
+                                        </p>
                                         <div className="flex justify-center mt-2.5">
                                             {selected ? (
                                                 <div className="w-5 h-5 rounded-full bg-[#462211] flex items-center justify-center">
@@ -622,7 +651,7 @@ const BusinessIdeas = () => {
                         </div>
                     )}
 
-                    {isSubscribed && timeRem && (
+                    {hasActiveSupport && timeRem && (
                         <div className="bg-[#EEF7EE] rounded-xl px-3 py-2.5 border border-emerald-100">
                             <p className="text-[10px] text-emerald-700 font-medium">Plan active — {timeRem.days} days {timeRem.hours} hrs remaining</p>
                         </div>
@@ -658,7 +687,8 @@ const BusinessIdeas = () => {
                     <button
                         type="button"
                         onClick={() => {
-                            if (isIdeaUnlocked(selectedIdea)) {
+                            // Buying a plan unlocks ONLY this idea — never skip pay when user came for Premium Support
+                            if (hasActiveSupport && isIdeaUnlocked(selectedIdea)) {
                                 navigate(`/user/business-ideas/${ideaId}/ecosystem`);
                             } else {
                                 setPaymentMode('plan');
@@ -667,7 +697,11 @@ const BusinessIdeas = () => {
                         }}
                         className="w-full bg-[#462211] text-white font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-[0.99] shadow-[0_4px_16px_rgba(70,34,17,0.2)]"
                     >
-                        <span>{isIdeaUnlocked(selectedIdea) ? 'Continue to Support Hub' : 'Explore & Pay Now'}</span>
+                        <span>
+                            {hasActiveSupport && isIdeaUnlocked(selectedIdea)
+                                ? 'Continue to Support Hub'
+                                : 'Explore & Pay Now'}
+                        </span>
                         <ArrowRight size={18} />
                     </button>
                 </div>
@@ -686,9 +720,9 @@ const BusinessIdeas = () => {
         }, [ideaId, selectedIdea, unlockedIdeaIds.join('|')]);
 
         const cards = selectedIdea?.ecosystemCards || [];
-        const activePlan = settings.businessPlans[selectedPlanIdx] || settings.businessPlans[0];
         const hubIcons = [Headphones, Bell, Calculator, Wrench];
         const freeIdea = isIdeaFree(selectedIdea);
+        const paidPlanName = userData?.activeBusinessPlan || null;
 
         if (cards.length === 0 && !loading) {
             return (
@@ -711,17 +745,21 @@ const BusinessIdeas = () => {
                         <div className="flex-1 min-w-0">
                             <p className="text-[10px] text-[#7A5648]">Access</p>
                             <p className="text-[15px] font-semibold text-[#462211] leading-tight">
-                                {isSubscribed
-                                    ? (userData?.activeBusinessPlan || activePlan?.title || 'Premium Plan')
+                                {hasActiveSupport
+                                    ? (paidPlanName || 'Premium Support')
                                     : freeIdea
                                         ? 'Free Idea Access'
                                         : 'Idea Unlocked'}
                             </p>
                         </div>
                         <div className="text-right shrink-0">
-                            <p className="text-[10px] text-[#7A5648]">{isSubscribed ? 'Amount Paid' : 'Status'}</p>
+                            <p className="text-[10px] text-[#7A5648]">{hasActiveSupport ? 'Support' : 'Status'}</p>
                             <p className="text-[18px] font-bold text-[#462211]">
-                                {isSubscribed ? `₹${activePlan?.price || '—'}` : freeIdea ? 'Free' : `₹${selectedIdea?.price || 0}`}
+                                {hasActiveSupport && timeRem
+                                    ? `${timeRem.days}d left`
+                                    : freeIdea
+                                        ? 'Free'
+                                        : (Number(selectedIdea?.price) > 0 ? `₹${selectedIdea.price}` : 'Open')}
                             </p>
                             <span className="inline-flex items-center gap-1 mt-1 bg-emerald-100 text-emerald-700 text-[9px] font-semibold px-2 py-0.5 rounded-full">
                                 <Check size={9} strokeWidth={3} /> Active
@@ -794,13 +832,18 @@ const BusinessIdeas = () => {
                         <div className="flex-1 min-w-0">
                             <p className="text-[13px] font-semibold text-[#462211]">Support Chat Box</p>
                             <p className="text-[10px] text-[#7A5648] mt-0.5">
-                                {isSubscribed ? 'Chat with business experts anytime' : `Renew support chat for ₹${SUPPORT_RENEWAL_AMOUNT} / ${SUPPORT_RENEWAL_DAYS} days`}
+                                {(() => {
+                                    if (hasActiveSupport) return 'Chat with business experts anytime';
+                                    const { amount, days } = getSupportRenewalQuote();
+                                    if (amount > 0) return `Renew support chat for ₹${amount} / ${days} days`;
+                                    return 'Renew support chat (price set by admin)';
+                                })()}
                             </p>
                         </div>
                         <button
                             type="button"
                             onClick={() => {
-                                if (isSubscribed) {
+                                if (hasActiveSupport) {
                                     navigate('/user/chat-support');
                                 } else {
                                     setPaymentMode('renew');
@@ -809,7 +852,7 @@ const BusinessIdeas = () => {
                             }}
                             className="shrink-0 bg-[#462211] text-white text-[10px] font-semibold px-3 py-2 rounded-lg flex items-center gap-1"
                         >
-                            <MessageSquare size={12} /> {isSubscribed ? 'Open Chat' : 'Renew Chat'}
+                            <MessageSquare size={12} /> {hasActiveSupport ? 'Open Chat' : 'Renew Chat'}
                         </button>
                     </div>
                 </div>
@@ -986,6 +1029,9 @@ const BusinessIdeas = () => {
                     onSuccess={() => {
                         setShowPaymentModal(false);
                         refreshUserProfile?.();
+                        fetchIdeas();
+                        fetchIdeaDetails();
+                        if (ideaId) navigate(`/user/business-ideas/${ideaId}/ecosystem`);
                     }}
                 />
             )}
@@ -1009,11 +1055,11 @@ const BusinessIdeas = () => {
                 <PaymentModal
                     isOpen={showPaymentModal}
                     onClose={() => setShowPaymentModal(false)}
-                    plan="3 Months Support Extension"
+                    plan={`${getSupportRenewalQuote().days} Days Support Extension`}
                     type="SUPPORT_CHAT_RENEWAL"
                     extraData={{
-                        planName: '3 Months Support Extension',
-                        durationInDays: SUPPORT_RENEWAL_DAYS
+                        planName: `${getSupportRenewalQuote().days} Days Support Extension`,
+                        durationInDays: getSupportRenewalQuote().days
                     }}
                     onSuccess={() => {
                         setShowPaymentModal(false);

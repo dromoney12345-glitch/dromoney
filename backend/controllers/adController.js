@@ -154,8 +154,7 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('Reward already claimed for this ad', 400));
     }
 
-    // Ads do not credit coins or INR — only track watch completion
-
+    // Ads do not credit coins or INR — only track watch completion for Future Fund
     user.lifetimeAdsWatched = (user.lifetimeAdsWatched || 0) + 1;
     user.watchedAds.push(adId);
     user.dailyAdCount += 1;
@@ -165,6 +164,16 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
 
     const cooldownSeconds = Math.floor(Math.random() * (60 - 30 + 1)) + 30;
     user.nextAdAvailableAt = new Date(Date.now() + cooldownSeconds * 1000);
+
+    let ffSynced = null;
+    try {
+        const Settings = require('../models/Settings');
+        const { syncFutureFundCriteria } = require('../utils/futureFund');
+        const settings = (await Settings.findOne()) || {};
+        ffSynced = await syncFutureFundCriteria(user, settings);
+    } catch (ffErr) {
+        console.error('Future Fund sync after catalog ad failed:', ffErr.message);
+    }
 
     await user.save();
 
@@ -178,7 +187,14 @@ exports.rewardUserForAd = asyncHandler(async (req, res, next) => {
             inrEarned: 0,
             newWalletBalance: user.wallet?.balance || 0,
             dailyAdCount: user.dailyAdCount,
-            nextAdAvailableAt: user.nextAdAvailableAt
+            nextAdAvailableAt: user.nextAdAvailableAt,
+            lifetimeAdsWatched: user.lifetimeAdsWatched || 0,
+            futureFund: {
+                status: user.futureFund?.status || 'locked',
+                progress: ffSynced?.progress ?? user.futureFund?.progress ?? 0,
+                eligible: !!ffSynced?.eligible,
+                criteria: ffSynced?.criteria || user.futureFund?.criteria || [],
+            },
         }
     });
 });

@@ -32,22 +32,24 @@ async function migrateBusinessIdeasToFreeStart() {
     if (freeIdeasMigrated) return;
     try {
         const Settings = require('../models/Settings');
-        const settings = await Settings.findOne().select('businessIdeasFreeStartMigrated');
-        if (settings?.businessIdeasFreeStartMigrated) {
+        const FLAG = 'businessIdeasFreeStartMigratedV3';
+        const settings = await Settings.findOne().select(`${FLAG} businessIdeasFreeStartMigratedV2`);
+        if (settings?.[FLAG]) {
             freeIdeasMigrated = true;
             return;
         }
+        // Clear legacy locks (₹199 seeds) and any leftover premium flags from older builds
         await BusinessIdea.updateMany(
-            { $or: [{ isPremium: true }, { price: { $gt: 0 } }] },
+            {},
             { $set: { isPremium: false, price: 0 } }
         );
         await Settings.updateOne(
             {},
-            { $set: { businessIdeasFreeStartMigrated: true } },
+            { $set: { [FLAG]: true, businessIdeasFreeStartMigratedV2: true, businessIdeasFreeStartMigrated: true } },
             { upsert: true }
         );
         freeIdeasMigrated = true;
-        console.log('[BusinessIdeas] Migrated existing ideas to free start');
+        console.log('[BusinessIdeas] Migrated all ideas to free start (V3)');
     } catch (err) {
         console.error('[BusinessIdeas] free-start migrate failed:', err.message);
     }

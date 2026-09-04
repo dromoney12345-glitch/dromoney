@@ -16,7 +16,7 @@ const { getPayments, updatePaymentStatus } = require('../controllers/adminPaymen
 const { getPromotions, updatePromotionStatus } = require('../controllers/adminPromotionController');
 const { getAllFeedbacks, markAsRead } = require('../controllers/feedbackController');
 const { getAllReports, updateReportStatus } = require('../controllers/reportController');
-const { sendBroadcast, getNotifications, deleteNotification, clearAllNotifications, updateNotification } = require('../controllers/notificationController');
+const { sendBroadcast, getNotifications, deleteNotification, clearAllNotifications, updateNotification, getJourneyNotificationSpec } = require('../controllers/notificationController');
 const { 
     adminGetBusinessIdeas, 
     createBusinessIdea, 
@@ -130,6 +130,8 @@ router.route('/notifications')
 
 router.route('/notifications/bulk/clear')
     .delete(protectAdmin, clearAllNotifications);
+
+router.get('/notifications/journey-spec', protectAdmin, getJourneyNotificationSpec);
 
 router.route('/notifications/:id')
     .delete(protectAdmin, deleteNotification)

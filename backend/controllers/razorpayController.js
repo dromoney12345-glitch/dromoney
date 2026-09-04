@@ -17,9 +17,20 @@ const razorpay = new Razorpay({
 const {
     quotePayment,
     BOOSTER_FEE_PERCENT,
-    SUPPORT_CHAT_RENEWAL_FEE,
     DEFAULT_UNLOCK_FEE,
 } = require('../utils/moneyQuotes');
+
+function unlockOnlyThisIdea(user, ideaId) {
+    if (!user || !ideaId) return false;
+    const ideaIdStr = String(ideaId);
+    user.unlockedIdeas = user.unlockedIdeas || [];
+    const already = user.unlockedIdeas.some((id) => id && id.toString() === ideaIdStr);
+    if (!already) {
+        user.unlockedIdeas.push(ideaId);
+        return true;
+    }
+    return false;
+}
 
 async function resolvePaymentQuote({ type, ideaId, planName, user }) {
     const settings = (await Settings.findOne()) || {};
@@ -27,16 +38,35 @@ async function resolvePaymentQuote({ type, ideaId, planName, user }) {
     if (type === 'BUSINESS_IDEA_UNLOCK') {
         const idea = await BusinessIdea.findById(ideaId);
         if (!idea) return { error: 'Business Idea not found', status: 404 };
+        if (idea.isPremium !== true || !(Number(idea.price) > 0)) {
+            return { error: 'This idea is free — no unlock payment needed', status: 400 };
+        }
         if (user?.unlockedIdeas?.map(String).includes(String(ideaId))) {
             return { error: 'Already unlocked', status: 400 };
         }
-        const q = quotePayment({ baseAmount: Number(idea.price) > 0 ? idea.price : 199, feePercent: 0 });
+        const q = quotePayment({ baseAmount: Number(idea.price), feePercent: 0 });
         return { ...q, planName: `Unlock: ${idea.title}`, paymentType: type, durationDays: 30 };
     }
 
     if (type === 'SUPPORT_CHAT_RENEWAL') {
-        const q = quotePayment({ baseAmount: SUPPORT_CHAT_RENEWAL_FEE, feePercent: 0 });
-        return { ...q, planName: '3 Months Support Extension', paymentType: type, durationDays: 90 };
+        const plans = settings.businessPlans || [];
+        const fromSettings = Number(settings.supportChatRenewalAmount);
+        const planPrices = plans
+            .map((p) => Number(p.price))
+            .filter((n) => Number.isFinite(n) && n > 0);
+        const fromPlans = planPrices.length ? Math.min(...planPrices) : 0;
+        const amount = fromSettings > 0 ? fromSettings : fromPlans;
+        if (!(amount > 0)) {
+            return { error: 'Support chat renewal price is not configured by admin', status: 400 };
+        }
+        const days = Number(settings.supportChatRenewalDays) > 0 ? Number(settings.supportChatRenewalDays) : 90;
+        const q = quotePayment({ baseAmount: amount, feePercent: 0 });
+        return {
+            ...q,
+            planName: `${days} Days Support Extension`,
+            paymentType: type,
+            durationDays: days,
+        };
     }
 
     if (type === 'SUPPORT_BOOSTER' || type === 'TASK_BOOSTER') {
@@ -55,13 +85,16 @@ async function resolvePaymentQuote({ type, ideaId, planName, user }) {
 
     if (type === 'BUSINESS_HUB_PLAN') {
         const plans = settings.businessPlans || [];
-        const plan = plans.find((p) => p.title === planName);
-        const q = quotePayment({ baseAmount: plan ? plan.price : 0, feePercent: 0 });
+        const plan = plans.find((p) => p.title === planName) || (planName ? null : plans[0]);
+        if (!plan || !(Number(plan.price) > 0)) {
+            return { error: 'Business plan is not configured by admin', status: 400 };
+        }
+        const q = quotePayment({ baseAmount: Number(plan.price), feePercent: 0 });
         return {
             ...q,
-            planName: planName || 'Business Hub Plan',
+            planName: plan.title || planName || 'Business Hub Plan',
             paymentType: type,
-            durationDays: plan?.durationInDays || 30,
+            durationDays: Number(plan.durationInDays) || 30,
         };
     }
 
@@ -109,7 +142,7 @@ exports.getPaymentQuote = asyncHandler(async (req, res, next) => {
 // @route   POST /api/user/data/razorpay/create-order
 // @access  Private
 exports.createOrder = asyncHandler(async (req, res, next) => {
-    const { type, ideaId, planName: reqPlanName } = req.body;
+    const { type, ideaId, planName: reqPlanName, planDuration: reqPlanDuration } = req.body;
     const user = await User.findById(req.user.id);
 
     const quote = await resolvePaymentQuote({ type, ideaId, planName: reqPlanName, user });
@@ -294,16 +327,10 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
         if (!user) return next(new ErrorResponse('User not found during unlock', 404));
 
         if (payment.paymentType === 'BUSINESS_IDEA_UNLOCK' && payment.businessIdea) {
-            console.log(`[PAYMENT] Unlocking Business Idea ${payment.businessIdea} for user ${user._id}`);
-            // Unlock Business Idea
-            const ideaIdStr = payment.businessIdea.toString();
-            const already = (user.unlockedIdeas || []).some((id) => id && id.toString() === ideaIdStr);
-            if (!already) {
-                user.unlockedIdeas.push(payment.businessIdea);
-                await user.save();
-            }
+            console.log(`[PAYMENT] Unlocking only Business Idea ${payment.businessIdea} for user ${user._id}`);
+            unlockOnlyThisIdea(user, payment.businessIdea);
+            await user.save();
 
-            // Create standard Transaction for user history
             const Transaction = require('../models/Transaction');
             await Transaction.create({
                 user: user._id,
@@ -356,6 +383,11 @@ exports.verifyPayment = asyncHandler(async (req, res, next) => {
             user.supportExpiry = currentExpiry;
             user.activeBusinessPlan = payment.plan || 'Premium Plan';
             user.businessPlanStatus = 'active';
+            // Premium Support bought from one idea → unlock ONLY that idea (never all)
+            if (payment.businessIdea) {
+                unlockOnlyThisIdea(user, payment.businessIdea);
+                console.log(`[PAYMENT] Hub plan unlocked only idea ${payment.businessIdea} for user ${user._id}`);
+            }
             await user.save();
 
             const Transaction = require('../models/Transaction');
@@ -472,17 +504,18 @@ exports.submitManualPayment = asyncHandler(async (req, res, next) => {
         finalAmount = Number(quote.payableAmount || quote.amount || finalAmount);
         planName = quote.planName || planName;
         durationDays = quote.durationDays || 180;
-    } else if (pType === 'BUSINESS_IDEA_UNLOCK') {
-        const idea = await BusinessIdea.findById(ideaId);
-        if (!idea) return next(new ErrorResponse('Business Idea not found', 404));
-        const alreadyUnlocked = (user.unlockedIdeas || []).some((id) => id.toString() === String(ideaId));
-        if (alreadyUnlocked) return next(new ErrorResponse('Idea already unlocked', 400));
-        finalAmount = Number(idea.price) > 0 ? Number(idea.price) : 199;
-        planName = reqPlanName || `Unlock: ${idea.title}`;
-    } else if (pType === 'SUPPORT_CHAT_RENEWAL') {
-        finalAmount = 150;
-        planName = reqPlanName || '3 Months Support Extension';
-        durationDays = 90;
+    } else if (pType === 'BUSINESS_IDEA_UNLOCK' || pType === 'SUPPORT_CHAT_RENEWAL' || pType === 'BUSINESS_HUB_PLAN') {
+        const quote = await resolvePaymentQuote({
+            type: pType,
+            ideaId,
+            planName: reqPlanName,
+            user,
+        });
+        if (quote.error) return next(new ErrorResponse(quote.error, quote.status || 400));
+        pType = quote.paymentType;
+        finalAmount = Number(quote.payableAmount || quote.amount || finalAmount);
+        planName = quote.planName || planName;
+        durationDays = quote.durationDays || durationDays;
     } else if (!reqPlanName) {
         if (pType === 'PLATFORM_UNLOCK') {
             planName = 'Lifetime Access';

@@ -9,7 +9,7 @@ const { migratePdfActivationSettings } = require('../utils/futureFund');
 exports.getPublicSettings = async (req, res) => {
     try {
         await migratePdfActivationSettings();
-        const settings = await Settings.findOne().select('appName contactEmail contactPhone adminUpiId qrScannerImage bankDetails referralSystemEnabled referralCommission referralLinkBaseUrl registrationFee minWithdrawal offerwallEnabled futureFundKycTarget futureFundDailyTasksTarget futureFundWatchAdTarget futureFundEventsTarget futureFundBoostersTarget futureFundSalesTarget futureFundDaysTarget futureFundActivityMinutes businessPlans maintenanceMode registrationOpen taskWindowStart taskWindowEnd taskRenewalHours kycWindowStart kycWindowEnd');
+        const settings = await Settings.findOne().select('appName contactEmail contactPhone adminUpiId qrScannerImage bankDetails referralSystemEnabled referralCommission referralLinkBaseUrl registrationFee minWithdrawal offerwallEnabled futureFundKycTarget futureFundDailyTasksTarget futureFundWatchAdTarget futureFundEventsTarget futureFundBoostersTarget futureFundSalesTarget futureFundDaysTarget futureFundActivityMinutes businessPlans supportChatRenewalAmount supportChatRenewalDays maintenanceMode registrationOpen taskWindowStart taskWindowEnd taskRenewalHours kycWindowStart kycWindowEnd');
         
         // Add fallbacks for existing documents that might not have newer schema fields
         const responseData = settings ? settings.toObject() : {

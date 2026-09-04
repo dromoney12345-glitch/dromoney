@@ -147,8 +147,13 @@ const SettingsSchema = new mongoose.Schema({
     // Withdrawal Card renewal display
     cardRenewalAmount: { type: Number, default: 199 },
     cardRenewalDisplayAmount: { type: Number, default: 699 },
-    // One-shot: business ideas opened free (legacy ₹199 locks cleared once)
+    // One-shot: business ideas opened free (legacy ₹199 locks cleared)
     businessIdeasFreeStartMigrated: { type: Boolean, default: false },
+    businessIdeasFreeStartMigratedV2: { type: Boolean, default: false },
+    businessIdeasFreeStartMigratedV3: { type: Boolean, default: false },
+    // Support chat renewal (user panel — must match admin, never hardcode)
+    supportChatRenewalAmount: { type: Number, default: 0 },
+    supportChatRenewalDays: { type: Number, default: 90 },
     adminEmail: {
         type: String,
         default: 'admin@dromoney.com'

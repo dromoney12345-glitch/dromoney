@@ -179,7 +179,13 @@ async function syncFutureFundCriteria(user, settings = {}) {
         }
     }
 
-    // Do not auto-activate — user taps Activate Fund.
+    // Never keep Active if all 3 criteria are not actually met (blocks forced / stale activations).
+    if (user.futureFund.status === 'active' && !eligible) {
+        user.futureFund.status = 'locked';
+        modified = true;
+    }
+
+    // Do not auto-activate — user taps Activate Fund only after eligible === true.
 
     return {
         user,

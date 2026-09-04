@@ -1,18 +1,19 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Clock, MonitorPlay, Sparkles, TrendingUp, RefreshCw, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { ChevronLeft, Clock, MonitorPlay, Sparkles, TrendingUp, RefreshCw, AlertTriangle, CheckCircle, XCircle, Play } from 'lucide-react';
 import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
-import UnlockModal from '../components/UnlockModal';
 import { showFlutterRewardedAd, isFlutterApp } from '../../shared/utils/flutterAds';
 
 const WatchAndEarn = () => {
     const navigate = useNavigate();
     const { userData, refreshUserProfile } = useUser();
     const [status, setStatus] = useState(null);
+    const [catalogAds, setCatalogAds] = useState([]);
     const [loading, setLoading] = useState(true);
     const [calling, setCalling] = useState(false);
     const [toast, setToast] = useState(null);
+    const inFlutter = isFlutterApp();
 
     const showToast = (message, type = 'success') => {
         setToast({ message, type });
@@ -20,6 +21,23 @@ const WatchAndEarn = () => {
     };
 
     const [isRefreshingCoins, setIsRefreshingCoins] = useState(false);
+
+    const fetchStatus = useCallback(async () => {
+        setLoading(true);
+        try {
+            const [rewardRes, adsRes] = await Promise.all([
+                api.get('/reward/status'),
+                api.get('/public/ads').catch(() => null),
+            ]);
+            if (rewardRes.success) setStatus(rewardRes);
+            if (adsRes?.success) setCatalogAds(adsRes.data || []);
+        } catch (err) {
+            console.error('Error fetching reward status:', err);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     const handleRefreshCoins = async () => {
         setIsRefreshingCoins(true);
         await refreshUserProfile(false);
@@ -27,23 +45,25 @@ const WatchAndEarn = () => {
         setIsRefreshingCoins(false);
     };
 
-    const fetchStatus = async () => {
-        setLoading(true);
-        try {
-            const res = await api.get('/reward/status');
-            if (res.success) {
-                setStatus(res);
-            }
-        } catch (err) {
-            console.error('Error fetching reward status:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
         fetchStatus();
-    }, []);
+    }, [fetchStatus]);
+
+    // Returning from AdPlayer / app switch — refresh FF ad progress
+    useEffect(() => {
+        const onVisible = () => {
+            if (document.visibilityState === 'visible') {
+                fetchStatus();
+                refreshUserProfile?.(false);
+            }
+        };
+        document.addEventListener('visibilitychange', onVisible);
+        window.addEventListener('focus', onVisible);
+        return () => {
+            document.removeEventListener('visibilitychange', onVisible);
+            window.removeEventListener('focus', onVisible);
+        };
+    }, [fetchStatus, refreshUserProfile]);
 
     const claimLock = useRef(false);
 
@@ -53,7 +73,10 @@ const WatchAndEarn = () => {
         try {
             const claimRes = await api.post('/reward/claim', { earned: true, source: 'admob' });
             if (claimRes.success) {
-                showToast('Ad completed. Progress updated.');
+                const ffAds = claimRes.futureFund?.criteria?.find((c) => c.unit === 'ads' || c.id === 2);
+                const current = ffAds?.current ?? claimRes.lifetimeAdsWatched;
+                const target = ffAds?.target ?? status?.futureFundAdsTarget ?? 50;
+                showToast(`Ad counted for Future Fund (${Math.min(current, target)}/${target}).`);
             } else {
                 showToast(claimRes.message || 'Could not record this ad.', 'error');
             }
@@ -64,9 +87,8 @@ const WatchAndEarn = () => {
         await fetchStatus();
         if (refreshUserProfile) await refreshUserProfile();
         claimLock.current = false;
-    }, [refreshUserProfile]);
+    }, [refreshUserProfile, fetchStatus, status?.futureFundAdsTarget]);
 
-    // Native may fire these; they must NEVER claim. Only a finished rewarded ad claims.
     useEffect(() => {
         window.refreshRewardStatus = async () => {
             await fetchStatus();
@@ -75,7 +97,7 @@ const WatchAndEarn = () => {
         return () => {
             delete window.refreshRewardStatus;
         };
-    }, [refreshUserProfile]);
+    }, [refreshUserProfile, fetchStatus]);
 
     const [cooldownRemaining, setCooldownRemaining] = useState(0);
 
@@ -97,7 +119,7 @@ const WatchAndEarn = () => {
             });
         }, 1000);
         return () => clearInterval(t);
-    }, [status?.nextAdIn]);
+    }, [status?.nextAdIn, fetchStatus]);
 
     const handleWatchAd = async () => {
         if (!status?.available) {
@@ -108,8 +130,13 @@ const WatchAndEarn = () => {
         setCalling(true);
 
         try {
-            if (!isFlutterApp()) {
-                showToast('Open the DroMoney app to watch live ads.', 'error');
+            if (!inFlutter) {
+                const next = catalogAds.find((a) => !a.isWatched);
+                if (next?._id) {
+                    navigate(`/user/ad-player/${next._id}`);
+                    return;
+                }
+                showToast('No catalog ads left today. Open the DroMoney app for AdMob ads.', 'error');
                 return;
             }
 
@@ -142,6 +169,12 @@ const WatchAndEarn = () => {
 
     const maxDailyLimit = status?.maxDailyLimit || 10;
     const dailyAdCount = status ? (maxDailyLimit - status.remainingAds) : 0;
+    const ffAdsTarget = Number(status?.futureFundAdsTarget) || 50;
+    const ffAdsCurrent = Math.min(
+        ffAdsTarget,
+        Number(status?.lifetimeAdsWatched ?? userData?.lifetimeAdsWatched ?? 0)
+    );
+    const unwatchedCatalog = catalogAds.filter((a) => !a.isWatched);
 
     return (
         <div className="pb-24 bg-[#FCF8F5] font-['Poppins'] min-h-screen">
@@ -154,10 +187,9 @@ const WatchAndEarn = () => {
                 </div>
             )}
 
-            {/* Header with back button */}
             <div className="bg-white px-4 py-2.5 flex items-center justify-between sticky top-0 z-40 border-b border-[#EDE4DC]">
                 <div className="flex items-center gap-3">
-                    <button onClick={() => navigate(-1)} className="text-[#462211] active:scale-95 transition-all">
+                    <button type="button" onClick={() => navigate(-1)} className="text-[#462211] active:scale-95 transition-all">
                         <ChevronLeft size={22} strokeWidth={2.2} />
                     </button>
                     <h1 className="text-[17px] font-semibold text-[#462211] tracking-tight">Watch Ads</h1>
@@ -171,7 +203,7 @@ const WatchAndEarn = () => {
                             <Sparkles size={9} className="text-[#462211]" />
                             <span className="text-[8px] text-[#462211] uppercase tracking-widest">Daily Ads</span>
                         </div>
-                        <p className="text-[#7A5648] text-[10px]">AdMob ads only — no coins or wallet credit</p>
+                        <p className="text-[#7A5648] text-[10px]">Each completed ad counts toward Future Fund (50)</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <button type="button" onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-8 h-8 flex items-center justify-center bg-[#F3E8E0] text-[#462211] rounded-full active:scale-95 transition-all">
@@ -188,7 +220,7 @@ const WatchAndEarn = () => {
                         <TrendingUp size={14} className="text-[#462211]" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="text-[8px] text-[#7A5648] uppercase tracking-wider leading-none mb-1">Today's Progress</p>
+                        <p className="text-[8px] text-[#7A5648] uppercase tracking-wider leading-none mb-1">Today&apos;s Progress</p>
                         <div className="flex items-center gap-2">
                             <div className="flex-1 h-1.5 bg-[#F3E8E0] rounded-full overflow-hidden">
                                 <div
@@ -200,9 +232,22 @@ const WatchAndEarn = () => {
                         </div>
                     </div>
                 </div>
+
+                <div className="mt-2 bg-white border border-[#EDE4DC] rounded-xl p-2.5">
+                    <p className="text-[8px] text-[#7A5648] uppercase tracking-wider mb-1">Future Fund — Ads</p>
+                    <div className="flex items-center gap-2">
+                        <div className="flex-1 h-1.5 bg-[#F3E8E0] rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-[#462211] rounded-full transition-all duration-500"
+                                style={{ width: `${Math.round((ffAdsCurrent / ffAdsTarget) * 100)}%` }}
+                            />
+                        </div>
+                        <span className="text-[10px] font-semibold text-[#462211] shrink-0">{ffAdsCurrent}/{ffAdsTarget}</span>
+                    </div>
+                </div>
             </div>
 
-            <div className="px-3 mt-4 space-y-3">
+            <div className="px-3 mt-2 space-y-3">
                 {loading && !status ? (
                     <div className="py-12 text-center text-slate-400 text-[11px] uppercase tracking-widest">Loading...</div>
                 ) : (
@@ -236,7 +281,14 @@ const WatchAndEarn = () => {
                                 <div className="relative z-10">
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
-                                            <h3 className="text-slate-800 text-[15px] font-medium">Daily Ad</h3>
+                                            <h3 className="text-slate-800 text-[15px] font-medium">
+                                                {inFlutter ? 'AdMob Rewarded Ad' : 'Watch Ad'}
+                                            </h3>
+                                            <p className="text-[10px] text-slate-400 mt-0.5">
+                                                {inFlutter
+                                                    ? 'Full rewarded ad required — close/back does not count'
+                                                    : 'Play a catalog ad to count toward Future Fund'}
+                                            </p>
                                         </div>
                                         <div className="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1.5">
                                             <CheckCircle size={12} />
@@ -256,6 +308,32 @@ const WatchAndEarn = () => {
                                         <MonitorPlay size={16} />
                                         {calling ? 'Launching Ad...' : 'Watch Ad Now'}
                                     </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {!inFlutter && unwatchedCatalog.length > 0 && status?.remainingAds > 0 && (
+                            <div className="bg-white border border-[#EDE4DC] rounded-xl overflow-hidden">
+                                <div className="px-3 py-2.5 border-b border-[#EDE4DC] bg-[#FFF8F3]">
+                                    <p className="text-[11px] font-semibold text-[#462211]">Catalog ads (count for Future Fund)</p>
+                                </div>
+                                <div className="divide-y divide-[#EDE4DC]">
+                                    {unwatchedCatalog.slice(0, 8).map((ad) => (
+                                        <button
+                                            key={ad._id}
+                                            type="button"
+                                            onClick={() => navigate(`/user/ad-player/${ad._id}`)}
+                                            className="w-full flex items-center gap-3 px-3 py-3 text-left active:bg-[#FFF5F0]"
+                                        >
+                                            <div className="w-9 h-9 rounded-lg bg-[#462211] text-white flex items-center justify-center shrink-0">
+                                                <Play size={14} fill="currentColor" />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-[12px] font-medium text-[#462211] truncate">{ad.title || 'Advertisement'}</p>
+                                                <p className="text-[10px] text-[#7A5648]">{ad.duration || 30}s · tap to watch</p>
+                                            </div>
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                         )}

@@ -5,9 +5,6 @@ import api from '../../shared/services/api';
 import { useUser } from '../context/UserContext';
 import PaymentModal from '../components/PaymentModal';
 
-const SUPPORT_RENEWAL_AMOUNT = 150;
-const SUPPORT_RENEWAL_DAYS = 90;
-
 const ChatSupportPage = () => {
     const navigate = useNavigate();
     const { userData, refreshUserProfile, addNotification } = useUser();
@@ -15,12 +12,33 @@ const ChatSupportPage = () => {
     const [newMessage, setNewMessage] = useState('');
     const [sending, setSending] = useState(false);
     const [showRenewalModal, setShowRenewalModal] = useState(false);
+    const [renewalAmount, setRenewalAmount] = useState(0);
+    const [renewalDays, setRenewalDays] = useState(90);
     const scrollRef = useRef(null);
 
     const hasActiveSupport = userData?.supportExpiry && new Date(userData.supportExpiry) > new Date();
     const daysLeft = hasActiveSupport
         ? Math.ceil((new Date(userData.supportExpiry) - new Date()) / (1000 * 60 * 60 * 24))
         : 0;
+
+    useEffect(() => {
+        const loadRenewalSettings = async () => {
+            try {
+                const res = await api.get('/public/settings');
+                if (!res.success || !res.data) return;
+                const fromSettings = Number(res.data.supportChatRenewalAmount) || 0;
+                const planPrices = (res.data.businessPlans || [])
+                    .map((p) => Number(p.price))
+                    .filter((n) => Number.isFinite(n) && n > 0);
+                const fromPlans = planPrices.length ? Math.min(...planPrices) : 0;
+                setRenewalAmount(fromSettings > 0 ? fromSettings : fromPlans);
+                setRenewalDays(Number(res.data.supportChatRenewalDays) > 0 ? Number(res.data.supportChatRenewalDays) : 90);
+            } catch (err) {
+                console.error('Renewal settings error', err);
+            }
+        };
+        loadRenewalSettings();
+    }, []);
 
     useEffect(() => {
         if (hasActiveSupport) fetchMessages();
@@ -65,6 +83,10 @@ const ChatSupportPage = () => {
             setSending(false);
         }
     };
+
+    const renewalLabel = renewalAmount > 0
+        ? `Renew support chat for ₹${renewalAmount} and get ${renewalDays} days of expert help.`
+        : `Renew support chat for ${renewalDays} days of expert help.`;
 
     return (
         <div className="flex flex-col font-['Poppins',sans-serif] bg-[#FCF8F5]" style={{ height: 'calc(100vh - 48px - 80px)', overflow: 'hidden' }}>
@@ -121,7 +143,7 @@ const ChatSupportPage = () => {
                             {userData?.supportExpiry ? 'Support Plan Expired' : 'Support Chat Locked'}
                         </h4>
                         <p className="text-[11px] text-[#7A5648] font-medium leading-relaxed px-2">
-                            Renew support chat for ₹{SUPPORT_RENEWAL_AMOUNT} and get {SUPPORT_RENEWAL_DAYS} days of expert help.
+                            {renewalLabel}
                         </p>
                         <button
                             type="button"
@@ -129,7 +151,7 @@ const ChatSupportPage = () => {
                             className="w-full bg-[#462211] text-white py-3 rounded-xl text-[11px] font-semibold uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all"
                         >
                             <CreditCard size={16} />
-                            Renew · ₹{SUPPORT_RENEWAL_AMOUNT}
+                            {renewalAmount > 0 ? `Renew · ₹${renewalAmount}` : 'Renew Support'}
                         </button>
                         <button
                             type="button"
@@ -157,7 +179,7 @@ const ChatSupportPage = () => {
                             disabled={sending || !newMessage.trim()}
                             className="w-11 h-11 bg-[#462211] text-white rounded-xl flex items-center justify-center active:scale-90 transition-all disabled:opacity-50 shadow-md shrink-0"
                         >
-                            {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                            {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={16} />}
                         </button>
                     </form>
                 </div>
@@ -167,11 +189,11 @@ const ChatSupportPage = () => {
                 <PaymentModal
                     isOpen={showRenewalModal}
                     onClose={() => setShowRenewalModal(false)}
-                    plan="3 Months Support Extension"
+                    plan={`${renewalDays} Days Support Extension`}
                     type="SUPPORT_CHAT_RENEWAL"
                     extraData={{
-                        planName: '3 Months Support Extension',
-                        durationInDays: SUPPORT_RENEWAL_DAYS
+                        planName: `${renewalDays} Days Support Extension`,
+                        durationInDays: renewalDays
                     }}
                     onSuccess={() => {
                         setShowRenewalModal(false);

@@ -9,12 +9,14 @@ const Notifications = () => {
     const [sent, setSent] = useState(false);
     const [loading, setLoading] = useState(false);
     const [history, setHistory] = useState([]);
+    const [journeySpec, setJourneySpec] = useState([]);
     const [userStats, setUserStats] = useState({ totalActive: 0 });
     const [audience, setAudience] = useState('all');
     const [userQuery, setUserQuery] = useState('');
     const [userResults, setUserResults] = useState([]);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [scheduledAt, setScheduledAt] = useState('');
+    const [editingId, setEditingId] = useState(null);
 
     // Toast state
     const [toast, setToast] = useState(null); // { message: '', type: 'success' | 'error' }
@@ -27,7 +29,17 @@ const Notifications = () => {
     useEffect(() => {
         fetchHistory();
         fetchStats();
+        fetchJourneySpec();
     }, []);
+
+    const fetchJourneySpec = async () => {
+        try {
+            const res = await api.get('/admin/notifications/journey-spec');
+            if (res.success) setJourneySpec(res.data || []);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     useEffect(() => {
         if (audience === 'all' || userQuery.trim().length < 2) {
@@ -94,8 +106,7 @@ const Notifications = () => {
         try {
             const res = await api.get('/admin/notifications');
             if (res.success) {
-                // Sorting is already descending from backend, but double checking here
-                const sorted = [...res.data].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                const sorted = [...(res.data || [])].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 setHistory(sorted);
             }
         } catch (err) { console.error(err); }
@@ -172,7 +183,30 @@ const Notifications = () => {
 
             <div className="mb-6 bg-white rounded-lg border border-slate-100 shadow-sm p-4">
                 <h3 className="text-[12px] font-medium text-slate-800 uppercase tracking-normal mb-3">Automatic notifications</h3>
-                <p className="text-[11px] text-slate-500 mb-3">These fire only on the matching event. The same event is not sent twice. If the app token is not saved yet, the push is queued until the phone registers.</p>
+                <p className="text-[11px] text-slate-500 mb-3">
+                    These fire only on the matching event. The same event is not sent twice (where marked once-only).
+                    If the app token is not saved yet, the push is queued until the phone registers.
+                </p>
+                {journeySpec.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-[280px] overflow-y-auto custom-scrollbar">
+                        {journeySpec.map((item) => (
+                            <div key={item.step} className="border border-slate-100 rounded-lg p-3 bg-slate-50/50">
+                                <div className="flex items-start justify-between gap-2 mb-1">
+                                    <p className="text-[12px] font-semibold text-slate-800 leading-tight">{item.title}</p>
+                                    <span className={`text-[9px] font-medium uppercase px-1.5 py-0.5 rounded shrink-0 ${
+                                        item.onceOnly ? 'bg-amber-50 text-amber-700' : 'bg-sky-50 text-sky-700'
+                                    }`}>
+                                        {item.onceOnly ? 'Once' : 'Repeatable'}
+                                    </span>
+                                </div>
+                                <p className="text-[10px] text-slate-500 font-mono mb-1">{item.step}</p>
+                                <p className="text-[11px] text-slate-600 leading-snug line-clamp-2">{item.body}</p>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-[11px] text-slate-400">Loading automatic notification rules…</p>
+                )}
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
@@ -325,7 +359,11 @@ const Notifications = () => {
                                 <div className="mt-5 flex items-center justify-between">
                                     <div className="flex items-center gap-3 px-4 py-2.5 bg-sky-50 rounded-lg border border-sky-100">
                                         <Users size={16} className="text-sky-500" />
-                                        <span className="text-[13px] font-medium text-sky-600 uppercase tracking-wide">{n.recipients?.toLocaleString()} Recipients</span>
+                                        <span className="text-[13px] font-medium text-sky-600 uppercase tracking-wide">
+                                            {n.status === 'scheduled'
+                                                ? 'Scheduled'
+                                                : `${(n.recipients ?? 0).toLocaleString()} Recipients`}
+                                        </span>
                                     </div>
                                 </div>
                             </div>

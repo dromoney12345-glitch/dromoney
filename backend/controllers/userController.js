@@ -426,6 +426,20 @@ exports.getFutureFundStatus = asyncHandler(async (req, res, next) => {
         ]),
     ]);
 
+    const getISTDateString = (dateObj) =>
+        new Date(new Date(dateObj).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })).toDateString();
+
+    const todayIstStr = getISTDateString(new Date());
+    const resetIstStr = getISTDateString(user.lastAdCountResetAt || 0);
+    const adsWatchedToday = todayIstStr === resetIstStr
+        ? Math.max(user.todayRewardCount || 0, user.dailyAdCount || 0)
+        : 0;
+    const tasksCompletedToday = (user.dailyTaskCompletions || []).filter(
+        (tc) => getISTDateString(tc.completedAt) === todayIstStr
+    ).length;
+    const dailyAdTarget = Number(settings.adMaxDailyLimit) || 10;
+    const dailyTaskTarget = 10;
+
     res.status(200).json({
         success: true,
         data: {
@@ -439,6 +453,16 @@ exports.getFutureFundStatus = asyncHandler(async (req, res, next) => {
             successfulSales: synced.salesCurrent,
             todayEarnings: todayAgg[0]?.total || 0,
             lifetimeEarnings: lifeAgg[0]?.total || 0,
+            dailyProgress: {
+                ads: {
+                    current: Math.min(dailyAdTarget, adsWatchedToday),
+                    target: dailyAdTarget,
+                },
+                tasks: {
+                    current: Math.min(dailyTaskTarget, tasksCompletedToday),
+                    target: dailyTaskTarget,
+                },
+            },
         }
     });
 });
@@ -505,6 +529,10 @@ exports.unlockFutureFund = asyncHandler(async (req, res, next) => {
     const synced = await syncFutureFundCriteria(user, settings);
 
     if (!synced.eligible) {
+        if (user.futureFund?.status === 'active') {
+            user.futureFund.status = 'locked';
+            await user.save({ validateBeforeSave: false });
+        }
         const missing = synced.criteria
             .filter((c) => !c.completed)
             .map((c) => `${c.title} (${c.current}/${c.target})`)
@@ -512,7 +540,9 @@ exports.unlockFutureFund = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse(`Complete all criteria first: ${missing}`, 400));
     }
 
+    // Activate only after KYC + Ads + Tasks targets are all met.
     user.futureFund.status = 'active';
+    user.futureFund.progress = 100;
     await user.save({ validateBeforeSave: false });
 
     try {

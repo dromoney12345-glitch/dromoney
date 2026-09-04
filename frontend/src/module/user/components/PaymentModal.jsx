@@ -119,7 +119,7 @@ const PaymentModal = ({ isOpen, onClose, plan, amount, type = 'PLATFORM_UNLOCK',
 
         try {
             const formData = new FormData();
-            formData.append('amount', amount);
+            formData.append('amount', String(Number(quote?.payableAmount ?? amount ?? 0)));
             formData.append('type', type);
             formData.append('planName', extraData.planName || plan);
             formData.append('utrNumber', utrNumber);

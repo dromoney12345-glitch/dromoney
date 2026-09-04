@@ -24,6 +24,19 @@ const startFutureFundCron = () => {
                 }
             }
 
+            // Re-verify active users — lock anyone who no longer meets all criteria
+            const maybeActive = await User.find({ 'futureFund.status': 'active' }).limit(5000);
+            for (const user of maybeActive) {
+                try {
+                    const synced = await syncFutureFundCriteria(user, settings);
+                    if (synced.modified) {
+                        await user.save({ validateBeforeSave: false });
+                    }
+                } catch (e) {
+                    console.error('FF active recheck failed for', user._id, e.message);
+                }
+            }
+
             const activeUsers = await User.find({ 'futureFund.status': 'active' });
             if (activeUsers.length === 0) {
                 console.log('No active Future Fund users found. Skipping distribution.');

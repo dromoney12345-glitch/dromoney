@@ -6,9 +6,18 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const { getLastRenewalTick } = require('../utils/taskRenewal');
 const { syncFutureFundCriteria } = require('../utils/futureFund');
-const { sendOtpSMS } = require('../utils/smsService');
+const { sendOtpSMS, normalizePhone } = require('../utils/smsService');
 
 const { findReferrerByCode } = require('../utils/referralCode');
+
+async function saveOtpForPhone(phone, otp) {
+    await Otp.deleteMany({ phone });
+    return Otp.create({ phone, code: otp });
+}
+
+async function findValidOtp(phone, code) {
+    return Otp.findOne({ phone, code: String(code).trim() }).sort({ createdAt: -1 });
+}
 
 // @desc    Register user
 // @route   POST /api/user/auth/register
@@ -29,24 +38,27 @@ exports.register = async (req, res, next) => {
             return next(new ErrorResponse('Please provide phone and OTP', 400));
         }
 
+        const trimmedPhoneEarly = normalizePhone(phone);
+        const otpCode = String(otp).trim();
+
         // Mock OTP bypass — ONLY for test number 9999999999
-        const isMockTestNumber = phone === '9999999999';
-        const isMockOtp = otp === '123456';
+        const isMockTestNumber = trimmedPhoneEarly === '9999999999';
+        const isMockOtp = otpCode === '123456';
 
         // Verify OTP: allow mock bypass for test number, otherwise check DB
         let otpRecord = null;
         if (!(isMockTestNumber && isMockOtp)) {
-            otpRecord = await Otp.findOne({ phone, code: otp });
+            otpRecord = await findValidOtp(trimmedPhoneEarly, otpCode);
             if (!otpRecord) {
                 return next(new ErrorResponse('Invalid or expired OTP', 401));
             }
         }
 
         // Delete OTP after verification (skip for mock)
-        if (otpRecord) await Otp.deleteOne({ _id: otpRecord._id });
+        if (otpRecord) await Otp.deleteMany({ phone: trimmedPhoneEarly });
 
         // Check if user already exists
-        const trimmedPhone = phone ? phone.trim() : '';
+        const trimmedPhone = trimmedPhoneEarly;
         const trimmedEmail = email ? email.trim().toLowerCase() : '';
 
         const userWithPhone = (trimmedPhone && trimmedPhone !== '') ? await User.findOne({ phone: trimmedPhone }) : null;
@@ -140,35 +152,35 @@ exports.sendRegisterOtp = async (req, res, next) => {
             return next(new ErrorResponse('Please provide a phone number', 400));
         }
 
-        // Check if phone or email already registered
-        const trimmedPhone = phone ? phone.trim() : '';
+        const trimmedPhone = normalizePhone(phone);
         const trimmedEmail = email ? email.trim().toLowerCase() : '';
 
-        const userWithPhone = (trimmedPhone && trimmedPhone !== '') ? await User.findOne({ phone: trimmedPhone }) : null;
+        if (!/^[6-9]\d{9}$/.test(trimmedPhone) && trimmedPhone !== '9999999999') {
+            return next(new ErrorResponse('Please enter a valid 10-digit mobile number', 400));
+        }
+
+        const userWithPhone = trimmedPhone ? await User.findOne({ phone: trimmedPhone }) : null;
         if (userWithPhone) {
             return next(new ErrorResponse('This phone number is already registered.', 400));
         }
 
-        const userWithEmail = (trimmedEmail && trimmedEmail !== '') ? await User.findOne({ email: trimmedEmail }) : null;
+        const userWithEmail = trimmedEmail ? await User.findOne({ email: trimmedEmail }) : null;
         if (userWithEmail) {
             return next(new ErrorResponse('This email address is already registered.', 400));
         }
 
-        // Generate a 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        
-        // Save to DB
-        await Otp.create({ phone, code: otp });
+        await saveOtpForPhone(trimmedPhone, otp);
 
-        console.log(`[OTP] Registration OTP generated for ${phone}: ${otp}`);
+        console.log(`[OTP] Registration OTP generated for ${trimmedPhone}`);
 
-        // Skip SMS for testing number
-        if (phone !== '9999999999') {
+        if (trimmedPhone !== '9999999999') {
             try {
-                await sendOtpSMS(phone, otp);
+                await sendOtpSMS(trimmedPhone, otp);
             } catch (smsErr) {
-                console.error(`[SMS Service Error] Failed to send registration OTP to ${phone}:`, smsErr.message);
-                // Gracefully continue so that registration is not blocked by SMS gateway failures
+                console.error(`[SMS Service Error] Failed to send registration OTP to ${trimmedPhone}:`, smsErr.message);
+                await Otp.deleteMany({ phone: trimmedPhone });
+                return next(new ErrorResponse('OTP SMS could not be sent. Please try again in a minute.', 502));
             }
         }
 
@@ -192,10 +204,15 @@ exports.sendLoginOtp = async (req, res, next) => {
             return next(new ErrorResponse('Please provide a phone number', 400));
         }
 
-        let user = await User.findOne({ phone });
+        const trimmedPhone = normalizePhone(phone);
+        if (!/^[6-9]\d{9}$/.test(trimmedPhone) && trimmedPhone !== '9999999999') {
+            return next(new ErrorResponse('Please enter a valid 10-digit mobile number', 400));
+        }
+
+        let user = await User.findOne({ phone: trimmedPhone });
 
         // Auto-create test account for 9999999999 if not present
-        if (phone === '9999999999' && !user) {
+        if (trimmedPhone === '9999999999' && !user) {
             user = await User.create({
                 name: 'Test Account',
                 email: 'testaccount@gmail.com',
@@ -209,26 +226,22 @@ exports.sendLoginOtp = async (req, res, next) => {
             return next(new ErrorResponse('No account found with this phone number. Please register.', 404));
         }
 
-        // Check if user is blocked
         if (user.isBlocked) {
             return next(new ErrorResponse('Your account has been blocked. Please contact support.', 403));
         }
 
-        // Generate a 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        
-        // Save to DB
-        await Otp.create({ phone, code: otp });
+        await saveOtpForPhone(trimmedPhone, otp);
 
-        console.log(`[OTP] Login OTP generated for ${phone}: ${otp}`);
+        console.log(`[OTP] Login OTP generated for ${trimmedPhone}`);
 
-        // Skip SMS for testing number
-        if (phone !== '9999999999') {
+        if (trimmedPhone !== '9999999999') {
             try {
-                await sendOtpSMS(phone, otp);
+                await sendOtpSMS(trimmedPhone, otp);
             } catch (smsErr) {
-                console.error(`[SMS Service Error] Failed to send login OTP to ${phone}:`, smsErr.message);
-                // Gracefully continue so that login is not blocked by SMS gateway failures
+                console.error(`[SMS Service Error] Failed to send login OTP to ${trimmedPhone}:`, smsErr.message);
+                await Otp.deleteMany({ phone: trimmedPhone });
+                return next(new ErrorResponse('OTP SMS could not be sent. Please try again in a minute.', 502));
             }
         }
 
@@ -252,29 +265,29 @@ exports.verifyLoginOtp = async (req, res, next) => {
             return next(new ErrorResponse('Please provide phone and OTP', 400));
         }
 
-        // Mock OTP bypass — ONLY for test number 9999999999
-        const isMockTestNumber = phone === '9999999999';
-        const isMockOtp = otp === '123456';
+        const trimmedPhone = normalizePhone(phone);
+        const code = String(otp).trim();
 
-        // Verify OTP: allow mock bypass for test number, otherwise check DB
+        // Mock OTP bypass — ONLY for test number 9999999999
+        const isMockTestNumber = trimmedPhone === '9999999999';
+        const isMockOtp = code === '123456';
+
         let otpRecord = null;
         if (!(isMockTestNumber && isMockOtp)) {
-            otpRecord = await Otp.findOne({ phone, code: otp });
+            otpRecord = await findValidOtp(trimmedPhone, code);
             if (!otpRecord) {
                 return next(new ErrorResponse('Invalid or expired OTP', 401));
             }
         }
 
-        // Delete OTP after verification (skip for mock)
-        if (otpRecord) await Otp.deleteOne({ _id: otpRecord._id });
+        if (otpRecord) await Otp.deleteMany({ phone: trimmedPhone });
 
-        const user = await User.findOne({ phone });
+        const user = await User.findOne({ phone: trimmedPhone });
 
         if (!user) {
             return next(new ErrorResponse('User not found', 404));
         }
 
-        // Check if user is blocked
         if (user.isBlocked) {
             return next(new ErrorResponse('Your account has been blocked. Please contact support.', 403));
         }

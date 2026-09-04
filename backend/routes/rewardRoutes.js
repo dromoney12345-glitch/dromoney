@@ -65,7 +65,10 @@ router.get('/status', async (req, res) => {
             nextAdIn, // in seconds
             remainingAds,
             maxDailyLimit: MAX_DAILY_ADS,
-            rewardAmount: 0
+            rewardAmount: 0,
+            lifetimeAdsWatched: user.lifetimeAdsWatched || 0,
+            todayRewardCount: user.todayRewardCount || 0,
+            futureFundAdsTarget: Number(settings.futureFundWatchAdTarget) || 50,
         });
     } catch (err) {
         console.error(err);
@@ -110,10 +113,19 @@ router.post('/claim', rewardLimiter, idempotency(), async (req, res) => {
             }
         }
 
-        // Watch & Earn does not credit coins or INR — track completion for Future Fund (50 ads)
+        // Watch & Earn — track for Future Fund lifetime ads + daily score
         user.lastRewardAt = new Date();
         user.todayRewardCount = (user.todayRewardCount || 0) + 1;
+        user.dailyAdCount = (user.dailyAdCount || 0) + 1;
         user.lifetimeAdsWatched = (user.lifetimeAdsWatched || 0) + 1;
+
+        let ffSynced = null;
+        try {
+            const { syncFutureFundCriteria } = require('../utils/futureFund');
+            ffSynced = await syncFutureFundCriteria(user, settings);
+        } catch (ffErr) {
+            console.error('Future Fund sync after ad claim failed:', ffErr.message);
+        }
 
         await user.save();
 
@@ -128,7 +140,16 @@ router.post('/claim', rewardLimiter, idempotency(), async (req, res) => {
             success: true,
             message: 'Ad watched successfully',
             inrEarned: 0,
-            newWalletBalance: user.wallet?.balance || 0
+            newWalletBalance: user.wallet?.balance || 0,
+            lifetimeAdsWatched: user.lifetimeAdsWatched || 0,
+            todayRewardCount: user.todayRewardCount || 0,
+            remainingAds: Math.max(0, MAX_DAILY_ADS - (user.todayRewardCount || 0)),
+            futureFund: {
+                status: user.futureFund?.status || 'locked',
+                progress: ffSynced?.progress ?? user.futureFund?.progress ?? 0,
+                eligible: !!ffSynced?.eligible,
+                criteria: ffSynced?.criteria || user.futureFund?.criteria || [],
+            },
         });
     } catch (err) {
         console.error(err);
