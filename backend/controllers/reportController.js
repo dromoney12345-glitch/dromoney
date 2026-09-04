@@ -1,5 +1,4 @@
 const Report = require('../models/Report');
-const Notification = require('../models/Notification');
 const asyncHandler = require('../middleware/async');
 
 // @desc    Submit new problem report
@@ -63,30 +62,22 @@ exports.updateReportStatus = asyncHandler(async (req, res, next) => {
         return res.status(404).json({ success: false, error: 'Report not found' });
     }
 
-    // Create Notification for the user
     if (status === 'Resolved' || status === 'Rejected') {
-        const title = status === 'Resolved' ? 'Report Resolved' : 'Report Rejected';
-        const message = status === 'Resolved' 
-            ? `Your reported problem "${report.message.substring(0, 30)}..." has been resolved by our team.` 
-            : `Your reported problem has been rejected.`;
-            
-        const notification = await Notification.create({
-            user: report.user,
-            title,
-            message,
-            type: status === 'Resolved' ? 'success' : 'warning'
-        });
-
-        // Emit real-time socket event if possible
-        if (global.io) {
-            global.io.to(report.user.toString()).emit('new_notification', {
-                id: notification._id,
-                title: notification.title,
-                message: notification.message,
-                type: notification.type,
-                isRead: false,
-                createdAt: notification.createdAt
-            });
+        try {
+            const { notifyJourney } = require('../utils/userJourneyPush');
+            const preview = String(report.message || '').slice(0, 40);
+            await notifyJourney(
+                report.user,
+                status === 'Resolved' ? 'report_resolved' : 'report_rejected',
+                {
+                    notificationId: `${report.user}_report_${report._id}_${status}`,
+                    body: status === 'Resolved'
+                        ? `आपकी reported problem "${preview}${preview.length >= 40 ? '...' : ''}" resolve कर दी गई है।`
+                        : 'आपकी reported problem reject कर दी गई है। Help Center से और जानकारी लें।',
+                }
+            );
+        } catch (pushErr) {
+            console.error('Report status notification failed:', pushErr.message);
         }
     }
 

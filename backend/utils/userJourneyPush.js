@@ -187,8 +187,33 @@ const JOURNEY_STEPS = {
         type: 'error',
         link: '/user/home',
     },
+    payment_declined: {
+        title: 'Payment Declined',
+        body: 'आपका payment approve नहीं हो सका। कृपया details check करें और यदि जरूरत हो तो दोबारा payment करें या support से संपर्क करें।',
+        type: 'error',
+        link: '/user/virtual-account',
+    },
+    report_resolved: {
+        title: 'Report Resolved',
+        body: 'आपकी reported problem हमारे team द्वारा resolve कर दी गई है। धन्यवाद।',
+        type: 'success',
+        link: '/user/help',
+    },
+    report_rejected: {
+        title: 'Report Update',
+        body: 'आपकी reported problem reject कर दी गई है। अधिक जानकारी के लिए Help Center देखें।',
+        type: 'warning',
+        link: '/user/help',
+    },
+    task_submitted: {
+        title: 'Task Under Review',
+        body: 'आपका task proof successfully submit हो गया है और अभी admin review में है। Approval पर आपको notification मिलेगा।',
+        type: 'info',
+        link: '/user/earn',
+    },
 };
 
+/** Once-per-user lifetime steps (stable dedupe key). inactive_nudge is weekly — not here. */
 const ONCE_STEPS = new Set([
     'welcome',
     'kyc_approved',
@@ -199,8 +224,25 @@ const ONCE_STEPS = new Set([
     'ff_criteria_done',
     'ff_activated',
     'va_renew_reminder',
-    'inactive_nudge',
 ]);
+
+function emitUserNotification(userId, payload) {
+    if (!global.io || !userId) return;
+    try {
+        global.io.emit(`user_notification_${String(userId)}`, {
+            title: payload.title,
+            message: payload.message,
+            type: payload.type || 'info',
+            link: payload.link || '/user/home',
+            step: payload.step || '',
+            id: payload.id || Date.now(),
+            isRead: false,
+            createdAt: new Date().toISOString(),
+        });
+    } catch (err) {
+        console.error('[JOURNEY-PUSH] socket emit failed:', err.message);
+    }
+}
 
 function stringifyData(data = {}) {
     const out = {};
@@ -217,7 +259,7 @@ function journeyNotificationId(userId, step, extras = {}) {
     return `${userId}_${step}_${Date.now()}`;
 }
 
-async function persistNotification(userId, { title, message, type, step, link, skipUserArray = false, dedupeKey = '' }) {
+async function persistNotification(userId, { title, message, type, step, link, skipUserArray = true, dedupeKey = '' }) {
     const AppNotification = require('../models/AppNotification');
     if (dedupeKey) {
         const existing = await AppNotification.findOne({ user: userId, dedupeKey }).select('_id');
@@ -234,6 +276,7 @@ async function persistNotification(userId, { title, message, type, step, link, s
         dedupeKey: dedupeKey || '',
     });
 
+    // Legacy User.notifications array — off by default to avoid duplicate bell rows.
     if (!skipUserArray) {
         await User.findByIdAndUpdate(userId, {
             $push: {
@@ -292,15 +335,24 @@ async function notifyJourney(userId, step, extras = {}) {
             ? await AppNotification.findOne({ user: userId, dedupeKey: notificationId }).select('_id')
             : null;
 
+        let doc = already;
         if (!already) {
-            await persistNotification(userId, {
+            doc = await persistNotification(userId, {
                 title,
                 message: body,
                 type,
                 step,
                 link,
-                skipUserArray: false,
+                skipUserArray: true,
                 dedupeKey: notificationId,
+            });
+            emitUserNotification(userId, {
+                title,
+                message: body,
+                type,
+                link,
+                step,
+                id: doc?._id || notificationId,
             });
         }
 
@@ -319,7 +371,7 @@ async function notifyJourney(userId, step, extras = {}) {
             await queuePendingPush(userId, { step, title, body, link, notificationId });
         }
 
-        return { sent: !!sent, skipped: !!already };
+        return { sent: !!sent, skipped: !!already, notificationId };
     } catch (err) {
         console.error(`[JOURNEY-PUSH] ${step} failed:`, err.message);
         try {
@@ -363,7 +415,9 @@ async function flushPendingPushes(userId) {
 
 module.exports = {
     JOURNEY_STEPS,
+    ONCE_STEPS,
     notifyJourney,
     flushPendingPushes,
     persistNotification,
+    emitUserNotification,
 };

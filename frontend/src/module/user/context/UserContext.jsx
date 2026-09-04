@@ -99,10 +99,6 @@ export const UserProvider = ({ children }) => {
                         console.warn('[User Socket] connect_error:', err.message, '→', SOCKET_URL);
                     });
 
-                    activeSocket.on('new_broadcast', (notif) => {
-                        addNotification(notif.title, notif.message, 'broadcast');
-                    });
-
                     // Listen to real-time withdrawal updates for this specific user
                     activeSocket.on(`withdrawal_update_${profile._id}`, (data) => {
                         refreshUserProfile();
@@ -117,7 +113,13 @@ export const UserProvider = ({ children }) => {
                     });
 
                     activeSocket.on(`user_notification_${profile._id}`, (notif) => {
-                        addNotification(notif.title, notif.message, notif.type || 'broadcast');
+                        addNotification(notif.title, notif.message, notif.type || 'info');
+                        fetchNotifications();
+                    });
+
+                    activeSocket.on('new_broadcast', (notif) => {
+                        addNotification(notif.title, notif.message, 'broadcast');
+                        fetchNotifications();
                     });
 
                     requestNativeFcmToken();
@@ -543,6 +545,7 @@ export const UserProvider = ({ children }) => {
         addCoins: addEarning,
         requestWithdrawal,
         addNotification,
+        markAsRead,
         refreshUserProfile,
         updateProfileImage,
         updateProfileData,

@@ -97,6 +97,7 @@ const UserSchema = new mongoose.Schema({
     kycApprovedAt: { type: Date },
     lastActiveAt: { type: Date },
     inactiveReminderSent: { type: Boolean, default: false },
+    inactiveReminderWeek: { type: String, default: '' },
     inviteInactive: {
         day7PenaltyApplied: { type: Boolean, default: false },
         day14WipeApplied: { type: Boolean, default: false },

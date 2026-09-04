@@ -89,27 +89,11 @@ exports.updateWithdrawalStatus = async (req, res) => {
                 return res.status(400).json({ success: false, message: `User has insufficient balance (₹${user.wallet.balance}) for this withdrawal of ₹${withdrawal.amount} with ₹5 transaction fee.` });
             }
             user.wallet.balance -= totalDeduction;
-            
-            // Add in-app notification
-            user.notifications = user.notifications || [];
-            user.notifications.push({
-                title: "Withdrawal Approved",
-                message: `Your withdrawal of ₹${withdrawal.amount} has been approved. ₹${totalDeduction} deducted from wallet.`,
-                type: "success",
-                date: new Date()
-            });
             await user.save();
         }
 
-        // Handle Rejected notifications
+        // Handle Rejected — notifyJourney below covers in-app + FCM
         if (status === 'Rejected') {
-            user.notifications = user.notifications || [];
-            user.notifications.push({
-                title: "Withdrawal Rejected",
-                message: `Your withdrawal request for ₹${withdrawal.amount} was rejected.`,
-                type: "error",
-                date: new Date()
-            });
             await user.save();
         }
 
@@ -261,15 +245,6 @@ exports.bulkApproveWithdrawals = async (req, res) => {
                 }
                 
                 user.wallet.balance -= totalDeduction;
-                
-                // Add in-app notification
-                user.notifications = user.notifications || [];
-                user.notifications.push({
-                    title: "Withdrawal Approved",
-                    message: `Your withdrawal of ₹${withdrawal.amount} has been approved. ₹${totalDeduction} deducted from wallet.`,
-                    type: "success",
-                    date: new Date()
-                });
                 await user.save();
 
                 // Save withdrawal status

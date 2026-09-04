@@ -82,14 +82,10 @@ async function deliverNotification(notification) {
     return notification;
 }
 
-const { JOURNEY_STEPS } = require('../utils/userJourneyPush');
+const { JOURNEY_STEPS, ONCE_STEPS } = require('../utils/userJourneyPush');
 
 exports.getJourneyNotificationSpec = async (req, res, next) => {
     try {
-        const ONCE_STEPS = new Set([
-            'welcome', 'kyc_approved', 'va_reminder_3', 'va_deadline_7', 'va_deadline_1',
-            'va_activated', 'ff_criteria_done', 'ff_activated', 'va_renew_reminder', 'inactive_nudge',
-        ]);
         const data = Object.entries(JOURNEY_STEPS).map(([step, def]) => ({
             step,
             title: def.title,

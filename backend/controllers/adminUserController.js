@@ -71,25 +71,8 @@ exports.manageKYC = async (req, res, next) => {
         if (kycApproved) {
             user.kyc.rejectionReason = ''; // Clear reason on approval
             if (!user.kycApprovedAt) user.kycApprovedAt = new Date();
-
-            user.notifications = user.notifications || [];
-            user.notifications.push({
-                title: "KYC Verified! ✅",
-                message: "KYC approved. Income page is now free to use. Create a Virtual Account to withdraw from Virtual.",
-                type: "success",
-                date: new Date()
-            });
         } else if (kycRejected) {
             if (rejectionReason) user.kyc.rejectionReason = rejectionReason;
-            
-            // Add in-app notification
-            user.notifications = user.notifications || [];
-            user.notifications.push({
-                title: "KYC Rejected ⚠️",
-                message: `KYC verification failed. Reason: ${rejectionReason || 'Invalid documents or blurred image'}. Click here to re-submit your details.`,
-                type: "error",
-                date: new Date()
-            });
         }
 
         // Use markModified for nested objects to ensure Mongoose detects change
@@ -112,7 +95,11 @@ exports.manageKYC = async (req, res, next) => {
             if (kycApproved) {
                 await notifyJourney(user._id, 'kyc_approved');
             } else if (kycRejected) {
-                await notifyJourney(user._id, 'kyc_rejected');
+                await notifyJourney(user._id, 'kyc_rejected', {
+                    body: rejectionReason
+                        ? `आपका KYC verification complete नहीं हो सका। Reason: ${rejectionReason}. कृपया सुधार कर documents दोबारा submit करें।`
+                        : undefined,
+                });
             }
         } catch (pushErr) {
             console.error('Push notification failed for manageKYC:', pushErr.message);
@@ -155,8 +142,20 @@ exports.toggleBlock = async (req, res, next) => {
         }
 
         // We need 'isBlocked' in User Schema. I'll add it in the next step.
+        const wasBlocked = !!user.isBlocked;
         user.isBlocked = !user.isBlocked;
         await user.save();
+
+        if (user.isBlocked && !wasBlocked) {
+            try {
+                const { notifyJourney } = require('../utils/userJourneyPush');
+                await notifyJourney(user._id, 'account_hold', {
+                    notificationId: `${user._id}_account_hold_${Date.now()}`,
+                });
+            } catch (pushErr) {
+                console.error('Account hold notification failed:', pushErr.message);
+            }
+        }
 
         res.status(200).json({
             success: true,

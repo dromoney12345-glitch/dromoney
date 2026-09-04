@@ -116,14 +116,6 @@ exports.updatePaymentStatus = async (req, res) => {
                     }
                     user.isBoosterActive = !!(user.isSupportBoosterActive || user.isTaskBoosterActive);
                     user.boosterExpiry = expiryDate;
-                    
-                    user.notifications = user.notifications || [];
-                    user.notifications.push({
-                        title: 'Booster Activated! ⚡',
-                        message: `Your ${isSupport ? 'Event Booster' : 'Power Booster'} is now active! Enjoy ${isSupport ? 'event support benefits' : '12x coin earnings for 24 hours'}.`,
-                        type: 'success',
-                        isRead: false
-                    });
                     await user.save();
 
                     // Create standard Transaction for user history
@@ -138,11 +130,23 @@ exports.updatePaymentStatus = async (req, res) => {
                     });
 
                     try {
+                        const { persistNotification, emitUserNotification } = require('../utils/userJourneyPush');
                         const { sendNotificationToUser } = require('./fcmController');
                         const boosterName = isSupport ? 'Support Booster' : 'Task Booster';
+                        const title = 'Booster Activated! ⚡';
+                        const message = `Your ${isSupport ? 'Event Booster' : 'Power Booster'} is now active! Enjoy ${isSupport ? 'event support benefits' : '12x coin earnings for 24 hours'}.`;
+                        const doc = await persistNotification(user._id, {
+                            title,
+                            message,
+                            type: 'success',
+                            step: 'booster_activated',
+                            link: '/user/home',
+                            dedupeKey: `${user._id}_booster_${payment._id}`,
+                        });
+                        emitUserNotification(user._id, { title, message, type: 'success', link: '/user/home', id: doc?._id });
                         await sendNotificationToUser(user._id, {
-                            title: 'Booster Activated! ⚡',
-                            body: `Your ${boosterName} is now active! Enjoy 3X coin earnings for 30 days.`,
+                            title,
+                            body: `Your ${boosterName} is now active!`,
                             data: { type: 'booster', link: '/user/home' }
                         });
                     } catch (pushErr) {
@@ -155,13 +159,6 @@ exports.updatePaymentStatus = async (req, res) => {
                     if (ideaId && !already) {
                         user.unlockedIdeas.push(payment.businessIdea);
                     }
-                    user.notifications = user.notifications || [];
-                    user.notifications.push({
-                        title: 'Business Idea Unlocked',
-                        message: `Your payment for ${payment.plan || 'this business idea'} is confirmed. Only this idea is unlocked.`,
-                        type: 'success',
-                        isRead: false
-                    });
                     await user.save();
 
                     const Transaction = require('../models/Transaction');
@@ -175,7 +172,15 @@ exports.updatePaymentStatus = async (req, res) => {
                     });
 
                     try {
+                        const { persistNotification, emitUserNotification } = require('../utils/userJourneyPush');
                         const { sendNotificationToUser } = require('./fcmController');
+                        const title = 'Business Idea Unlocked';
+                        const message = `Your payment for ${payment.plan || 'this business idea'} is confirmed. Only this idea is unlocked.`;
+                        const doc = await persistNotification(user._id, {
+                            title, message, type: 'success', step: 'business_idea_unlock',
+                            link: '/user/business-ideas', dedupeKey: `${user._id}_idea_unlock_${payment._id}`,
+                        });
+                        emitUserNotification(user._id, { title, message, type: 'success', link: '/user/business-ideas', id: doc?._id });
                         await sendNotificationToUser(user._id, {
                             title: 'Business Idea Unlocked 🚀',
                             body: `Your payment for ${payment.plan || 'this business idea'} is confirmed.`,
@@ -200,13 +205,6 @@ exports.updatePaymentStatus = async (req, res) => {
                         const already = user.unlockedIdeas.some((id) => id && id.toString() === ideaId);
                         if (!already) user.unlockedIdeas.push(payment.businessIdea);
                     }
-                    user.notifications = user.notifications || [];
-                    user.notifications.push({
-                        title: 'Premium Support Activated',
-                        message: `${payment.plan || 'Premium Plan'} is active for this idea. Other ideas stay locked unless free or paid separately.`,
-                        type: 'success',
-                        isRead: false
-                    });
                     await user.save();
 
                     const Transaction = require('../models/Transaction');
@@ -220,7 +218,15 @@ exports.updatePaymentStatus = async (req, res) => {
                     });
 
                     try {
+                        const { persistNotification, emitUserNotification } = require('../utils/userJourneyPush');
                         const { sendNotificationToUser } = require('./fcmController');
+                        const title = 'Premium Support Activated';
+                        const message = `${payment.plan || 'Premium Plan'} is active for this idea. Other ideas stay locked unless free or paid separately.`;
+                        const doc = await persistNotification(user._id, {
+                            title, message, type: 'success', step: 'business_hub_plan',
+                            link: '/user/business-ideas', dedupeKey: `${user._id}_hub_plan_${payment._id}`,
+                        });
+                        emitUserNotification(user._id, { title, message, type: 'success', link: '/user/business-ideas', id: doc?._id });
                         await sendNotificationToUser(user._id, {
                             title: 'Premium Support Activated 🚀',
                             body: `Your ${payment.plan || 'Premium Plan'} is confirmed.`,
@@ -237,13 +243,6 @@ exports.updatePaymentStatus = async (req, res) => {
                     currentExpiry.setDate(currentExpiry.getDate() + daysToAdd);
                     user.supportExpiry = currentExpiry;
                     user.businessPlanStatus = 'active';
-                    user.notifications = user.notifications || [];
-                    user.notifications.push({
-                        title: 'Support Chat Renewed',
-                        message: `Support chat is extended by ${daysToAdd} days.`,
-                        type: 'success',
-                        isRead: false
-                    });
                     await user.save();
 
                     const Transaction = require('../models/Transaction');
@@ -257,7 +256,15 @@ exports.updatePaymentStatus = async (req, res) => {
                     });
 
                     try {
+                        const { persistNotification, emitUserNotification } = require('../utils/userJourneyPush');
                         const { sendNotificationToUser } = require('./fcmController');
+                        const title = 'Support Chat Renewed';
+                        const message = `Support chat is extended by ${daysToAdd} days.`;
+                        const doc = await persistNotification(user._id, {
+                            title, message, type: 'success', step: 'support_chat_renewal',
+                            link: '/user/chat-support', dedupeKey: `${user._id}_support_renew_${payment._id}`,
+                        });
+                        emitUserNotification(user._id, { title, message, type: 'success', link: '/user/chat-support', id: doc?._id });
                         await sendNotificationToUser(user._id, {
                             title: 'Support Chat Renewed 💬',
                             body: `Your support access is extended by ${daysToAdd} days.`,
@@ -270,16 +277,6 @@ exports.updatePaymentStatus = async (req, res) => {
                     const isRenewal = payment.paymentType === 'VIRTUAL_ACCOUNT_RENEWAL';
                     const { activateVirtualWallet } = require('../utils/walletLedger');
                     await activateVirtualWallet(user, { isRenewal });
-
-                    user.notifications = user.notifications || [];
-                    user.notifications.push({
-                        title: isRenewal ? 'Virtual Account Renewed' : 'Virtual Account Unlocked',
-                        message: isRenewal
-                            ? 'Virtual Account renewed. It is now active for 6 more months.'
-                            : 'Virtual Account approved. It is now active for 6 months.',
-                        type: 'success',
-                        isRead: false
-                    });
 
                     await user.save();
 
@@ -308,10 +305,24 @@ exports.updatePaymentStatus = async (req, res) => {
                     }
                 }
             }
+        }
 
-            // Emit real-time signal via global io
-            if (global.io && payment.user) {
-                global.io.emit(`payment_update_${payment.user.toString()}`, { status });
+        // Always notify client of payment status change
+        if (global.io && payment.user) {
+            global.io.emit(`payment_update_${payment.user.toString()}`, { status });
+        }
+
+        if (status !== 'Success' && payment.user) {
+            try {
+                const { notifyJourney } = require('../utils/userJourneyPush');
+                await notifyJourney(payment.user, 'payment_declined', {
+                    notificationId: `${payment.user}_payment_declined_${payment._id}`,
+                    body: remarks
+                        ? `आपका payment approve नहीं हो सका। Reason: ${remarks}`
+                        : undefined,
+                });
+            } catch (pushErr) {
+                console.error('Payment declined notification failed:', pushErr.message);
             }
         }
 

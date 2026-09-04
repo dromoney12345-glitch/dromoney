@@ -565,13 +565,6 @@ exports.submitManualPayment = asyncHandler(async (req, res, next) => {
         processedAt: null
     });
 
-    user.notifications = user.notifications || [];
-    user.notifications.push({
-        title: 'Payment Pending ⏳',
-        message: 'Your payment proof has been uploaded. Please wait 10-15 mins for admin to approve your transaction.',
-        type: 'info',
-        createdAt: new Date()
-    });
     await user.save();
 
     try {

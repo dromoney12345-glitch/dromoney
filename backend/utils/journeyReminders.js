@@ -1,4 +1,3 @@
-const cron = require('node-cron');
 const User = require('../models/User');
 const { daysSince, neverCreatedVirtualAccount } = require('../utils/walletLedger');
 
@@ -9,6 +8,15 @@ async function notify(userId, step, extras) {
     } catch (err) {
         console.error(`[JOURNEY] ${step} failed:`, err.message);
     }
+}
+
+function isoWeekKey(date = new Date()) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const week = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return `${d.getUTCFullYear()}-W${String(week).padStart(2, '0')}`;
 }
 
 async function sendFirstTimeVaReminders(user, now = new Date()) {
@@ -41,15 +49,24 @@ async function sendFirstTimeVaReminders(user, now = new Date()) {
 async function sendInactiveNudges(now = new Date()) {
     const sixDaysAgo = new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000);
     const eightDaysAgo = new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000);
+    const weekKey = isoWeekKey(now);
     const users = await User.find({
         isBlocked: { $ne: true },
-        inactiveReminderSent: { $ne: true },
         lastActiveAt: { $gte: eightDaysAgo, $lte: sixDaysAgo },
+        $or: [
+            { inactiveReminderWeek: { $ne: weekKey } },
+            { inactiveReminderWeek: { $exists: false } },
+            { inactiveReminderSent: { $ne: true } },
+        ],
     }).limit(4000);
 
     for (const user of users) {
-        await notify(user._id, 'inactive_nudge', { notificationId: `${user._id}_inactive_nudge` });
+        if (user.inactiveReminderWeek === weekKey) continue;
+        await notify(user._id, 'inactive_nudge', {
+            notificationId: `${user._id}_inactive_nudge_${weekKey}`,
+        });
         user.inactiveReminderSent = true;
+        user.inactiveReminderWeek = weekKey;
         await user.save({ validateBeforeSave: false });
     }
 }
@@ -79,4 +96,5 @@ module.exports = {
     sendFirstTimeVaReminders,
     sendInactiveNudges,
     sendRenewalGraceReminders,
+    isoWeekKey,
 };

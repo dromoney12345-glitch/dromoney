@@ -79,6 +79,15 @@ exports.submitTask = asyncHandler(async (req, res, next) => {
         console.error('Admin push notification failed for task proof submission:', pushErr.message);
     }
 
+    try {
+        const { notifyJourney } = require('../utils/userJourneyPush');
+        await notifyJourney(req.user.id, 'task_submitted', {
+            notificationId: `${req.user.id}_task_submitted_${submission._id}`,
+        });
+    } catch (userPushErr) {
+        console.error('User task submitted notification failed:', userPushErr.message);
+    }
+
     res.status(201).json({
         success: true,
         data: submission,

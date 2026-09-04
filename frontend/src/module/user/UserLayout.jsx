@@ -16,7 +16,7 @@ const UserLayout = () => {
     const [isNotifOpen, setIsNotifOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
-    const { userData, notifications, clearNotifications, markAsRead, logout } = useUser();
+    const { userData, notifications, clearNotifications, markAsRead, logout, addNotification, fetchNotifications } = useUser();
 
     const kycOk = ['approved', 'verified'].includes(String(userData?.kycStatus || '').toLowerCase());
 
@@ -63,6 +63,12 @@ const UserLayout = () => {
                 });
                 if (token) await saveFcmTokenToServer(token, 'web');
                 unsubscribe = onMessage(messaging, (payload) => {
+                    const title = payload?.notification?.title || payload?.data?.title;
+                    const body = payload?.notification?.body || payload?.data?.body;
+                    if (title && body) {
+                        addNotification(title, body, payload?.data?.type || 'info');
+                        fetchNotifications?.();
+                    }
                     if (Notification.permission === 'granted' && payload?.notification) {
                         new Notification(payload.notification.title, {
                             body: payload.notification.body,
@@ -103,33 +109,22 @@ const UserLayout = () => {
         const readIds = JSON.parse(localStorage.getItem('dromoney_read_notifs') || '[]');
         const seen = new Set();
 
-        const fromInbox = (notifications || []).map((n) => ({
-            ...n,
-            timestamp: n.timestamp || Date.now(),
-        }));
-
-        const fromProfile = (userData?.userNotifications || []).map((n) => {
-            const idStr = n._id || n.id;
-            return {
-                id: idStr,
-                title: n.title,
-                message: n.message,
-                time: n.createdAt ? new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now',
-                timestamp: n.createdAt ? new Date(n.createdAt).getTime() : Date.now(),
-                type: n.type || 'info',
-                isRead: n.isRead || readIds.includes(String(idStr)),
-            };
-        });
-
-        return [...fromInbox, ...fromProfile]
+        // Prefer AppNotification inbox (from API + live socket/FCM). Avoid merging legacy
+        // user.notifications — that caused duplicate rows for the same journey event.
+        return (notifications || [])
+            .map((n) => ({
+                ...n,
+                timestamp: n.timestamp || Date.now(),
+                isRead: n.isRead || readIds.includes(String(n.id)),
+            }))
             .filter((n) => {
-                const key = `${n.title}|${n.message}|${n.id || ''}`;
+                const key = `${n.title}|${n.message}`;
                 if (seen.has(key)) return false;
                 seen.add(key);
                 return true;
             })
             .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-    }, [notifications, userData?.userNotifications]);
+    }, [notifications]);
 
     const unreadNotifs = allNotifications.filter(n => !n.isRead);
 
