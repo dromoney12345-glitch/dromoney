@@ -3,6 +3,7 @@ import api, { BASE_URL } from '../../shared/services/api';
 import io from 'socket.io-client';
 import { buildReferralLink, getPendingReferralCode, clearPendingReferralCode, savePendingReferralCode, fetchFlutterInstallReferrer, getReferralClickId, clearReferralClickId } from '../../shared/utils/referral';
 import { installFcmTokenBridge, requestNativeFcmToken, saveFcmTokenToServer, readPendingFcmToken } from '../../shared/utils/fcmToken';
+import { showFlutterSystemNotification } from '../../shared/utils/flutterNotifications';
 
 const UserContext = React.createContext();
 
@@ -115,14 +116,30 @@ export const UserProvider = ({ children }) => {
                     activeSocket.on(`user_notification_${profile._id}`, (notif) => {
                         addNotification(notif.title, notif.message, notif.type || 'info');
                         fetchNotifications();
+                        // Phone tray while app is open (FCM alone often skips foreground)
+                        showFlutterSystemNotification({
+                            title: notif.title,
+                            body: notif.message,
+                            link: notif.link || '/user/home',
+                            type: notif.type || 'info',
+                        });
                     });
 
                     activeSocket.on('new_broadcast', (notif) => {
                         addNotification(notif.title, notif.message, 'broadcast');
                         fetchNotifications();
+                        showFlutterSystemNotification({
+                            title: notif.title,
+                            body: notif.message,
+                            link: notif.link || '/user/home',
+                            type: 'broadcast',
+                        });
                     });
 
                     requestNativeFcmToken();
+                    // Extra pull after socket ready — Flutter often injects token late
+                    setTimeout(() => requestNativeFcmToken(), 2500);
+                    setTimeout(() => requestNativeFcmToken(), 8000);
                 }
             });
 
@@ -383,6 +400,7 @@ export const UserProvider = ({ children }) => {
         try {
             const response = await api.post('/user/auth/verify-otp', { phone, otp });
             localStorage.setItem('dromoney_token', response.token);
+            sessionStorage.removeItem('dromoney_va_guide_shown');
             setIsAuthenticated(true);
             persistFcmAfterAuth();
             return { success: true };
@@ -397,6 +415,7 @@ export const UserProvider = ({ children }) => {
         try {
             const response = await api.post('/user/auth/login', { email, password });
             localStorage.setItem('dromoney_token', response.token);
+            sessionStorage.removeItem('dromoney_va_guide_shown');
             setIsAuthenticated(true);
             persistFcmAfterAuth();
             return { success: true };
@@ -421,6 +440,7 @@ export const UserProvider = ({ children }) => {
                 Object.keys(headers).length ? { headers } : undefined
             );
             localStorage.setItem('dromoney_token', response.token);
+            sessionStorage.removeItem('dromoney_va_guide_shown');
             setIsAuthenticated(true);
             persistFcmAfterAuth();
             await tryAttachPendingReferral({ waitMs: 5000 });
@@ -433,6 +453,7 @@ export const UserProvider = ({ children }) => {
 
     const logout = () => {
         localStorage.removeItem('dromoney_token');
+        sessionStorage.removeItem('dromoney_va_guide_shown');
         setIsAuthenticated(false);
         setUserData(INITIAL_USER_STATE);
         localStorage.removeItem('dromoney_read_notifs');

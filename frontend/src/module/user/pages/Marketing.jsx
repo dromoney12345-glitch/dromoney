@@ -81,7 +81,7 @@ const Marketing = () => {
         const inviteBadge = (ref) => {
         if (ref.status === 'Completed') return 'Released';
         if (ref.status === 'Failed' || ref.milestone === 'removed') return 'Removed';
-        if (ref.status === 'Waiting KYC' || ref.milestone === 'waiting_kyc') return 'Waiting KYC';
+        if (ref.status === 'Waiting KYC' || ref.milestone === 'waiting_kyc') return 'In Pending';
         if (ref.milestone === 'card_active') return 'Creating VA';
         return 'In Pending';
     };

@@ -117,15 +117,11 @@ const AdPlayer = () => {
             if (res.success) {
                 completedRef.current = true;
                 setIsCompleted(true);
-                const ffAds = res.data?.futureFund?.criteria?.find((c) => c.unit === 'ads' || c.id === 2);
-                const current = ffAds?.current ?? res.data?.lifetimeAdsWatched;
-                const target = ffAds?.target ?? 50;
-                if (current != null) {
-                    showToast(`Ad counted for Future Fund (${Math.min(Number(current), Number(target))}/${target}).`);
-                } else {
-                    showToast('Ad completed successfully!', 'success');
-                }
+                showToast('Ad completed! Progress updated.');
                 await refreshUserProfile();
+                if (typeof window.refreshRewardStatus === 'function') {
+                    await window.refreshRewardStatus();
+                }
             } else {
                 showToast(res.message || 'Failed to claim reward', 'error');
                 claimingRef.current = false;

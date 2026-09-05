@@ -1,6 +1,6 @@
 export function defaultAffiliateHowItWorks(amount = 200) {
     return (
-        `Share your invite link. After your friend completes KYC, ₹${amount} goes to your Pending Wallet. ` +
+        `Share your invite link. After your friend registers, ₹${amount} goes to your Pending Wallet. ` +
         'It moves to Virtual when they create a Virtual Account. ' +
         'If they do not create a Virtual Account, their Pending is cleared every 14 days (14, 28, 42…) until they buy one. ' +
         'After a 6-month Virtual Account expires, the same 14-day Pending cycle runs until they renew. Old Virtual balance is never deleted.'
@@ -24,10 +24,22 @@ export function rewriteWalletCycleCopy(text) {
         )
         .replace(
             /when they complete KYC and unlock their withdrawal card, instant referral rewards are credited to your matching wallet\.?/gi,
-            'when they complete KYC, ₹200 goes to your Pending Wallet. It moves to Virtual when they create a Virtual Account.'
+            'when they register, ₹200 goes to your Pending Wallet. It moves to Virtual when they create a Virtual Account.'
+        )
+        .replace(
+            /when they complete KYC, ₹200 goes to your Pending Wallet\. It moves to Virtual when they create a Virtual Account\.?/gi,
+            'when they register, ₹200 goes to your Pending Wallet. It moves to Virtual when they create a Virtual Account.'
+        )
+        .replace(
+            /After your friend completes KYC, ₹(\d+) goes to your Pending Wallet\.?/gi,
+            'After your friend registers, ₹$1 goes to your Pending Wallet.'
         )
         .replace(
             /जब वे KYC पूरा करके Virtual Account बनाते हैं, तो आपके वॉलेट में रेफरल रिवॉर्ड इंसटेंट ऐड हो जाता है।?/g,
-            'जब वे KYC पूरा करते हैं, ₹200 आपके Pending Wallet में जाता है। जब वे Virtual Account बनाते हैं, तब यह Virtual में जाता है। VA न बनाने पर उनका Pending हर 14 दिन (14, 28, 42…) पर clear होता है।'
+            'जब वे रजिस्टर करते हैं, ₹200 आपके Pending Wallet में जाता है। जब वे Virtual Account बनाते हैं, तब यह Virtual में जाता है। VA न बनाने पर उनका Pending हर 14 दिन (14, 28, 42…) पर clear होता है।'
+        )
+        .replace(
+            /जब वे KYC पूरा करते हैं, ₹200 आपके Pending Wallet में जाता है।?/g,
+            'जब वे रजिस्टर करते हैं, ₹200 आपके Pending Wallet में जाता है।'
         );
 }

@@ -10,12 +10,8 @@ const {
     isVirtualUnlocked,
     neverCreatedVirtualAccount,
     daysSince,
+    registrationAnchorDate,
 } = require('./walletLedger');
-
-function isKycComplete(user) {
-    const status = String(user?.kyc?.status || '').toLowerCase();
-    return status === 'verified' || status === 'approved';
-}
 
 async function commissionAmount() {
     const settings = (await Settings.findOne()) || {};
@@ -24,15 +20,14 @@ async function commissionAmount() {
 }
 
 /**
- * After invitee KYC: hold ₹200 in the referrer's Pending Wallet.
- * Releases to Virtual only when the invitee creates a Withdrawal Card.
+ * After invitee registers: hold ₹200 in the referrer's Pending Wallet.
+ * Releases to Virtual only when the invitee creates a Virtual Account.
  */
-async function creditReferralOnKyc(userDoc) {
+async function creditReferralOnRegister(userDoc) {
     if (!userDoc?._id) return { credited: false, reason: 'no_user' };
 
-    const user = await User.findById(userDoc._id).select('name referredBy isPaid kyc kycApprovedAt');
+    const user = await User.findById(userDoc._id).select('name referredBy isPaid createdAt');
     if (!user?.referredBy) return { credited: false, reason: 'not_referred' };
-    if (!isKycComplete(user)) return { credited: false, reason: 'kyc_incomplete' };
 
     const commission = await commissionAmount();
     if (!commission) return { credited: false, reason: 'system_disabled' };
@@ -72,8 +67,8 @@ async function creditReferralOnKyc(userDoc) {
             referrer.notifications.push({
                 title: toVirtual ? 'Invite ₹200 credited' : 'Invite ₹200 in Pending',
                 message: toVirtual
-                    ? `${user.name} completed KYC and has a Virtual Account. ₹${commission} is in your Virtual Account.`
-                    : `${user.name} completed KYC. ₹${commission} is in your Pending Wallet.`,
+                    ? `${user.name} joined and has a Virtual Account. ₹${commission} is in your Virtual Account.`
+                    : `${user.name} joined via your invite. ₹${commission} is in your Pending Wallet.`,
                 type: 'success',
                 isRead: false,
             });
@@ -94,15 +89,20 @@ async function creditReferralOnKyc(userDoc) {
             console.error('Referral push failed:', pushErr.message);
         }
 
-        console.log(`[REFERRAL] ₹${commission} to referrer ${referrer._id} after KYC of ${user._id} (${toVirtual ? 'virtual' : 'pending hold'})`);
+        console.log(`[REFERRAL] ₹${commission} to referrer ${referrer._id} after register of ${user._id} (${toVirtual ? 'virtual' : 'pending hold'})`);
         return { credited: true, amount: commission, held: !toVirtual };
     } catch (err) {
         if (err.code === 11000) {
             return { credited: false, reason: 'already_credited' };
         }
-        console.error('[REFERRAL] KYC credit failed:', err.message);
+        console.error('[REFERRAL] register credit failed:', err.message);
         return { credited: false, reason: 'error', error: err.message };
     }
+}
+
+/** @deprecated Use creditReferralOnRegister — kept for older callers */
+async function creditReferralOnKyc(userDoc) {
+    return creditReferralOnRegister(userDoc);
 }
 
 /**
@@ -160,8 +160,8 @@ async function releaseReferralToVirtual(userDoc) {
 }
 
 /**
- * 28-day inactivity (hidden from the invitee): remove the referrer's pending ₹200 only.
- * Does not block or suspend the invitee. Does not touch Virtual balance.
+ * 28-day rule: if invitee never created VA, remove referrer's pending ₹200.
+ * Clock starts at invitee registration (createdAt).
  */
 async function clawbackInvite(userDoc) {
     const tx = await ReferralTransaction.findOne({
@@ -182,7 +182,7 @@ async function clawbackInvite(userDoc) {
         referrer.notifications = referrer.notifications || [];
         referrer.notifications.push({
             title: 'Refer active users only',
-            message: `${inviteeName} is not active yet, so ₹${amount} was removed from Pending.`,
+            message: `${inviteeName} did not create a Virtual Account in time, so ₹${amount} was removed from Pending.`,
             type: 'warning',
             isRead: false,
         });
@@ -208,7 +208,7 @@ async function applyInviteDay28IfDue(invitee) {
     if (!invitee?._id || !neverCreatedVirtualAccount(invitee)) {
         return { clawed: false };
     }
-    const days = daysSince(invitee.kycApprovedAt || invitee.kyc?.approvedAt);
+    const days = daysSince(registrationAnchorDate(invitee));
     invitee.inviteInactive = invitee.inviteInactive || {};
     if (days == null || days < 28 || invitee.inviteInactive.day28ClawbackApplied) {
         return { clawed: false };
@@ -218,10 +218,6 @@ async function applyInviteDay28IfDue(invitee) {
     return { ...result, applied: true };
 }
 
-/**
- * When the referrer later unlocks/renews Virtual Account, release holds
- * for invitees who already bought a Virtual Account.
- */
 async function releaseReadyInvitesForReferrer(referrerDoc) {
     if (!referrerDoc?._id) return { released: 0 };
     migrateWalletSplits(referrerDoc);
@@ -236,7 +232,7 @@ async function releaseReadyInvitesForReferrer(referrerDoc) {
     });
     let released = 0;
     for (const tx of txs) {
-        const invitee = await User.findById(tx.referredUser).select('name isPaid kyc withdrawalCard');
+        const invitee = await User.findById(tx.referredUser).select('name isPaid withdrawalCard');
         if (!invitee?.isPaid) continue;
         const result = await releaseReferralToVirtual(invitee);
         if (result.released) released += 1;
@@ -250,19 +246,16 @@ async function afterVirtualAccountActivated(userDoc) {
     return { fromInvitee, fromReferrerHolds };
 }
 
-// Payment callers: invitee Withdrawal Card unlocks the held ₹200 Pending → Virtual.
+/** Invitee Virtual Account unlocks the held ₹200 Pending → Virtual (no KYC). */
 async function creditReferralOnQualifiedUnlock(userDoc) {
-    const user = await User.findById(userDoc._id).select('name referredBy isPaid kyc');
+    const user = await User.findById(userDoc._id).select('name referredBy isPaid');
     if (!user) return { credited: false, reason: 'no_user' };
     if (!user.isPaid) return { credited: false, reason: 'not_paid' };
-    if (!isKycComplete(user)) {
-        return { credited: false, reason: 'kyc_incomplete' };
-    }
     return releaseReferralToVirtual(user);
 }
 
 module.exports = {
-    isKycComplete,
+    creditReferralOnRegister,
     creditReferralOnKyc,
     creditReferralOnQualifiedUnlock,
     releaseReferralToVirtual,

@@ -413,8 +413,8 @@ const FutureFund = () => {
     const activationRows = [
         {
             key: 'kyc',
-            label: `${kycTarget} Successful KYC`,
-            subtitle: 'Invited friends who complete KYC',
+            label: `${kycTarget} Successful Invites`,
+            subtitle: 'Invited friends who register',
             icon: User,
             current: kycCurrent,
             target: kycTarget,
@@ -515,7 +515,7 @@ const FutureFund = () => {
                 <div className="bg-[#F3E8E0] rounded-xl px-3 py-2.5 flex items-start gap-2">
                     <Info size={14} className="text-[#462211] shrink-0 mt-0.5" />
                     <p className="text-[11px] text-[#462211] leading-snug">
-                        Activate with {kycTarget} Successful KYC, {adsTarget} Advertisement Videos, and {tasksTarget} Tasks.
+                        Activate with {kycTarget} Successful Invites, {adsTarget} Advertisement Videos, and {tasksTarget} Tasks.
                     </p>
                 </div>
 

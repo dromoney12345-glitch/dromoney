@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const { daysSince, neverCreatedVirtualAccount } = require('../utils/walletLedger');
+const { daysSince, neverCreatedVirtualAccount, registrationAnchorDate } = require('../utils/walletLedger');
 
 async function notify(userId, step, extras) {
     try {
@@ -21,7 +21,7 @@ function isoWeekKey(date = new Date()) {
 
 async function sendFirstTimeVaReminders(user, now = new Date()) {
     if (!neverCreatedVirtualAccount(user)) return false;
-    const days = daysSince(user.kycApprovedAt || user.kyc?.approvedAt, now);
+    const days = daysSince(registrationAnchorDate(user), now);
     if (days == null) return false;
 
     user.inviteInactive = user.inviteInactive || {};

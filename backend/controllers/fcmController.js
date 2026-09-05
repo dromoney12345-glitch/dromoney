@@ -52,22 +52,71 @@ function firebaseReady() {
 }
 
 function pushPayload(title, body, tokens, data) {
+    const safeTitle = String(title || 'Dromoney').slice(0, 120);
+    const safeBody = String(body || '').slice(0, 500);
+    const dataPayload = stringifyFcmData({
+        ...(data || {}),
+        title: safeTitle,
+        body: safeBody,
+        click_action: 'FLUTTER_NOTIFICATION_CLICK',
+    });
+
     return {
-        notification: { title, body },
+        tokens,
+        // Required for system tray when app is background / killed
+        notification: {
+            title: safeTitle,
+            body: safeBody,
+        },
+        data: dataPayload,
         android: {
             priority: 'high',
+            ttl: 86400000,
             notification: {
+                title: safeTitle,
+                body: safeBody,
                 sound: 'default',
+                // Must match Flutter flutter_local_notifications channel id
                 channelId: 'high_importance_channel',
+                priority: 'high',
+                defaultSound: true,
+                defaultVibrateTimings: true,
+                visibility: 'public',
+                clickAction: 'FLUTTER_NOTIFICATION_CLICK',
+                // Avoid collapsing unrelated alerts into one
+                tag: String(data?.notificationId || `dm_${Date.now()}`).slice(0, 64),
             },
         },
         apns: {
+            headers: {
+                'apns-priority': '10',
+                'apns-push-type': 'alert',
+            },
             payload: {
-                aps: { sound: 'default' },
+                aps: {
+                    alert: {
+                        title: safeTitle,
+                        body: safeBody,
+                    },
+                    sound: 'default',
+                    badge: 1,
+                    'content-available': 1,
+                    'mutable-content': 1,
+                },
             },
         },
-        data: stringifyFcmData(data),
-        tokens,
+        webpush: {
+            headers: { Urgency: 'high' },
+            notification: {
+                title: safeTitle,
+                body: safeBody,
+                icon: '/logo.png',
+                badge: '/logo.png',
+            },
+            fcmOptions: {
+                link: String(data?.link || '/user/home'),
+            },
+        },
     };
 }
 
@@ -86,11 +135,15 @@ exports.saveToken = asyncHandler(async (req, res, next) => {
     const userId = req.user?._id || req.user?.id;
     const adminId = req.admin?._id || req.admin?.id;
 
+    // Always persist mobile tokens into fcmTokenMobile (and fcmTokens for reachability)
     const add = isMobile
         ? { fcmTokenMobile: token, fcmTokens: token }
         : { fcmTokens: token };
 
     if (userId) {
+        const before = await User.findById(userId).select('fcmTokenMobile');
+        const hadMobile = (before?.fcmTokenMobile || []).length > 0;
+
         const updated = await User.findByIdAndUpdate(
             userId,
             { $addToSet: add },
@@ -105,6 +158,18 @@ exports.saveToken = asyncHandler(async (req, res, next) => {
             await flushPendingPushes(userId);
         } catch (flushErr) {
             console.error('[FCM] Pending push flush failed:', flushErr.message);
+        }
+
+        // First mobile token ever: mark Failed logs so pending flush can retry cleanly
+        if (isMobile && !hadMobile) {
+            try {
+                await NotificationLog.updateMany(
+                    { userId, status: 'Failed' },
+                    { $set: { status: 'Retry' } }
+                );
+            } catch {
+                /* ignore */
+            }
         }
     } else if (adminId) {
         const Admin = require('../models/Admin');
@@ -208,7 +273,12 @@ exports.sendNotificationToUser = async (userId, payload) => {
         const user = await User.findById(userId);
         if (!user) return false;
 
-        const tokens = uniqueTokens([...(user.fcmTokens || []), ...(user.fcmTokenMobile || [])]);
+        const mobileTokens = uniqueTokens(user.fcmTokenMobile || []);
+        const webTokens = uniqueTokens(user.fcmTokens || []);
+        // Prefer native mobile tokens for phone tray; still include web for browsers
+        const tokens = uniqueTokens(
+            mobileTokens.length ? [...mobileTokens, ...webTokens] : webTokens
+        );
         if (!tokens.length) {
             console.log(`[FCM-DEBUG] No tokens for user ${userId}`);
             return false;
@@ -224,7 +294,10 @@ exports.sendNotificationToUser = async (userId, payload) => {
             notificationId,
         });
 
-        console.log(`[FCM-DEBUG] Sending to ${tokens.length} tokens for user: ${userId}`);
+        console.log(
+            `[FCM-DEBUG] Sending to ${tokens.length} tokens for user: ${userId} ` +
+            `(mobile=${mobileTokens.length} web=${webTokens.length})`
+        );
         const response = await admin.messaging().sendEachForMulticast(message);
         console.log(`[FCM-DEBUG] Success: ${response.successCount}, Fail: ${response.failureCount}`);
 
@@ -237,6 +310,12 @@ exports.sendNotificationToUser = async (userId, payload) => {
             await cleanupInvalidTokens(user, tokens, response.responses, ['fcmTokens', 'fcmTokenMobile']);
         }
 
+        // If only web tokens "succeeded" but user has no mobile token, treat as soft fail for queue
+        const delivered = response.successCount > 0;
+        if (!delivered && mobileTokens.length === 0) {
+            console.log(`[FCM-DEBUG] No successful delivery and no mobile token for ${userId}`);
+        }
+
         await NotificationLog.findOneAndUpdate(
             { notificationId },
             {
@@ -245,12 +324,12 @@ exports.sendNotificationToUser = async (userId, payload) => {
                 tokens,
                 title: payload.title,
                 body: payload.body,
-                status: response.successCount > 0 ? 'Sent' : 'Failed',
+                status: delivered ? 'Sent' : 'Failed',
             },
             { upsert: true }
         );
 
-        return response.successCount > 0;
+        return delivered;
     } catch (error) {
         console.error('[FCM] sendNotificationToUser failed:', error.message);
         return false;

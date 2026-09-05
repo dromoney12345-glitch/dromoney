@@ -79,14 +79,14 @@ exports.manageKYC = async (req, res, next) => {
         user.markModified('kyc');
         await user.save();
 
-        // Invite ₹200 → referrer Pending Wallet after KYC (Virtual after invitee card)
+        // Idempotent backfill if older invitee never got register credit
         if (kycApproved) {
             try {
-                const { creditReferralOnKyc } = require('../utils/referralReward');
-                const result = await creditReferralOnKyc(user);
-                console.log('[REFERRAL] KYC approve credit:', result);
+                const { creditReferralOnRegister } = require('../utils/referralReward');
+                const result = await creditReferralOnRegister(user);
+                console.log('[REFERRAL] legacy KYC path credit:', result);
             } catch (refErr) {
-                console.error('[REFERRAL] KYC approve credit failed:', refErr.message);
+                console.error('[REFERRAL] legacy KYC path credit failed:', refErr.message);
             }
         }
 

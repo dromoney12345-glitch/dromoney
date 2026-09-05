@@ -12,9 +12,9 @@ const statusLabel = (item) => {
     const milestone = String(item.milestone || '');
     if (status === 'Completed' || status === 'Settled') return 'Settled';
     if (status === 'Failed' || milestone === 'removed') return 'Removed';
-    if (status === 'Waiting KYC' || milestone === 'waiting_kyc') return 'Waiting KYC';
+    if (status === 'Waiting KYC' || milestone === 'waiting_kyc') return 'Registered';
     if (milestone === 'card_active') return 'To Virtual';
-    if (status === 'Pending' || milestone === 'card_pending') return 'In Pending';
+    if (status === 'Pending' || milestone === 'card_pending' || milestone === 'registered') return 'In Pending';
     return status || 'Pending';
 };
 
@@ -135,7 +135,7 @@ const MarketingHistory = () => {
                         <div className="text-center py-10 px-5 bg-white rounded-2xl border border-[#EDE4DC]">
                             <p className="text-[11px] font-semibold text-[#462211] uppercase tracking-widest mb-1">No referrals yet</p>
                             <p className="text-[10px] font-medium text-[#7A5648]">
-                                Share your Play Store invite link — ₹200 goes to Pending after KYC, then to Virtual when they create a Virtual Account.
+                                Share your Play Store invite link — ₹200 goes to Pending when they register, then to Virtual when they create a Virtual Account.
                             </p>
                         </div>
                     ) : (

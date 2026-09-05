@@ -43,12 +43,10 @@ router.get('/status', async (req, res) => {
 
         await checkAndResetDailyLimit(user);
 
+        const usedToday = Math.max(user.todayRewardCount || 0, user.dailyAdCount || 0);
         let available = true;
         let nextAdIn = 0;
-        let remainingAds = Math.max(
-            0,
-            MAX_DAILY_ADS - Math.max(user.todayRewardCount || 0, user.dailyAdCount || 0)
-        );
+        let remainingAds = Math.max(0, MAX_DAILY_ADS - usedToday);
 
         if (remainingAds <= 0) {
             available = false;
@@ -71,7 +69,8 @@ router.get('/status', async (req, res) => {
             maxDailyLimit: MAX_DAILY_ADS,
             rewardAmount: 0,
             lifetimeAdsWatched: user.lifetimeAdsWatched || 0,
-            todayRewardCount: user.todayRewardCount || 0,
+            todayRewardCount: usedToday,
+            dailyAdCount: usedToday,
             futureFundAdsTarget: Number(settings.futureFundWatchAdTarget) || 50,
         });
     } catch (err) {

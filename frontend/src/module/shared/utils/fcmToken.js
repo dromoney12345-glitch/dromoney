@@ -63,7 +63,19 @@ export async function saveFcmTokenToServer(raw, platform = 'mobile') {
     if (!localStorage.getItem('dromoney_token')) return false;
     try {
         const { default: api } = await import('../services/api');
-        await api.post('/fcm-tokens/save', { token, platform, fcmToken: token });
+        const platformNorm = String(platform || 'mobile').toLowerCase();
+        // Flutter WebView always stores as mobile so Android/iOS tray gets the right token bucket
+        const resolved =
+            platformNorm === 'web' && !isFlutterWebView()
+                ? 'web'
+                : platformNorm === 'web'
+                    ? 'mobile'
+                    : platformNorm || 'mobile';
+        await api.post('/fcm-tokens/save', {
+            token,
+            platform: resolved,
+            fcmToken: token,
+        });
         try {
             localStorage.removeItem(PENDING_KEY);
             window.__pendingFcmTokens = [];
@@ -86,28 +98,62 @@ export function installFcmTokenBridge() {
     window.saveFcmToken = handler;
     window.saveAppFcmToken = handler;
     window.onFcmToken = handler;
+    window.receiveFcmToken = handler;
 }
 
 export function isFlutterWebView() {
+    if (typeof window === 'undefined') return false;
     return !!(
-        (typeof window !== 'undefined' && window.flutter_inappwebview) ||
-        (typeof window !== 'undefined' && window.FlutterTokenChannel)
+        window.flutter_inappwebview ||
+        window.FlutterInAppWebView ||
+        window.FlutterTokenChannel ||
+        navigator.userAgent?.includes('Flutter')
     );
 }
 
+async function callNativeTokenHandlers(bridge) {
+    if (!bridge || typeof bridge.callHandler !== 'function') return '';
+    const handlers = ['getFcmToken', 'requestFcmToken', 'getToken', 'fetchFcmToken'];
+    for (const name of handlers) {
+        try {
+            const native = await bridge.callHandler(name);
+            const token = normalizeFcmToken(native);
+            if (token) return token;
+        } catch {
+            /* try next */
+        }
+    }
+    return '';
+}
+
+/**
+ * Persist any pending token and pull a fresh native FCM token from Flutter.
+ * Retries a few times because the bridge often appears after first paint.
+ */
 export async function requestNativeFcmToken() {
     const pending = readPendingFcmToken();
     if (pending && localStorage.getItem('dromoney_token')) {
         await saveFcmTokenToServer(pending, 'mobile');
     }
 
-    const wv = typeof window !== 'undefined' ? window.flutter_inappwebview : null;
-    if (wv && typeof wv.callHandler === 'function') {
-        try {
-            const native = await wv.callHandler('getFcmToken');
-            if (native) await saveFcmTokenToServer(native, 'mobile');
-        } catch {
-            /* Flutter handler optional */
+    const tryOnce = async () => {
+        const wv =
+            typeof window !== 'undefined'
+                ? window.flutter_inappwebview || window.FlutterInAppWebView
+                : null;
+        const token = await callNativeTokenHandlers(wv);
+        if (token) {
+            await saveFcmTokenToServer(token, 'mobile');
+            return true;
         }
+        return false;
+    };
+
+    if (await tryOnce()) return;
+
+    // Bridge may not be ready yet — retry briefly
+    for (const wait of [800, 2000, 4000]) {
+        await new Promise((r) => setTimeout(r, wait));
+        if (await tryOnce()) return;
     }
 }

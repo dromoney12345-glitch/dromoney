@@ -347,7 +347,7 @@ const Wallet = () => {
         if (ref.status === 'Failed' || ref.milestone === 'removed') return { text: 'Removed', cls: 'text-red-700 bg-red-50' };
         if (ref.milestone === 'card_active') return { text: 'Virtual Account created — releasing', cls: 'text-emerald-700 bg-emerald-50' };
         if (ref.milestone === 'card_pending') return { text: 'In Pending until they create a Virtual Account', cls: 'text-[#462211] bg-[#FFF5F0]' };
-        return { text: 'Waiting for KYC', cls: 'text-slate-600 bg-slate-100' };
+        return { text: 'In Pending until they create a Virtual Account', cls: 'text-[#462211] bg-[#FFF5F0]' };
     };
 
     const pendingTabs = ['All', 'Invite Earnings', 'Task Earnings', 'Transferred'];
@@ -417,14 +417,14 @@ const Wallet = () => {
                             ) : !canViewVirtual ? (
                                 <>
                                     <li>Pay ₹499 to create a Virtual Account. It stays active for 6 months.</li>
-                                    <li>If you pay within 3 days of KYC, ₹399 is a 6-month reserve in Virtual and is used at renewal. ₹100 is the platform charge.</li>
+                                    <li>If you pay within 3 days of registration, ₹399 is a 6-month reserve in Virtual and is used at renewal. ₹100 is the platform charge.</li>
                                     <li>If you do not create a Virtual Account, Pending is cleared every 14 days (14, 28, 42…) until you buy one.</li>
                                     <li>After you create it, current Pending moves to Virtual and you can withdraw.</li>
                                 </>
                             ) : (
                                 <>
                                     <li>Pending Wallet stays open for life — you can view it anytime.</li>
-                                    <li>Invite ₹200 is added to Pending when the invited user completes KYC.</li>
+                                    <li>Invite ₹200 is added to Pending when the invited user registers.</li>
                                     <li>That ₹200 moves to your Virtual Account when they create their Virtual Account.</li>
                                     <li>You can withdraw from Virtual Account after it is created.</li>
                                 </>

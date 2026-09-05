@@ -88,7 +88,7 @@ exports.register = async (req, res, next) => {
         }
 
         // Resolve invite code (Play Store link, /join/CODE, or deferred install click)
-        // ₹200 is credited to the referrer only after this user's KYC is approved
+        // ₹200 is credited to the referrer Pending Wallet immediately on register
         let referredBy = null;
         const linked = await findReferrerByCode(rawReferral, {
             excludePhone: trimmedPhone,
@@ -108,7 +108,7 @@ exports.register = async (req, res, next) => {
         }
         if (resolved.reason === 'ok') {
             referredBy = resolved.referrer._id;
-            console.log(`[REFERRAL] Linked new user to referrer ${referredBy} (code ${resolved.cleanCode}) — ₹200 on KYC approve`);
+            console.log(`[REFERRAL] Linked new user to referrer ${referredBy} (code ${resolved.cleanCode}) — ₹200 on register`);
         } else if (rawReferral) {
             console.warn(`[REFERRAL] Invite not attached (${resolved.reason}): ${String(rawReferral).slice(0, 120)}`);
         }
@@ -126,6 +126,13 @@ exports.register = async (req, res, next) => {
 
         if (referredBy) {
             await User.findByIdAndUpdate(referredBy, { $inc: { referralCount: 1 } });
+            try {
+                const { creditReferralOnRegister } = require('../utils/referralReward');
+                const result = await creditReferralOnRegister(user);
+                console.log('[REFERRAL] register credit:', result);
+            } catch (refErr) {
+                console.error('[REFERRAL] register credit failed:', refErr.message);
+            }
         }
 
         try {
@@ -418,7 +425,7 @@ exports.getMe = async (req, res, next) => {
                 modified = true;
             }
 
-            // 4. Sync Future Fund criteria (KYC / ads / tasks)
+            // 4. Sync Future Fund criteria (invites / ads / tasks)
             try {
                 const ff = await syncFutureFundCriteria(user, settings);
                 if (ff.modified) modified = true;
@@ -454,11 +461,11 @@ exports.getMe = async (req, res, next) => {
                 }
             }
 
-            // Backfill invite commission if KYC is already approved
+            // Backfill invite commission for referred users (idempotent)
             if (user.referredBy) {
                 try {
-                    const { creditReferralOnKyc } = require('../utils/referralReward');
-                    await creditReferralOnKyc(user);
+                    const { creditReferralOnRegister } = require('../utils/referralReward');
+                    await creditReferralOnRegister(user);
                 } catch (refErr) {
                     console.error('[REFERRAL] getMe credit failed:', refErr.message);
                 }

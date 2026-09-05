@@ -71,15 +71,19 @@ async function migratePdfActivationSettings() {
     );
 }
 
-async function countSuccessfulKyc(userId) {
+async function countSuccessfulInvites(userId) {
     return User.countDocuments({
         referredBy: userId,
-        'kyc.status': { $in: ['Approved', 'Verified'] },
     });
 }
 
+/** @deprecated Alias — FF criterion is registered invitees, not KYC */
+async function countSuccessfulKyc(userId) {
+    return countSuccessfulInvites(userId);
+}
+
 async function countSuccessfulSales(userId) {
-    return countSuccessfulKyc(userId);
+    return countSuccessfulInvites(userId);
 }
 
 async function syncFutureFundCriteria(user, settings = {}) {
@@ -100,7 +104,7 @@ async function syncFutureFundCriteria(user, settings = {}) {
         modified = true;
     }
 
-    const kycCurrent = await countSuccessfulKyc(user._id);
+    const kycCurrent = await countSuccessfulInvites(user._id);
     const adsCurrent = Number(user.lifetimeAdsWatched) || 0;
     let tasksCurrent = Number(user.lifetimeTasksCompleted) || 0;
     if (!tasksCurrent) {
@@ -117,8 +121,8 @@ async function syncFutureFundCriteria(user, settings = {}) {
     const criteria = [
         {
             id: 1,
-            title: 'Successful KYC',
-            description: 'Invite friends who complete Aadhaar KYC.',
+            title: 'Successful Invites',
+            description: 'Invite friends who register on Dromoney.',
             target: targets.kycTarget,
             current: kycCurrent,
             completed: kycCurrent >= targets.kycTarget,

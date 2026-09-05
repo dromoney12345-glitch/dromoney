@@ -35,8 +35,6 @@ import AuthLayout from './module/user/auth/AuthLayout';
 import Login from './module/user/auth/Login';
 import Register from './module/user/auth/Register';
 import JoinReferral from './module/user/pages/JoinReferral';
-import KycSetup from './module/user/auth/KycSetup';
-import PendingApproval from './module/user/auth/PendingApproval';
 import AdminLogin from './module/admin/auth/Login';
 import AdminLayout from './module/admin/AdminLayout';
 import AdminDashboard from './module/admin/pages/Dashboard';
@@ -51,7 +49,6 @@ import Wallets from './module/admin/pages/Wallets';
 import NotificationsAdmin from './module/admin/pages/Notifications';
 import Reports from './module/admin/pages/Reports';
 import SettingsAdmin from './module/admin/pages/Settings';
-import KYC from './module/admin/pages/KYC';
 import Promotions from './module/admin/pages/Promotions';
 import WatchAndEarnAdmin from './module/admin/pages/WatchAndEarnAdmin';
 import LayoutManager from './module/admin/pages/LayoutManager';
@@ -68,6 +65,14 @@ import { installFcmTokenBridge, requestNativeFcmToken } from './module/shared/ut
 import { notifyFlutterAppReady } from './module/shared/utils/flutterAds';
 
 const SilentBoot = () => <div className="min-h-screen bg-white" aria-hidden />;
+
+/** Only restore routes that exist in the app (prevents /home ↔ / loops). */
+function isSafeAppRoute(path) {
+  if (!path || typeof path !== 'string') return false;
+  const clean = path.split('?')[0];
+  if (clean === '/' || clean === '/home') return false;
+  return clean.startsWith('/user') || clean.startsWith('/admin');
+}
 
 // Protected Route Component
 const ProtectedUserRoute = ({ children }) => {
@@ -105,14 +110,18 @@ const ProtectedAdminRoute = ({ children }) => {
 const RootRedirect = () => {
   const { isAuthenticated, loading } = useUser();
   const location = useLocation();
-  if (loading) return null; // wait silently
-  
+  if (loading) return <SilentBoot />;
+
   const lastRoute = sessionStorage.getItem('dromoney_last_route');
   if (isAuthenticated) {
-    if (lastRoute && lastRoute !== '/') {
+    if (isSafeAppRoute(lastRoute)) {
       return <Navigate to={lastRoute} replace />;
     }
-    return <Navigate to='/user/home' replace />;
+    // Clear bad legacy values like "/home" that caused infinite redirects
+    if (lastRoute && !isSafeAppRoute(lastRoute)) {
+      sessionStorage.removeItem('dromoney_last_route');
+    }
+    return <Navigate to="/user/home" replace />;
   }
 
   const invite =
@@ -126,13 +135,21 @@ const RootRedirect = () => {
   return <Navigate to={`/user/auth/login${location.search || ''}`} replace />;
 };
 
+/** Unknown paths must NOT bounce to "/" (that re-reads lastRoute and can loop). */
+const CatchAllRedirect = () => {
+  const { isAuthenticated, loading } = useUser();
+  if (loading) return <SilentBoot />;
+  if (isAuthenticated) return <Navigate to="/user/home" replace />;
+  return <Navigate to="/user/auth/login" replace />;
+};
+
 const RouteTracker = () => {
   const location = useLocation();
   
   React.useEffect(() => {
     captureReferralFromLocation();
-    // 1. Existing App Logic
-    if (location.pathname !== '/' && location.pathname !== '/user/auth/login') {
+    // Persist only real app routes — never bare "/home" or "/"
+    if (isSafeAppRoute(location.pathname)) {
       sessionStorage.setItem('dromoney_last_route', location.pathname + location.search);
     }
     
@@ -142,33 +159,27 @@ const RouteTracker = () => {
       document.body.classList.remove('user-panel');
     }
 
-    // 2. Flutter Route Tracking Integration
+    // Flutter Route Tracking Integration
     try {
-      // Normalize route to ensure consistent format
       const normalizedRoute = location.pathname.startsWith('/') 
         ? location.pathname 
         : `/${location.pathname}`;
       
-      // Development logging only - Always visible in dev tools for testing
       if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV) {
         console.log(`[Flutter Route Sync] Detected route: ${normalizedRoute}`);
       }
 
-      // Safe check for Flutter InAppWebView injected object
       if (window.flutter_inappwebview && typeof window.flutter_inappwebview.callHandler === 'function') {
-        // Send route to Flutter
         window.flutter_inappwebview.callHandler("routeChanged", normalizedRoute);
         
         if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV) {
           console.log(`[Flutter Route Sync] Sent ${normalizedRoute} to Flutter`);
         }
-      } else {
-        if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV) {
-          console.log(`[Flutter Route Sync] flutter_inappwebview not found. Running in standard browser.`);
-        }
+      } else if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV) {
+        // Log once per unique route — avoid flooding when not in Flutter
+        console.debug(`[Flutter Route Sync] browser mode @ ${normalizedRoute}`);
       }
     } catch (error) {
-      // Catch any potential errors to prevent breaking browser usage
       if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV) {
         console.error('[Flutter Route Sync Error]', error);
       }
@@ -219,6 +230,15 @@ function App() {
             <Routes>
             {/* Redirecting root to login or home based on auth */}
             <Route path="/" element={<RootRedirect />} />
+            {/* Legacy/short paths that used to cause / ↔ /home infinite loops */}
+            <Route path="/home" element={<Navigate to="/user/home" replace />} />
+            <Route path="/earn" element={<Navigate to="/user/earn" replace />} />
+            <Route path="/wallet" element={<Navigate to="/user/wallet" replace />} />
+            <Route path="/profile" element={<Navigate to="/user/profile" replace />} />
+            <Route path="/income" element={<Navigate to="/user/income" replace />} />
+            <Route path="/watch" element={<Navigate to="/user/watch" replace />} />
+            <Route path="/login" element={<Navigate to="/user/auth/login" replace />} />
+            <Route path="/register" element={<Navigate to="/user/auth/register" replace />} />
 
             {/* Auth Module Routes (Always Public) */}
             <Route path="/join/:code" element={<JoinReferral />} />
@@ -228,8 +248,8 @@ function App() {
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
             </Route>
-            <Route path="/user/auth/kyc" element={<KycSetup />} />
-            <Route path="/user/auth/pending" element={<PendingApproval />} />
+            <Route path="/user/auth/kyc" element={<Navigate to="/user/home" replace />} />
+            <Route path="/user/auth/pending" element={<Navigate to="/user/home" replace />} />
 
             {/* User Module Routes (Protected) */}
             <Route path="/user" element={<ProtectedUserRoute><UserLayout /></ProtectedUserRoute>}>
@@ -278,7 +298,7 @@ function App() {
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<ProtectedAdminRoute><AdminLayout /></ProtectedAdminRoute>}>
               <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="kyc" element={<KYC />} />
+              <Route path="kyc" element={<Navigate to="/admin/users" replace />} />
               <Route path="documents" element={<Navigate to="/admin/layout" replace />} />
               <Route path="users" element={<Users />} />
               <Route path="payments" element={<Payments />} />
@@ -302,8 +322,8 @@ function App() {
               <Route path="settings" element={<SettingsAdmin />} />
             </Route>
 
-            {/* Fallback for safety */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Fallback — never bounce unknown paths back through "/" (loop risk) */}
+            <Route path="*" element={<CatchAllRedirect />} />
           </Routes>
         </Router>
       </UserProvider>

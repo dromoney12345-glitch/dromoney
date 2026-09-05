@@ -33,7 +33,6 @@ const OptionCard = ({ icon: Icon, iconBg, iconColor, arrowBg, title, subtitle, o
 const Income = () => {
     const navigate = useNavigate();
     const { userData, loading: userLoading } = useUser();
-    const status = String(userData?.kycStatus || 'Not Started').toLowerCase();
     const virtualUnlocked = !!userData?.isPaid && userData?.withdrawalCard?.status === 'active';
     const vaView = getVaView(userData);
     const vaExpired = !!vaView.expired;
@@ -46,12 +45,6 @@ const Income = () => {
         title: 'Future Plan',
         subtitle: 'We are continuously bringing new earning opportunities for you.',
     });
-
-    useEffect(() => {
-        if (userLoading) return;
-        if (status === 'pending' || status === 'rejected') navigate('/user/auth/pending');
-        else if (status === 'not started') navigate('/user/auth/kyc');
-    }, [status, navigate, userLoading]);
 
     useEffect(() => {
         const load = async () => {
@@ -80,11 +73,11 @@ const Income = () => {
         load();
     }, []);
 
-    if (userLoading || status === 'pending' || status === 'rejected' || status === 'not started') {
+    if (userLoading) {
         return (
             <div className="min-h-full flex flex-col items-center justify-center gap-3 bg-[#FCF8F5] font-poppins">
                 <Loader2 className="animate-spin text-[#462211]" size={28} />
-                <p className="text-[10px] uppercase tracking-widest text-slate-400">Verifying KYC...</p>
+                <p className="text-[10px] uppercase tracking-widest text-slate-400">Loading...</p>
             </div>
         );
     }
@@ -107,7 +100,7 @@ const Income = () => {
                     iconColor="text-[#462211]"
                     arrowBg="bg-[#FFF5F0]"
                     title={reward != null ? `Invite & Earn ₹${reward}` : 'Invite & Earn'}
-                    subtitle={reward != null ? `₹${reward} goes to Pending after KYC, then to Virtual when they create a Virtual Account.` : 'Reward goes to Pending after KYC, then to Virtual when they create a Virtual Account.'}
+                    subtitle={reward != null ? `₹${reward} goes to Pending when they register, then to Virtual when they create a Virtual Account.` : 'Reward goes to Pending when they register, then to Virtual when they create a Virtual Account.'}
                     onClick={() => navigate('/user/guide/invite')}
                 />
                 <OptionCard

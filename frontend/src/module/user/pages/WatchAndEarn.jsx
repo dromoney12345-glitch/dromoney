@@ -7,7 +7,7 @@ import { showFlutterRewardedAd, isFlutterApp } from '../../shared/utils/flutterA
 
 const WatchAndEarn = () => {
     const navigate = useNavigate();
-    const { userData, refreshUserProfile } = useUser();
+    const { refreshUserProfile } = useUser();
     const [status, setStatus] = useState(null);
     const [catalogAds, setCatalogAds] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -22,6 +22,15 @@ const WatchAndEarn = () => {
 
     const [isRefreshingCoins, setIsRefreshingCoins] = useState(false);
 
+    const applyStatusPayload = useCallback((payload) => {
+        if (!payload || typeof payload !== 'object') return;
+        setStatus((prev) => ({
+            ...(prev || {}),
+            ...payload,
+            success: true,
+        }));
+    }, []);
+
     const fetchStatus = useCallback(async () => {
         setLoading(true);
         try {
@@ -29,14 +38,14 @@ const WatchAndEarn = () => {
                 api.get('/reward/status'),
                 api.get('/public/ads').catch(() => null),
             ]);
-            if (rewardRes.success) setStatus(rewardRes);
+            if (rewardRes?.success) applyStatusPayload(rewardRes);
             if (adsRes?.success) setCatalogAds(adsRes.data || []);
         } catch (err) {
             console.error('Error fetching reward status:', err);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [applyStatusPayload]);
 
     const handleRefreshCoins = async () => {
         setIsRefreshingCoins(true);
@@ -49,7 +58,7 @@ const WatchAndEarn = () => {
         fetchStatus();
     }, [fetchStatus]);
 
-    // Returning from AdPlayer / app switch — refresh FF ad progress
+    // Returning from AdPlayer / app switch — refresh daily ad progress
     useEffect(() => {
         const onVisible = () => {
             if (document.visibilityState === 'visible') {
@@ -68,26 +77,37 @@ const WatchAndEarn = () => {
     const claimLock = useRef(false);
 
     const claimFlutterReward = useCallback(async () => {
-        if (claimLock.current) return;
+        if (claimLock.current) return false;
         claimLock.current = true;
         try {
             const claimRes = await api.post('/reward/claim', { earned: true, source: 'admob' });
             if (claimRes.success) {
-                const ffAds = claimRes.futureFund?.criteria?.find((c) => c.unit === 'ads' || c.id === 2);
-                const current = ffAds?.current ?? claimRes.lifetimeAdsWatched;
-                const target = ffAds?.target ?? status?.futureFundAdsTarget ?? 50;
-                showToast(`Ad counted for Future Fund (${Math.min(current, target)}/${target}).`);
-            } else {
-                showToast(claimRes.message || 'Could not record this ad.', 'error');
+                const today = Number(claimRes.todayRewardCount) || 0;
+                const remaining = Number(claimRes.remainingAds);
+                applyStatusPayload({
+                    todayRewardCount: today,
+                    remainingAds: Number.isFinite(remaining) ? remaining : undefined,
+                    lifetimeAdsWatched: claimRes.lifetimeAdsWatched,
+                    available: (Number.isFinite(remaining) ? remaining : 1) > 0,
+                    nextAdIn: 30,
+                });
+                showToast(`Ad counted! Today ${today} watched`);
+                await fetchStatus();
+                if (refreshUserProfile) await refreshUserProfile(false);
+                claimLock.current = false;
+                return true;
             }
+            showToast(claimRes.message || 'Could not record this ad.', 'error');
         } catch (err) {
-            const errMsg = err.response?.data?.message || err.message || 'Failed to verify reward.';
+            const errMsg = err?.message || err?.response?.data?.message || 'Failed to verify reward.';
+            console.error('[WatchAndEarn] claim failed', err);
             showToast(errMsg, 'error');
         }
         await fetchStatus();
-        if (refreshUserProfile) await refreshUserProfile();
+        if (refreshUserProfile) await refreshUserProfile(false);
         claimLock.current = false;
-    }, [refreshUserProfile, fetchStatus, status?.futureFundAdsTarget]);
+        return false;
+    }, [refreshUserProfile, fetchStatus, applyStatusPayload]);
 
     useEffect(() => {
         window.refreshRewardStatus = async () => {
@@ -140,20 +160,31 @@ const WatchAndEarn = () => {
                 return;
             }
 
-            const { ok, reason } = await showFlutterRewardedAd('reward_ad_1');
-            if (ok || window.__dromoneyPendingAdReward) {
+            const adResult = await showFlutterRewardedAd('reward_ad_1');
+            const { ok, reason, elapsedMs = 0 } = adResult;
+            console.debug('[WatchAndEarn] AdMob result', adResult);
+
+            // Count when rewarded OR when a full-length session finished (≥5s) without hard fail
+            const countIt =
+                ok ||
+                window.__dromoneyPendingAdReward ||
+                (elapsedMs >= 5000 && reason !== 'failed' && reason !== 'no_bridge' && reason !== 'error');
+
+            if (countIt) {
                 delete window.__dromoneyPendingAdReward;
                 await claimFlutterReward();
                 return;
             }
 
-            console.warn('Flutter rewarded ad unavailable:', reason);
+            console.warn('Flutter rewarded ad unavailable:', reason, 'elapsedMs=', elapsedMs);
             showToast(
                 reason === 'no_bridge'
                     ? 'Open the DroMoney app to watch live ads.'
                     : reason === 'timeout'
                         ? 'Ad timed out. Please try again and watch until the end.'
-                        : 'Watch the full AdMob ad to complete. Back or close does not count.',
+                        : reason === 'failed'
+                            ? 'Ad failed to load. Please try again.'
+                            : 'Poora video dekho — beech mein back/close mat dabao, tabhi count badhega.',
                 'error'
             );
         } catch (e) {
@@ -170,13 +201,13 @@ const WatchAndEarn = () => {
         return `${m}m ${s}s`;
     };
 
-    const maxDailyLimit = status?.maxDailyLimit || 10;
-    const dailyAdCount = status ? (maxDailyLimit - status.remainingAds) : 0;
-    const ffAdsTarget = Number(status?.futureFundAdsTarget) || 50;
-    const ffAdsCurrent = Math.min(
-        ffAdsTarget,
-        Number(status?.lifetimeAdsWatched ?? userData?.lifetimeAdsWatched ?? 0)
+    const maxDailyLimit = Number(status?.maxDailyLimit) || 10;
+    const dailyAdCount = Math.max(
+        0,
+        Number(status?.todayRewardCount) ||
+            (status?.remainingAds != null ? maxDailyLimit - Number(status.remainingAds) : 0)
     );
+    const progressPct = Math.min((dailyAdCount / maxDailyLimit) * 100, 100);
     const unwatchedCatalog = catalogAds.filter((a) => !a.isWatched);
 
     return (
@@ -206,7 +237,7 @@ const WatchAndEarn = () => {
                             <Sparkles size={9} className="text-[#462211]" />
                             <span className="text-[8px] text-[#462211] uppercase tracking-widest">Daily Ads</span>
                         </div>
-                        <p className="text-[#7A5648] text-[10px]">Each completed ad counts toward Future Fund (50)</p>
+                        <p className="text-[#7A5648] text-[10px]">Watch up to {maxDailyLimit} ads today</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <button type="button" onClick={handleRefreshCoins} disabled={isRefreshingCoins} className="w-8 h-8 flex items-center justify-center bg-[#F3E8E0] text-[#462211] rounded-full active:scale-95 transition-all">
@@ -228,24 +259,11 @@ const WatchAndEarn = () => {
                             <div className="flex-1 h-1.5 bg-[#F3E8E0] rounded-full overflow-hidden">
                                 <div
                                     className="h-full bg-[#462211] rounded-full transition-all duration-500"
-                                    style={{ width: `${Math.min((dailyAdCount / maxDailyLimit) * 100, 100)}%` }}
+                                    style={{ width: `${progressPct}%` }}
                                 />
                             </div>
-                            <span className="text-[10px] text-[#462211] shrink-0">{dailyAdCount}/{maxDailyLimit}</span>
+                            <span className="text-[10px] text-[#462211] shrink-0 tabular-nums">{dailyAdCount}/{maxDailyLimit}</span>
                         </div>
-                    </div>
-                </div>
-
-                <div className="mt-2 bg-white border border-[#EDE4DC] rounded-xl p-2.5">
-                    <p className="text-[8px] text-[#7A5648] uppercase tracking-wider mb-1">Future Fund — Ads</p>
-                    <div className="flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-[#F3E8E0] rounded-full overflow-hidden">
-                            <div
-                                className="h-full bg-[#462211] rounded-full transition-all duration-500"
-                                style={{ width: `${Math.round((ffAdsCurrent / ffAdsTarget) * 100)}%` }}
-                            />
-                        </div>
-                        <span className="text-[10px] font-semibold text-[#462211] shrink-0">{ffAdsCurrent}/{ffAdsTarget}</span>
                     </div>
                 </div>
             </div>
@@ -290,7 +308,7 @@ const WatchAndEarn = () => {
                                             <p className="text-[10px] text-slate-400 mt-0.5">
                                                 {inFlutter
                                                     ? 'Full rewarded ad required — close/back does not count'
-                                                    : 'Play a catalog ad to count toward Future Fund'}
+                                                    : 'Play a catalog ad to increase today\'s progress'}
                                             </p>
                                         </div>
                                         <div className="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1.5">
@@ -318,7 +336,7 @@ const WatchAndEarn = () => {
                         {!inFlutter && unwatchedCatalog.length > 0 && status?.remainingAds > 0 && (
                             <div className="bg-white border border-[#EDE4DC] rounded-xl overflow-hidden">
                                 <div className="px-3 py-2.5 border-b border-[#EDE4DC] bg-[#FFF8F3]">
-                                    <p className="text-[11px] font-semibold text-[#462211]">Catalog ads (count for Future Fund)</p>
+                                    <p className="text-[11px] font-semibold text-[#462211]">Catalog ads</p>
                                 </div>
                                 <div className="divide-y divide-[#EDE4DC]">
                                     {unwatchedCatalog.slice(0, 8).map((ad) => (

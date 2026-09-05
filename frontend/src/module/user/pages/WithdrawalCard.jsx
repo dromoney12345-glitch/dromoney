@@ -144,7 +144,7 @@ const WithdrawalCard = () => {
                         <div className="mt-4 bg-[#EEF7EE] rounded-2xl p-4 border border-emerald-100">
                             <p className="text-[12px] font-medium text-emerald-800">Early bonus</p>
                             <p className="text-[11px] text-emerald-700 mt-1 leading-snug">
-                                Pay within 3 days of KYC — ₹{quote.credit} goes into Virtual as a 6-month reserve and is used at renewal. ₹100 is the platform charge.
+                                Pay within 3 days of registration — ₹{quote.credit} goes into Virtual as a 6-month reserve and is used at renewal. ₹100 is the platform charge.
                             </p>
                         </div>
                     )}

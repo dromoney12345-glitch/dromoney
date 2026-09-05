@@ -25,8 +25,8 @@ export function getVaView(userData) {
         const applied = Number(card.pendingWipesApplied) || 0;
         wipeCycle = applied + 1;
         daysUntilPendingWipe = Math.max(0, wipeCycle * 14 - days);
-    } else if (!unlocked && !expired && (userData?.kycApprovedAt || userData?.kyc?.approvedAt)) {
-        const start = new Date(userData.kycApprovedAt || userData.kyc.approvedAt);
+    } else if (!unlocked && !expired && (userData?.createdAt || userData?.kycApprovedAt || userData?.kyc?.approvedAt)) {
+        const start = new Date(userData.createdAt || userData.kycApprovedAt || userData.kyc.approvedAt);
         const days = Math.max(0, Math.floor((now - start.getTime()) / DAY_MS));
         const applied = Number(userData?.inviteInactive?.pendingWipesApplied) || 0;
         wipeCycle = applied + 1;

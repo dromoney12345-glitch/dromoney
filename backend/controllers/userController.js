@@ -60,119 +60,14 @@ exports.markNotificationRead = asyncHandler(async (req, res) => {
     res.status(200).json({ success: true });
 });
 
-// @desc    Update KYC Status and Documents
+// @desc    KYC removed — Login/Register only; endpoint kept for old clients
 // @route   PATCH /api/user/data/kyc
 // @access  Private
-exports.updateKyc = asyncHandler(async (req, res, next) => {
-    const { documentNumber } = req.body;
-
-    const user = await User.findById(req.user.id);
-    if (!user) {
-        return next(new ErrorResponse('User not found', 404));
-    }
-
-    // Check Admin KYC Timing Window (IST)
-    const Settings = require('../models/Settings');
-    const { isWithinIstWindow } = require('../utils/taskRenewal');
-    const settings = await Settings.findOne();
-    const kycStart = settings?.kycWindowStart || '07:00';
-    const kycEnd = settings?.kycWindowEnd || '19:00';
-    if (!isWithinIstWindow(kycStart, kycEnd)) {
-        const formatTime = (t) => {
-            const [h, m] = t.split(':');
-            let hrs = parseInt(h, 10);
-            const ampm = hrs >= 12 ? 'pm' : 'am';
-            hrs = hrs % 12 || 12;
-            const mins = parseInt(m, 10);
-            return mins > 0 ? `${hrs}:${m}${ampm}` : `${hrs}${ampm}`;
-        };
-        return next(new ErrorResponse(`KYC submissions are only available between ${formatTime(kycStart)} and ${formatTime(kycEnd)}`, 400));
-    }
-
-    // Prevent resubmission if already Approved/Verified
-    if (user.kyc?.status === 'Approved' || user.kyc?.status === 'Verified') {
-        return res.status(200).json({
-            success: true,
-            message: 'KYC already approved'
-        });
-    }
-
-    if (!req.file) {
-        return next(new ErrorResponse('Please upload your Aadhaar Card image', 400));
-    }
-
-    if (!documentNumber) {
-        return next(new ErrorResponse('Please provide Aadhaar Number', 400));
-    }
-
-    // Upload to Cloudinary using Stream (Memory Storage)
-    try {
-        const uploadFromBuffer = (buffer) => {
-            return new Promise((resolve, reject) => {
-                const stream = cloudinary.uploader.upload_stream(
-                    {
-                        folder: 'dromoney/kyc',
-                        resource_type: 'image',
-                        format: 'jpg',
-                        public_id: `aadhaar_${user._id}_${Date.now()}`
-                    },
-                    (error, result) => {
-                        if (result) resolve(result);
-                        else reject(error);
-                    }
-                );
-                stream.end(buffer);
-            });
-        };
-
-        const result = await uploadFromBuffer(req.file.buffer);
-        
-        // Update user KYC data
-        user.kyc = {
-            status: 'Pending',
-            documentType: 'Aadhaar',
-            documentNumber: documentNumber,
-            documentImage: result.secure_url,
-            rejectionReason: ''
-        };
-
-        user.markModified('kyc');
-        await user.save();
-
-        try {
-            const { notifyJourney } = require('../utils/userJourneyPush');
-            await notifyJourney(user._id, 'kyc_submitted');
-        } catch (pushErr) {
-            console.error('Push notification failed for KYC submission:', pushErr.message);
-        }
-
-        // Send Push Notification to Admins
-        try {
-            const { sendNotificationToAllAdmins } = require('./fcmController');
-            await sendNotificationToAllAdmins({
-                title: 'KYC Pending Approval 📂',
-                body: `User ${user.name} has submitted KYC documents. Review details.`,
-                data: {
-                    type: 'kyc_alert',
-                    link: '/admin/kyc'
-                }
-            });
-        } catch (pushErr) {
-            console.error('Admin push notification failed for KYC pending approval:', pushErr.message);
-        }
-        
-        return res.status(200).json({
-            success: true,
-            message: 'After 1 hour your KYC will be confirmed, please wait.',
-            data: {
-                status: user.kyc.status,
-                documentImage: user.kyc.documentImage
-            }
-        });
-    } catch (err) {
-        console.error('KYC UPLOAD ERROR:', err);
-        return next(new ErrorResponse(`Upload failed: ${err.message || 'Server error'}`, 500));
-    }
+exports.updateKyc = asyncHandler(async (req, res) => {
+    res.status(410).json({
+        success: false,
+        message: 'KYC is no longer required. You can use the app after Login or Register.',
+    });
 });
 
 // @desc    Unlock Platform (Payment Simulation)
@@ -532,7 +427,7 @@ exports.unlockFutureFund = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse(`Complete all criteria first: ${missing}`, 400));
     }
 
-    // Activate only after KYC + Ads + Tasks targets are all met.
+    // Activate only after Invites + Ads + Tasks targets are all met.
     user.futureFund.status = 'active';
     user.futureFund.progress = 100;
     await user.save({ validateBeforeSave: false });
@@ -558,18 +453,17 @@ exports.unlockFutureFund = asyncHandler(async (req, res, next) => {
 });
 
 function mapReferralRow(ref, tx, commission) {
-    const kycStatus = String(ref.kyc?.status || '').toLowerCase();
-    const kycDone = kycStatus === 'approved' || kycStatus === 'verified';
     const cardActive = ref.isPaid && String(ref.withdrawalCard?.status || '') === 'active';
+    const registered = !!ref._id;
 
-    let milestone = 'waiting_kyc';
+    let milestone = 'registered';
     if (tx?.status === 'Failed') milestone = 'removed';
     else if (tx?.status === 'Completed' || (cardActive && tx?.status === 'Pending')) milestone = 'card_active';
     else if (cardActive) milestone = 'card_active';
-    else if (kycDone) milestone = 'card_pending';
+    else if (tx?.status === 'Pending' || registered) milestone = 'card_pending';
 
-    const amount = tx?.amount || (kycDone ? commission : 0);
-    const status = tx?.status || (kycDone ? 'Pending' : 'Waiting KYC');
+    const amount = tx?.amount || (registered ? commission : 0);
+    const status = tx?.status || (registered ? 'Pending' : 'Waiting');
 
     return {
         _id: tx?._id || ref._id,
@@ -579,7 +473,7 @@ function mapReferralRow(ref, tx, commission) {
         amount,
         status,
         createdAt: tx?.createdAt || ref.createdAt,
-        kycStatus: ref.kyc?.status || 'Not Started',
+        kycStatus: ref.kyc?.status || 'Not Required',
         kycApprovedAt: ref.kycApprovedAt || null,
         cardStatus: ref.withdrawalCard?.status || 'none',
         isPaid: !!ref.isPaid,
@@ -650,10 +544,10 @@ exports.attachReferral = asyncHandler(async (req, res, next) => {
     console.log(`[REFERRAL] Attached ${user._id} to referrer ${linked.referrer._id} after signup`);
 
     try {
-        const { creditReferralOnKyc } = require('../utils/referralReward');
-        await creditReferralOnKyc(user);
+        const { creditReferralOnRegister } = require('../utils/referralReward');
+        await creditReferralOnRegister(user);
     } catch (refErr) {
-        console.error('[REFERRAL] attach-referral KYC credit:', refErr.message);
+        console.error('[REFERRAL] attach-referral credit:', refErr.message);
     }
 
     res.status(200).json({ success: true, attached: true });
@@ -676,15 +570,13 @@ exports.getReferrals = asyncHandler(async (req, res, next) => {
             .sort('-createdAt'),
     ]);
 
-    const { creditReferralOnKyc } = require('../utils/referralReward');
+    const { creditReferralOnRegister } = require('../utils/referralReward');
     let creditedAny = false;
     for (const invitee of invitedUsers) {
-        const kycStatus = String(invitee.kyc?.status || '').toLowerCase();
-        const kycDone = kycStatus === 'approved' || kycStatus === 'verified';
         const hasTx = transactions.some((tx) => String(tx.referredUser?._id || tx.referredUser) === String(invitee._id));
-        if (kycDone && !hasTx) {
+        if (!hasTx) {
             try {
-                const result = await creditReferralOnKyc(invitee);
+                const result = await creditReferralOnRegister(invitee);
                 if (result?.credited) creditedAny = true;
             } catch (err) {
                 console.error('[REFERRAL] backfill on list failed:', err.message);
@@ -720,7 +612,7 @@ exports.getReferrals = asyncHandler(async (req, res, next) => {
     }
 
     const totalRevenue = referralsData.reduce((sum, r) => {
-        if (r.status === 'Waiting KYC') return sum;
+        if (r.status === 'Waiting KYC' || r.status === 'Waiting') return sum;
         return sum + (Number(r.amount) || 0);
     }, 0);
 

@@ -1,30 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Pencil, User, ShieldCheck, Users, Headset, MessageSquare,
+    Pencil, User, Users, Headset, MessageSquare,
     ChevronRight, ChevronLeft, LogOut, Mail, Phone, Flag, Loader2, X, Send
 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import api from '../../shared/services/api';
-import KycModal from '../components/KycModal';
 import ReferralsModal from '../components/ReferralsModal';
 import FeedbackModal from '../components/FeedbackModal';
 import EditProfileModal from '../components/EditProfileModal';
 
-const kycDisplay = (status) => {
-    const s = String(status || '').toLowerCase();
-    if (s === 'approved' || s === 'verified') return { text: 'Verified', color: 'text-emerald-600' };
-    if (s === 'pending') return { text: 'Pending', color: 'text-amber-600' };
-    if (s === 'rejected') return { text: 'Rejected', color: 'text-rose-600' };
-    return { text: 'Not Started', color: 'text-slate-400' };
-};
-
 const Profile = () => {
     const navigate = useNavigate();
     const { userData, addNotification, updateProfileImage, updateProfileData, logout, refreshUserProfile } = useUser();
-    const { name, id, email, phone, referrals, profileImage, kycStatus } = userData;
+    const { name, id, email, phone, referrals, profileImage } = userData;
     const [isUploading, setIsUploading] = useState(false);
-    const [isKycOpen, setIsKycOpen] = useState(false);
     const [isReferralsOpen, setIsReferralsOpen] = useState(false);
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
     const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
@@ -33,7 +23,6 @@ const Profile = () => {
     const [isSendingReport, setIsSendingReport] = useState(false);
 
     const inviteCount = Number(referrals?.count || 0);
-    const kyc = kycDisplay(kycStatus);
 
     const handleImageChange = async (e) => {
         const file = e.target.files?.[0];
@@ -101,7 +90,6 @@ const Profile = () => {
                 <h1 className="text-[17px] font-semibold text-[#462211] tracking-tight">Profile</h1>
             </div>
             <div className="px-3 pt-2"></div>
-            <KycModal isOpen={isKycOpen} onClose={() => setIsKycOpen(false)} />
             <ReferralsModal isOpen={isReferralsOpen} onClose={() => setIsReferralsOpen(false)} referralCount={inviteCount} />
             <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
             <EditProfileModal isOpen={isEditProfileOpen} onClose={() => setIsEditProfileOpen(false)} userData={userData} updateProfileData={updateProfileData} addNotification={addNotification} />
@@ -196,30 +184,14 @@ const Profile = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2.5 mb-2.5">
-                <button
-                    type="button"
-                    onClick={() => setIsKycOpen(true)}
-                    className="bg-white rounded-2xl px-3 py-3 text-left shadow-[0_4px_16px_rgba(15,23,42,0.05)] active:scale-[0.99]"
-                >
-                    <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-2">
-                            <ShieldCheck size={18} className="text-emerald-500 mt-0.5 shrink-0" />
-                            <div>
-                                <p className="text-[13px] font-medium text-slate-800 leading-tight">KYC Status</p>
-                                <p className={`text-[8px] font-medium uppercase tracking-wider mt-1 ${kyc.color}`}>{kyc.text}</p>
-                            </div>
-                        </div>
-                        <ChevronRight size={16} className="text-slate-300 mt-1" />
-                    </div>
-                </button>
+            <div className="mb-2.5">
                 <button
                     type="button"
                     onClick={() => {
                         if (refreshUserProfile) refreshUserProfile(false);
                         setIsReferralsOpen(true);
                     }}
-                    className="bg-white rounded-2xl px-3 py-3 text-left shadow-[0_4px_16px_rgba(15,23,42,0.05)] active:scale-[0.99]"
+                    className="w-full bg-white rounded-2xl px-3 py-3 text-left shadow-[0_4px_16px_rgba(15,23,42,0.05)] active:scale-[0.99]"
                 >
                     <div className="flex items-start justify-between">
                         <div className="flex items-start gap-2">

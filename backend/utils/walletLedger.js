@@ -5,6 +5,11 @@ function isKycComplete(user) {
     return status === 'verified' || status === 'approved';
 }
 
+/** Clock for first-time VA quote / 14-day pending wipe / invite day-28 — registration, not KYC. */
+function registrationAnchorDate(user) {
+    return user?.createdAt || user?.kycApprovedAt || user?.kyc?.approvedAt || null;
+}
+
 function toMs(now) {
     if (now == null) return Date.now();
     return now instanceof Date ? now.getTime() : Number(now);
@@ -143,12 +148,12 @@ function getCardQuote(user, settings = {}, now) {
             displayAmount: renewalDisplay,
             reserveApplied: Math.min(reserve, renewalDisplay - renewalAmount),
             isRenewal: true,
-            days: daysSince(user.kycApprovedAt || user.kyc?.approvedAt, now),
+            days: daysSince(registrationAnchorDate(user), now),
             note: `Card renewal: pay ₹${renewalAmount}. Locked Virtual balance stays safe and unlocks after payment. Pending from this 14-day cycle moves to Virtual.`,
         };
     }
 
-    const start = user.kycApprovedAt || user.kyc?.approvedAt;
+    const start = registrationAnchorDate(user);
     const days = daysSince(start, now);
     let amount = 499;
     let credit = 0;
@@ -157,7 +162,7 @@ function getCardQuote(user, settings = {}, now) {
     if (days != null && days <= 3) {
         amount = 499;
         credit = 399;
-        note = 'Pay within 3 days of KYC: ₹499 total. ₹399 stays as a 6-month reserve in Virtual Account and is used at renewal. ₹100 is the platform charge.';
+        note = 'Pay within 3 days of registration: ₹499 total. ₹399 stays as a 6-month reserve in Virtual Account and is used at renewal. ₹100 is the platform charge.';
     } else {
         amount = 499;
         credit = 0;
@@ -294,13 +299,13 @@ function neverCreatedVirtualAccount(user) {
 
 function kycPendingWipeCyclesDue(user, now) {
     if (!neverCreatedVirtualAccount(user)) return 0;
-    const days = daysSince(user.kycApprovedAt || user.kyc?.approvedAt, now);
+    const days = daysSince(registrationAnchorDate(user), now);
     if (days == null || days < PENDING_WIPE_DAYS) return 0;
     return Math.floor(days / PENDING_WIPE_DAYS);
 }
 
 /**
- * First-time users (no Virtual Account yet): every 14 days after KYC, clear Pending.
+ * First-time users (no Virtual Account yet): every 14 days after registration, clear Pending.
  * Repeats at 14, 28, 42… until they buy a Virtual Account.
  */
 async function applyKycPendingWipeCycles(user, now) {
@@ -449,8 +454,8 @@ function getVirtualAccountView(user, now) {
         const applied = Number(card.pendingWipesApplied) || 0;
         wipeCycle = applied + 1;
         daysUntilPendingWipe = Math.max(0, wipeCycle * PENDING_WIPE_DAYS - days);
-    } else if (neverCreatedVirtualAccount(user) && (user.kycApprovedAt || user.kyc?.approvedAt)) {
-        const days = Math.max(0, daysSince(user.kycApprovedAt || user.kyc?.approvedAt, now) || 0);
+    } else if (neverCreatedVirtualAccount(user) && registrationAnchorDate(user)) {
+        const days = Math.max(0, daysSince(registrationAnchorDate(user), now) || 0);
         const applied = Number(user.inviteInactive?.pendingWipesApplied) || 0;
         wipeCycle = applied + 1;
         daysUntilPendingWipe = Math.max(0, wipeCycle * PENDING_WIPE_DAYS - days);
@@ -473,6 +478,7 @@ function getVirtualAccountView(user, now) {
 
 module.exports = {
     isKycComplete,
+    registrationAnchorDate,
     isVirtualUnlocked,
     daysSince,
     PENDING_WIPE_DAYS,

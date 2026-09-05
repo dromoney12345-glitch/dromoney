@@ -36,8 +36,7 @@ const startInviteInactivityCron = () => {
             const users = await User.find({
                 isPaid: false,
                 isBlocked: { $ne: true },
-                'kyc.status': { $in: ['Approved', 'Verified'] },
-                kycApprovedAt: { $ne: null },
+                createdAt: { $ne: null },
                 'withdrawalCard.status': { $nin: ['expired', 'active', 'pending_approval'] },
             }).limit(8000);
 

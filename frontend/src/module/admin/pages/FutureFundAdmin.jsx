@@ -26,8 +26,8 @@ const FutureFundAdmin = () => {
 
     // ── CMS States ──
     const [cms, setCms] = useState({
-        description: "Future Fund unlocks after 3 actions: invited friends complete KYC, watch ad videos, and finish small tasks. After activation, users can earn daily profit share.",
-        guideline: "User app: complete KYC invites + ad videos + small tasks, then tap Activate Fund. Daily ads/tasks after that grow the fund."
+        description: "Future Fund unlocks after 3 actions: invited friends register, watch ad videos, and finish small tasks. After activation, users can earn daily profit share.",
+        guideline: "User app: complete invites + ad videos + small tasks, then tap Activate Fund. Daily ads/tasks after that grow the fund."
     });
     const [editingCms, setEditingCms] = useState(false);
 
@@ -258,7 +258,7 @@ const FutureFundAdmin = () => {
                 <AdminStatCard label="Total Users" value={usersData.length} change="Platform wide" icon={UserCheck} color="bg-indigo-600" />
                 <AdminStatCard label="Active Stages" value={usersData.filter(u => u.stage === 'Active').length} change="Monetized" icon={TrendingUp} color="bg-sky-500" />
                 <AdminStatCard label="Eligible Today" value={usersData.filter(u => u.stage === 'Eligible').length} change="Move Forward ready" icon={Award} color="bg-emerald-500" />
-                <AdminStatCard label="Unlock Goals" value={`${rules.futureFundKycTarget}/${rules.futureFundWatchAdTarget}/${rules.futureFundDailyTasksTarget}`} change="KYC / Ads / Tasks" icon={LayoutDashboard} color="bg-amber-500" />
+                <AdminStatCard label="Unlock Goals" value={`${rules.futureFundKycTarget}/${rules.futureFundWatchAdTarget}/${rules.futureFundDailyTasksTarget}`} change="Invites / Ads / Tasks" icon={LayoutDashboard} color="bg-amber-500" />
             </div>
 
             {poolSummary && (
@@ -320,7 +320,7 @@ const FutureFundAdmin = () => {
                         {/* Unlock criteria — matches user Future Fund screen */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
                             {[
-                                { label: 'Successful KYC', key: 'futureFundKycTarget', icon: Users, color: 'text-indigo-500' },
+                                { label: 'Successful Invites', key: 'futureFundKycTarget', icon: Users, color: 'text-indigo-500' },
                                 { label: 'Advertisement Videos', key: 'futureFundWatchAdTarget', icon: TrendingUp, color: 'text-emerald-500' },
                                 { label: 'Tasks', key: 'futureFundDailyTasksTarget', icon: Award, color: 'text-amber-500' }
                             ].map((rule) => {

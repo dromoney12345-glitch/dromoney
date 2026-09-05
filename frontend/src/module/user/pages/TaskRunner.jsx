@@ -25,12 +25,6 @@ const TaskRunner = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addCoins, userData, refreshUserProfile } = useUser();
-    const kycOk = ['approved', 'verified'].includes(String(userData?.kycStatus || '').toLowerCase());
-
-    useEffect(() => {
-        if (!userData?.mongoId) return;
-        if (!kycOk) navigate(-1);
-    }, [userData?.mongoId, kycOk, navigate]);
 
     // Fetch dynamic task from storage once inside an effect
     const [task, setTask] = useState(null);
@@ -135,11 +129,17 @@ const TaskRunner = () => {
             if (window.flutter_inappwebview || window.FlutterInAppWebView) {
                 try {
                     const { showFlutterRewardedAd } = await import('../../shared/utils/flutterAds');
-                    const { ok } = await showFlutterRewardedAd('reward_ad_1');
-                    if (ok) {
+                    const adResult = await showFlutterRewardedAd('reward_ad_1');
+                    const countIt =
+                        adResult.ok ||
+                        (Number(adResult.elapsedMs) >= 5000 &&
+                            adResult.reason !== 'failed' &&
+                            adResult.reason !== 'no_bridge' &&
+                            adResult.reason !== 'error');
+                    if (countIt) {
                         await submitTask();
                     } else {
-                        showToast('Watch the full ad to complete this task. Back/close does not count.', 'error');
+                        showToast('Poora ad dekho — back/close mat dabao.', 'error');
                         setStatus('idle');
                     }
                 } catch (e) {

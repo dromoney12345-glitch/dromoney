@@ -59,17 +59,6 @@ const IncomeInfo = () => {
     }, [window.location.hash]);
 
     const handleProtectedAction = (path) => {
-        const kycStr = (userData?.kycStatus || 'Not Started').toLowerCase();
-        
-        if (kycStr !== 'verified' && kycStr !== 'approved') {
-            if (kycStr === 'pending' || kycStr === 'rejected') {
-                navigate('/user/auth/pending');
-            } else {
-                navigate('/user/auth/kyc');
-            }
-            return;
-        }
-
         if (!userData.isPaid) {
             addNotification("Access Denied", "Please firstly take the 499 plan then access will be granted.", "error");
             setPaymentModal({ isOpen: true, plan: 'Lifetime Access Plan' });

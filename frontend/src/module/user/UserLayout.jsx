@@ -9,6 +9,9 @@ import api from '../shared/services/api';
 import { isFlutterWebView, requestNativeFcmToken, saveFcmTokenToServer } from '../shared/utils/fcmToken';
 import LogoImg from '../../assets/WhatsApp_Image_2026-04-28_at_10.52.49_PM-removebg-preview.png';
 import PullToRefreshWrapper from './components/PullToRefreshWrapper';
+import VaGuidePopup from './components/VaGuidePopup';
+
+const VA_GUIDE_SESSION_KEY = 'dromoney_va_guide_shown';
 
 const UserLayout = () => {
     const location = useLocation();
@@ -16,13 +19,37 @@ const UserLayout = () => {
     const [isNotifOpen, setIsNotifOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+    const [showVaGuide, setShowVaGuide] = useState(false);
     const { userData, notifications, clearNotifications, markAsRead, logout, addNotification, fetchNotifications } = useUser();
 
-    const kycOk = ['approved', 'verified'].includes(String(userData?.kycStatus || '').toLowerCase());
+    const hasActiveVirtualAccount =
+        !!userData?.isPaid && String(userData?.withdrawalCard?.status || '').toLowerCase() === 'active';
 
-    // Future Fund heartbeat after KYC (no longer requires ₹499 unlock)
+    // One-time VA purchase guide after login (this session only; not if VA already bought)
     useEffect(() => {
-        if (!kycOk) return undefined;
+        if (!userData?.mongoId) return undefined;
+        if (hasActiveVirtualAccount) {
+            setShowVaGuide(false);
+            return undefined;
+        }
+        if (sessionStorage.getItem(VA_GUIDE_SESSION_KEY) === '1') return undefined;
+        if (/virtual-account|withdrawal-card/.test(location.pathname)) return undefined;
+
+        const t = setTimeout(() => {
+            sessionStorage.setItem(VA_GUIDE_SESSION_KEY, '1');
+            setShowVaGuide(true);
+        }, 900);
+        return () => clearTimeout(t);
+    }, [userData?.mongoId, hasActiveVirtualAccount, location.pathname]);
+
+    const dismissVaGuide = () => {
+        sessionStorage.setItem(VA_GUIDE_SESSION_KEY, '1');
+        setShowVaGuide(false);
+    };
+
+    // Future Fund heartbeat for logged-in users
+    useEffect(() => {
+        if (!userData?.mongoId) return undefined;
 
         const ping = () => {
             if (document.visibilityState !== 'visible') return;
@@ -43,11 +70,19 @@ const UserLayout = () => {
             clearInterval(interval);
             document.removeEventListener('visibilitychange', onVisible);
         };
-    }, [kycOk]);
+    }, [userData?.mongoId]);
 
     useEffect(() => {
         requestNativeFcmToken();
-        if (isFlutterWebView()) return undefined;
+        const retryA = setTimeout(() => requestNativeFcmToken(), 1500);
+        const retryB = setTimeout(() => requestNativeFcmToken(), 5000);
+
+        if (isFlutterWebView()) {
+            return () => {
+                clearTimeout(retryA);
+                clearTimeout(retryB);
+            };
+        }
 
         let unsubscribe = () => {};
         const registerWebFcm = async () => {
@@ -68,12 +103,14 @@ const UserLayout = () => {
                     if (title && body) {
                         addNotification(title, body, payload?.data?.type || 'info');
                         fetchNotifications?.();
-                    }
-                    if (Notification.permission === 'granted' && payload?.notification) {
-                        new Notification(payload.notification.title, {
-                            body: payload.notification.body,
-                            icon: '/logo.png',
-                        });
+                        // Browser system toast when tab is open
+                        if (Notification.permission === 'granted') {
+                            try {
+                                new Notification(title, { body, icon: '/logo.png' });
+                            } catch {
+                                /* ignore */
+                            }
+                        }
                     }
                 });
             } catch (err) {
@@ -81,7 +118,11 @@ const UserLayout = () => {
             }
         };
         registerWebFcm();
-        return () => unsubscribe();
+        return () => {
+            clearTimeout(retryA);
+            clearTimeout(retryB);
+            unsubscribe();
+        };
     }, []);
 
     useEffect(() => {
@@ -146,6 +187,7 @@ const UserLayout = () => {
 
     return (
         <div className="user-app-shell bg-white text-slate-900 font-poppins overflow-hidden flex flex-col w-full max-w-[430px] mx-auto relative" style={{ backgroundColor: '#FCF8F5' }}>
+            <VaGuidePopup isOpen={showVaGuide} onClose={dismissVaGuide} />
             <header className="shrink-0 z-50 bg-white px-3 py-2 flex items-center justify-between min-h-[54px] border-b border-slate-100/80">
                 <div className="flex items-center gap-2.5 active:scale-95 transition-transform cursor-pointer" onClick={() => navigate('/user/home')}>
                     <div

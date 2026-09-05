@@ -7,8 +7,7 @@ import { isFlutterApp } from '../../shared/utils/flutterAds';
 
 const Offerwall = () => {
     const navigate = useNavigate();
-    const { userData, loading: userLoading } = useUser();
-    const status = String(userData?.kycStatus || 'Not Started').toLowerCase();
+    const { loading: userLoading } = useUser();
 
     const [loading, setLoading] = useState(true);
     const [enabled, setEnabled] = useState(false);
@@ -17,13 +16,6 @@ const Offerwall = () => {
 
     useEffect(() => {
         if (userLoading) return;
-        if (status === 'pending' || status === 'rejected') navigate('/user/auth/pending');
-        else if (status === 'not started') navigate('/user/auth/kyc');
-    }, [status, navigate, userLoading]);
-
-    useEffect(() => {
-        if (userLoading) return;
-        if (status === 'pending' || status === 'rejected' || status === 'not started') return;
 
         const load = async () => {
             setLoading(true);
@@ -44,18 +36,18 @@ const Offerwall = () => {
             }
         };
         load();
-    }, [userLoading, status]);
+    }, [userLoading]);
 
     const openInBrowser = () => {
         if (!wallUrl) return;
         window.open(wallUrl, '_blank', 'noopener,noreferrer');
     };
 
-    if (userLoading || status === 'pending' || status === 'rejected' || status === 'not started') {
+    if (userLoading) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center gap-3 bg-[#FCF8F5] font-poppins">
                 <Loader2 className="animate-spin text-[#462211]" size={28} />
-                <p className="text-[10px] uppercase tracking-widest text-[#9A8478]">Verifying KYC...</p>
+                <p className="text-[10px] uppercase tracking-widest text-[#9A8478]">Loading...</p>
             </div>
         );
     }
