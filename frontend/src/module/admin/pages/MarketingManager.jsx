@@ -234,7 +234,7 @@ const MarketingManager = () => {
     const ALL_GUIDES_LIST = [
         { id: 'va-popup', label: 'VA Login Popup', dbKey: VA_GUIDE_CONTENT_KEY, icon: CreditCard },
         { id: 'explore-now', label: 'Explore Now Guide', dbKey: 'explore_now_guide', icon: Compass },
-        { id: 'kyc', label: 'Get Started', dbKey: 'guide_kyc', icon: ShieldCheck },
+        { id: 'get-started', label: 'Get Started', dbKey: 'guide_get_started', icon: ShieldCheck },
         { id: 'invite', label: 'How to Invite?', dbKey: 'guide_invite', icon: UserPlus },
         { id: 'card', label: 'Create Virtual Account', dbKey: 'guide_card', icon: CreditCard },
         { id: 'withdraw', label: 'How to Withdraw?', dbKey: 'guide_withdraw', icon: Wallet },
@@ -281,6 +281,18 @@ const MarketingManager = () => {
             setExploreGuide({ ...DEFAULT_VA_GUIDE, content: '', logoUrl: '' });
         } else if (guideId === 'explore-now') {
             setExploreGuide(DEFAULT_EXPLORE_GUIDE);
+        } else if (guideId === 'get-started') {
+            setExploreGuide({
+                badge: 'GET STARTED',
+                title: 'How to get started',
+                subtitle: 'Register & Login only — no Aadhaar / KYC',
+                logoUrl: '',
+                ctaText: 'Start Earning',
+                nextRoute: '/user/income',
+                content:
+                    'Create your account with mobile OTP — no KYC. After login use Income, invites, and Daily Work. Create a Virtual Account for withdrawals and Pending → Virtual.',
+                points: [],
+            });
         } else if (guideId === 'affiliate-how') {
             setExploreGuide({
                 badge: 'AFFILIATE CENTER',

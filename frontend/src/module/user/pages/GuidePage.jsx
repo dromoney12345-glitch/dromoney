@@ -20,12 +20,16 @@ const ICON_MAP = {
 const GuidePage = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
-    const activeSlug = slug || 'explore-now';
-    const fallbackGuide = GUIDES[activeSlug] || GUIDES['explore-now'] || GUIDES.kyc;
+    const activeSlug = slug === 'kyc' ? 'get-started' : (slug || 'explore-now');
+    const fallbackGuide = GUIDES[activeSlug] || GUIDES['explore-now'] || GUIDES['get-started'];
     const [guide, setGuide] = useState(fallbackGuide);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (slug === 'kyc') {
+            navigate('/user/guide/get-started', { replace: true });
+            return undefined;
+        }
         const fetchGuide = async () => {
             setLoading(true);
             try {
@@ -33,7 +37,9 @@ const GuidePage = () => {
                     ? 'explore_now_guide'
                     : activeSlug === 'affiliate-how'
                         ? 'page_affiliate_how_it_works'
-                        : `guide_${activeSlug}`;
+                        : activeSlug === 'get-started'
+                            ? 'guide_get_started'
+                            : `guide_${activeSlug}`;
                 const res = await api.get(`/public/content/${contentKey}`);
 
                 if (res && res.success && res.data) {
@@ -62,8 +68,10 @@ const GuidePage = () => {
                             points: rawPoints
                         };
                         const stillKyc =
-                            (activeSlug === 'invite' || activeSlug === 'affiliate-how') &&
-                            /\bKYC\b|Aadhaar/i.test(`${nextGuide.content || ''} ${JSON.stringify(nextGuide.points || [])}`);
+                            (activeSlug === 'invite' || activeSlug === 'affiliate-how' || activeSlug === 'get-started') &&
+                            /How to do KYC|Complete KYC|Upload Aadhaar|Aadhaar verification|Complete your 1-Step Aadhaar|Friend Completes KYC|KYC Complete करता/i.test(
+                                `${nextGuide.content || ''} ${nextGuide.title || ''} ${JSON.stringify(nextGuide.points || [])}`
+                            );
                         if (stillKyc && fallbackGuide) {
                             setGuide({
                                 ...fallbackGuide,
@@ -105,7 +113,7 @@ const GuidePage = () => {
             }
         };
         fetchGuide();
-    }, [activeSlug]);
+    }, [activeSlug, slug, navigate]);
 
     const goNext = () => {
         localStorage.setItem(`dromoney_guide_${activeSlug}`, 'seen');
