@@ -257,6 +257,7 @@ function App() {
               <Route path="home" element={<Home />} />
               <Route path="earn" element={<Earn />} />
               <Route path="income" element={<Income />} />
+              <Route path="guide/kyc" element={<Navigate to="/user/guide/get-started" replace />} />
               <Route path="guide/:slug" element={<GuidePage />} />
               <Route path="withdrawal-card" element={<WithdrawalCard />} />
               <Route path="virtual-account" element={<WithdrawalCard />} />
