@@ -41,24 +41,24 @@ Withdraw your verified earnings directly to your UPI ID or Bank Account with 100
         }
     },
     {
-        key: 'guide_kyc',
-        title: 'How to do KYC',
-        description: 'Aadhaar verification steps',
+        key: 'guide_get_started',
+        title: 'How to get started',
+        description: 'Register & Login — no KYC',
         data: {
-            badge: 'YOUR GROWTH OUR GUIDANCE',
-            title: 'How to do KYC',
-            subtitle: 'Complete your 1-Step Aadhaar verification',
+            badge: 'GET STARTED',
+            title: 'How to get started',
+            subtitle: 'Register & Login only — no Aadhaar / KYC',
             logoUrl: '',
-            ctaText: 'Complete KYC Now',
+            ctaText: 'Start Earning',
             nextRoute: '/user/income',
-            content: `📋 Step 1: Open KYC Verification
-Opening the Income tab will automatically take you to KYC setup if it is not already completed.
+            content: `📱 1. Account बनाएं & Login करें
+Mobile Number और OTP से Register / Login करें। KYC / Aadhaar की जरूरत नहीं है।
 
-🆔 Step 2: Enter Aadhaar Details
-Enter your valid 12-digit Aadhaar number and upload clear front and back photos.
+🏠 2. App explore करें
+Login के बाद Income, Daily Work, Invite और Future Fund इस्तेमाल कर सकते हैं।
 
-✅ Step 3: Admin Approval
-After instant admin review, your Income center opens for 100% free access without any platform fees.`
+💳 3. Virtual Account
+Withdrawals और Pending → Virtual unlock के लिए Virtual Account बनाएं।`
         }
     },
     {

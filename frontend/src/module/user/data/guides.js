@@ -105,10 +105,18 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
             'Pay ₹499 → admin approval → Virtual Account unlocks for 6 months.',
         ],
     },
-    kyc: {
+    'get-started': {
         title: 'How to get started',
         subtitle: 'Register & Login only',
         next: '/user/income',
+        content: `📱 1. Account बनाएं & Login करें
+Mobile Number और OTP से Register / Login करें। KYC / Aadhaar की जरूरत नहीं है।
+
+🏠 2. App explore करें
+Login के बाद Income, Daily Work, Invite और Future Fund इस्तेमाल कर सकते हैं।
+
+💳 3. Virtual Account
+Withdrawals और Pending → Virtual unlock के लिए Virtual Account बनाएं।`,
         points: [
             'Create your account with mobile number and OTP — no Aadhaar or KYC needed.',
             'After Login or Register you can use Income, tasks, ads, and invites.',
@@ -162,7 +170,7 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
 
 /** 8 cards: Get started, Invite, Virtual Account, etc. */
 export const HOME_GUIDE_CARDS = [
-    { slug: 'kyc', label: 'Get Started', icon: 'ClipboardCheck', iconBg: 'bg-violet-50', iconColor: 'text-violet-600' },
+    { slug: 'get-started', label: 'Get Started', icon: 'ClipboardCheck', iconBg: 'bg-violet-50', iconColor: 'text-violet-600' },
     { slug: 'invite', label: 'How to Invite?', icon: 'UserPlus', iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
     { slug: 'card', label: 'Create Virtual Account', icon: 'CreditCard', iconBg: 'bg-amber-50', iconColor: 'text-amber-600' },
     { slug: 'withdraw', label: 'How to Withdraw?', icon: 'Wallet', iconBg: 'bg-sky-50', iconColor: 'text-sky-600' },
