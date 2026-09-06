@@ -25,7 +25,8 @@ exports.getUsers = async (req, res, next) => {
         }
 
         if (status && status !== 'All') {
-            query['kyc.status'] = status;
+            if (status === 'Active') query.isBlocked = { $ne: true };
+            else if (status === 'Blocked') query.isBlocked = true;
         }
 
         const users = await User.find(query).sort('-createdAt');
@@ -40,94 +41,25 @@ exports.getUsers = async (req, res, next) => {
     }
 };
 
-// @desc    Manage KYC
+// @desc    KYC removed — endpoint kept for old admin clients
 // @route   PUT /api/admin/users/:id/kyc
 // @access  Private (Admin)
-exports.manageKYC = async (req, res, next) => {
-    try {
-        const { status, rejectionReason } = req.body;
-        const user = await User.findById(req.params.id);
-
-        if (!user) {
-            return next(new ErrorResponse('User not found', 404));
-        }
-
-        // Ensure kyc object exists
-        if (!user.kyc) {
-            user.kyc = { status: 'Not Started' };
-        }
-
-        const statusKey = String(status || '').trim().toLowerCase();
-        const kycApproved = statusKey === 'approved' || statusKey === 'verified';
-        const kycRejected = statusKey === 'rejected';
-        if (kycApproved) {
-            user.kyc.status = statusKey === 'verified' ? 'Verified' : 'Approved';
-        } else if (kycRejected) {
-            user.kyc.status = 'Rejected';
-        } else {
-            user.kyc.status = status;
-        }
-        
-        if (kycApproved) {
-            user.kyc.rejectionReason = ''; // Clear reason on approval
-            if (!user.kycApprovedAt) user.kycApprovedAt = new Date();
-        } else if (kycRejected) {
-            if (rejectionReason) user.kyc.rejectionReason = rejectionReason;
-        }
-
-        // Use markModified for nested objects to ensure Mongoose detects change
-        user.markModified('kyc');
-        await user.save();
-
-        // Idempotent backfill if older invitee never got register credit
-        if (kycApproved) {
-            try {
-                const { creditReferralOnRegister } = require('../utils/referralReward');
-                const result = await creditReferralOnRegister(user);
-                console.log('[REFERRAL] legacy KYC path credit:', result);
-            } catch (refErr) {
-                console.error('[REFERRAL] legacy KYC path credit failed:', refErr.message);
-            }
-        }
-
-        try {
-            const { notifyJourney } = require('../utils/userJourneyPush');
-            if (kycApproved) {
-                await notifyJourney(user._id, 'kyc_approved');
-            } else if (kycRejected) {
-                await notifyJourney(user._id, 'kyc_rejected', {
-                    body: rejectionReason
-                        ? `आपका KYC verification complete नहीं हो सका। Reason: ${rejectionReason}. कृपया सुधार कर documents दोबारा submit करें।`
-                        : undefined,
-                });
-            }
-        } catch (pushErr) {
-            console.error('Push notification failed for manageKYC:', pushErr.message);
-        }
-
-        res.status(200).json({
-            success: true,
-            data: user
-        });
-    } catch (err) {
-        next(err);
-    }
+exports.manageKYC = async (req, res) => {
+    res.status(410).json({
+        success: false,
+        message: 'KYC is no longer used. Users only need Login / Register.',
+    });
 };
 
-// @desc    Get all users with Pending KYC
+// @desc    Pending KYC list removed
 // @route   GET /api/admin/kyc/pending
 // @access  Private (Admin)
-exports.getPendingKyc = async (req, res, next) => {
-    try {
-        const users = await User.find({ 'kyc.status': { $in: ['Pending', 'pending'] } }).sort('-createdAt');
-        res.status(200).json({
-            success: true,
-            count: users.length,
-            data: users
-        });
-    } catch (err) {
-        next(err);
-    }
+exports.getPendingKyc = async (req, res) => {
+    res.status(200).json({
+        success: true,
+        count: 0,
+        data: [],
+    });
 };
 
 // @desc    Block/Unblock User

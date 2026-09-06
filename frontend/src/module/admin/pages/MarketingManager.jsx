@@ -33,7 +33,7 @@ const DEFAULT_EXPLORE_GUIDE = {
             icon: 'Sparkles'
         },
         {
-            title: '📱 1. Account बनाएं & KYC करें',
+            title: '📱 1. Account बनाएं & Login करें',
             text: 'Dromoney इस्तेमाल करने के लिए सबसे पहले Account बनाना होता है। आप Mobile Number और OTP से Login कर सकते हैं। इसके बाद अपना 1-Step Aadhaar Verification पूरा करके सभी इनकम प्रोजेक्ट्स का फ्री एक्सेस अनलॉक करें।',
             icon: 'ShieldCheck'
         },
@@ -44,7 +44,7 @@ const DEFAULT_EXPLORE_GUIDE = {
         },
         {
             title: '👥 3. Invite Friends & Referrals',
-            text: 'अपना पर्सनल रेफरल लिंक दोस्तों के साथ शेयर करें। जब वे KYC पूरा करते हैं, ₹200 आपके Pending Wallet में जाता है। जब वे Virtual Account बनाते हैं, तब यह Virtual में जाता है। VA न बनाने पर उनका Pending हर 14 दिन (14, 28, 42…) पर clear होता है।',
+            text: 'अपना पर्सनल रेफरल लिंक दोस्तों के साथ शेयर करें। जब वे रजिस्टर करते हैं, ₹200 आपके Pending Wallet में जाता है। जब वे Virtual Account बनाते हैं, तब यह Virtual में जाता है। VA न बनाने पर उनका Pending हर 14 दिन (14, 28, 42…) पर clear होता है।',
             icon: 'UserPlus'
         },
         {
@@ -232,7 +232,7 @@ const MarketingManager = () => {
     // ── All User Guides List & CMS ──
     const ALL_GUIDES_LIST = [
         { id: 'explore-now', label: 'Explore Now Guide', dbKey: 'explore_now_guide', icon: Compass },
-        { id: 'kyc', label: 'How to do KYC?', dbKey: 'guide_kyc', icon: ShieldCheck },
+        { id: 'kyc', label: 'Get Started', dbKey: 'guide_kyc', icon: ShieldCheck },
         { id: 'invite', label: 'How to Invite?', dbKey: 'guide_invite', icon: UserPlus },
         { id: 'card', label: 'Create Virtual Account', dbKey: 'guide_card', icon: CreditCard },
         { id: 'withdraw', label: 'How to Withdraw?', dbKey: 'guide_withdraw', icon: Wallet },
@@ -285,7 +285,7 @@ const MarketingManager = () => {
                 ctaText: 'Invite Friends',
                 nextRoute: '/user/marketing',
                 content:
-                    'Share your invite link. After your friend completes KYC, ₹200 goes to your Pending Wallet. It moves to Virtual when they create a Virtual Account. If they do not create a Virtual Account, their Pending is cleared every 14 days (14, 28, 42…) until they buy one. After a 6-month Virtual Account expires, the same 14-day Pending cycle runs until they renew. Old Virtual balance is never deleted.',
+                    'Share your invite link. After your friend registers, ₹200 goes to your Pending Wallet. It moves to Virtual when they create a Virtual Account. If they do not create a Virtual Account, their Pending is cleared every 14 days (14, 28, 42…) until they buy one. After a 6-month Virtual Account expires, the same 14-day Pending cycle runs until they renew. Old Virtual balance is never deleted.',
                 points: [],
             });
         } else if (guideId === 'daily') {
@@ -572,7 +572,7 @@ const MarketingManager = () => {
                                                     <button
                                                         type="button"
                                                         onClick={() => {
-                                                            const hindiTemplate = `🚀 Dromoney कैसे काम करता है?\n❇️ Dromoney में आपका स्वागत है! Dromoney एक Learning, Part-Time Opportunity, Business Guidance और Support Platform है। यहाँ यूजर नई चीज़ें सीख सकता है, Part-Time Opportunities को समझ सकता है, Business Ideas देख सकता है, SHME Ecosystem के माध्यम से अपना बिज़नेस शुरू करने की जानकारी प्राप्त कर सकता है और Community Activities में भाग ले सकता है।\n\n⚠️ Dromoney किसी भी प्रकार की निश्चित कमाई (Guaranteed Income), निश्चित लाभ (Guaranteed Profit) या व्यवसाय में सफलता की गारंटी नहीं देता। परिणाम प्रत्येक यूजर की मेहनत, कौशल, भागीदारी और परिस्थितियों पर निर्भर करते हैं।\n\n📱 1. Account बनाएं & KYC करें\nDromoney इस्तेमाल करने के लिए सबसे पहले Account बनाना होता है। आप Mobile Number और OTP से Login कर सकते हैं। इसके बाद अपना 1-Step Aadhaar Verification पूरा करके सभी इनकम प्रोजेक्ट्स का फ्री एक्सेस अनलॉक करें।\n\n🏠 2. Home Page & Opportunities\nLogin करने के बाद Home Page दिखाई देता है। यहाँ आपको मिलता है:\n• 🎯 Part-Time Income Modules & Daily Tasks\n• 💼 Business Content & Exclusive Ideas\n• 🚀 Future Fund & Growth Boosters\n• 🎁 Daily Quizzes, Video Watching & Rewards\n• 👥 Community Guidelines & Help Desk\n\n👥 3. Invite Friends & Referrals\nअपना पर्सनल रेफरल लिंक दोस्तों के साथ शेयर करें। जब वे KYC पूरा करके विड्रॉल कार्ड बनाते हैं, तो आपके वॉलेट में रेफरल रिवॉर्ड इंसटेंट ऐड हो जाता है।\n\n💼 4. Part-Time Income & Business Guidance\nDromoney Users को अलग-अलग प्रकार की Opportunities को Explore करने का मौका देता है। आप Daily Tasks, Video Watching, Quizzes, Brand Promotion और Refer & Earn के माध्यम से Rewards Earn कर सकते हैं।\n\n💳 5. Withdrawal & Security\nकमाई हुई राशि को आप अपने Bank Account या UPI में आसानी से विड्रॉ कर सकते हैं। लाइफटाइम विड्रॉल कार्ड अनलॉक करके डायरेक्ट पेआउट्स प्राप्त करें। Withdrawal के लिए KYC Verification और Security Protocol का पालन करना अनिवार्य है।`;
+                                                            const hindiTemplate = `🚀 Dromoney कैसे काम करता है?\n❇️ Dromoney में आपका स्वागत है! Dromoney एक Learning, Part-Time Opportunity, Business Guidance और Support Platform है। यहाँ यूजर नई चीज़ें सीख सकता है, Part-Time Opportunities को समझ सकता है, Business Ideas देख सकता है, SHME Ecosystem के माध्यम से अपना बिज़नेस शुरू करने की जानकारी प्राप्त कर सकता है और Community Activities में भाग ले सकता है।\n\n⚠️ Dromoney किसी भी प्रकार की निश्चित कमाई (Guaranteed Income), निश्चित लाभ (Guaranteed Profit) या व्यवसाय में सफलता की गारंटी नहीं देता। परिणाम प्रत्येक यूजर की मेहनत, कौशल, भागीदारी और परिस्थितियों पर निर्भर करते हैं।\n\n📱 1. Account बनाएं & Login करें\nDromoney इस्तेमाल करने के लिए सबसे पहले Account बनाना होता है। आप Mobile Number और OTP से Login कर सकते हैं। इसके बाद अपना 1-Step Aadhaar Verification पूरा करके सभी इनकम प्रोजेक्ट्स का फ्री एक्सेस अनलॉक करें।\n\n🏠 2. Home Page & Opportunities\nLogin करने के बाद Home Page दिखाई देता है। यहाँ आपको मिलता है:\n• 🎯 Part-Time Income Modules & Daily Tasks\n• 💼 Business Content & Exclusive Ideas\n• 🚀 Future Fund & Growth Boosters\n• 🎁 Daily Quizzes, Video Watching & Rewards\n• 👥 Community Guidelines & Help Desk\n\n👥 3. Invite Friends & Referrals\nअपना पर्सनल रेफरल लिंक दोस्तों के साथ शेयर करें। जब वे KYC पूरा करके विड्रॉल कार्ड बनाते हैं, तो आपके वॉलेट में रेफरल रिवॉर्ड इंसटेंट ऐड हो जाता है।\n\n💼 4. Part-Time Income & Business Guidance\nDromoney Users को अलग-अलग प्रकार की Opportunities को Explore करने का मौका देता है। आप Daily Tasks, Video Watching, Quizzes, Brand Promotion और Refer & Earn के माध्यम से Rewards Earn कर सकते हैं।\n\n💳 5. Withdrawal & Security\nकमाई हुई राशि को आप अपने Bank Account या UPI में आसानी से विड्रॉ कर सकते हैं। लाइफटाइम विड्रॉल कार्ड अनलॉक करके डायरेक्ट पेआउट्स प्राप्त करें। Withdrawal के लिए KYC Verification और Security Protocol का पालन करना अनिवार्य है।`;
                                                             setExploreGuide({ ...exploreGuide, content: hindiTemplate });
                                                         }}
                                                         className="bg-slate-100 text-slate-700 hover:bg-slate-200 px-2 py-0.5 rounded text-[10px] font-medium transition-colors"
@@ -582,7 +582,7 @@ const MarketingManager = () => {
                                                     <button
                                                         type="button"
                                                         onClick={() => {
-                                                            const englishTemplate = `🚀 How Dromoney Works\nWelcome to Dromoney! Dromoney is a comprehensive Learning, Part-Time Opportunity, Business Guidance, and Support Platform. Here you can explore smart part-time earning opportunities, access exclusive business ideas, and participate in community rewards.\n\n⚠️ Disclaimer: Dromoney does not guarantee fixed income or profits. Earnings depend entirely on your effort, skills, and active participation.\n\n📱 1. Create Account & Complete KYC\nGetting started is quick and easy. Sign up using your mobile number and OTP. Complete your simple 1-Step Aadhaar verification to unlock instant access to high-paying income projects.\n\n🏠 2. Explore Home Dashboard\nOnce logged in, explore top earning opportunities:\n• 🎯 Part-Time Income Modules & Daily Tasks\n• 💼 Exclusive Business Ideas & Guidance\n• 🚀 Future Fund Profit Share & Multiplier Boosters\n• 🎁 Daily Quizzes, Video Ads & Extra Rewards\n\n👥 3. Refer Friends & Earn Rewards\nShare your unique referral invite link with friends. When they complete KYC and unlock their withdrawal card, instant referral rewards are credited to your matching wallet.\n\n💳 4. Instant Withdrawals & Security\nWithdraw your verified earnings directly to your UPI ID or Bank Account with 100% transparency and end-to-end encryption.`;
+                                                            const englishTemplate = `🚀 How Dromoney Works\nWelcome to Dromoney! Dromoney is a comprehensive Learning, Part-Time Opportunity, Business Guidance, and Support Platform. Here you can explore smart part-time earning opportunities, access exclusive business ideas, and participate in community rewards.\n\n⚠️ Disclaimer: Dromoney does not guarantee fixed income or profits. Earnings depend entirely on your effort, skills, and active participation.\n\n📱 1. Create Account & Login\nGetting started is quick and easy. Sign up using your mobile number and OTP. Complete your registration with OTP to unlock income projects.\n\n🏠 2. Explore Home Dashboard\nOnce logged in, explore top earning opportunities:\n• 🎯 Part-Time Income Modules & Daily Tasks\n• 💼 Exclusive Business Ideas & Guidance\n• 🚀 Future Fund Profit Share & Multiplier Boosters\n• 🎁 Daily Quizzes, Video Ads & Extra Rewards\n\n👥 3. Refer Friends & Earn Rewards\nShare your unique referral invite link with friends. When they complete KYC and unlock their withdrawal card, instant referral rewards are credited to your matching wallet.\n\n💳 4. Instant Withdrawals & Security\nWithdraw your verified earnings directly to your UPI ID or Bank Account with 100% transparency and end-to-end encryption.`;
                                                             setExploreGuide({ ...exploreGuide, content: englishTemplate });
                                                         }}
                                                         className="bg-slate-100 text-slate-700 hover:bg-slate-200 px-2 py-0.5 rounded text-[10px] font-medium transition-colors"

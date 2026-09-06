@@ -13,8 +13,6 @@ const CoinsAndTasks = () => {
     // Timing Settings
     const [taskWindowStart, setTaskWindowStart] = useState('00:00');
     const [taskWindowEnd, setTaskWindowEnd] = useState('23:59');
-    const [kycWindowStart, setKycWindowStart] = useState('07:00');
-    const [kycWindowEnd, setKycWindowEnd] = useState('19:00');
     const [taskRenewalHours, setTaskRenewalHours] = useState(24);
     
     // Modal State
@@ -43,8 +41,6 @@ const CoinsAndTasks = () => {
                 setDailyLimit(response.data.maxCoinsPerDay || 100);
                 setTaskWindowStart(response.data.taskWindowStart || '00:00');
                 setTaskWindowEnd(response.data.taskWindowEnd || '23:59');
-                setKycWindowStart(response.data.kycWindowStart || '07:00');
-                setKycWindowEnd(response.data.kycWindowEnd || '19:00');
                 setTaskRenewalHours(response.data.taskRenewalHours || 24);
             }
         } catch (err) {
@@ -134,8 +130,6 @@ const CoinsAndTasks = () => {
                 maxCoinsPerDay: Math.max(0, Number(dailyLimit) || 0),
                 taskWindowStart,
                 taskWindowEnd,
-                kycWindowStart,
-                kycWindowEnd,
                 taskRenewalHours: Number(taskRenewalHours)
             });
             
@@ -218,7 +212,7 @@ const CoinsAndTasks = () => {
 
                             
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 sm:col-span-2">
                                     <h4 className="text-xs font-semibold text-slate-700 uppercase mb-3">Tasks Window</h4>
                                     <div className="flex items-center gap-3">
                                         <div>
@@ -232,22 +226,6 @@ const CoinsAndTasks = () => {
                                         </div>
                                     </div>
                                     <p className="text-[10px] text-slate-500 mt-2">Users can only complete tasks during this time window.</p>
-                                </div>
-
-                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                    <h4 className="text-xs font-semibold text-slate-700 uppercase mb-3">KYC Window</h4>
-                                    <div className="flex items-center gap-3">
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 block mb-1">Start Time</label>
-                                            <input type="time" value={kycWindowStart} onChange={e => setKycWindowStart(e.target.value)} className="border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:border-sky-500" />
-                                        </div>
-                                        <span className="text-slate-400 mt-5">to</span>
-                                        <div>
-                                            <label className="text-[10px] text-slate-500 block mb-1">End Time</label>
-                                            <input type="time" value={kycWindowEnd} onChange={e => setKycWindowEnd(e.target.value)} className="border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:border-sky-500" />
-                                        </div>
-                                    </div>
-                                    <p className="text-[10px] text-slate-500 mt-2">Users can only submit KYC requests during this time window.</p>
                                 </div>
                             </div>
                             

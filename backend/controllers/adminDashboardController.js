@@ -52,9 +52,6 @@ exports.getStats = async (req, res, next) => {
             { $group: { _id: null, total: { $sum: '$amount' }, count: { $sum: 1 } } }
         ]);
 
-        // 4. Verification Queue
-        const pendingKycCount = await User.countDocuments({ 'kyc.status': 'Pending' });
-
         // 5. Total Wallet Balance in circulation
         const totalWalletBalance = await User.aggregate([
             { $group: { _id: null, total: { $sum: '$wallet.balance' } } }

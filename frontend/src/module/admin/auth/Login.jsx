@@ -61,7 +61,7 @@ const AdminLogin = () => {
                         </div>
 
                         <p className="text-[13px] text-white/70 max-w-[280px] leading-relaxed">
-                            Sign in to manage users, KYC, wallets, tasks, and Future Fund — same cream look as the live app.
+                            Sign in to manage users, wallets, tasks, and Future Fund — same cream look as the live app.
                         </p>
 
                         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-[10px] font-medium uppercase tracking-wider">

@@ -93,12 +93,14 @@ const Dashboard = () => {
             
             const userRes = await api.get('/admin/users');
             if (userRes.success) {
-                const pending = userRes.data.filter(u => u.kyc?.status === 'Pending').slice(0, 3);
-                setQueue(pending.map(u => ({
+                const pendingVa = userRes.data
+                    .filter((u) => String(u.withdrawalCard?.status || '') === 'pending_approval')
+                    .slice(0, 5);
+                setQueue(pendingVa.map((u) => ({
                     name: u.name,
                     time: 'Recent',
-                    type: 'KYC',
-                    status: 'Pending'
+                    type: 'VA',
+                    status: 'Pending',
                 })));
             }
         } catch (err) {
@@ -161,7 +163,7 @@ const Dashboard = () => {
     const formattedCurrent = revenueTarget.formattedCurrent || '₹0';
 
     const fraudAlerts = alerts || [];
-    const kycQueue = queue || [];
+    const reviewQueue = queue || [];
 
     const handleRefresh = async () => {
         setIsRefreshing(true);
@@ -525,23 +527,23 @@ const Dashboard = () => {
                         <button onClick={() => navigate('/admin/withdrawals')} className="text-[9px] font-medium text-indigo-500 uppercase flex items-center gap-2 hover:gap-3 transition-all">Wallets <ChevronRight size={10} /></button>
                     </div>
                     <div className="divide-y divide-slate-50 max-h-[360px] overflow-y-auto custom-scrollbar">
-                        {kycQueue.length === 0 ? (
+                        {reviewQueue.length === 0 ? (
                             <div className="p-6 text-center text-slate-400 text-[11px] uppercase tracking-normal">No pending requests</div>
-                        ) : kycQueue.map((k, i) => (
+                        ) : reviewQueue.map((k, i) => (
                             <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-all group/row">
                                 <div className="flex items-center gap-4">
                                     <div className="w-9 h-9 bg-slate-50 border border-slate-100 text-slate-900 rounded-xl flex items-center justify-center font-medium group-hover/row:bg-slate-900 group-hover/row:text-white transition-all">
-                                        {k.type === 'KYC' ? <ShieldCheck size={16} /> : <DollarSign size={16} />}
+                                        <DollarSign size={16} />
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2">
                                             <p className="text-[13px] font-medium text-slate-800 tracking-tight leading-none">{k.name}</p>
-                                            <span className={`text-[7px] font-medium px-1.5 py-0.5 rounded-md uppercase tracking-normal ${k.type === 'KYC' ? 'bg-indigo-50 text-indigo-500' : 'bg-emerald-50 text-emerald-500'}`}>{k.type}</span>
+                                            <span className="text-[7px] font-medium px-1.5 py-0.5 rounded-md uppercase tracking-normal bg-emerald-50 text-emerald-500">{k.type || 'VA'}</span>
                                         </div>
                                         <p className="text-[8px] font-medium text-slate-400 mt-1 uppercase tracking-tighter">{k.time} • Live System</p>
                                     </div>
                                 </div>
-                                <button onClick={() => navigate(k.type === 'KYC' ? '/admin/kyc' : '/admin/withdrawals')} className="bg-white border border-slate-100 text-slate-900 px-3 py-1.5 rounded-lg text-[9px] font-medium uppercase tracking-normal shadow-sm hover:bg-slate-900 hover:text-white transition-all">Review</button>
+                                <button onClick={() => navigate('/admin/payments')} className="bg-white border border-slate-100 text-slate-900 px-3 py-1.5 rounded-lg text-[9px] font-medium uppercase tracking-normal shadow-sm hover:bg-slate-900 hover:text-white transition-all">Review</button>
                             </div>
                         ))}
                     </div>

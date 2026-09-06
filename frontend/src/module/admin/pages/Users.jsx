@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Eye, Ban, Edit2, CheckCircle, XCircle, User, Mail, Phone, Wallet, Users as UsersIcon, Calendar, ArrowRight, TrendingUp, Save, Trash2, ShieldAlert, FileText, Camera, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { Search, Eye, Ban, Edit2, CheckCircle, XCircle, User, Mail, Phone, Wallet, Users as UsersIcon, Calendar, ArrowRight, TrendingUp, Save, Trash2 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import StatusBadge from '../components/StatusBadge';
 import api from '../../shared/services/api';
@@ -20,9 +20,6 @@ const Users = () => {
     // Edit Modal State
     const [editingUser, setEditingUser] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-    // KYC Approval State
-    const [kycActionLoading, setKycActionLoading] = useState(false);
 
     // ── Logic ──
     useEffect(() => {
@@ -45,7 +42,8 @@ const Users = () => {
                     wallet: `₹${parseFloat(u.wallet?.balance || 0).toFixed(2)}`,
                     status: u.isBlocked ? 'Blocked' : 'Active',
                     joined: new Date(u.createdAt).toLocaleDateString(),
-                    kyc: u.kyc || { status: 'Not Started' },
+                    isPaid: !!u.isPaid,
+                    cardStatus: u.withdrawalCard?.status || 'none',
                     isBlocked: u.isBlocked || false
                 }));
                 
@@ -75,29 +73,6 @@ const Users = () => {
             }
         } catch (err) {
             console.error("Toggle Status Error:", err);
-        }
-    };
-
-    const handleManageKyc = async (id, status) => {
-        let rejectionReason = '';
-        if (status === 'Rejected') {
-            rejectionReason = window.prompt("Enter rejection reason:");
-            if (!rejectionReason) return;
-        }
-
-        setKycActionLoading(true);
-        try {
-            const response = await api.put(`/admin/users/${id}/kyc`, { status, rejectionReason });
-            if (response.success) {
-                fetchUsers();
-                // Close drawer or update locally
-                setIsDrawerOpen(false);
-            }
-        } catch (err) {
-            console.error("KYC Manage Error:", err);
-            alert("Failed to update KYC status");
-        } finally {
-            setKycActionLoading(false);
         }
     };
 
@@ -216,7 +191,7 @@ const Users = () => {
                             <tr className="border-b border-slate-50 bg-slate-50/50">
                                 <th className="text-left px-5 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">User</th>
                                 <th className="text-left px-5 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Mobile</th>
-                                <th className="text-center px-5 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">KYC Status</th>
+                                <th className="text-center px-5 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Virtual Account</th>
                                 <th className="text-left px-5 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Earnings</th>
                                 <th className="text-left px-5 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Wallet</th>
                                 <th className="text-left px-5 py-4 text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Status</th>
@@ -240,10 +215,17 @@ const Users = () => {
                                     <td className="px-5 py-4 text-[13px] font-medium text-slate-600 tabular-nums font-['Poppins']">{user.mobile}</td>
                                     <td className="px-5 py-4">
                                         <div className="flex flex-col items-center gap-0.5">
-                                            <StatusBadge status={user.kyc.status} />
-                                            {(user.kyc.status === 'Pending' || user.kyc.status === 'pending') && (
-                                                <span className="text-[8px] font-semibold text-amber-500 uppercase tracking-tighter font-['Poppins']">Requires Review</span>
-                                            )}
+                                            <StatusBadge
+                                                status={
+                                                    user.isPaid && String(user.cardStatus).toLowerCase() === 'active'
+                                                        ? 'Active'
+                                                        : String(user.cardStatus).toLowerCase() === 'expired'
+                                                            ? 'Expired'
+                                                            : String(user.cardStatus).toLowerCase() === 'pending_approval'
+                                                                ? 'Pending'
+                                                                : 'None'
+                                                }
+                                            />
                                         </div>
                                     </td>
                                     <td className="px-5 py-4 text-[13px] font-semibold text-emerald-600 font-['Poppins']">{user.earnings}</td>
@@ -253,9 +235,6 @@ const Users = () => {
                                         <div className="flex items-center justify-center gap-2">
                                             <button onClick={() => openDetails(user)} title="View Detail" className="w-8 h-8 bg-sky-50 hover:bg-sky-500 hover:text-white text-sky-500 rounded-xl flex items-center justify-center transition-all active:scale-90 border border-sky-100/50 relative">
                                                 <Eye size={14} />
-                                                {(user.kyc.status === 'Pending' || user.kyc.status === 'pending') && (
-                                                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-500 border-2 border-white rounded-full animate-pulse"></span>
-                                                )}
                                             </button>
                                             <button onClick={() => openEdit(user)} title="Edit User" className="w-8 h-8 bg-slate-50 hover:bg-slate-200 text-slate-400 hover:text-slate-600 rounded-xl flex items-center justify-center transition-all active:scale-90 border border-slate-100/50">
                                                 <Edit2 size={14} />
@@ -346,58 +325,25 @@ const Users = () => {
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-4 space-y-5 scrollbar-hide">
-                            {/* KYC Approval Card (Crucial Part) */}
-                            <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden p-4 space-y-5 font-['Poppins']">
+                            {/* Virtual Account summary */}
+                            <div className="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden p-4 space-y-3 font-['Poppins']">
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2 text-slate-400">
-                                        <ShieldAlert size={14} className="text-amber-500" />
-                                        <span className="text-[10px] font-semibold uppercase tracking-normal font-['Poppins']">KYC Verification</span>
-                                    </div>
-                                    <StatusBadge status={activeUserInDrawer.kyc.status} />
+                                    <span className="text-[10px] font-semibold uppercase tracking-normal text-slate-400 font-['Poppins']">Virtual Account</span>
+                                    <StatusBadge
+                                        status={
+                                            activeUserInDrawer.isPaid && String(activeUserInDrawer.cardStatus).toLowerCase() === 'active'
+                                                ? 'Active'
+                                                : String(activeUserInDrawer.cardStatus).toLowerCase() === 'expired'
+                                                    ? 'Expired'
+                                                    : String(activeUserInDrawer.cardStatus).toLowerCase() === 'pending_approval'
+                                                        ? 'Pending'
+                                                        : 'None'
+                                        }
+                                    />
                                 </div>
-
-                                {activeUserInDrawer.kyc.documentImage ? (
-                                    <div className="space-y-4">
-                                        <div className="relative group rounded-lg overflow-hidden border border-slate-100 aspect-video bg-slate-50">
-                                            <img src={activeUserInDrawer.kyc.documentImage} alt="KYC" className="w-full h-full object-cover" />
-                                            <a href={activeUserInDrawer.kyc.documentImage} target="_blank" rel="noreferrer" className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-[2px]">
-                                                <button className="bg-white text-slate-900 px-4 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-normal shadow-xl font-['Poppins']">View Full Size</button>
-                                            </a>
-                                        </div>
-                                        <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                            <FileText size={16} className="text-slate-400" />
-                                            <div>
-                                                <p className="text-[8px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">Aadhaar Number</p>
-                                                <p className="text-[13px] font-semibold text-slate-700 tracking-tight tabular-nums font-['Poppins']">{activeUserInDrawer.kyc.documentNumber || 'N/A'}</p>
-                                            </div>
-                                        </div>
-
-                                        {/* Approval Buttons */}
-                                        {(activeUserInDrawer.kyc.status === 'Pending' || activeUserInDrawer.kyc.status === 'pending') && (
-                                            <div className="grid grid-cols-2 gap-3 pt-2">
-                                                <button 
-                                                    disabled={kycActionLoading}
-                                                    onClick={() => handleManageKyc(activeUserInDrawer.id, 'Approved')}
-                                                    className="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-lg text-[10px] font-semibold uppercase tracking-normal shadow-lg shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50 font-['Poppins']"
-                                                >
-                                                    {kycActionLoading ? <Loader2 size={14} className="animate-spin" /> : <><Check size={14} /> Approve</>}
-                                                </button>
-                                                <button 
-                                                    disabled={kycActionLoading}
-                                                    onClick={() => handleManageKyc(activeUserInDrawer.id, 'Rejected')}
-                                                    className="flex items-center justify-center gap-2 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white py-3.5 rounded-lg text-[10px] font-semibold uppercase tracking-normal border border-rose-100 transition-all active:scale-95 disabled:opacity-50 font-['Poppins']"
-                                                >
-                                                    <XCircle size={14} /> Reject
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="py-8 flex flex-col items-center justify-center gap-3 bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                                        <Camera size={24} className="text-slate-300" />
-                                        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-normal font-['Poppins']">No Document Uploaded</p>
-                                    </div>
-                                )}
+                                <p className="text-[11px] text-slate-500 leading-snug">
+                                    Login / Register only. Withdrawals require an active Virtual Account.
+                                </p>
                             </div>
 
                             {/* Info Grid */}

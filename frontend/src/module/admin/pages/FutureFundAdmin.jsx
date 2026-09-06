@@ -344,7 +344,7 @@ const FutureFundAdmin = () => {
                         </div>
 
                         <p className="text-[10px] text-slate-500 leading-relaxed mb-4">
-                            These 3 numbers are the user activation criteria: 10 Successful KYC, 50 Advertisement Videos, 50 Tasks. After unlock, the active screen uses daily ad/task progress, not these lifetime totals.
+                            These 3 numbers are the user activation criteria: 10 Successful Invites, 50 Advertisement Videos, 50 Tasks. After unlock, the active screen uses daily ad/task progress, not these lifetime totals.
                         </p>
 
                         {/* Profit Distribution Tiers */}
@@ -376,7 +376,7 @@ const FutureFundAdmin = () => {
                     </div>
                     
                     <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-100 text-[10px] text-slate-400 font-medium leading-normal">
-                        These 3 targets match the user app unlock screen: invited KYC, ad videos, and small tasks. Save writes them to the database used by the live Future Fund page.
+                        These 3 targets match the user app unlock screen: registered invites, ad videos, and small tasks. Save writes them to the database used by the live Future Fund page.
                     </div>
                 </div>
             </div>
@@ -386,7 +386,7 @@ const FutureFundAdmin = () => {
                 <div className="p-4 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-indigo-100 font-medium">FF</div>
-                        <div><h2 className="text-sm font-medium text-slate-800 uppercase tracking-normal">User Progress Tracker</h2><p className="text-[10px] text-slate-400 font-medium uppercase tracking-tighter leading-none mt-1">KYC + Ads + Tasks</p></div>
+                        <div><h2 className="text-sm font-medium text-slate-800 uppercase tracking-normal">User Progress Tracker</h2><p className="text-[10px] text-slate-400 font-medium uppercase tracking-tighter leading-none mt-1">Invites + Ads + Tasks</p></div>
                     </div>
                     <div className="relative w-full md:w-80">
                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none" />
