@@ -12,6 +12,7 @@ import PageHeader from '../components/PageHeader';
 import { contentStorage } from '../../shared/services/contentStorage';
 import api from '../../shared/services/api';
 import { useAdmin } from '../context/AdminContext';
+import { DEFAULT_VA_GUIDE, VA_GUIDE_CONTENT_KEY } from '../../user/data/vaGuideDefaults';
 
 const ICON_MAP = {
     ShieldCheck, ListChecks, UserPlus, CreditCard, TrendingUp,
@@ -231,6 +232,7 @@ const MarketingManager = () => {
 
     // ── All User Guides List & CMS ──
     const ALL_GUIDES_LIST = [
+        { id: 'va-popup', label: 'VA Login Popup', dbKey: VA_GUIDE_CONTENT_KEY, icon: CreditCard },
         { id: 'explore-now', label: 'Explore Now Guide', dbKey: 'explore_now_guide', icon: Compass },
         { id: 'kyc', label: 'Get Started', dbKey: 'guide_kyc', icon: ShieldCheck },
         { id: 'invite', label: 'How to Invite?', dbKey: 'guide_invite', icon: UserPlus },
@@ -256,14 +258,15 @@ const MarketingManager = () => {
             if (res && res.success && res.data) {
                 const guideContent = res.data.data || res.data;
                 const isDummy = guideContent.title === 'Default Title' && guideContent.description === 'Content pending admin setup.';
-                if (guideContent && typeof guideContent === 'object' && !isDummy && (guideContent.title || guideContent.content)) {
+                if (guideContent && typeof guideContent === 'object' && !isDummy && (guideContent.title || guideContent.content || (Array.isArray(guideContent.points) && guideContent.points.length))) {
                     setExploreGuide({
-                        badge: guideContent.badge || 'YOUR GROWTH OUR GUIDANCE',
+                        badge: guideContent.badge || guideContent.eyebrow || (guideId === 'va-popup' ? DEFAULT_VA_GUIDE.badge : 'YOUR GROWTH OUR GUIDANCE'),
                         title: guideContent.title || guideMeta.label,
                         subtitle: guideContent.subtitle || guideContent.description || '',
                         logoUrl: guideContent.logoUrl || '',
-                        ctaText: guideContent.ctaText || 'Start Earning Now',
-                        nextRoute: guideContent.nextRoute || guideContent.next || '/user/earn',
+                        ctaText: guideContent.ctaText || (guideId === 'va-popup' ? DEFAULT_VA_GUIDE.ctaText : 'Start Earning Now'),
+                        laterText: guideContent.laterText || DEFAULT_VA_GUIDE.laterText,
+                        nextRoute: guideContent.nextRoute || guideContent.next || (guideId === 'va-popup' ? DEFAULT_VA_GUIDE.nextRoute : '/user/earn'),
                         content: guideContent.content || (Array.isArray(guideContent.points) ? guideContent.points.map(p => typeof p === 'string' ? p : `${p.title}\n${p.text}`).join('\n\n') : ''),
                         points: Array.isArray(guideContent.points) ? guideContent.points : []
                     });
@@ -274,7 +277,9 @@ const MarketingManager = () => {
             console.error('Error fetching guide:', err);
         }
         // Fallback default
-        if (guideId === 'explore-now') {
+        if (guideId === 'va-popup') {
+            setExploreGuide({ ...DEFAULT_VA_GUIDE, content: '', logoUrl: '' });
+        } else if (guideId === 'explore-now') {
             setExploreGuide(DEFAULT_EXPLORE_GUIDE);
         } else if (guideId === 'affiliate-how') {
             setExploreGuide({
@@ -323,11 +328,26 @@ const MarketingManager = () => {
         setIsSavingGuide(true);
         const guideMeta = ALL_GUIDES_LIST.find(g => g.id === selectedGuideId) || ALL_GUIDES_LIST[0];
         try {
+            const dataToSave = selectedGuideId === 'va-popup'
+                ? {
+                    badge: exploreGuide.badge || DEFAULT_VA_GUIDE.badge,
+                    title: exploreGuide.title || DEFAULT_VA_GUIDE.title,
+                    subtitle: exploreGuide.subtitle || DEFAULT_VA_GUIDE.subtitle,
+                    ctaText: exploreGuide.ctaText || DEFAULT_VA_GUIDE.ctaText,
+                    laterText: exploreGuide.laterText || DEFAULT_VA_GUIDE.laterText,
+                    nextRoute: exploreGuide.nextRoute || DEFAULT_VA_GUIDE.nextRoute,
+                    points: (exploreGuide.points || []).map((p) => ({
+                        icon: p.icon || 'wallet',
+                        title: String(p.title || '').trim(),
+                        text: String(p.text || '').trim(),
+                    })).filter((p) => p.title || p.text),
+                }
+                : exploreGuide;
             const payload = {
                 key: guideMeta.dbKey,
-                title: exploreGuide.title || guideMeta.label,
-                description: exploreGuide.subtitle || 'User Guide Content',
-                data: exploreGuide
+                title: dataToSave.title || guideMeta.label,
+                description: dataToSave.subtitle || 'User Guide Content',
+                data: dataToSave
             };
             const res = await api.post('/admin/content', payload);
             if (res && res.success) {
@@ -346,9 +366,31 @@ const MarketingManager = () => {
 
     const handleLoadDefaultTemplate = () => {
         if (window.confirm("Reset this guide to recommended default template?")) {
+            if (selectedGuideId === 'va-popup') {
+                setExploreGuide({ ...DEFAULT_VA_GUIDE, content: '', logoUrl: '' });
+                addNotification("Info", "VA popup defaults loaded. Click 'Save Guide' to publish.", "info");
+                return;
+            }
             fetchGuideData(selectedGuideId);
             addNotification("Info", "Default template loaded. Click 'Save Guide' to publish.", "info");
         }
+    };
+
+    const updateVaPoint = (index, field, value) => {
+        const points = [...(exploreGuide.points || [])];
+        points[index] = { ...(points[index] || {}), [field]: value };
+        setExploreGuide({ ...exploreGuide, points });
+    };
+
+    const addVaPoint = () => {
+        const points = [...(exploreGuide.points || [])];
+        points.push({ icon: 'wallet', title: 'New point', text: 'Describe this benefit…' });
+        setExploreGuide({ ...exploreGuide, points });
+    };
+
+    const removeVaPoint = (index) => {
+        const points = (exploreGuide.points || []).filter((_, i) => i !== index);
+        setExploreGuide({ ...exploreGuide, points });
     };
 
     const movePoint = (index, direction) => {
@@ -454,7 +496,8 @@ const MarketingManager = () => {
 
                                     <div className="space-y-3 text-[11.5px]">
                                         {/* Header Logo & Target Route */}
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div className={`grid grid-cols-1 ${selectedGuideId === 'va-popup' ? '' : 'sm:grid-cols-2'} gap-3`}>
+                                            {selectedGuideId !== 'va-popup' && (
                                             <div className="space-y-1">
                                                 <label className="text-[11px] font-medium text-slate-600">Header Logo Image</label>
                                                 <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 rounded-lg p-1">
@@ -509,13 +552,14 @@ const MarketingManager = () => {
                                                     </label>
                                                 </div>
                                             </div>
+                                            )}
 
                                             <div className="space-y-1">
                                                 <label className="text-[11px] font-medium text-slate-600">Button Target Route</label>
                                                 <input
                                                     value={exploreGuide.nextRoute || ''}
                                                     onChange={(e) => setExploreGuide({ ...exploreGuide, nextRoute: e.target.value })}
-                                                    placeholder="e.g. /user/earn"
+                                                    placeholder="e.g. /user/virtual-account"
                                                     className="w-full bg-slate-50 border border-slate-200/80 rounded-lg px-3 py-1.5 text-[11.5px] font-normal text-slate-800 outline-none focus:bg-white focus:border-slate-400 transition-colors"
                                                 />
                                             </div>
@@ -524,11 +568,11 @@ const MarketingManager = () => {
                                         {/* Top Badge & CTA Button Text */}
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                             <div className="space-y-1">
-                                                <label className="text-[11px] font-medium text-slate-600">Top Badge Tag</label>
+                                                <label className="text-[11px] font-medium text-slate-600">{selectedGuideId === 'va-popup' ? 'Eyebrow Label' : 'Top Badge Tag'}</label>
                                                 <input
                                                     value={exploreGuide.badge || ''}
                                                     onChange={(e) => setExploreGuide({ ...exploreGuide, badge: e.target.value })}
-                                                    placeholder="e.g. YOUR GROWTH OUR GUIDANCE"
+                                                    placeholder={selectedGuideId === 'va-popup' ? 'e.g. Quick guide' : 'e.g. YOUR GROWTH OUR GUIDANCE'}
                                                     className="w-full bg-slate-50 border border-slate-200/80 rounded-lg px-3 py-1.5 text-[11.5px] font-normal text-slate-800 outline-none focus:bg-white focus:border-slate-400 transition-colors"
                                                 />
                                             </div>
@@ -537,11 +581,23 @@ const MarketingManager = () => {
                                                 <input
                                                     value={exploreGuide.ctaText || ''}
                                                     onChange={(e) => setExploreGuide({ ...exploreGuide, ctaText: e.target.value })}
-                                                    placeholder="e.g. Start Earning Now"
+                                                    placeholder="e.g. Buy Virtual Account"
                                                     className="w-full bg-slate-50 border border-slate-200/80 rounded-lg px-3 py-1.5 text-[11.5px] font-normal text-slate-800 outline-none focus:bg-white focus:border-slate-400 transition-colors"
                                                 />
                                             </div>
                                         </div>
+
+                                        {selectedGuideId === 'va-popup' && (
+                                            <div className="space-y-1">
+                                                <label className="text-[11px] font-medium text-slate-600">Secondary Link Text</label>
+                                                <input
+                                                    value={exploreGuide.laterText || ''}
+                                                    onChange={(e) => setExploreGuide({ ...exploreGuide, laterText: e.target.value })}
+                                                    placeholder="e.g. Maybe later"
+                                                    className="w-full bg-slate-50 border border-slate-200/80 rounded-lg px-3 py-1.5 text-[11.5px] font-normal text-slate-800 outline-none focus:bg-white focus:border-slate-400 transition-colors"
+                                                />
+                                            </div>
+                                        )}
 
                                         {/* Main Title & Subtitle */}
                                         <div className="space-y-1">
@@ -549,7 +605,7 @@ const MarketingManager = () => {
                                             <input
                                                 value={exploreGuide.title || ''}
                                                 onChange={(e) => setExploreGuide({ ...exploreGuide, title: e.target.value })}
-                                                placeholder="e.g. Complete Platform Guide & Growth Steps"
+                                                placeholder="e.g. How to purchase Virtual Account"
                                                 className="w-full bg-slate-50 border border-slate-200/80 rounded-lg px-3 py-1.5 text-[12px] font-medium text-slate-800 outline-none focus:bg-white focus:border-slate-400 transition-colors"
                                             />
                                         </div>
@@ -564,7 +620,70 @@ const MarketingManager = () => {
                                             />
                                         </div>
 
-                                        {/* Complete Guide Content */}
+                                        {selectedGuideId === 'va-popup' ? (
+                                            <div className="space-y-2 pt-2 border-t border-slate-100">
+                                                <div className="flex items-center justify-between">
+                                                    <label className="text-[11px] font-medium text-slate-700">Popup Points</label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={addVaPoint}
+                                                        className="inline-flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded text-[10px] font-medium"
+                                                    >
+                                                        <Plus size={11} /> Add point
+                                                    </button>
+                                                </div>
+                                                <p className="text-[10px] text-slate-500">Login par dikhne wale benefit points — title, text aur icon edit karein.</p>
+                                                <div className="space-y-2">
+                                                    {(exploreGuide.points || []).map((point, idx) => (
+                                                        <div key={idx} className="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 space-y-1.5">
+                                                            <div className="flex items-center justify-between gap-2">
+                                                                <span className="text-[10px] font-semibold text-slate-500">Point {idx + 1}</span>
+                                                                <div className="flex items-center gap-1">
+                                                                    <button type="button" onClick={() => movePoint(idx, -1)} className="p-1 rounded bg-white border border-slate-200 text-slate-500 hover:text-slate-800" title="Move up">
+                                                                        <ArrowUp size={11} />
+                                                                    </button>
+                                                                    <button type="button" onClick={() => movePoint(idx, 1)} className="p-1 rounded bg-white border border-slate-200 text-slate-500 hover:text-slate-800" title="Move down">
+                                                                        <ArrowDown size={11} />
+                                                                    </button>
+                                                                    <button type="button" onClick={() => removeVaPoint(idx)} className="p-1 rounded bg-white border border-rose-200 text-rose-500 hover:bg-rose-50" title="Remove">
+                                                                        <Trash2 size={11} />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                                                                <select
+                                                                    value={point.icon || 'wallet'}
+                                                                    onChange={(e) => updateVaPoint(idx, 'icon', e.target.value)}
+                                                                    className="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] text-slate-800 outline-none"
+                                                                >
+                                                                    <option value="wallet">Wallet</option>
+                                                                    <option value="card">Card</option>
+                                                                    <option value="shield">Shield</option>
+                                                                    <option value="sparkles">Sparkles</option>
+                                                                </select>
+                                                                <input
+                                                                    value={point.title || ''}
+                                                                    onChange={(e) => updateVaPoint(idx, 'title', e.target.value)}
+                                                                    placeholder="Point title"
+                                                                    className="sm:col-span-2 bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11.5px] font-medium text-slate-800 outline-none"
+                                                                />
+                                                            </div>
+                                                            <textarea
+                                                                value={point.text || ''}
+                                                                onChange={(e) => updateVaPoint(idx, 'text', e.target.value)}
+                                                                placeholder="Point description..."
+                                                                rows={2}
+                                                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-[11px] text-slate-700 outline-none resize-y leading-relaxed"
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                    {!(exploreGuide.points || []).length && (
+                                                        <p className="text-center text-[11px] text-slate-400 py-4">No points yet — click Add point.</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                        /* Complete Guide Content */
                                         <div className="space-y-1.5 pt-2 border-t border-slate-100">
                                             <div className="flex items-center justify-between">
                                                 <label className="text-[11px] font-medium text-slate-700">Guide Content (Hindi / English)</label>
@@ -599,6 +718,7 @@ const MarketingManager = () => {
                                                 className="w-full bg-slate-50 border border-slate-200/80 rounded-lg p-3 text-[11.5px] font-normal text-slate-800 h-56 outline-none focus:bg-white focus:border-slate-400 transition-colors resize-y leading-relaxed font-sans"
                                             />
                                         </div>
+                                        )}
 
                                         <button
                                             type="button"
@@ -647,6 +767,32 @@ const MarketingManager = () => {
 
                                     {/* Single Sheet Content */}
                                     <div className="flex-1 overflow-y-auto pr-1 -mt-1 custom-scrollbar">
+                                        {selectedGuideId === 'va-popup' ? (
+                                            <div className="space-y-1.5">
+                                                {(exploreGuide.points || []).map((p, idx) => {
+                                                    const iconKey = String(p.icon || 'wallet').toLowerCase();
+                                                    const PreviewIcon =
+                                                        iconKey === 'card' || iconKey === 'creditcard' ? CreditCard
+                                                            : iconKey === 'shield' || iconKey === 'shieldcheck' ? ShieldCheck
+                                                                : iconKey === 'sparkles' || iconKey === 'star' ? Sparkles
+                                                                    : Wallet;
+                                                    return (
+                                                    <div key={idx} className="flex gap-2 bg-white border border-[#EDE4DC] rounded-xl px-2 py-1.5">
+                                                        <div className="w-6 h-6 rounded-lg bg-[#FFF5F0] text-[#462211] flex items-center justify-center shrink-0">
+                                                            <PreviewIcon size={11} strokeWidth={2.2} />
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <p className="text-[10px] font-semibold text-[#462211] leading-tight">{p.title || 'Point'}</p>
+                                                            <p className="text-[8.5px] text-[#7A5648] mt-0.5 leading-snug">{p.text}</p>
+                                                        </div>
+                                                    </div>
+                                                    );
+                                                })}
+                                                {!(exploreGuide.points || []).length && (
+                                                    <p className="text-center text-slate-400 text-xs py-6">No points added yet</p>
+                                                )}
+                                            </div>
+                                        ) : (
                                         <div className="bg-white rounded-xl border border-[#EDE4DC] shadow-2xs p-2.5 space-y-2.5 text-[9.5px] text-[#7A5648] leading-relaxed">
                                             {(() => {
                                                 const contentStr = exploreGuide.content || (exploreGuide.points?.length ? exploreGuide.points.map(p => `${p.title}\n${p.text}`).join('\n\n') : '');
@@ -690,6 +836,7 @@ const MarketingManager = () => {
                                                 });
                                             })()}
                                         </div>
+                                        )}
                                     </div>
 
                                     {/* Simulated CTA */}
@@ -699,7 +846,7 @@ const MarketingManager = () => {
                                             <ArrowRight size={11} />
                                         </div>
                                         <div className="w-full text-center text-[9px] font-medium text-[#7A5648]">
-                                            Back to Home
+                                            {selectedGuideId === 'va-popup' ? (exploreGuide.laterText || 'Maybe later') : 'Back to Home'}
                                         </div>
                                     </div>
                                 </div>

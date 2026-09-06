@@ -51,7 +51,7 @@ const GuidePage = () => {
                             }
                             return point;
                         });
-                        setGuide({
+                        const nextGuide = {
                             title: d.title || fallbackGuide?.title || 'Guide',
                             subtitle: d.subtitle || d.description || fallbackGuide?.subtitle || '',
                             badge: d.badge || fallbackGuide?.badge || 'YOUR GROWTH OUR GUIDANCE',
@@ -60,7 +60,26 @@ const GuidePage = () => {
                             next: d.nextRoute || d.next || fallbackGuide?.next || '/user/earn',
                             ctaText: d.ctaText || fallbackGuide?.ctaText || 'Start Earning Now',
                             points: rawPoints
-                        });
+                        };
+                        const stillKyc =
+                            (activeSlug === 'invite' || activeSlug === 'affiliate-how') &&
+                            /\bKYC\b|Aadhaar/i.test(`${nextGuide.content || ''} ${JSON.stringify(nextGuide.points || [])}`);
+                        if (stillKyc && fallbackGuide) {
+                            setGuide({
+                                ...fallbackGuide,
+                                content: rewriteWalletCycleCopy(
+                                    fallbackGuide.content ||
+                                    (Array.isArray(fallbackGuide.points) && typeof fallbackGuide.points[0] === 'string'
+                                        ? fallbackGuide.points.join('\n\n')
+                                        : '')
+                                ),
+                                points: (fallbackGuide.points || []).map((point) =>
+                                    typeof point === 'string' ? rewriteWalletCycleCopy(point) : point
+                                ),
+                            });
+                        } else {
+                            setGuide(nextGuide);
+                        }
                         setLoading(false);
                         return;
                     }

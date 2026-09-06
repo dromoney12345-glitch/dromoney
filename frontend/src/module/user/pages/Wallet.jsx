@@ -9,6 +9,7 @@ import {
 import UnlockModal from '../components/UnlockModal';
 import api from '../../shared/services/api';
 import { getVaView } from '../utils/virtualAccount';
+import { isHiddenWalletTransaction } from '../../shared/utils/hiddenWalletTx';
 
 const Wallet = () => {
     const navigate = useNavigate();
@@ -329,12 +330,14 @@ const Wallet = () => {
     };
 
     const filteredTransactions = (wallet.transactions || []).filter(tx => {
+        if (isHiddenWalletTransaction(tx)) return false;
         if (filter === 'Earning') return tx.type === 'credit';
         if (filter === 'Payout') return tx.type === 'withdrawal' || tx.type === 'debit';
         return true;
     });
 
     const pendingFilteredTransactions = (wallet.transactions || []).filter((tx) => {
+        if (isHiddenWalletTransaction(tx)) return false;
         const t = `${tx.source || ''} ${tx.title || ''}`.toLowerCase();
         if (pendingFilter === 'Invite Earnings') return /invite|referral|refer/.test(t);
         if (pendingFilter === 'Task Earnings') return /task/.test(t);

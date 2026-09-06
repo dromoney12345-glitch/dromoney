@@ -13,6 +13,7 @@ import {
     ChevronLeft
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { isHiddenWalletTransaction } from '../../shared/utils/hiddenWalletTx';
 
 const History = () => {
     const { userData } = useUser();
@@ -110,7 +111,7 @@ const History = () => {
                     </div>
 
                     <div className="flex flex-col">
-                        {(!userData?.wallet?.transactions || userData?.wallet?.transactions.length === 0) ? (
+                        {(!userData?.wallet?.transactions || userData.wallet.transactions.filter((t) => !isHiddenWalletTransaction(t)).length === 0) ? (
                             <div className="bg-white/60 backdrop-blur-sm border border-slate-100 p-8 text-center shadow-sm">
                                 <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-100">
                                     <HistoryIcon className="text-slate-300" size={24} />
@@ -119,7 +120,7 @@ const History = () => {
                                 <p className="text-[11px] text-slate-400 mt-1">Transactions will appear here.</p>
                             </div>
                         ) : (
-                            userData.wallet.transactions.map((item, index) => (
+                            userData.wallet.transactions.filter((t) => !isHiddenWalletTransaction(t)).map((item, index) => (
                                 <div 
                                     key={item._id || index} 
                                     className="bg-white p-3.5 flex items-center justify-between shadow-sm border-b border-slate-100 last:border-b-0 group hover:bg-slate-50 transition-colors"

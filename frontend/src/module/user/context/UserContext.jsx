@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useMemo, useEffect } from '
 import api, { BASE_URL } from '../../shared/services/api';
 import io from 'socket.io-client';
 import { buildReferralLink, getPendingReferralCode, clearPendingReferralCode, savePendingReferralCode, fetchFlutterInstallReferrer, getReferralClickId, clearReferralClickId } from '../../shared/utils/referral';
+import { isHiddenWalletTransaction } from '../../shared/utils/hiddenWalletTx';
 import { installFcmTokenBridge, requestNativeFcmToken, saveFcmTokenToServer, readPendingFcmToken } from '../../shared/utils/fcmToken';
 import { showFlutterSystemNotification } from '../../shared/utils/flutterNotifications';
 
@@ -309,7 +310,9 @@ export const UserProvider = ({ children }) => {
     };
 
     const mapAndSetUserData = (dbUser, transactions = [], settings = {}) => {
-        const inrTransactions = transactions.filter(t => t.currency === 'INR');
+        const inrTransactions = transactions
+            .filter(t => t.currency === 'INR')
+            .filter(t => !isHiddenWalletTransaction(t));
 
         setUserData({
             name: dbUser.name,

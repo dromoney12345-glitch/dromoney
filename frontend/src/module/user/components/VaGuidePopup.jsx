@@ -1,36 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, CreditCard, Wallet, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
+import api from '../../shared/services/api';
+import { DEFAULT_VA_GUIDE, VA_GUIDE_CONTENT_KEY, normalizeVaGuide } from '../data/vaGuideDefaults';
 
-const GUIDE_POINTS = [
-    {
-        icon: Wallet,
-        title: 'Pending → Virtual',
-        text: 'Create a Virtual Account so Pending earnings can move to Virtual and stay withdrawable.',
-    },
-    {
-        icon: CreditCard,
-        title: 'Withdraw to UPI / Bank',
-        text: 'Withdrawals work only from an active Virtual Account (₹499 for 6 months).',
-    },
-    {
-        icon: ShieldCheck,
-        title: 'Early offer',
-        text: 'Pay within 3 days of registration: ₹399 stays as a 6-month reserve in Virtual (used at renewal).',
-    },
-    {
-        icon: Sparkles,
-        title: 'Protect your earnings',
-        text: 'Without a Virtual Account, Pending is cleared every 14 days (14, 28, 42…).',
-    },
-];
+const ICON_BY_KEY = {
+    wallet: Wallet,
+    card: CreditCard,
+    creditcard: CreditCard,
+    shield: ShieldCheck,
+    shieldcheck: ShieldCheck,
+    sparkles: Sparkles,
+    star: Sparkles,
+};
 
 /**
  * One-shot guide: how to buy Virtual Account + benefits.
- * Parent controls open/close; CTA navigates to /user/virtual-account.
+ * Copy is loaded from admin CMS key `popup_va_guide` (Marketing & Promos).
  */
 const VaGuidePopup = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
+    const [guide, setGuide] = useState(DEFAULT_VA_GUIDE);
 
     useEffect(() => {
         if (!isOpen) return undefined;
@@ -41,11 +31,36 @@ const VaGuidePopup = ({ isOpen, onClose }) => {
         };
     }, [isOpen]);
 
+    useEffect(() => {
+        if (!isOpen) return undefined;
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await api.get(`/public/content/${VA_GUIDE_CONTENT_KEY}`);
+                if (cancelled) return;
+                const payload = res?.data?.data || res?.data || res;
+                const isDummy =
+                    payload?.title === 'Default Title' &&
+                    payload?.description === 'Content pending admin setup.';
+                if (!isDummy && payload) {
+                    setGuide(normalizeVaGuide(payload));
+                } else {
+                    setGuide(DEFAULT_VA_GUIDE);
+                }
+            } catch {
+                if (!cancelled) setGuide(DEFAULT_VA_GUIDE);
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     const goBuy = () => {
         onClose();
-        navigate('/user/virtual-account');
+        navigate(guide.nextRoute || '/user/virtual-account');
     };
 
     return (
@@ -70,23 +85,23 @@ const VaGuidePopup = ({ isOpen, onClose }) => {
 
                     <div className="pr-10">
                         <p className="text-[9px] font-semibold uppercase tracking-widest text-[#9A8478] mb-1">
-                            Quick guide
+                            {guide.badge || 'Quick guide'}
                         </p>
                         <h2 className="text-[17px] font-semibold text-[#462211] leading-snug tracking-tight">
-                            How to purchase Virtual Account
+                            {guide.title}
                         </h2>
                         <p className="text-[12px] text-[#7A5648] mt-1 leading-snug">
-                            Unlock withdrawals and keep your earnings safe.
+                            {guide.subtitle}
                         </p>
                     </div>
                 </div>
 
                 <div className="px-4 py-3 space-y-2.5 max-h-[55vh] overflow-y-auto">
-                    {GUIDE_POINTS.map((row) => {
-                        const Icon = row.icon;
+                    {(guide.points || []).map((row, idx) => {
+                        const Icon = ICON_BY_KEY[String(row.icon || 'wallet').toLowerCase()] || Wallet;
                         return (
                             <div
-                                key={row.title}
+                                key={`${row.title}-${idx}`}
                                 className="flex gap-3 bg-white border border-[#EDE4DC] rounded-2xl px-3 py-2.5"
                             >
                                 <div className="w-9 h-9 rounded-xl bg-[#FFF5F0] text-[#462211] flex items-center justify-center shrink-0">
@@ -107,7 +122,7 @@ const VaGuidePopup = ({ isOpen, onClose }) => {
                         onClick={goBuy}
                         className="w-full bg-[#462211] text-white py-3.5 rounded-2xl text-[13px] font-semibold flex items-center justify-center gap-2 active:scale-[0.98]"
                     >
-                        Buy Virtual Account
+                        {guide.ctaText || 'Buy Virtual Account'}
                         <ArrowRight size={16} strokeWidth={2.4} />
                     </button>
                     <button
@@ -115,7 +130,7 @@ const VaGuidePopup = ({ isOpen, onClose }) => {
                         onClick={onClose}
                         className="w-full text-[11px] font-medium uppercase tracking-widest text-[#9A8478] py-2"
                     >
-                        Maybe later
+                        {guide.laterText || 'Maybe later'}
                     </button>
                 </div>
             </div>

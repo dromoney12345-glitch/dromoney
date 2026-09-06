@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { buildReferralLink } from '../../shared/utils/referral';
-import { defaultAffiliateHowItWorks, rewriteWalletCycleCopy } from '../utils/walletCycleCopy';
+import { defaultAffiliateHowItWorks, sanitizeAffiliateHowItWorks } from '../utils/walletCycleCopy';
 
 const Marketing = () => {
     const navigate = useNavigate();
@@ -69,14 +69,18 @@ const Marketing = () => {
                 const res = await api.get('/public/content/page_affiliate_how_it_works');
                 const d = res?.data?.data || res?.data || {};
                 const isDummy = d.title === 'Default Title';
-                const text = rewriteWalletCycleCopy(d.content || d.text || '');
-                if (!isDummy && text) setHowItWorks(text);
+                if (!isDummy && (d.content || d.text)) {
+                    setHowItWorks(sanitizeAffiliateHowItWorks(d.content || d.text, rewardAmount));
+                } else {
+                    setHowItWorks(defaultAffiliateHowItWorks(rewardAmount));
+                }
             } catch (err) {
                 console.error('Failed to load affiliate how-it-works', err);
+                setHowItWorks(defaultAffiliateHowItWorks(rewardAmount));
             }
         };
         loadHowItWorks();
-    }, []);
+    }, [rewardAmount]);
 
         const inviteBadge = (ref) => {
         if (ref.status === 'Completed') return 'Released';

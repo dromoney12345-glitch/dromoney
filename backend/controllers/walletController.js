@@ -412,7 +412,9 @@ exports.requestWithdrawal = asyncHandler(async (req, res, next) => {
 // @route   GET /api/user/wallet/transactions
 // @access  Private
 exports.getTransactions = asyncHandler(async (req, res, next) => {
-    const transactions = await Transaction.find({ user: req.user.id }).sort('-date');
+    const { isHiddenWalletTransaction } = require('../utils/hiddenWalletTx');
+    const rows = await Transaction.find({ user: req.user.id }).sort('-date');
+    const transactions = rows.filter((tx) => !isHiddenWalletTransaction(tx));
 
     res.status(200).json({
         success: true,

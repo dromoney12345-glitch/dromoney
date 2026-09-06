@@ -326,12 +326,11 @@ function buildWebJoinLink(code) {
 }
 
 /**
- * Shareable referral link.
- * Always use /join/CODE so the invite is recorded before Play Store download.
- * The join page then sends Android users to Play Store with Install Referrer.
+ * Shareable referral link — always the admin Play Store base + invite referrer.
+ * Matches Admin → Affiliates "Referral Base URL" so the link never flips to /join/.
  */
-export function buildReferralLink(code) {
-    return buildWebJoinLink(code);
+export function buildReferralLink(code, baseUrlFromSettings = '') {
+    return buildPlayStoreReferralLink(code, normalizeReferralLinkBaseUrl(baseUrlFromSettings));
 }
 
 export function captureReferralFromLocation(href) {

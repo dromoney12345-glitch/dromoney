@@ -73,13 +73,16 @@ After instant admin review, your Income center opens for 100% free access withou
             ctaText: 'Invite Friends Now',
             nextRoute: '/user/marketing',
             content: `🔗 1. Copy & Share Invite Link
-Copy your personal referral link from the Marketing section and share it via WhatsApp or social media.
+Copy your personal Play Store invite link from Affiliate Center and share via WhatsApp or social media.
 
-📱 2. Friend Completes KYC
-Your invited friend downloads the app and completes their Aadhaar verification.
+📱 2. Friend Registers
+Your friend downloads the app from that Play Store link and registers. The invite code is already inside the link.
 
-💰 3. Instant ₹200 Reward
-After KYC verification, ₹200 appears in your Pending Wallet. It moves to your Virtual Account when they create their Virtual Account.`
+💰 3. Instant ₹200 in Pending
+Right after they register, ₹200 appears in your Pending Wallet. It moves to your Virtual Account when they create their Virtual Account.
+
+✅ 4. Virtual Account unlock
+If they do not create a Virtual Account, their Pending is cleared every 14 days (14, 28, 42…) until they buy one.`
         }
     },
     {
@@ -257,7 +260,7 @@ Pay ₹499. Within 3 days of KYC, ₹399 is a 6-month reserve used at renewal.`
             logoUrl: '',
             ctaText: 'Invite Friends',
             nextRoute: '/user/marketing',
-            content: 'Share your invite link. After your friend completes KYC, ₹200 goes to your Pending Wallet. It moves to Virtual when they create a Virtual Account. If they do not create a Virtual Account, their Pending is cleared every 14 days (14, 28, 42…) until they buy one. After a 6-month Virtual Account expires, the same 14-day Pending cycle runs until they renew. Old Virtual balance is never deleted.'
+            content: 'Share your invite link. After your friend registers, ₹200 goes to your Pending Wallet. It moves to Virtual when they create a Virtual Account. If they do not create a Virtual Account, their Pending is cleared every 14 days (14, 28, 42…) until they buy one. After a 6-month Virtual Account expires, the same 14-day Pending cycle runs until they renew. Old Virtual balance is never deleted.'
         }
     }
 ];

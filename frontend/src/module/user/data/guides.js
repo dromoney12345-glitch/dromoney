@@ -36,12 +36,19 @@ Dromoney Users को अलग-अलग प्रकार की Opportunitie
         title: 'How to Invite',
         subtitle: 'Invite & Earn ₹200',
         next: '/user/marketing',
+        content: `🔗 1. अपनी personal Play Store invite link copy करें और WhatsApp या social media पर share करें।
+
+📱 2. Friend aapki invite link se Dromoney App download karke register karta hai. Invite code link ke andar already hota hai.
+
+💰 3. Register hote hi aapke Pending Wallet mein ₹200 aa jata hai.
+
+✅ 4. Jab friend Virtual Account banata hai, tab ye ₹200 aapke Virtual Account mein chala jata hai. Bina VA ke unka Pending har 14 din (14, 28, 42…) clear hota hai.`,
         points: [
-            'Copy or share your invite link.',
-            'Your friend pastes that link (or opens it) — the invite code is already inside the link — then registers.',
+            'Copy or share your Play Store invite link.',
+            'Your friend downloads from that link and registers — the invite code is already inside the link.',
             'Right after they register, ₹200 is added to your Pending Wallet.',
             'That ₹200 moves to your Virtual Account when they create their Virtual Account.',
-            'If they do not create a Virtual Account within 28 days, the ₹200 invite hold is removed. Their own Pending is also cleared every 14 days (14, 28, 42…) until they buy one.',
+            'If they do not create a Virtual Account, their Pending is cleared every 14 days (14, 28, 42…) until they buy one.',
         ],
     },
     fund: {
