@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 const DROMONEY_API = process.env.DROMONEY_API_PROXY || 'http://127.0.0.1:5001'
 
@@ -24,4 +27,5 @@ export default defineConfig({
     globals: true,
     setupFiles: './src/setupTests.js',
   }
-})
+});		
+
