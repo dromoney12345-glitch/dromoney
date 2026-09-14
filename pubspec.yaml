@@ -1,0 +1,85 @@
+name: webview_master_app
+description: A feature-rich Flutter WebView application with splash screen, onboarding, and permissions.
+publish_to: "none"
+# version: 1.0.0+1
+version: 1.0.9+16
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # WebView
+  flutter_inappwebview: ^6.1.5
+
+  # Permissions
+  permission_handler: ^13.0.2
+
+  # Local Storage
+  shared_preferences: ^2.3.2
+
+  # Network Connectivity
+  connectivity_plus: ^7.3.1
+
+  # HTTP Client
+  http: ^1.2.0
+
+  # UI
+  cupertino_icons: ^1.0.2
+
+  # Local Notification
+  flutter_local_notifications: ^22.3.0
+
+  # Firebase Cloud Messaging
+  firebase_core: ^4.14.0
+  firebase_messaging: ^16.6.0
+  url_launcher: ^6.3.2
+  dio: ^5.9.0
+  open_file: ^4.0.0
+  path_provider: ^2.1.5
+  image_picker: ^1.2.1
+  google_sign_in: ^6.3.0
+  firebase_auth: ^6.6.1
+  flutter_launcher_icons: ^0.14.4
+  geolocator: ^14.0.2
+  change_app_package_name: ^1.5.0
+  share_plus: ^13.3.0
+  google_mobile_ads: ^9.1.0 
+  google_fonts: ^8.2.1
+  app_links: ^7.2.1
+  play_install_referrer: ^0.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Linting
+  flutter_lints: ^6.0.0
+
+  # App Icon Generator
+
+# Flutter Launcher Icons Configuration
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png"
+  adaptive_icon_background: "#ffec3d"
+  adaptive_icon_foreground: "assets/images/logo.png"
+
+flutter:
+  uses-material-design: true
+
+  # Assets
+  assets:
+    - assets/images/
+    - assets/onboarding/
+
+  # Fonts (optional - uncomment to add custom fonts)
+  # fonts:
+  #   - family: CustomFont
+  #     fonts:
+  #       - asset: fonts/CustomFont-Regular.ttf
+  #       - asset: fonts/CustomFont-Bold.ttf
+  #         weight: 700
