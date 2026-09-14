@@ -13,15 +13,26 @@
         { "key": "Content-Type", "value": "application/json; charset=utf-8" },
         { "key": "Cache-Control", "value": "public, max-age=300" }
       ]
+    },
+    {
+      "source": "/api/assetlinks",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=300" }
+      ]
     }
   ],
   "rewrites": [
     {
       "source": "/.well-known/assetlinks.json",
-      "destination": "/assetlinks.json"
+      "destination": "/api/assetlinks"
     },
     {
-      "source": "/((?!assetlinks\\.json$).*)",
+      "source": "/assetlinks.json",
+      "destination": "/api/assetlinks"
+    },
+    {
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]
