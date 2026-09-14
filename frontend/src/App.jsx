@@ -138,6 +138,17 @@ const RootRedirect = () => {
 /** Unknown paths must NOT bounce to "/" (that re-reads lastRoute and can loop). */
 const CatchAllRedirect = () => {
   const { isAuthenticated, loading } = useUser();
+  const location = useLocation();
+
+  // Never hijack Digital Asset Links / static verification files into the login SPA.
+  if (location.pathname.startsWith('/.well-known') || location.pathname === '/assetlinks.json') {
+    return (
+      <pre style={{ padding: 16, whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 12 }}>
+        assetlinks.json is missing from this deploy. Redeploy frontend so /assetlinks.json is served as JSON.
+      </pre>
+    );
+  }
+
   if (loading) return <SilentBoot />;
   if (isAuthenticated) return <Navigate to="/user/home" replace />;
   return <Navigate to="/user/auth/login" replace />;
