@@ -62,11 +62,13 @@
                 android:name="flutter_deeplinking_enabled"
                 android:value="true"/>
 
-            <!-- Verified App Links: https://dromoney.com/join/CODE -->
+            <!-- Verified App Links: /referral?code= + /join/CODE -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https" android:host="dromoney.com" android:pathPrefix="/referral"/>
+                <data android:scheme="https" android:host="www.dromoney.com" android:pathPrefix="/referral"/>
                 <data android:scheme="https" android:host="dromoney.com" android:pathPrefix="/join"/>
                 <data android:scheme="https" android:host="www.dromoney.com" android:pathPrefix="/join"/>
                 <data android:scheme="https" android:host="dromoney.com" android:pathPrefix="/user/auth/register"/>
