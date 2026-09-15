@@ -6,7 +6,7 @@ import {
     History, CheckCircle2, Share2, ArrowUpRight, Wallet, TrendingUp, Trophy, Shield, Mail
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { buildReferralLink } from '../../shared/utils/referral';
+import { buildReferralLink, buildInviteShareText } from '../../shared/utils/referral';
 import { defaultAffiliateHowItWorks, sanitizeAffiliateHowItWorks } from '../utils/walletCycleCopy';
 
 const Marketing = () => {
@@ -15,7 +15,6 @@ const Marketing = () => {
     const { userData, refreshUserProfile } = useUser();
     const [copied, setCopied] = useState(false);
     const [rewardAmount, setRewardAmount] = useState(200);
-    const [linkBase, setLinkBase] = useState('');
     const [showReferralLink, setShowReferralLink] = useState(location.state?.showReferral || false);
     const [showShareModal, setShowShareModal] = useState(false);
     const [referrals, setReferrals] = useState([]);
@@ -23,10 +22,8 @@ const Marketing = () => {
     const [howItWorks, setHowItWorks] = useState('');
 
     const referralCode = userData?.referrals?.code || '';
-    const referralLink = buildReferralLink(referralCode, linkBase);
-    const inviteShareText = referralCode
-        ? `Hey! Join Dromoney and start earning 🚀\n\nInvite code: ${referralCode}\n${referralLink}`
-        : `Hey! Join Dromoney and start earning 🚀\n\n${referralLink}`;
+    const referralLink = buildReferralLink(referralCode);
+    const inviteShareText = buildInviteShareText(referralCode, referralLink);
 
     React.useEffect(() => {
         const fetchSettings = async () => {
@@ -34,7 +31,6 @@ const Marketing = () => {
                 const res = await api.get('/public/settings');
                 if (res.success && res.data) {
                     setRewardAmount(res.data.referralCommission || 200);
-                    setLinkBase(res.data.referralLinkBaseUrl || '');
                 }
             } catch (err) {
                 console.error("Failed to fetch referral settings", err);

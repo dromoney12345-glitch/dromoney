@@ -334,7 +334,7 @@ export const UserProvider = ({ children }) => {
             referrals: {
                 count: dbUser.referralCount || 0,
                 code: dbUser.referralCode,
-                link: buildReferralLink(dbUser.referralCode, settings?.referralLinkBaseUrl)
+                link: buildReferralLink(dbUser.referralCode)
             },
             wallet: {
                 balance: dbUser.wallet?.balance || 0,
