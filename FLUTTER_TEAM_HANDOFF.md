@@ -1,36 +1,26 @@
-# Flutter team handoff — Invite code autofill after Play Store install
+# Flutter team — referral link update (BlueRide-style)
 
-Website already expects this. Flutter must read Play Install Referrer and push it into the WebView.
+## New share format (website already sends this)
 
----
+```
+Join me on Dromoney! Using my invite code 9GNMQN to start earning 🚀
 
-## 1) `pubspec.yaml` — add dependencies
-
-```yaml
-dependencies:
-  flutter_inappwebview: ^6.1.5   # already if you use InAppWebView
-  play_install_referrer: ^0.5.0
-  app_links: ^7.2.1
-  shared_preferences: ^2.3.2
+App: https://dromoney.com/referral?code=9GNMQN
 ```
 
-Then run: `flutter pub get`
+## Flutter requirements
 
----
+### 1) App Links in `AndroidManifest.xml`
 
-## 2) `android/app/src/main/AndroidManifest.xml`
-
-Inside `<activity android:name=".MainActivity" ...>` add (keep existing MAIN/LAUNCHER filter):
+Add `/referral` (keep `/join` too):
 
 ```xml
-<meta-data
-    android:name="flutter_deeplinking_enabled"
-    android:value="true" />
-
 <intent-filter android:autoVerify="true">
     <action android:name="android.intent.action.VIEW" />
     <category android:name="android.intent.category.DEFAULT" />
     <category android:name="android.intent.category.BROWSABLE" />
+    <data android:scheme="https" android:host="dromoney.com" android:pathPrefix="/referral" />
+    <data android:scheme="https" android:host="www.dromoney.com" android:pathPrefix="/referral" />
     <data android:scheme="https" android:host="dromoney.com" android:pathPrefix="/join" />
     <data android:scheme="https" android:host="www.dromoney.com" android:pathPrefix="/join" />
     <data android:scheme="https" android:host="dromoney.com" android:pathPrefix="/user/auth/register" />
@@ -38,81 +28,44 @@ Inside `<activity android:name=".MainActivity" ...>` add (keep existing MAIN/LAU
 </intent-filter>
 ```
 
-Package name must be `com.dromoney.user` (matches website assetlinks).
+Updated file also in this repo: `android/app/src/main/AndroidManifest.xml`
 
----
+### 2) Deep link → WebView
 
-## 3) New file: `lib/services/referral_install_bridge.dart`
+When app opens from `https://dromoney.com/referral?code=XXXX`:
 
-Copy the full file from this repo:  
-`lib/services/referral_install_bridge.dart`
+1. Parse `code` query param  
+2. Load WebView to:  
+   `https://dromoney.com/user/auth/register?invite=XXXX`  
+   **or** inject: `window.savePendingReferral('XXXX')`
 
----
+### 3) Play Install Referrer (unchanged — still required)
 
-## 4) Wire into WebView (only change needed in your screen)
+After Play Store install from that flow, still call:
 
-### `main.dart` (before `runApp`)
+- `ReferralInstallBridge.instance.init()`
+- `registerWebViewHandlers(controller)`
+- `injectIntoWebView(controller)` on load
 
-```dart
-import 'services/referral_install_bridge.dart';
+File: `lib/services/referral_install_bridge.dart`
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await ReferralInstallBridge.instance.init(); // IMPORTANT: before WebView
-  runApp(const MyApp());
-}
+### 4) Packages
+
+```yaml
+play_install_referrer: ^0.5.0
+app_links: ^7.2.1
+shared_preferences: ^2.3.2
+flutter_inappwebview: ^6.x
 ```
 
-### Your `InAppWebView` widget
+## Flow
 
-```dart
-InAppWebView(
-  // ... your existing options / initialUrl ...
-  onWebViewCreated: (controller) {
-    ReferralInstallBridge.instance.registerWebViewHandlers(controller);
-    // keep any other handlers you already have
-  },
-  onLoadStop: (controller, url) async {
-    await ReferralInstallBridge.instance.injectIntoWebView(controller);
-    // keep any other onLoadStop logic
-  },
-)
-```
+1. User shares WhatsApp message with `/referral?code=`  
+2. Friend opens link → site saves code → Android browser goes to Play Store with referrer  
+3. Fresh install → Flutter reads Install Referrer → Sign Up autofill → register → ₹200 to referrer  
 
-That is enough. Website Sign Up will autofill invite code.
+## Test
 
----
-
-## 5) What website already listens for
-
-Flutter → Web:
-
-- `window.savePendingReferral(rawReferrerString)`
-- handlers: `getInstallReferrer`, `getPlayInstallReferrer`, `getReferrer`, `getReferralCode`
-
-Example Play referrer string:
-
-```text
-utm_source=invite&utm_medium=share&utm_content=9GNMQN&ref=9GNMQN
-```
-
----
-
-## 6) Test checklist
-
-1. Uninstall app completely  
-2. Open invite Play Store link (with `referrer=` / `ref=CODE`)  
-3. Install → open app → Sign Up  
-4. Invite code field should autofill  
-
-**Note:** Already-installed app pe Install Referrer nahi aata. Fresh Play install required.
-
----
-
-## 7) Website side (other team / DevOps)
-
-Deploy frontend so this returns JSON (not HTML):
-
-`https://dromoney.com/.well-known/assetlinks.json`
-
-File lives at: `frontend/public/.well-known/assetlinks.json`
+1. Share invite from Affiliate Center  
+2. Confirm message looks like BlueRide (code + `App: https://dromoney.com/referral?code=...`)  
+3. Uninstall app → open link → install → Sign Up shows code  
