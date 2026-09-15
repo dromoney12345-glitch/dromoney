@@ -251,7 +251,8 @@ function App() {
             <Route path="/login" element={<Navigate to="/user/auth/login" replace />} />
             <Route path="/register" element={<Navigate to="/user/auth/register" replace />} />
 
-            {/* Auth Module Routes (Always Public) */}
+            {/* Invite landing — BlueRide-style /referral?code= + legacy /join/:code */}
+            <Route path="/referral" element={<JoinReferral />} />
             <Route path="/join/:code" element={<JoinReferral />} />
             <Route path="/join" element={<JoinReferral />} />
             <Route path="/user/auth" element={<AuthLayout />}>

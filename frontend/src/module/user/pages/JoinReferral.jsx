@@ -10,8 +10,7 @@ import {
 } from '../../shared/utils/referral';
 
 /**
- * /join/:code — record the invite, then send Android browsers to Play Store
- * so a Play Store download can still be attributed to the referrer.
+ * /referral?code=XXX and /join/:code — save invite, then Play Store (Android) or Sign Up.
  */
 const JoinReferral = () => {
     const { code } = useParams();
@@ -23,6 +22,7 @@ const JoinReferral = () => {
 
         const run = async () => {
             const fromParam =
+                searchParams.get('code') ||
                 searchParams.get('invite') ||
                 searchParams.get('ref') ||
                 searchParams.get('referral') ||
@@ -52,8 +52,8 @@ const JoinReferral = () => {
                 || (typeof window !== 'undefined' && !!(window.Android || window.flutter_inappwebview))
                 || /; wv\)/i.test(ua);
 
-            // Chrome/Android browser: send them to Play Store with the invite referrer.
-            // In-app browsers (WhatsApp / Flutter) stay on Sign Up so the code is not lost.
+            // Chrome/Android browser: Play Store with Install Referrer.
+            // WhatsApp / Flutter WebView: keep code and open Sign Up.
             if (cleaned && android && !inAppWebView) {
                 window.location.replace(buildPlayStoreReferralLink(cleaned));
                 return;

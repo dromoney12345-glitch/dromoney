@@ -130,6 +130,15 @@ function extractFromUrlString(rawUrl) {
         const parts = url.pathname.split('/').filter(Boolean);
         const joinIdx = parts.findIndex((p) => p.toLowerCase() === 'join');
         if (joinIdx >= 0 && parts[joinIdx + 1]) return normalizeCode(parts[joinIdx + 1]);
+
+        // /referral?code=XXX — BlueRide-style path (code usually in query; path alone has none)
+        if (parts.some((p) => p.toLowerCase() === 'referral')) {
+            const fromQueryAgain =
+                looksLikeInviteCode(url.searchParams.get('code')) ||
+                looksLikeInviteCode(url.searchParams.get('ref')) ||
+                looksLikeInviteCode(url.searchParams.get('invite'));
+            if (fromQueryAgain) return fromQueryAgain;
+        }
     } catch {
         /* ignore */
     }
@@ -318,19 +327,38 @@ export function normalizeReferralLinkBaseUrl(raw) {
     }
 }
 
+/** Canonical public origin for shared invite links (WhatsApp / social). */
+const SHARE_ORIGIN = 'https://dromoney.com';
+
 function buildWebJoinLink(code) {
     const cleanCode = extractReferralCode(code);
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://dromoney.app';
+    const origin = typeof window !== 'undefined' ? window.location.origin : SHARE_ORIGIN;
     if (!cleanCode) return `${origin}/join`;
     return `${origin}/join/${cleanCode}`;
 }
 
 /**
- * Shareable referral link — always the admin Play Store base + invite referrer.
- * Matches Admin → Affiliates "Referral Base URL" so the link never flips to /join/.
+ * Clean shareable app link (BlueRide-style):
+ * https://dromoney.com/referral?code=9GNMQN
+ * Opens /referral → saves code → Play Store (Android) or Sign Up.
  */
-export function buildReferralLink(code, baseUrlFromSettings = '') {
-    return buildPlayStoreReferralLink(code, normalizeReferralLinkBaseUrl(baseUrlFromSettings));
+export function buildReferralLink(code) {
+    const cleanCode = extractReferralCode(code);
+    if (!cleanCode) return `${SHARE_ORIGIN}/referral`;
+    return `${SHARE_ORIGIN}/referral?code=${encodeURIComponent(cleanCode)}`;
+}
+
+/** WhatsApp / share sheet body — code + App link, like BlueRide. */
+export function buildInviteShareText(code, link) {
+    const cleanCode = extractReferralCode(code);
+    const appLink = link || buildReferralLink(cleanCode);
+    if (cleanCode) {
+        return (
+            `Join me on Dromoney! Using my invite code ${cleanCode} to start earning 🚀\n\n` +
+            `App: ${appLink}`
+        );
+    }
+    return `Join me on Dromoney and start earning 🚀\n\nApp: ${appLink}`;
 }
 
 export function captureReferralFromLocation(href) {
